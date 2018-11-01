@@ -1,5 +1,8 @@
-;;; Start
+;;; Package --- Summary
 
+;;; Commentary:
+
+;;; Code:
 (let ((normal-gc-cons-threshold (* 32 1024 1024))
       (init-gc-cons-threshold (* 192 1024 1024)))
   (setq gc-cons-threshold init-gc-cons-threshold)
@@ -32,7 +35,7 @@
 (require 'init-which-key)
 (require 'init-fonts)
 (require 'init-edit-utils)
-
+(require 'init-chinese)
 ;; Language
 (require 'init-rust)
 (require 'init-ahk)
@@ -44,5 +47,5 @@
   (load custom-file))
 
 (provide 'init)
-;;;end
+;;; init.el ends here
 
