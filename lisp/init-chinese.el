@@ -3,6 +3,7 @@
 ;;; Commentary:
 
 ;;; Code:
+;; emacs using Chinese input methdod
 (require-package 'pyim)
 (when (maybe-require-package 'pyim-basedict)
   (require 'pyim)
@@ -21,6 +22,10 @@
 (setq pyim-default-scheme 'quanpin
       pyim-page-length 5)
 
+
+;; English help
+(quelpa '(company-english-helper :fetcher github :repo "manateelazycat/company-english-helper"))
+(require 'company-english-helper)
 
 (provide 'init-chinese)
 ;;; init-chinese.el ends here

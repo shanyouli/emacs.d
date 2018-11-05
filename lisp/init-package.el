@@ -3,9 +3,13 @@
 (require 'package)
 (setq package-archives
       '( ;;官方
-	("melpa" . "https://melpa.org/packages/")
-	("gnu" . "https://elpa.gnu.org/packages/")
-	("org" . "http://orgmode.org/elpa/")))
+	;;("melpa" . "https://melpa.org/packages/")
+	;;("gnu" . "https://elpa.gnu.org/packages/")
+	;;("org" . "http://orgmode.org/elpa/")
+	("melpa" . "https://elpa.emacs-china.org/melpa/")
+	("gnu" . "https://elpa.emacs-china.org/gnu/")
+	("org" . "https://elpa.emacs-china.org/org/")
+	))
 
 ;; On-demand installation of packages
 (defun require-package (package &optional min-version no-refresh)

@@ -36,15 +36,25 @@
 (require 'init-fonts)
 (require 'init-edit-utils)
 (require 'init-chinese)
+(require 'init-magit)
 ;; Language
 (require 'init-rust)
 (require 'init-ahk)
+
+(require-package 'aurel)
+(autoload 'aurel-package-info "aurel" nil t)
+(autoload 'aurel-package-search "aurel" nil t)
+(autoload 'aurel-package-search-by-name "aurel" nil t)
+(autoload 'aurel-maintainer-search "aurel" nil t)
+(autoload 'aurel-installed-packages "aurel" nil t)
+
 
 (when (require 'time-date nil t)
   (message "Emacs startup time: %.3f seconds."
            (time-to-seconds (time-since emacs-load-start-time))))
 (when (file-exists-p custom-file)
   (load custom-file))
+
 
 (provide 'init)
 ;;; init.el ends here
