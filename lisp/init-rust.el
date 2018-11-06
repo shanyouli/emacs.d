@@ -1,4 +1,4 @@
-;; init-rust.el
+;;; init-rust.el --- Initialize Rust configurations
 
 ;; about racer Install
 ;; You maybe install rust-nightly
@@ -6,7 +6,16 @@
 ;; Installation 1--3
 ;; rustup toolchain add nightly
 ;; rustup component add rust-src
-;; cargo +nightly install rarcer
+;; cargo +nightly install racer
+
+;;; Commentary:
+;; rust languager
+
+;;; code:
+
+(eval-when-compile
+  (require 'init-elpa)
+  (require 'init-utils))
 
 (when (maybe-require-package 'rust-mode)
   (when (maybe-require-package 'racer)
@@ -20,4 +29,4 @@
     (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)))
 
 (provide 'init-rust)
-;;;end
+;;; init-rust.el ends here

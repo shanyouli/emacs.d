@@ -1,5 +1,7 @@
 
-;;init-package.el
+;;init-elpa.el
+
+;;; Code:
 (require 'package)
 (setq package-archives
       '( ;;官方
@@ -44,4 +46,5 @@ locate PACKAGE."
       quelpa-melpa-recipe-stores nil
       quelpa-self-upgrade-p nil)
 
-(provide 'init-package)
+(provide 'init-elpa)
+;;; init-elpa.el ends here

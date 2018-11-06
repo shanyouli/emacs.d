@@ -17,7 +17,7 @@
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
 
 (require 'init-utils)
-(require 'init-package)
+(require 'init-elpa)
 
 (require-package 'diminish)
 (require-package 'scratch)
@@ -49,12 +49,13 @@
 (autoload 'aurel-installed-packages "aurel" nil t)
 
 
-(when (require 'time-date nil t)
-  (message "Emacs startup time: %.3f seconds."
-           (time-to-seconds (time-since emacs-load-start-time))))
+
 (when (file-exists-p custom-file)
   (load custom-file))
 
+(when (require 'time-date nil t)
+  (message "Emacs startup time: %.3f seconds."
+           (time-to-seconds (time-since emacs-load-start-time))))
 
 (provide 'init)
 ;;; init.el ends here
