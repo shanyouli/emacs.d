@@ -40,6 +40,7 @@
 ;; Language
 (require 'init-rust)
 (require 'init-ahk)
+(require 'init-scheme)
 
 (require-package 'aurel)
 (autoload 'aurel-package-info "aurel" nil t)

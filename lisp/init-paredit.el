@@ -2,6 +2,9 @@
 ;; init-paredit
 (require-package 'paredit)
 (autoload 'enable-paredit-mode "paredit")
+(autoload 'paredit-mode "paredit"
+  "Minor mode for pseudostructurally editing Lisp code."
+  t)
 
 (defun maybe-map-paredit-newline ()
   (unless (or (memq major-mode '(inferior-emacs-lisp-mode cider-repl-mode))
