@@ -1,5 +1,14 @@
+;;; init-edit-utils.el --- Initialize edit-utils
 
-;; init-edit-utils.el
+;;; Commentary:
+;; edit-utils
+
+;;; Code:
+
+(eval-when-compile
+  ;;(require 'init-elpa)
+  )
+
 (require-package 'unfill)
 
 (when (fboundp 'electric-pair-mode)
@@ -61,4 +70,4 @@
 (setq auto-save-silent t)
 
 (provide 'init-edit-utils)
-;;;end
+;;; init-edit-utils.el ends here

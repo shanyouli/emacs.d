@@ -14,7 +14,7 @@
 ;;; code:
 
 (eval-when-compile
-  (require 'init-elpa)
+ ;; (require 'init-elpa)
   (require 'init-utils))
 
 (when (maybe-require-package 'rust-mode)

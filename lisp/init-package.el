@@ -1,7 +1,8 @@
 
-;;init-elpa.el
+;;init-package.el
 
 ;;; Code:
+
 (require 'package)
 (setq package-archives
       '( ;;官方
@@ -14,6 +15,7 @@
 	))
 
 ;; On-demand installation of packages
+;;;###autoload
 (defun require-package (package &optional min-version no-refresh)
   "Install given PACKAGE, optionally requiring MIN-VERSION.
 If NO-REFRESH is non-nil, the available package lists will not be
@@ -46,5 +48,5 @@ locate PACKAGE."
       quelpa-melpa-recipe-stores nil
       quelpa-self-upgrade-p nil)
 
-(provide 'init-elpa)
-;;; init-elpa.el ends here
+(provide 'init-package)
+;;; init-package.el ends here
