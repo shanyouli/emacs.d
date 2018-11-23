@@ -3,7 +3,7 @@
 ;; Copyright (C) 2018  lye li
 
 ;; Author: lye li <shanyouli6@gamil.com>
-;; Keywords: 
+;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,25 +20,16 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
-
-(use-package awsehell
+(quelpa '(awseshell :fetcher github :repo "manateelazycat/aweshell"))
+(use-package aweshell
   :ensure nil
-  :quelpa (awseshell :fetcher github :repo "manateelazycat/aweshell")
-  )
-
-(defun lye/eshell ()
-  (interactive)
-  (require 'aweshell)
-  (eshell))
-
-(defalias 'eshell 'lye/eshell)
+  :commands (aweshell-toggle aweshell-next aweshell-prev aweshell-next))
 
 
 
 
 (provide 'init-eshell)
 ;;; init-eshell.el ends here
-

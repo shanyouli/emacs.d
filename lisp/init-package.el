@@ -76,7 +76,6 @@
 (defvar my-necessary-packages '(
                                 use-package
                                 quelpa
-                                quelpa-use-package
                                 diminish
                                 bind-key))
 (dolist (package my-necessary-packages)
@@ -97,8 +96,7 @@
 
 (eval-when-compile
   (require 'use-package)
-  (require 'quelpa)
-  (require 'quelpa-use-package))
+  (require 'quelpa))
 
 ;; Extensions
 (use-package package-utils

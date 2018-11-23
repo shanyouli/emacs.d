@@ -26,21 +26,27 @@
 
 (use-package flycheck
   :diminish flycheck-mode
-  :hook (after-init . global-flycheck-mode)
+  :init (dolist (hook (list
+		       'scheme-mode-hook
+		       'python-mode-hook))
+	  (add-hook hook '(lambda ()
+			    (flycheck-mode 1))))
   :config
   (setq flycheck-indication-mode 'right-fringe)
   (setq flycheck-emacs-lisp-load-path 'inherit)
 
   ;; Only check while saving and opening files
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (setq flycheck-global-modes
-	'(not emacs-lisp-mode))
   )
 
 (when (display-graphic-p)
   (use-package flycheck-posframe
     :after flycheck
     :hook (flycheck-mode . flycheck-posframe-mode)))
+
+(use-package flycheck-color-mode-line
+  :after flycheck
+  :hook (flycheck-mode . flycheck-color-mode-line-mode))
 
 (provide 'init-flycheck)
 ;;; init-flycheck.el ends here

@@ -119,14 +119,11 @@
       make-backup-files nil) ; not ~ file
 
 ;; Save Emacs buffers when they lose focus after 1s
-(use-package auto-save
-  :ensure nil
-  :quelpa (auto-save :url "https://raw.githubusercontent.com/manateelazycat/lazycat-emacs/master/site-lisp/extensions/lazycat/auto-save.el" :fetcher url)
-             :hook (after-init . auto-save-enable)
-             :config
-             (progn
-               (setq auto-save-silent t)
-               (setq auto-save-idle 2)))
+(quelpa '(auto-save :url "https://raw.githubusercontent.com/manateelazycat/lazycat-emacs/master/site-lisp/extensions/lazycat/auto-save.el" :fetcher url))
+(require 'auto-save)
+(setq auto-save-idle 2)
+(setq auto-save-silent t)
+(add-hook 'after-init-hook #'auto-save-enable)
 
 ;;Displays the key bindings following your currently entered incomplete command
 (use-package which-key

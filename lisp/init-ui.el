@@ -90,16 +90,11 @@
 
 
 ;; set mode-line
-(if (display-graphic-p)
-    (use-package awesome-tray
-      :quelpa (awesome-tray :fetcher github :repo "manateelazycat/awesome-tray")
-      :config
-      (require 'awesome-tray)
-      (add-hook 'after-init-hook (lambda ()
-				   (awesome-tray-mode 1))))
-  (use-package doom-modeline
-    :init (doom-modeline-init))
-  )
+(when (display-graphic-p)
+  (quelpa '(awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
+  (require 'awesome-tray)
+  (add-hook 'after-init-hook '(lambda ()
+			       (awesome-tray-mode 1))))
 
 ;; Theme
 (defun standardize-theme (theme)

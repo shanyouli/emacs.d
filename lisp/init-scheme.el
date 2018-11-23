@@ -80,6 +80,7 @@
   "Minor mode for pseudo-structurally editing Lisp code."
   t)
   (autoload 'enable-paredit-mode "paredit")
+  (add-hook 'scheme-mode-hook #'enable-paredit-mode)
   )
 
 (provide 'init-scheme)

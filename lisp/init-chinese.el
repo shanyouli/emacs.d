@@ -24,14 +24,12 @@
 ;;; Code:
 
 ;; ZH Automatically translated as EN
-(use-package insert-translated-name
-  :quelpa (insert-translated-name :fetcher github :repo "manateelazycat/insert-translated-name"))
+(quelpa '(insert-translated-name :fetcher github :repo "manateelazycat/insert-translated-name"))
 (require 'insert-translated-name)
 (global-set-key (kbd "M-t") 'insert-translated-name-insert)
 
 ;; Configure Chinese input method
 (use-package pyim
-  :bind* (("M-j" . pyim-convert-code-at-point))
   :diminish pyim-isearch-mode
   :config
   ;; Activate the Pinyin of basedict
@@ -81,16 +79,15 @@
 		    :around #'lye/company-dabbrev-prefix)))
 
   ;; ivy-regex-plus
-  (if (featurep 'ivy)
-      (with-eval-after-load 'ivy
-	(defun lye/ivy-cregexp (str)
-	  (concat
-	   (ivy--regex-plus str)
-	   "\\|"
-	   (pyim-cregexp-build str)))
-	(setq ivy-re-builders-alist
-	      '((t . lye/ivy-cregexp)))))
-  )
+  (when  (featurep 'ivy)
+    (with-eval-after-load 'ivy
+      (defun lye/ivy-cregexp (str)
+	(concat
+	 (ivy--regex-plus str)
+	 "\\|"
+	 (pyim-cregexp-build str)))
+      (setq ivy-re-builders-alist
+	    '((t . lye/ivy-cregexp))))))
 
 (defun lye/toggle-input-method ()
   "Use pyim input method."
@@ -101,8 +98,9 @@
 (global-set-key (kbd "C-\\") 'lye/toggle-input-method)
 
 (quelpa '(company-english-helper :fetcher github :repo manateelazycat/company-english-helper))
-(require 'company-english-helper)
-
+(use-package company-english-helper
+  :ensure nil
+  :commands(toggle-company-english-helper))
 
 (provide 'init-chinese)
 ;;; init-chinese.el ends here

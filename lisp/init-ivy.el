@@ -63,6 +63,7 @@
   :after counsel
   :config
   (setq amx-save-file (concat lye-emacs-temporal-dir "amx-items"))
+  (setq amx-history-length 10)
   (amx-initialize)
 )
 
