@@ -56,5 +56,6 @@
 
 (when (file-exists-p custom-file)
   (load custom-file))
+
 (provide 'init-custom)
 ;;; init-custom.el ends here
