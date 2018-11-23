@@ -1,16 +1,31 @@
-;;; init --- Emacs configuations.
+;;; init.el --- Lye Emacs configurations.            -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2018  lye
+
+;; Author: lye <shanyouli6@gemail.com>
+;; Keywords: .emacs.d lye
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
+
+;; Lye Emacs Configurations
 
 ;;; Code:
 
 (when (version< emacs-version "25.1")
   (error "This requires Emacs 25.1 and above!"))
-
-(defvar emacs-load-start-time
-  "Getting Emacs startup time"
-  nil)
-(setq emacs-load-start-time (current-time))
 
 ;; Speed up startup
 (defvar default-file-name-handler-alist file-name-handler-alist)
@@ -25,54 +40,35 @@
 
 ;; Load path
 (add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
+;;(add-to-list 'load-path (expanda-file-name "site-lisp" user-emacs-directory))
 
-;; Load 'custom-file'
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(if (file-exists-p custom-file)
-    (load custom-file))
+;; Constants
+(require 'init-const)
 
-;; Custom some used function
-(require 'init-utils)
+;; Customization
+(require 'init-custom)
 
 ;; Packages
 (require 'init-package)
-
-(require-package 'diminish)
-(require-package 'scratch)
-(require-package 'command-log-mode)
-
-(require 'init-frame-hooks)
-(require 'init-xterm)
-(require 'init-theme)
-(require 'init-gui-frames)
-(require 'init-dired)
-(require 'init-flycheck)
+
+;; Preferences
+(require 'init-basic)
+(require 'init-edit)
+(require 'init-funcs)
+(require 'init-ui)
 (require 'init-ivy)
 (require 'init-company)
-(require 'init-paredit)
-(require 'init-which-key)
-(require 'init-fonts)
-(require 'init-edit-utils)
+(require 'init-yasnippet)
 (require 'init-chinese)
+(require 'init-flycheck)
+(require 'init-eshell)
 (require 'init-magit)
-;; Language
-(require 'init-rust)
-(require 'init-ahk)
+;;(require 'init-pair)
+
+(require 'init-elisp)
+(require 'init-org)
 (require 'init-scheme)
-
-(require-package 'aurel)
-(autoload 'aurel-package-info "aurel" nil t)
-(autoload 'aurel-package-search "aurel" nil t)
-(autoload 'aurel-package-search-by-name "aurel" nil t)
-(autoload 'aurel-maintainer-search "aurel" nil t)
-(autoload 'aurel-installed-packages "aurel" nil t)
-
-
-
-(when (require 'time-date nil t)
-  (message "Emacs startup time: %.3f seconds."
-           (time-to-seconds (time-since emacs-load-start-time))))
+;;(require 'init-lsp)
 
 (provide 'init)
 ;;; init.el ends here
-

@@ -1,9 +1,9 @@
-;;; init-flycheck.el --- Initialize Flycheck Configurations.  -*- lexical-binding: t; -*-
+;;; init-eshell.el --- Initialize Eshell Configurations.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  lye li
 
-;; Author: lye li <shanyouli6@gamil.com
-
+;; Author: lye li <shanyouli6@gamil.com>
+;; Keywords: 
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,27 +20,25 @@
 
 ;;; Commentary:
 
-;;
+;; 
 
 ;;; Code:
 
-(use-package flycheck
-  :diminish flycheck-mode
-  :hook (after-init . global-flycheck-mode)
-  :config
-  (setq flycheck-indication-mode 'right-fringe)
-  (setq flycheck-emacs-lisp-load-path 'inherit)
-
-  ;; Only check while saving and opening files
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (setq flycheck-global-modes
-	'(not emacs-lisp-mode))
+(use-package awsehell
+  :ensure nil
+  :quelpa (awseshell :fetcher github :repo "manateelazycat/aweshell")
   )
 
-(when (display-graphic-p)
-  (use-package flycheck-posframe
-    :after flycheck
-    :hook (flycheck-mode . flycheck-posframe-mode)))
+(defun lye/eshell ()
+  (interactive)
+  (require 'aweshell)
+  (eshell))
 
-(provide 'init-flycheck)
-;;; init-flycheck.el ends here
+(defalias 'eshell 'lye/eshell)
+
+
+
+
+(provide 'init-eshell)
+;;; init-eshell.el ends here
+

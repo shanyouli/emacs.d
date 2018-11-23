@@ -1,9 +1,9 @@
-;;; init-flycheck.el --- Initialize Flycheck Configurations.  -*- lexical-binding: t; -*-
+;;; init-org.el ---Org-mode configurations.          -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  lye li
 
-;; Author: lye li <shanyouli6@gamil.com
-
+;; Author: lye li <shanyouli6@gamil.com>
+;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,23 +24,25 @@
 
 ;;; Code:
 
-(use-package flycheck
-  :diminish flycheck-mode
-  :hook (after-init . global-flycheck-mode)
+(use-package org
+  :commands org-mode
+  :bind (("C-c a" . org-agenda)
+	 ("C-c l" . org-store-link)
+	 ("C-c c" . org-capture)
+	 ("C-c b" . org-switchb))
+  :mode ("\\.org\\'" . org-mode)
+  :ensure nil
   :config
-  (setq flycheck-indication-mode 'right-fringe)
-  (setq flycheck-emacs-lisp-load-path 'inherit)
+  ;;Align tag
+  (dolist (face '(org-level-1
+		  org-level-2
+		  org-level-3
+		  org-level-4
+		  org-level-5
+		  org-level-6
+		  org-level-7))
+    (set-face-attribute face nil :height 1.0))
 
-  ;; Only check while saving and opening files
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (setq flycheck-global-modes
-	'(not emacs-lisp-mode))
   )
-
-(when (display-graphic-p)
-  (use-package flycheck-posframe
-    :after flycheck
-    :hook (flycheck-mode . flycheck-posframe-mode)))
-
-(provide 'init-flycheck)
-;;; init-flycheck.el ends here
+(provide 'init-org)
+;;; init-org.el ends here

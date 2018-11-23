@@ -1,52 +1,110 @@
+;;; init-package.el --- Initialize package configurations  -*- lexical-binding: t; -*-
 
-;;init-package.el
+;; Copyright (C) 2018  DESKTOP-RD96RHO
+
+;; Author: DESKTOP-RD96RHO <lye@DESKTOP-RD96RHO>
+;; Keywords:
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Emacs Package Management configurations.
+
 
 ;;; Code:
 
+(eval-when-compile
+  (require 'init-custom))
+
 (require 'package)
-(setq package-archives
-      '( ;;官方
-	;;("melpa" . "https://melpa.org/packages/")
-	;;("gnu" . "https://elpa.gnu.org/packages/")
-	;;("org" . "http://orgmode.org/elpa/")
-	("melpa" . "https://elpa.emacs-china.org/melpa/")
-	("gnu" . "https://elpa.emacs-china.org/gnu/")
-	("org" . "https://elpa.emacs-china.org/org/")
-	))
+;; HACK: DO NOT save the variable "package-selected-packages" in init/custom file
+;; @see https://github.com/jwiegley/use-package/issues/383#issuecomment-247801751
+(defun my-save-selected-packages (&optional value)
+  "Set and (don't!) save 'package-selected-packages' to VALUE"
+  (when value
+    (setq package-selected-packages value))
+  (unless after-init-time
+    (add-hook 'after-init-hook #'package--save-selected-packages)))
+(advice-add 'package--save-selected-packages :override #'my-save-selected-packages)
 
-;; On-demand installation of packages
-;;;###autoload
-(defun require-package (package &optional min-version no-refresh)
-  "Install given PACKAGE, optionally requiring MIN-VERSION.
-If NO-REFRESH is non-nil, the available package lists will not be
-re-downloaded in order to locate PACKAGE."
-  (or (package-installed-p package min-version)
-      (if (or no-refresh (assoc package package-archive-contents))
-          (package-install package)
-        (progn
-          (package-refresh-contents)
-          (require-package package min-version t)))))
+;;
+;; ELPA: refer to https://melpa.org and https://elpa.emacs-china.org
+(defun set-package-archives (archives)
+  "Set specific package ARCHIVES repository"
+  (interactive
+   (list
+    (intern (completing-read "Switch to archives: "
+                             '(melpa melpa-mirror emacs-china netease)))))
+  (let* ((no-ssl (and (memq system-type '(window-nt ms-dos))
+                     (not (gnutls-available-p))))
+        (proto (if no-ssl "http" "https")))
+    (cond
+     ((eq archives 'melpa)
+      (setq package-archives `(,(cons "gnu"  (concat proto "://elpa.gnu.org/packages/"))
+                               ,(cons "melpa" (concat proto "://melpa.org/packages/")))))
+     ((eq archives 'melpa-mirror)
+      (setq package-archives `(,(cons "gnu"  (concat proto "://elpa.gnu.org/packages/"))
+                               ,(cons "melpa" (concat proto "://www.mirrorservice.org/sites/melpa.org/packages/")))))
+     ((eq archives 'emacs-china)
+      (setq package-archives `(,(cons "gnu"  (concat proto "://elpa.emacs-china.org/gnu/"))
+                               ,(cons "melpa" (concat proto "://elpa.emacs-china.org/melpa/")))))
+     ((eq archives 'netease)
+      (setq package-archives `(,(cons "gnu"  (concat proto "://mirrors.163.com/elpa/gnu/"))
+                               ,(cons "melpa" (concat proto "://mirrors.163.com/elpa/melpa/")))))
+     (t
+      (error "Unknown archives: '%s'" archives))))
+  (message "Set package archives to '%s' ." archives))
+;; Set package archives
+(set-package-archives lye-package-archives)
 
-(defun maybe-require-package (package &optional min-version no-refresh)
-  "Try to install PACKAGE, and return non-nil if successful.
-In the event of failure, return nil and print a warning message.
-Optionally require MIN-VERSION.  If NO-REFRESH is non-nil, the
-available package lists will not be re-downloaded in order to
-locate PACKAGE."
-  (condition-case err
-      (require-package package min-version no-refresh)
-    (error
-     (message "Couldn't install optional package `%s': %S" package err)
-     nil)))
-(setq package-enable-at-startup nil)
+;; Initialize packages
 (package-initialize)
 
-;; Using quelpa to Install some packages
-(require-package 'quelpa)
+;; Setup 'use-package quelpa quelpa-use-package'
+(defvar my-necessary-packages '(
+                                use-package
+                                quelpa
+                                quelpa-use-package
+                                diminish
+                                bind-key))
+(dolist (package my-necessary-packages)
+  (unless (package-installed-p package)
+    (package-refresh-contents)
+    (package-install package)))
+;; Should set before loading 'use-packge'
+(setq use-package-always-ensure t)
+(setq use-package-always-defer t)
+(setq use-package-expand-minimally t)
+(setq use-package-enable-imenu-support t)
+
+;; Should set before loading 'quelpa'
 (setq quelpa-checkout-melpa-p nil
       quelpa-update-melpa-p nil
       quelpa-melpa-recipe-stores nil
       quelpa-self-upgrade-p nil)
-
+
+(eval-when-compile
+  (require 'use-package)
+  (require 'quelpa)
+  (require 'quelpa-use-package))
+
+;; Extensions
+(use-package package-utils
+  :init
+  (defalias 'upgrade-packages 'package-utils-upgrade-all)
+  (defalias 'upgrade-packages-and-restart 'package-utils-upgrade-all-and-restart))
+
 (provide 'init-package)
 ;;; init-package.el ends here

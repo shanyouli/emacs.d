@@ -1,55 +1,108 @@
-;;; init-company --- Company
+;;; init-company.el --- Initialize Company configurations.  -*- lexical-binding: t; -*-
+
+;; Copyright (C) 2018  lye li
+
+;; Author: lye li <shanyouli6@gamil.com>
+
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 ;;; Commentary:
 
+;; Company Configuration
+
 ;;; Code:
 
-(eval-when-compile
- ;;(require 'init-elpa)
- (require 'init-utils))
-;; WAITING: haskell-mode sets tags-table-list globally, breaks tags-completion-at-point-function
-;; TODO Default sort order should place [a-z] before punctuation
+(defcustom my-yas nil
+  "Enable yasnippet for company backends or not."
+  :type 'boolean)
 
-(setq tab-always-indent 'complete)
-  (add-to-list 'completion-styles 'initials t)
+(use-package company
+  :diminish company-mode
+  :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
+  :bind (
+         :map company-active-map
+         ("C-p" . company-select-previous)
+         ("C-n" . company-select-next)
+         :map company-search-map
+         ("C-p" . company-select-previous)
+         ("C-n" . company-select-next))
+  :hook (after-init . global-company-mode)
+  :config
+  ;; aligns annotation to the right hand side
+  (setq company-tooltip-align-annotations t)
 
-(when (maybe-require-package 'company)
-  (add-hook 'after-init-hook 'global-company-mode)
-  (after-load 'company
-    (diminish 'company-mode "CMP")
-    (define-key company-mode-map (kbd "M-/") 'company-complete)
-    (define-key company-active-map (kbd "M-/") 'company-other-backend)
-    (define-key company-active-map (kbd "C-n") 'company-select-next)
-    (define-key company-active-map (kbd "C-p") 'company-select-previous)
-    (setq-default company-dabbrev-other-buffers 'all
-                  company-tooltip-align-annotations t))
-  (global-set-key (kbd "M-C-/") 'company-complete)
-  (when (maybe-require-package 'company-quickhelp)
-    (add-hook 'after-init-hook 'company-quickhelp-mode))
+  (setq company-idle-delay 0.2
+        company-tooltip-limit 10
+        company-minimum-prefix-length 2
+        company-require-match nil
+        company-dabbrev-ignore-case nil
+        company-dabbrev-downcase nil
+        company-dabbrev-code-other-buffers t
+        company-show-numbers t)
 
-  (defun lye/local-push-company-backend (backend)
-    "Add BACKEND to a buffer-local version of `company-backends'."
-    (make-local-variable 'company-backends)
-    (push backend company-backends)))
+  ;;Do not use it in these major modes
+  (setq company-global-modes
+	'(not message-mode git-commit-mode))
 
-;; Suspend page-break-lines-mode while company menu is active
-;; (see https://github.com/company-mode/company-mode/issues/416)
-(after-load 'company
-  (after-load 'page-break-lines
-    (defvar-local lye/page-break-lines-on-p nil)
+  (setq company-frontends
+        '(company-pseudo-tooltip-unless-just-one-frontend
+          company-preview-if-just-one-frontend))
 
-    (defun lye/page-break-lines-disable (&rest ignore)
-      (when (setq lye/page-break-lines-on-p (bound-and-true-p page-break-lines-mode))
-        (page-break-lines-mode -1)))
+  (define-key company-active-map (kbd "<return>") nil)
+  (define-key company-active-map (kbd "RET") nil)
+  (define-key company-active-map (kbd "TAB") #'company-complete-selection)
+  (define-key company-active-map (kbd "<tab>") #'company-complete-selection))
 
-    (defun lye/page-break-lines-maybe-reenable (&rest ignore)
-      (when lye/page-break-lines-on-p
-        (page-break-lines-mode 1)))
-    
-    (add-hook 'company-completion-started-hook 'lye/page-break-lines-disable)
-    (add-hook 'company-completion-finished-hook 'lye/page-break-lines-maybe-reenable)
-    (add-hook 'company-completion-cancelled-hook 'lye/page-break-lines-maybe-reenable)))
+(defun ora-company-number ()
+  "Forward to `company-complete-number'.
+Unless the number is potentially part of the candidate.
+In that case, insert the number."
+  (interactive)
+  (let* ((k (this-command-keys))
+         (re (concat "^" company-prefix k)))
+    (if (cl-find-if (lambda (s) (string-match re s))
+                    company-candidates)
+        (self-insert-command 1)
+      (company-complete-number
+       (if (equal k "0")
+           10
+         (string-to-number k))))))
+(with-eval-after-load 'company
+(let ((map company-active-map))
+  (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
+        (number-sequence 0 9))))
 
-
+(with-eval-after-load 'company
+(let ((map company-active-map))
+  (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
+        (number-sequence 0 9))
+  (define-key map [escape] (lambda()
+                          (interactive)
+                          (company-abort)
+                          (evil-force-normal-state)
+                          (self-insert-command 1))))
+  )
+
+;; Use company-posframe
+(use-package company-posframe
+  :after company
+  :config
+  (if (display-graphic-p)
+      (company-posframe-mode 1)))
+
+;; Quick help
+
+
 (provide 'init-company)
-;;; init-company ends here
+;;; init-company.el ends here
