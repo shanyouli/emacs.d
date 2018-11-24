@@ -31,6 +31,7 @@
 ;; Configure Chinese input method
 (use-package pyim
   :diminish pyim-isearch-mode
+  :bind* (("M-j" . pyim-convert-code-at-point))
   :config
   ;; Activate the Pinyin of basedict
   (use-package pyim-basedict
@@ -101,6 +102,8 @@
 (use-package company-english-helper
   :ensure nil
   :commands(toggle-company-english-helper))
+
+;; Google Translate
 
 (provide 'init-chinese)
 ;;; init-chinese.el ends here
