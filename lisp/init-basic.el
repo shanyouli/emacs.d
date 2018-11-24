@@ -105,9 +105,12 @@
 (use-package files
   :ensure nil
   :config
-  ;;When Emacs is closed under the Window system, it is forcibly confirmed to prevent misoperation.
+  ;; When Emacs is closed under the Window system, it is forcibly
+  ;; confirmedto prevent misoperation.
+  ;; @see https://lujun9972.github.io/blog/2017/04/15/%E9%98%B2%E6%AD%A2%E6%84%8F%E5%A4%96%E9%80%80%E5%87%BAemacs/
   (when *is-a-win*
-    (setq confirm-kill-emacs 'yes-or-no-p)))
+    (setq confirm-kill-emacs (lambda (prompt)
+				     (y-or-n-p-with-timeout "Exit Emacs after 10s?(" 10 "y")))))
 
 (use-package simple
   :ensure nil
