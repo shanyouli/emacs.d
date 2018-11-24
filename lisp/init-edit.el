@@ -52,5 +52,9 @@
 	       'org-mode-hook))
   (add-hook hook (lambda () (display-line-numbers-mode))))
 
+;; Don't display `symbolic link to Git-controlled source file....'
+;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links
+(setq vc-follow-symlinks nil)
+
 (provide 'init-edit)
 ;;; init-edit.el ends here
