@@ -23,6 +23,37 @@
 
 ;;; Code:
 
+;; Miscs
+(setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; Show path if name are same
+(setq adaptive-fill-regexp "[ t]+|[ t]*([0-9]+.|*+)[ t]*")
+(setq adaptive-fill-first-line-regexp "^* *$")
+(setq delete-by-moving-to-trash t) ; Deleting file go to OS'trash floder
+(setq set-mark-command-repeat-pop t) ; Repeating C-SPC after poping mark pops it again
+
+(setq-default major-mode 'text-mode)
+(add-hook 'text-mode-hook
+	  (lambda ()
+	    (turn-on-auto-fill)
+	    (diminish 'auto-fill-function)))
+(setq sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
+(setq sentence-end-double-space nil)
+
+;; Tab and Space
+;; Permanently indent with spaces, never with TABs
+(setq-default c-basic-offset 4
+	      tab-width 4
+	      indent-tabs-mode nil)
+
+;; Jump to things in Emacs tree-style
+(use-package avy
+  :bind (("C-:" . avy-goto-char)
+         ("C-'" . avy-goto-char-2)
+         ("M-g f" . avy-goto-line)
+         ("M-g w" . avy-goto-word-1)
+         ("M-g e" . avy-goto-worf-0))
+  :hook (after-init . avy-setup-default)
+  :config (setq avy-background 1))
+
 ;;Brackets highlighted
 (use-package highlight-parentheses
   :diminish highlight-parentheses-mode

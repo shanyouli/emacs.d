@@ -33,8 +33,7 @@
   "Set user mail address."
   :type 'string)
 
-;; Load `custom-file'
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+
 
 ;;Set package archives from which to fetch
 (defcustom lye-package-archives 'emacs-china
@@ -45,6 +44,10 @@
 	  (const :tag "Emacs-china" emacs-china)
 	  (const :tag "Netease" netease)))
 
+(defcustom lye-company-enable-yas nil
+  "Enable yasnippet for company backends or not."
+  :type  'boolean)
+
 ;; Set theme
 (defcustom lye-themes 'default
   "Set color theme."
@@ -54,6 +57,8 @@
 	  (const :tag "Tao theme" dark)
 	  ))
 
+;; Load `custom-file'
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file)
   (load custom-file))
 

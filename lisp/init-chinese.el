@@ -25,8 +25,10 @@
 
 ;; ZH Automatically translated as EN
 (quelpa '(insert-translated-name :fetcher github :repo "manateelazycat/insert-translated-name"))
-(require 'insert-translated-name)
-(global-set-key (kbd "M-t") 'insert-translated-name-insert)
+(require 'json)
+(use-package insert-translated-name
+  :commands (insert-translated-name-insert)
+  :bind ("C-c t" . insert-translated-name-insert))
 
 ;; Configure Chinese input method
 (use-package pyim
@@ -98,12 +100,23 @@
   (toggle-input-method))
 (global-set-key (kbd "C-\\") 'lye/toggle-input-method)
 
+;; Prompt English words when writing English
 (quelpa '(company-english-helper :fetcher github :repo manateelazycat/company-english-helper))
 (use-package company-english-helper
   :ensure nil
   :commands(toggle-company-english-helper))
 
-;; Google Translate
+;; YouDao translation
+(use-package youdao-dictionary
+  :bind (("C-c y" . youdao-dictionary-search-at-point)
+	 ("C-c Y" . youdao-dictionary-search-at-point-tooltip))
+  :config
+  ;; Cache documents
+  (setq url-automatic-caching t)
+  ;; Set file path for saving search history
+  (setq youdao-dictionary-search-history-file (concat lye-emacs-temporal-dir "youdaohs"))
+  ;; Enable Chinese word segmentation support (支持中文分词)
+  (setq youdao-dictionary-use-chinese-word-segmentation t))
 
 (provide 'init-chinese)
 ;;; init-chinese.el ends here

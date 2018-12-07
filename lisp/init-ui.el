@@ -92,9 +92,10 @@
 ;; set mode-line
 (when (display-graphic-p)
   (quelpa '(awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
-  (require 'awesome-tray)
-  (add-hook 'after-init-hook '(lambda ()
-			       (awesome-tray-mode 1))))
+  (use-package awesome-tray
+    :ensure nil
+    :commands awesome-tray-mode
+    :hook (after-init . awesome-tray-mode)))
 
 ;; Theme
 (defun standardize-theme (theme)
@@ -119,6 +120,13 @@
     ('dark
      (use-package dakrone-theme
        :init (load-theme 'dakrone t)))))
+
+;; Understand the topics currently in use
+(defun current-theme ()
+  "what is the Current theme?"
+  (interactive)
+  (message "The Current theme is %s"
+           (substring (format "%s" custom-enabled-themes) 1 -1)))
 
 (lye-load-theme lye-themes)
 ;; Misc

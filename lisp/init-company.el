@@ -23,13 +23,19 @@
 
 ;;; Code:
 
-(defcustom my-yas nil
-  "Enable yasnippet for company backends or not."
-  :type 'boolean)
-
 (use-package company
   :diminish company-mode
   :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
+  :preface
+  (defvar company-enable-yas lye-company-enable-yas
+    "Enable yasnippet for all backends.")
+
+  (defun company-backend-with-yas (backend)
+    (if (or (not company-enable-yas)
+            (add (listp backend) (member 'company-yasnippet backend)))
+        backend
+      (append (if (consp backend) backend (list backend))
+              '(:with company-yasnippet))))
   :bind (
          :map company-active-map
          ("C-p" . company-select-previous)
@@ -53,7 +59,7 @@
 
   ;;Do not use it in these major modes
   (setq company-global-modes
-	'(not message-mode git-commit-mode))
+        '(not message-mode git-commit-mode))
 
   (setq company-frontends
         '(company-pseudo-tooltip-unless-just-one-frontend
@@ -62,7 +68,10 @@
   (define-key company-active-map (kbd "<return>") nil)
   (define-key company-active-map (kbd "RET") nil)
   (define-key company-active-map (kbd "TAB") #'company-complete-selection)
-  (define-key company-active-map (kbd "<tab>") #'company-complete-selection))
+  (define-key company-active-map (kbd "<tab>") #'company-complete-selection)
+  ;; Support yas in commpany
+  ;; Note: Must be the last to involve all backends
+  (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
 
 (defun ora-company-number ()
   "Forward to `company-complete-number'.
@@ -94,15 +103,20 @@ In that case, insert the number."
                           (self-insert-command 1))))
   )
 
+;; Popup documentation for completion candidates
+(when (display-graphic-p)
+  (use-package company-quickhelp
+    :bind (:map company-active-map
+                ("M-h" . company-quickhelp-manual-begin))
+    :hook (global-company-mode . company-quickhelp-mode)
+    :config (setq company-quickhelp-delay 0.8)))
+
 ;; Use company-posframe
 (use-package company-posframe
   :after company
   :config
   (if (display-graphic-p)
       (company-posframe-mode 1)))
-
-;; Quick help
-
 
 (provide 'init-company)
 ;;; init-company.el ends here

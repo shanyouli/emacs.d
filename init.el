@@ -30,17 +30,21 @@
 ;; Speed up startup
 (defvar default-file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
-(setq gc-cons-threshold (* 192 1024 1024))
+(setq gc-cons-threshold 80000000)
 (add-hook 'emacs-startup-hook
           (lambda ()
             "Restore default values after init."
             (setq file-name-handler-alist default-file-name-handler-alist)
-            (setq gc-cons-threshold (* 32 1024 1024))
+            (setq gc-cons-threshold 800000)
             (add-hook 'focus-out-hook 'garbage-collect)))
 
 ;; Load path
-(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-;;(add-to-list 'load-path (expanda-file-name "site-lisp" user-emacs-directory))
+;; Optimize: Force `lisp' at the head to reduce the startup time.
+(defun update-load-path (&rest _)
+  "Update `load-path'."
+  (push (expand-file-name "lisp" user-emacs-directory) load-path))
+(advice-add #'package-initialize :after #'update-load-path)
+(update-load-path)
 
 ;; Constants
 (require 'init-const)

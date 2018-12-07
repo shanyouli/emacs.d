@@ -54,7 +54,7 @@
   :ensure nil
   :hook (after-init . (lambda () (require 'server)
 			(unless (server-running-p)
-                              (server-start)))))
+                          (server-start)))))
 
 
 ;; Save cursor position for everyfile you opened. So,  next time you open
@@ -63,7 +63,7 @@
   :ensure nil
   :config
   (progn
-    (setq save-place-file (concat lye-emacs-temporal-dir "saveplace.el")))
+    (setq save-place-file (concat lye-emacs-temporal-dir "saveplace")))
   :hook (after-init . save-place-mode))
 
 ;; Miantain a history of past actions and a resonable number of lists
@@ -73,7 +73,7 @@
   :init
   (progn
     (setq-default history-length 1000)
-    (setq savehist-file (concat lye-emacs-temporal-dir "history.el")
+    (setq savehist-file (concat lye-emacs-temporal-dir "history")
           enable-recursive-minibuffers t
           history-delete-duplicates t
           savehist-additional-variables '(mark-ring
@@ -92,7 +92,7 @@
   :init
   ;;(add-hook 'after-init-hook #'recentf-mode)
   (setq recentf-max-saved-items 200
-        recentf-save-file (concat lye-emacs-temporal-dir "recentf.el"))
+        recentf-save-file (concat lye-emacs-temporal-dir "recentf"))
   :config
   (add-to-list 'recentf-exclude (expand-file-name package-user-dir))
   (add-to-list 'recentf-exclude ".cache")
@@ -123,10 +123,13 @@
 
 ;; Save Emacs buffers when they lose focus after 1s
 (quelpa '(auto-save :url "https://raw.githubusercontent.com/manateelazycat/lazycat-emacs/master/site-lisp/extensions/lazycat/auto-save.el" :fetcher url))
-(require 'auto-save)
-(setq auto-save-idle 2)
-(setq auto-save-silent t)
-(add-hook 'after-init-hook #'auto-save-enable)
+(use-package auto-save
+  :ensure nil
+  :commands (auto-save-enable)
+  :hook (after-init . auto-save-enable)
+  :config
+  (setq auto-save-idle 2)
+  (setq auto-save-silent t))
 
 ;;Displays the key bindings following your currently entered incomplete command
 (use-package which-key
