@@ -66,9 +66,9 @@
   :hook (after-init . autopair-global-mode))
 
 ;;Chinese input automatically adds spaces in Chinese
-(use-package pangu-spacing
-  :diminish pangu-spacing-mode
-  :hook (after-init . global-pangu-spacing-mode))
+;;(use-package pangu-spacing
+;;  :diminish pangu-spacing-mode
+;;  :hook (after-init . global-pangu-spacing-mode))
 
 ;;Big blank delete
 (use-package hungry-delete

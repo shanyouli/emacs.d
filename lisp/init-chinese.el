@@ -101,22 +101,62 @@
 (global-set-key (kbd "C-\\") 'lye/toggle-input-method)
 
 ;; Prompt English words when writing English
-(quelpa '(company-english-helper :fetcher github :repo manateelazycat/company-english-helper))
+(quelpa '(company-english-helper :fetcher github :repo "manateelazycat/company-english-helper"))
 (use-package company-english-helper
   :ensure nil
   :commands(toggle-company-english-helper))
 
-;; YouDao translation
-(use-package youdao-dictionary
-  :bind (("C-c y" . youdao-dictionary-search-at-point)
-	 ("C-c Y" . youdao-dictionary-search-at-point-tooltip))
-  :config
-  ;; Cache documents
-  (setq url-automatic-caching t)
-  ;; Set file path for saving search history
-  (setq youdao-dictionary-search-history-file (concat lye-emacs-temporal-dir "youdaohs"))
-  ;; Enable Chinese word segmentation support (支持中文分词)
-  (setq youdao-dictionary-use-chinese-word-segmentation t))
+;;translate Chinese to English, or translate English to Chinese
+(if (eq (shell-command "type sdcv") 0)
+    (progn
+      (message "You Installed sdcv in the computer!")
+      (quelpa '(sdcv :fetcher github :repo "manateelazycat/sdcv"))
+      (use-package sdcv
+        :ensure nil
+        :commands (sdcv-search-pointer+ sdcv-search-pointer sdcv-search-input sdcv-search-input+)
+        :bind (("C-c y" . sdcv-search-pointer+)
+               ("C-c Y" . sdcv-search-input+))
+        :config
+        ; sdcv need posframe
+        (unless (featurep 'posframe)
+          (use-package posframe))
+        ;; (setq sdcv-say-word-p t) ;say word after translation
+        (setq sdcv-dictionary-data-dir "/usr/share/stardict/dic") ; setup dictionary list for simple search
+        (setq sdcv-dictionary-simple-list ; setup dictionary list for simple search
+              '("KDic11万英汉词典"
+                "懒虫简明英汉词典"
+                "懒虫简明汉英词典"))
+        (setq sdcv-dictionary-complete-list ; setup dictionary list for complete search
+              '(
+                "KDic11万英汉词典"
+                "懒虫简明英汉词典"
+                "懒虫简明汉英词典"
+                "21世纪英汉汉英双向词典"
+                "stardict1.3汉英词典"
+                "新世纪汉英科技大词典"
+                "牛津现代英汉双解词典"
+                "XDICT汉英辞典"
+                "XDICT英汉辞典"
+                "朗道汉英字典5.0"
+                "朗道英汉字典5.0"
+                "quick_eng-zh_CN"
+                "CDICT5英汉辞典"
+                ))))
+  (progn
+    (message "Not Installed sdcv, Using YouDao dictionary")
+    (use-package youdao-dictionary
+      :bind (("C-c y" . youdao-dictionary-search-at-point)
+	         ("C-c Y" . youdao-dictionary-search-at-point-tooltip))
+      :config
+      ;; Cache documents
+      (setq url-automatic-caching t)
+      ;; Set file path for saving search history
+      (setq youdao-dictionary-search-history-file (concat lye-emacs-temporal-dir "youdaohs"))
+      ;; Enable Chinese word segmentation support (支持中文分词)
+      (setq youdao-dictionary-use-chinese-word-segmentation t))))
+
+
+
 
 (provide 'init-chinese)
 ;;; init-chinese.el ends here
