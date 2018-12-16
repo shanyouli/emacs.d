@@ -47,13 +47,15 @@
  url-configuration-directory (concat lye-emacs-temporal-dir "url")
  ;; eshell files
  eshell-directory-name (concat lye-emacs-temporal-dir "eshell")
+;; Game score
+ gamegrid-user-score-file-directory (concat lye-emacs-temporal-dir "games")
  )
 
 ;; Start server
 (use-package server
   :ensure nil
   :hook (after-init . (lambda () (require 'server)
-			(unless (server-running-p)
+                        (unless (server-running-p)
                           (server-start)))))
 
 
@@ -110,19 +112,20 @@
   ;; @see https://lujun9972.github.io/blog/2017/04/15/%E9%98%B2%E6%AD%A2%E6%84%8F%E5%A4%96%E9%80%80%E5%87%BAemacs/
   (when *is-a-win*
     (setq confirm-kill-emacs (lambda (prompt)
-				     (y-or-n-p-with-timeout "Exit Emacs after 10s?(" 10 "y")))))
+                               (y-or-n-p-with-timeout "Exit Emacs after 10s?(" 10 "y")))))
 
 (use-package simple
   :ensure nil
   :hook (before-save . (lambda ()
-			 (delete-trailing-whitespace))))
+                         (delete-trailing-whitespace))))
 
 (setq auto-save-list-file-prefix nil;not.# and #.# file
       auto-save-default nil
       make-backup-files nil) ; not ~ file
 
 ;; Save Emacs buffers when they lose focus after 1s
-(quelpa '(auto-save :url "https://raw.githubusercontent.com/manateelazycat/lazycat-emacs/master/site-lisp/extensions/lazycat/auto-save.el" :fetcher url))
+;;(quelpa '(auto-save :url "https://raw.githubusercontent.com/manateelazycat/lazycat-emacs/master/site-lisp/extensions/lazycat/auto-save.el" :fetcher url))
+(quelpa '(auto-save :repo "manateelazycat/auto-save" :fetcher github))
 (use-package auto-save
   :ensure nil
   :commands (auto-save-enable)

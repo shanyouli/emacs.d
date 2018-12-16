@@ -69,10 +69,13 @@
 (require 'init-magit)
 ;;(require 'init-pair)
 
+;; RSS Reader
+(require 'init-elfeed)
+
 (require 'init-elisp)
 (require 'init-org)
 (require 'init-scheme)
-;;(require 'init-lsp)
-
+(require 'init-lsp)
+(require 'init-sh)
 (provide 'init)
 ;;; init.el ends here

@@ -44,6 +44,11 @@
 	      tab-width 4
 	      indent-tabs-mode nil)
 
+;; Delete selection if you insert
+(use-package delsel
+  :ensure nil
+  :hook (after-init . delete-selection-mode))
+
 ;; Jump to things in Emacs tree-style
 (use-package avy
   :bind (("C-:" . avy-goto-char)
@@ -86,5 +91,13 @@
 ;; Don't display `symbolic link to Git-controlled source file....'
 ;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links
 (setq vc-follow-symlinks nil)
+
+;; Some major-mode are used manateelazycat/vi-navigate
+(quelpa '(vi-navigate :fetcher github :repo "manateelazycat/vi-navigate"))
+(use-package vi-navigate
+  :ensure nil
+  :commands (vi-navigate-load-keys)
+  :hook (after-init . vi-navigate-load-keys))
+
 (provide 'init-edit)
 ;;; init-edit.el ends here

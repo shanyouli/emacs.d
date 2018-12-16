@@ -1,9 +1,9 @@
-;;; init-org.el ---Org-mode configurations.          -*- lexical-binding: t; -*-
+;;; init-sh.el ---Sh scripts Initalize Configurations.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  lye li
 
-;; Author: lye li <shanyouli6@gamil.com>
-;; Keywords:
+;; Author: lye li <shanyouli6@gmail.com>
+;; Keywords: language
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,30 +20,15 @@
 
 ;;; Commentary:
 
-;;
+;; sh-mode Configurations
 
 ;;; Code:
 
-(use-package org
-  :commands org-mode
-  :bind (("C-c a" . org-agenda)
-	 ("C-c l" . org-store-link)
-	 ("C-c c" . org-capture)
-	 ("C-c b" . org-switchb))
-  :mode ("\\.org\\'" . org-mode)
-  :ensure nil
-  :config
-  ;;Align tag
-  (dolist (face '(org-level-1
-		  org-level-2
-		  org-level-3
-		  org-level-4
-		  org-level-5
-		  org-level-6
-		  org-level-7))
-    (set-face-attribute face nil :height 1.0))
+;; @see: https://stackoverflow.com/questions/20558402/open-zsh-scripts-in-sh-mode-in-emacs
+(add-hook 'sh-mode-hook
+          (lambda ()
+            (if (string-match "\\.zsh$" buffer-file-name)
+                (sh-set-shell "zsh"))))
 
-  )
-
-(provide 'init-org)
-;;; init-org.el ends here
+(provide 'init-sh)
+;;; init-sh.el ends here

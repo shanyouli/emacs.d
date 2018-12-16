@@ -22,7 +22,6 @@
 
 ;; Emacs Package Management configurations.
 
-
 ;;; Code:
 
 (eval-when-compile

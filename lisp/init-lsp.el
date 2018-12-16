@@ -1,8 +1,8 @@
-;;; init-org.el ---Org-mode configurations.          -*- lexical-binding: t; -*-
+;;; init-lsp.el ---Language Server Program Configurations  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  lye li
 
-;; Author: lye li <shanyouli6@gamil.com>
+;; Author: lye li <shanyouli6@gmail.com>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -20,30 +20,16 @@
 
 ;;; Commentary:
 
-;;
+;; Language Server Progaram Configuraions
 
 ;;; Code:
 
-(use-package org
-  :commands org-mode
-  :bind (("C-c a" . org-agenda)
-	 ("C-c l" . org-store-link)
-	 ("C-c c" . org-capture)
-	 ("C-c b" . org-switchb))
-  :mode ("\\.org\\'" . org-mode)
-  :ensure nil
-  :config
-  ;;Align tag
-  (dolist (face '(org-level-1
-		  org-level-2
-		  org-level-3
-		  org-level-4
-		  org-level-5
-		  org-level-6
-		  org-level-7))
-    (set-face-attribute face nil :height 1.0))
+(use-package lsp
+  :ensure lsp-mode
+  :diminish lsp-mode
+  :hook ((json-mode . lsp)
+         (lsp-after-open . lsp-enable-imenu)))
 
-  )
 
-(provide 'init-org)
-;;; init-org.el ends here
+(provide 'init-lsp)
+;;; init-lsp.el ends here

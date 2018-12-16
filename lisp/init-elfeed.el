@@ -1,8 +1,8 @@
-;;; init-org.el ---Org-mode configurations.          -*- lexical-binding: t; -*-
+;;; init-elfeed.el ---A RSS feed reader.             -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  lye li
 
-;; Author: lye li <shanyouli6@gamil.com>
+;; Author: lye li <shanyouli6@gmail.com>
 ;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -20,30 +20,20 @@
 
 ;;; Commentary:
 
-;;
+;; A RSS feed reader.
 
 ;;; Code:
 
-(use-package org
-  :commands org-mode
-  :bind (("C-c a" . org-agenda)
-	 ("C-c l" . org-store-link)
-	 ("C-c c" . org-capture)
-	 ("C-c b" . org-switchb))
-  :mode ("\\.org\\'" . org-mode)
-  :ensure nil
+(use-package elfeed
+  :bind ("C-x w" . elfeed)
   :config
-  ;;Align tag
-  (dolist (face '(org-level-1
-		  org-level-2
-		  org-level-3
-		  org-level-4
-		  org-level-5
-		  org-level-6
-		  org-level-7))
-    (set-face-attribute face nil :height 1.0))
+  (setq elfeed-db-directory (concat lye-emacs-temporal-dir "elfeed"))
+  (setq elfeed-feeds
+        '("http://planet.emacsen.org/atom.xml"
+          "http://www.masteringemacs.org/feed/"
+          "https://oremacs.com/atom.xml"
+          "https://pinecast.com/feed/emacscast")))
 
-  )
 
-(provide 'init-org)
-;;; init-org.el ends here
+(provide 'init-elfeed)
+;;; init-elfeed.el ends here
