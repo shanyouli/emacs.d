@@ -60,6 +60,8 @@
 (require 'init-edit)
 (require 'init-funcs)
 (require 'init-ui)
+(require 'init-window)
+(require 'init-modeline)
 (require 'init-ivy)
 (require 'init-company)
 (require 'init-yasnippet)
@@ -72,10 +74,15 @@
 ;; RSS Reader
 (require 'init-elfeed)
 
+(when *is-a-win*
+  (require 'init-ahk))
+
 (require 'init-elisp)
 (require 'init-org)
 (require 'init-scheme)
 (require 'init-lsp)
 (require 'init-sh)
+
+
 (provide 'init)
 ;;; init.el ends here

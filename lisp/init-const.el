@@ -43,6 +43,7 @@
 (defconst *root*
   (string-equal "root" (getenv "USER"))
   "Are you using ROOT user?")
+
 ;; x w32 pc
 (defconst *is-a-term*
   (eq window-system nil)

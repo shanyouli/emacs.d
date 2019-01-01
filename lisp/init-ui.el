@@ -29,13 +29,13 @@
 ;; (setq facy-splash-image logo)
 
 ;; Title
-(setq frame-title-format
-      '("Lye Emacs - "
-        (:eval (if (buffer-file-name)
-                   (abbreviate-file-name (buffer-file-name))
-                 %b))))
-(setq icon-title-format frame-title-format)
-
+(when (display-graphic-p)
+  (setq frame-title-format
+        '("Lye Emacs - "
+          (:eval (if (buffer-file-name)
+                     (abbreviate-file-name (buffer-file-name))
+                   %b))))
+  (setq icon-title-format frame-title-format))
 
 ;; Suppress GUI features
 (unless *is-a-term*
@@ -90,12 +90,12 @@
 
 
 ;; set mode-line
-(when (display-graphic-p)
-  (quelpa '(awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
-  (use-package awesome-tray
-    :ensure nil
-    :commands awesome-tray-mode
-    :hook (after-init . awesome-tray-mode)))
+;; (when (display-graphic-p)
+;;   (quelpa '(awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
+;;   (use-package awesome-tray
+;;     :ensure nil
+;;     :commands awesome-tray-mode
+;;     :hook (after-init . awesome-tray-mode)))
 
 ;; Theme
 (defun standardize-theme (theme)
@@ -136,6 +136,18 @@
 (setq track-eol t) ; keep cursor at end of lines, Require line-move-visual is nil
 (setq line-move-visual nil)
 (setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
+
+;; set font
+;; @see https://emacs-china.org/t/emacs/7268/2
+(defun set-font (english chinese english-size chinese-size)
+  (set-face-attribute 'default nil :font
+                      (format   "%s:pixelsize=%d"  english english-size))
+  (dolist (charset '(kana han symbol cjk-misc bopomofo))
+    (set-fontset-font (frame-parameter nil 'font) charset
+                      (font-spec :family chinese :size chinese-size))))
+;;(set-font "Source Code Pro" "simsun" 12 14)
+(when (display-graphic-p)
+  (set-font "Sarasa Mono T SC" "Sarasa Mono T SC" 13 13))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

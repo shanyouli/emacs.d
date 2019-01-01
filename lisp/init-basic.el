@@ -51,13 +51,16 @@
  gamegrid-user-score-file-directory (concat lye-emacs-temporal-dir "games")
  )
 
+
 ;; Start server
+;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
 (use-package server
   :ensure nil
   :hook (after-init . (lambda () (require 'server)
                         (unless (server-running-p)
+                          (when (eq system-type 'cygwin)
+                            (defun server-ensure-safe-dir (dir) "Noop" t))
                           (server-start)))))
-
 
 ;; Save cursor position for everyfile you opened. So,  next time you open
 ;; the file, the cursor will be at the position you last opened it.
@@ -112,12 +115,12 @@
   ;; @see https://lujun9972.github.io/blog/2017/04/15/%E9%98%B2%E6%AD%A2%E6%84%8F%E5%A4%96%E9%80%80%E5%87%BAemacs/
   (when *is-a-win*
     (setq confirm-kill-emacs (lambda (prompt)
-                               (y-or-n-p-with-timeout "Exit Emacs after 10s?(" 10 "y")))))
+                               (y-or-n-p-with-timeout "Exit Emacs after 3s?" 3 "y")))))
 
-(use-package simple
-  :ensure nil
-  :hook (before-save . (lambda ()
-                         (delete-trailing-whitespace))))
+;; (use-package simple
+;;   :ensure nil
+;;   :hook (before-save . (lambda ()
+;;                          (delete-trailing-whitespace))))
 
 (setq auto-save-list-file-prefix nil;not.# and #.# file
       auto-save-default nil

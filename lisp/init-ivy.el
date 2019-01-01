@@ -26,19 +26,18 @@
 
 (use-package counsel
   :diminish ivy-mode counsel-mode
-  :bind (
-	 ("C-x f" . counsel-recentf)
-	 ("C-x C-b" . ivy-switch-buffer)
-	 :map ivy-minibuffer-map
-	 ([escape] . minibuffer-keyboard-quit)
-	 ("<C-return>" . ivy-immediate-done)
-	 :map swiper-map
-	 ([escape] . minibuffer-keyboard-quit))
+  :bind (("C-s" . swiper)
+         ("C-x f" . counsel-recentf)
+	     ("C-x C-b" . ivy-switch-buffer)
+	     :map ivy-minibuffer-map
+	     ([escape] . minibuffer-keyboard-quit)
+	     ("<C-return>" . ivy-immediate-done)
+	     :map swiper-map
+	     ([escape] . minibuffer-keyboard-quit))
   :hook ((after-init . ivy-mode)
-	 (ivy-mode . counsel-mode))
+	     (ivy-mode . counsel-mode))
   :config
   (setq enable-recursive-minibuffers t) ; Allow commands in minibuffers
-
   (setq ivy-use-selectable-prompt t)
   (setq ivy-use-virtual-buffers t) ; Enable bookmarks and recentf
   (setq ivy-height 10)
@@ -64,8 +63,7 @@
   :config
   (setq amx-save-file (concat lye-emacs-temporal-dir "amx-items"))
   (setq amx-history-length 10)
-  (amx-initialize)
-)
+  (amx-initialize))
 
 (provide 'init-ivy)
 ;;; init-ivy.el ends here

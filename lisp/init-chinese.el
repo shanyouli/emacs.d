@@ -107,7 +107,8 @@
   :commands(toggle-company-english-helper))
 
 ;;translate Chinese to English, or translate English to Chinese
-(if (eq (shell-command "type sdcv 2>&1 >/dev/null") 0)
+(if (executable-find "sdcv")
+    ;;(eq (shell-command "type sdcv 2>&1 >/dev/null") 0)
     (progn
       (message "You Installed sdcv in the computer!")
       (quelpa '(sdcv :fetcher github :repo "manateelazycat/sdcv"))
@@ -117,8 +118,7 @@
         :bind (("C-c y" . sdcv-search-pointer+)
                ("C-c Y" . sdcv-search-input+))
         :config
-                                        ; sdcv need posframe
-        (unless (featurep 'posframe)
+        (unless (featurep 'posframe) ; sdcv need posframe
           (use-package posframe))
         ;; (setq sdcv-say-word-p t) ;say word after translation
         (setq sdcv-dictionary-data-dir "/usr/share/stardict/dic") ; setup dictionary list for simple search
@@ -154,9 +154,6 @@
       (setq youdao-dictionary-search-history-file (concat lye-emacs-temporal-dir "youdaohs"))
       ;; Enable Chinese word segmentation support (支持中文分词)
       (setq youdao-dictionary-use-chinese-word-segmentation t))))
-
-
-
 
 (provide 'init-chinese)
 ;;; init-chinese.el ends here

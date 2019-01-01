@@ -99,5 +99,13 @@
   :commands (vi-navigate-load-keys)
   :hook (after-init . vi-navigate-load-keys))
 
+;;Set blank highlight when use display graphic
+(when (display-graphic-p)
+  (use-package highlight-indent-guides
+    :hook (prog-mode . highlight-indent-guides-mode)
+    :config
+    (setq highlight-indent-guides-method 'character)
+    (setq highlight-indent-guides-responsive t)))
+
 (provide 'init-edit)
 ;;; init-edit.el ends here
