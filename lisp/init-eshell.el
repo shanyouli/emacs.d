@@ -23,8 +23,9 @@
 ;;
 
 ;;; Code:
-(quelpa '(awseshell :fetcher github :repo "manateelazycat/aweshell"))
+;(quelpa '(awseshell :fetcher github :repo "manateelazycat/aweshell"))
 (use-package aweshell
+  :straight (aweshell :type git :host github :repo "manateelazycat/aweshell")
   :ensure nil
   :commands (aweshell-toggle aweshell-next aweshell-prev aweshell-next))
 
