@@ -128,14 +128,16 @@
 
 ;; Save Emacs buffers when they lose focus after 1s
 ;;(quelpa '(auto-save :url "https://raw.githubusercontent.com/manateelazycat/lazycat-emacs/master/site-lisp/extensions/lazycat/auto-save.el" :fetcher url))
-(quelpa '(auto-save :repo "manateelazycat/auto-save" :fetcher github))
+;;(quelpa '(auto-save :repo "manateelazycat/auto-save" :fetcher github))
 (use-package auto-save
+  :straight (auto-save :type git :host github :repo "manateelazycat/auto-save")
   :ensure nil
   :commands (auto-save-enable)
   :hook (after-init . auto-save-enable)
   :config
   (setq auto-save-idle 2)
   (setq auto-save-silent t))
+  
 
 ;;Displays the key bindings following your currently entered incomplete command
 (use-package which-key
