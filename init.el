@@ -69,6 +69,7 @@
 (require 'init-flycheck)
 (require 'init-eshell)
 (require 'init-magit)
+
 ;;(require 'init-pair)
 
 ;; RSS Reader

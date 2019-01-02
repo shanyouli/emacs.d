@@ -128,7 +128,10 @@
   (message "The Current theme is %s"
            (substring (format "%s" custom-enabled-themes) 1 -1)))
 
-(lye-load-theme lye-themes)
+(if (display-graphic-p)
+    (lye-load-theme lye-themes)
+  (require 'init-theme))
+
 ;; Misc
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq inhibit-startup-screen t)

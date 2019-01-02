@@ -144,5 +144,11 @@
   :diminish which-key
   :hook (after-init . which-key-mode))
 
+
+;; When I use Windows system, I hope emacs start-directory is "HOME" at emacs starting
+(when *is-a-win*
+  (if (string-equal default-directory "c:/Applications/ScoopApps/apps/emacs/current/bin/")
+      (cd "~")))
+
 (provide 'init-basic)
 ;;; init-basic.el ends here
