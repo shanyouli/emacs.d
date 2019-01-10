@@ -29,13 +29,13 @@
 ;; (setq facy-splash-image logo)
 
 ;; Title
-(when (display-graphic-p)
-  (setq frame-title-format
-        '("Lye Emacs - "
-          (:eval (if (buffer-file-name)
-                     (abbreviate-file-name (buffer-file-name))
-                   %b))))
-  (setq icon-title-format frame-title-format))
+;; (when (display-graphic-p)
+;;   (setq frame-title-format
+;;         '("Lye Emacs - "
+;;           (:eval (if (buffer-file-name)
+;;                      (abbreviate-file-name (buffer-file-name))
+;;                    %b))))
+;;   (setq icon-title-format frame-title-format))
 
 ;; Suppress GUI features
 (unless *is-a-term*
@@ -87,15 +87,6 @@
 (defadvice load-theme (after run-after-load-theme-hook activate)
   "Run `after-load-theme-hook'."
   (run-hooks 'after-load-theme-hook))
-
-
-;; set mode-line
-;; (when (display-graphic-p)
-;;   (quelpa '(awesome-tray :fetcher github :repo "manateelazycat/awesome-tray"))
-;;   (use-package awesome-tray
-;;     :ensure nil
-;;     :commands awesome-tray-mode
-;;     :hook (after-init . awesome-tray-mode)))
 
 ;; Theme
 (defun standardize-theme (theme)

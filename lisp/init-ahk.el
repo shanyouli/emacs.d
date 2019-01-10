@@ -28,13 +28,5 @@
   :mode "\\.ahk\\'"
   :defer t)
 
-(use-package stupid-indent-mode
-  :ensure t
-  :config
-  (setq stupid-indent-level 4); 4 spaces
-  )
-(require 'stupid-indent-mode)
-
-
 (provide 'init-ahk)
 ;;; init-ahk.el ends here

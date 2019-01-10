@@ -34,6 +34,5 @@
           "https://oremacs.com/atom.xml"
           "https://pinecast.com/feed/emacscast")))
 
-
 (provide 'init-elfeed)
 ;;; init-elfeed.el ends here

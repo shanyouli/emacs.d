@@ -56,10 +56,12 @@
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
 (use-package server
   :ensure nil
-  :hook (after-init . (lambda () (require 'server)
+  :commands (server-running-p)
+  :hook (after-init . (lambda ()
                         (unless (server-running-p)
                           (when (eq system-type 'cygwin)
-                            (defun server-ensure-safe-dir (dir) "Noop" t))
+                            (defun server-ensure-safe-dir (dir) "Noop" t)
+                            (setq server-auth-dir (concat lye-emacs-temporal-dir "server")))
                           (server-start)))))
 
 ;; Save cursor position for everyfile you opened. So,  next time you open
@@ -127,8 +129,6 @@
       make-backup-files nil) ; not ~ file
 
 ;; Save Emacs buffers when they lose focus after 1s
-;;(quelpa '(auto-save :url "https://raw.githubusercontent.com/manateelazycat/lazycat-emacs/master/site-lisp/extensions/lazycat/auto-save.el" :fetcher url))
-;;(quelpa '(auto-save :repo "manateelazycat/auto-save" :fetcher github))
 (use-package auto-save
   :straight (auto-save :type git :host github :repo "manateelazycat/auto-save")
   :ensure nil
@@ -137,13 +137,11 @@
   :config
   (setq auto-save-idle 2)
   (setq auto-save-silent t))
-  
 
 ;;Displays the key bindings following your currently entered incomplete command
 (use-package which-key
   :diminish which-key
   :hook (after-init . which-key-mode))
-
 
 ;; When I use Windows system, I hope emacs start-directory is "HOME" at emacs starting
 (when *is-a-win*

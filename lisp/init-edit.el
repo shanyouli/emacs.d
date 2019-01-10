@@ -93,19 +93,28 @@
 (setq vc-follow-symlinks nil)
 
 ;; Some major-mode are used manateelazycat/vi-navigate
-(quelpa '(vi-navigate :fetcher github :repo "manateelazycat/vi-navigate"))
 (use-package vi-navigate
+  :straight (vi-navigate :type git
+                         :host github
+                         :repo "manateelazycat/vi-navigate")
   :ensure nil
   :commands (vi-navigate-load-keys)
   :hook (after-init . vi-navigate-load-keys))
 
 ;;Set blank highlight when use display graphic
-(when (display-graphic-p)
-  (use-package highlight-indent-guides
-    :hook (prog-mode . highlight-indent-guides-mode)
+(if  (display-graphic-p)
+    (use-package highlight-indent-guides
+      :hook (prog-mode . highlight-indent-guides-mode)
+      :config
+      (setq highlight-indent-guides-method 'character)
+      (setq highlight-indent-guides-responsive t))
+  (use-package indent-guide
+    :hook (prog-mode . indent-guide-mode)
     :config
-    (setq highlight-indent-guides-method 'character)
-    (setq highlight-indent-guides-responsive t)))
+    (set-face-background 'indent-guide-face "dimgray")
+    (setq indent-guide-delay 0.1)
+    (setq indent-guide-recursive t)
+    (setq indent-guide-char "|")))
 
 (provide 'init-edit)
 ;;; init-edit.el ends here

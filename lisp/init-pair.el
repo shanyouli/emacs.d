@@ -25,8 +25,7 @@
 ;;; Code:
 
 
-(use-package awesome-pair
-  :quelpa (awesome-pair :fetcher github :repo "manateelazycat/awesome-pair"))
+(straight )
 (require 'awesome-pair)
 (dolist (hook (list
 	       'c-mode-common-hook

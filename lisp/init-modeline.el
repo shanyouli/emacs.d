@@ -26,7 +26,7 @@
                ") "
                ;; relative position, size of file
                "["
-               (propertize "%p" 'face 'font-lock-consstant-face) ;;% above top
+               (propertize "%p" 'face 'font-lock-constant-face) ;;% above top
                "/"
                (propertize "%I" 'face 'font-lock-constant-face) ;; size
                "] "

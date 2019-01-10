@@ -71,10 +71,9 @@
 ;; Initialize packages
 (package-initialize)
 
-;; Setup 'use-package quelpa quelpa-use-package'
+;; Setup `use-package'
 (defvar my-necessary-packages '(
                                 use-package
-                                quelpa
                                 diminish
                                 bind-key))
 (dolist (package my-necessary-packages)
@@ -101,15 +100,9 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;; Should set before loading 'quelpa'
-(setq quelpa-checkout-melpa-p nil
-      quelpa-update-melpa-p nil
-      quelpa-melpa-recipe-stores nil
-      quelpa-self-upgrade-p nil)
 
 (eval-when-compile
-  (require 'use-package)
-  (require 'quelpa))
+  (require 'use-package))
 
 ;; Extensions
 (use-package package-utils

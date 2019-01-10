@@ -24,9 +24,12 @@
 ;;; Code:
 
 ;; ZH Automatically translated as EN
-(quelpa '(insert-translated-name :fetcher github :repo "manateelazycat/insert-translated-name"))
-(require 'json)
 (use-package insert-translated-name
+  :straight (insert-translated-name-insert
+             :type git
+             :host github
+             :repo "manateelazycat/insert-translated-name")
+  :ensure nil
   :commands (insert-translated-name-insert)
   :bind ("C-c t" . insert-translated-name-insert))
 
@@ -47,21 +50,11 @@
   (setq pyim-dcache-directory (concat lye-emacs-temporal-dir "pyim/dcache"))
   ;; Use full spell
   (setq pyim-default-scheme 'quanpin)
-  ;; Probe setting
-  (setq-default pyim-english-input-switch-functions
-        '(pyim-probe-dynamic-english
-          pyim-probe-isearch-mode
-          pyim-probe-program-mode
-          pyim-probe-org-structure-template))
-
-  (setq-default pyim-punctuation-half-width-functions
-        '(pyim-probe-punctuation-after-punctuation
-          pyim-probe-punctuation-line-beginning))
 
   ;;Turn on pinyin search
   (pyim-isearch-mode 1)
   ;; Set 5 candidate words
-  (setq pyim-page-length 5)
+  (setq pyim-page-length 9)
   ;; Set the way the word box is drawn
   (if (and (display-graphic-p)
        (>= emacs-major-version 26))
@@ -101,8 +94,11 @@
 (global-set-key (kbd "C-\\") 'lye/toggle-input-method)
 
 ;; Prompt English words when writing English
-(quelpa '(company-english-helper :fetcher github :repo "manateelazycat/company-english-helper"))
 (use-package company-english-helper
+  :straight (comany-english-helper
+             :type git
+             :host github
+             :repo "manateelazycat/company-english-helper")
   :ensure nil
   :commands(toggle-company-english-helper))
 
@@ -111,8 +107,10 @@
     ;;(eq (shell-command "type sdcv 2>&1 >/dev/null") 0)
     (progn
       (message "You Installed sdcv in the computer!")
-      (quelpa '(sdcv :fetcher github :repo "manateelazycat/sdcv"))
       (use-package sdcv
+        :straight (sdcv :type git
+                        :host github
+                        :repo "manateelazycat/sdcv")
         :ensure nil
         :commands (sdcv-search-pointer+ sdcv-search-pointer sdcv-search-input sdcv-search-input+)
         :bind (("C-c y" . sdcv-search-pointer+)
