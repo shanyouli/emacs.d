@@ -58,7 +58,9 @@
   (use-package server
     :ensure nil
     :commands (server-running-p)
-    :hook (after-init . server-mode)
+    :hook (after-init . (lambda ()
+                          (unless (server-running-p)
+                            (server-start))))
     :init (setq server-auth-dir (concat lye-emacs-temporal-dir "server"))))
 
 ;; Save cursor position for everyfile you opened. So,  next time you open

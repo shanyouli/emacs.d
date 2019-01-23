@@ -83,7 +83,7 @@
 (require 'init-scheme)
 (require 'init-lsp)
 (require 'init-sh)
-
+(require 'init-markdown)
 
 (provide 'init)
 ;;; init.el ends here

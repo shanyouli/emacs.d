@@ -45,7 +45,8 @@
   (setq ivy-on-del-error-function nil)
   (setq ivy-display-style 'fancy)
   (setq ivy-format-function #'ivy-format-function-arrow) ; format-function >
-
+  (setq ivy-re-builders-alist
+        '((t . ivy--regex-fuzzy))) ; Fuzzy search
   (setq magit-completing-read-function 'ivy-completing-read)
 
   ;; Use faster search tools: rigprep

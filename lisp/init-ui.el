@@ -143,5 +143,25 @@
 (when (display-graphic-p)
   (set-font "Sarasa Mono T SC" "Sarasa Mono T SC" 13 13))
 
+
+;; set startup frame-size
+(defun lye/reset-frame-size (&optional frame)
+  "set the frame-size."
+  (interactive)
+  (when frame
+    (select-frame frame))
+  (if *is-a-win*
+      (progn
+        (set-frame-width (selected-frame) 96)
+        (set-frame-height (selected-frame) 32))
+    (set-frame-size (selected-frame) 96 32)))
+
+(when window-system
+  (lye/reset-frame-size))
+;;(add-hook 'emacs-startup-hook 'lye/reset-frame-size)
+;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
+(add-hook 'after-make-frame-functions 'lye/reset-frame-size)
+
+
 (provide 'init-ui)
 ;;; init-ui.el ends here
