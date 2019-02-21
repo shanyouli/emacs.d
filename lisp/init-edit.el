@@ -23,6 +23,10 @@
 
 ;;; Code:
 
+;; Explicitly set the prefered coding systems to avoid annoying prompt
+;; from emacs (especially on Microsoft Windows)
+(prefer-coding-system 'utf-8)
+
 ;; Miscs
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; Show path if name are same
 (setq adaptive-fill-regexp "[ t]+|[ t]*([0-9]+.|*+)[ t]*")
@@ -81,12 +85,19 @@
   :hook (after-init . global-hungry-delete-mode))
 
 ;; Displays line-number.el
-(dolist (hook (list
-	       'c-mode-common-hook
-	       'emacs-lisp-mode-hook
-	       'sh-mode-hook
-	       'org-mode-hook))
-  (add-hook hook (lambda () (display-line-numbers-mode))))
+(use-package  display-line-numbers
+  :ensure nil
+  :init
+  (setq display-line-numbers-width 2)
+  (setq display-line-numbers-grow-only t)
+  ;; (set-face-foreground 'line-number-current-line "#859393")
+  ;; (set-face-background 'line-number "#313335")
+  (dolist (hook (list
+	             'c-mode-common-hook
+	             'emacs-lisp-mode-hook
+	             'sh-mode-hook
+	             'org-mode-hook))
+    (add-hook hook (lambda () (display-line-numbers-mode)))))
 
 ;; Don't display `symbolic link to Git-controlled source file....'
 ;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links

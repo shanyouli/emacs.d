@@ -28,7 +28,8 @@
   :diminish flycheck-mode
   :init (dolist (hook (list
 		       'scheme-mode-hook
-		       'python-mode-hook))
+		       'python-mode-hook
+               'sh-mode-hook))
 	  (add-hook hook '(lambda ()
 			    (flycheck-mode 1))))
   :config

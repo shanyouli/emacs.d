@@ -44,7 +44,9 @@
   "Update `load-path'."
   (push (expand-file-name "lisp" user-emacs-directory) load-path))
 (advice-add #'package-initialize :after #'update-load-path)
-(update-load-path)
+(if (version< emacs-version "27.0")
+    (update-load-path)
+  (push (expand-file-name "lisp" user-emacs-directory) load-path))
 
 ;; Constants
 (require 'init-const)
@@ -61,7 +63,7 @@
 (require 'init-funcs)
 (require 'init-ui)
 (require 'init-window)
-(require 'init-modeline)
+;;(require 'init-modeline)
 (require 'init-ivy)
 (require 'init-company)
 (require 'init-yasnippet)

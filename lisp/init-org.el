@@ -42,7 +42,11 @@
 		  org-level-6
 		  org-level-7))
     (set-face-attribute face nil :height 1.0))
-
+  (add-hook 'org-mode-hook '(lambda ()
+                              (auto-fill-mode nil) ; 不自动换行
+                              (setq truncate-lines nil) ; 自动换行
+                              (org-indent-mode t) ; 自动缩进, * 和 ** etc.
+                              ))
   )
 
 (provide 'init-org)

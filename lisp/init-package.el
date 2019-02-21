@@ -69,7 +69,8 @@
 (set-package-archives lye-package-archives)
 
 ;; Initialize packages
-(package-initialize)
+(if (version< emacs-version "27.0")
+    (package-initialize))
 
 ;; Setup `use-package'
 (defvar my-necessary-packages '(

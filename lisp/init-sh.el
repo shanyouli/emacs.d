@@ -28,7 +28,8 @@
 (add-hook 'sh-mode-hook
           (lambda ()
             (if (string-match "\\.zsh$" buffer-file-name)
-                (sh-set-shell "zsh"))))
+                (sh-set-shell "zsh")
+              (sh-set-shell "bash"))))
 
 (provide 'init-sh)
 ;;; init-sh.el ends here

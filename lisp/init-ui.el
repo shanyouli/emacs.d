@@ -143,7 +143,6 @@
 (when (display-graphic-p)
   (set-font "Sarasa Mono T SC" "Sarasa Mono T SC" 13 13))
 
-
 ;; set startup frame-size
 (defun lye/reset-frame-size (&optional frame)
   "set the frame-size."
@@ -162,6 +161,19 @@
 ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
 (add-hook 'after-make-frame-functions 'lye/reset-frame-size)
 
+;; mode-line
+(if (display-graphic-p)
+    (progn
+      (use-package awesome-tray
+        :straight (awesome-tray
+                   :type git
+                   :host github
+                   :repo "manateelazycat/awesome-tray")
+        :ensure nil
+        :commands (awesome-tray-mode)
+        :init (awesome-tray-mode 1)))
+  (require 'init-modeline)
+  )
 
 (provide 'init-ui)
 ;;; init-ui.el ends here
