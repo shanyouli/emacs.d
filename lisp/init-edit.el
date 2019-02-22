@@ -85,19 +85,22 @@
   :hook (after-init . global-hungry-delete-mode))
 
 ;; Displays line-number.el
-(use-package  display-line-numbers
+(use-package display-line-numbers
   :ensure nil
-  :init
+  :config
   (setq display-line-numbers-width 2)
   (setq display-line-numbers-grow-only t)
   ;; (set-face-foreground 'line-number-current-line "#859393")
   ;; (set-face-background 'line-number "#313335")
-  (dolist (hook (list
-	             'c-mode-common-hook
-	             'emacs-lisp-mode-hook
-	             'sh-mode-hook
-	             'org-mode-hook))
-    (add-hook hook (lambda () (display-line-numbers-mode)))))
+  (use-package linum-relative
+    :init (setq linum-relative-backend 'display-line-numbers-mode)
+    (dolist (hook (list
+	               'c-mode-common-hook
+	               'emacs-lisp-mode-hook
+	               'sh-mode-hook
+	               'org-mode-hook))
+      ;; (add-hook hook (lambda () (display-line-numbers-mode)))
+      (add-hook hook (lambda () (linum-relative-mode))))))
 
 ;; Don't display `symbolic link to Git-controlled source file....'
 ;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links
@@ -126,6 +129,16 @@
     (setq indent-guide-delay 0.1)
     (setq indent-guide-recursive t)
     (setq indent-guide-char "|")))
+
+
+;; 80 wrap or set
+(defun lye/80-column ()
+  "80-column?"
+  (interactive)
+  (require 'whitespace)
+  (setq whitespace-line-column 80)
+  (setq whitespace-action '(face lines-tail))
+  (whitespace-mode))
 
 (provide 'init-edit)
 ;;; init-edit.el ends here

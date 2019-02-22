@@ -172,8 +172,7 @@
         :ensure nil
         :commands (awesome-tray-mode)
         :init (awesome-tray-mode 1)))
-  (require 'init-modeline)
-  )
+  (require 'init-modeline))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here
