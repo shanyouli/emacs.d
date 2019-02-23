@@ -127,7 +127,7 @@
       auto-save-default nil
       make-backup-files nil) ; not ~ file
 
-;; Save Emacs buffers when they lose focus after 1s
+;; Save Emacs buffers when they lose focus after 2s
 (use-package auto-save
   :straight (auto-save :type git :host github :repo "manateelazycat/auto-save")
   :ensure nil
@@ -137,7 +137,14 @@
   (setq auto-save-idle 2)
   (setq auto-save-silent t))
 
-;;Displays the key bindings following your currently entered incomplete command
+
+;; Use undo-tree
+(use-package undo-tree
+  ;; :ensure nil
+  :diminish
+  :hook (after-init . global-undo-tree-mode))
+
+;; Displays the key bindings following your currently entered incomplete command
 (use-package which-key
   :diminish which-key
   :hook (after-init . which-key-mode))
@@ -165,6 +172,22 @@ Return a string giving the duration of the Emacs initialization."
     (if (called-interactively-p 'interactive)
         (message "%s" str)
       str)))
+
+;; buffer list use awesome-tab
+(use-package awesome-tab
+  :ensure nil
+  :straight (awesome-tab
+             :type git
+             :host github
+             :repo "manateelazycat/awesome-tab")
+  :defer t
+  :init
+  (setq tabbar-active-color "#c678dd")
+  (setq tabbar-inactive-color "gray")
+  ;; :config
+  ;; (set-face-attribute :inherit 'default
+  ;; :height 1.2)
+  )
 
 (provide 'init-basic)
 ;;; init-basic.el ends here

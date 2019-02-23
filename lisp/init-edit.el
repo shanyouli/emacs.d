@@ -87,20 +87,23 @@
 ;; Displays line-number.el
 (use-package display-line-numbers
   :ensure nil
-  :config
+  :init
   (setq display-line-numbers-width 2)
   (setq display-line-numbers-grow-only t)
   ;; (set-face-foreground 'line-number-current-line "#859393")
   ;; (set-face-background 'line-number "#313335")
   (use-package linum-relative
-    :init (setq linum-relative-backend 'display-line-numbers-mode)
+    :commands linum-relative-mode
+    :init
+    (setq linum-relative-backend 'display-line-numbers-mode)
     (dolist (hook (list
 	               'c-mode-common-hook
 	               'emacs-lisp-mode-hook
 	               'sh-mode-hook
 	               'org-mode-hook))
-      ;; (add-hook hook (lambda () (display-line-numbers-mode)))
-      (add-hook hook (lambda () (linum-relative-mode))))))
+      (add-hook hook (lambda () (display-line-numbers-mode)))
+      ;;(add-hook hook (lambda () (linum-relative-mode 1)))
+      )))
 
 ;; Don't display `symbolic link to Git-controlled source file....'
 ;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links
@@ -132,6 +135,7 @@
 
 
 ;; 80 wrap or set
+;; see @https://stackoverflow.com/questions/18855510/have-emacs-highlight-characters-over-80
 (defun lye/80-column ()
   "80-column?"
   (interactive)
