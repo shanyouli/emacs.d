@@ -155,8 +155,8 @@
           (string-equal default-directory "c:/Applications/ScoopApps/apps/emacs-dev/current/bin/")
           (string-equal default-directory "c:/emacs/bin/")
           (string-equal default-directory "d:/Applications/emacs/bin/")
-          (string-equal default-directory "c:/ScoopApps/apps/emacs-dev/current/bin")
-          (string-equal default-directory "c:/ScoopApps/apps/emacs/current/bin"))
+          (string-equal default-directory "c:/ScoopApps/apps/emacs-dev/current/bin/")
+          (string-equal default-directory "c:/ScoopApps/apps/emacs/current/bin/"))
       
       (cd "~")))
 

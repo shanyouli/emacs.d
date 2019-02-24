@@ -69,8 +69,9 @@
 (set-package-archives lye-package-archives)
 
 ;; Initialize packages
-(if (version< emacs-version "27.0")
-    (package-initialize))
+(unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
+  (setq package-enable-at-startup nil) ;To prevent initializing twice
+  (package-initialize))
 
 ;; Setup `use-package'
 (defvar my-necessary-packages '(
