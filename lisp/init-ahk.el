@@ -28,5 +28,13 @@
   :mode "\\.ahk\\'"
   :defer t)
 
+;; Runninng Wsl in Emacs
+;; see @https://github.com/MatthewZMD/.emacs.d#bash-command
+(defun lye/wsl-bash ()
+  "Running windows subsystem Linux in emacs!"
+  (interactive)
+  (let ((shell-file-name "C:\\Windows\\System32\\wsl.exe"))
+    (shell "*bash*")))
+
 (provide 'init-ahk)
 ;;; init-ahk.el ends here

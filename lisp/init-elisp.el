@@ -61,5 +61,9 @@
       (cl-pushnew `(,cmd . "^") ivy-initial-inputs-alist))))
 
 
+;; Beautify line breaks
+(use-package page-break-lines
+  :hook (emacs-lisp-mode . turn-on-page-break-lines-mode))
+
 (provide 'init-elisp)
 ;;; init-elisp.el ends here

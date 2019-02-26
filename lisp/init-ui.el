@@ -46,22 +46,23 @@
       initial-buffer-choice nil)
 
 ;; Window size and features
-(when (fboundp 'tool-bar-mode)
-  (tool-bar-mode -1))
-(when (fboundp 'set-scroll-bar-mode)
-  (set-scroll-bar-mode nil))
-
-;; I generally prefer to hide the menu bar, but doing this on OS X
-;; simply makes it update unreliably in GUI frames, so we make an
-;; exception.
-(if *is-a-mac*
-    (add-hook 'after-make-frame-functions
-              (lambda (frame)
+(when (version< emacs-version  "27.0.0")
+  (when (fboundp 'tool-bar-mode)
+    (tool-bar-mode -1))
+  (when (fboundp 'set-scroll-bar-mode)
+    (set-scroll-bar-mode nil))
+  
+  ;; I generally prefer to hide the menu bar, but doing this on OS X
+  ;; simply makes it update unreliably in GUI frames, so we make an
+  ;; exception.
+  (if *is-a-mac*
+      (add-hook 'after-make-frame-functions
+                (lambda (frame)
                 (set-frame-parameter frame 'menu-bar-lines
                                      (if (display-graphic-p frame)
                                          1 0))))
-  (when (fboundp 'menu-bar-mode)
-    (menu-bar-mode -1)))
+    (when (fboundp 'menu-bar-mode)
+      (menu-bar-mode -1))))
 
 (let ((no-border '(internal-border-width . 0)))
   (add-to-list 'default-frame-alist no-border)
@@ -72,12 +73,11 @@
   "Don't delete *Scratch*."
   (if (string= (buffer-name (current-buffer)) "*scratch*")
       (progn
-	(delete-region (point-min) (point-max))
-	(insert initial-scratch-message)
-	nil)
+	    (delete-region (point-min) (point-max))
+	    (insert initial-scratch-message)
+	    nil)
     t))
-(add-hook 'kill-buffer-query-functions
-	  #'lye/unkillable-scratch-buffer)
+(add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
 
 ;; Theme
 
@@ -113,7 +113,7 @@
        :init (load-theme 'dakrone t)))))
 
 ;; Understand the topics currently in use
-(defun current-theme ()
+(defun lye/current-theme ()
   "what is the Current theme?"
   (interactive)
   (message "The Current theme is %s"
@@ -141,7 +141,7 @@
                       (font-spec :family chinese :size chinese-size))))
 ;;(set-font "Source Code Pro" "simsun" 12 14)
 (when (display-graphic-p)
-  (set-font "Sarasa Mono T SC" "Sarasa Mono T SC" 13 13))
+  (set-font "Sarasa Mono T SC" "Sarasa Mono T SC" 14 14))
 
 ;; set startup frame-size
 (defun lye/reset-frame-size (&optional frame)
@@ -173,6 +173,11 @@
         :commands (awesome-tray-mode)
         :init (awesome-tray-mode 1)))
   (require 'init-modeline))
+
+;; Do not use the mouse in the graphical interface
+(when (display-graphic-p)
+  (use-package disable-mouse
+    :init (global-disable-mouse-mode)))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

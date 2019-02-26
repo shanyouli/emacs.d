@@ -34,20 +34,24 @@
   :ensure nil
   :config
   ;;Align tag
-  (dolist (face '(org-level-1
-		  org-level-2
-		  org-level-3
-		  org-level-4
-		  org-level-5
-		  org-level-6
-		  org-level-7))
-    (set-face-attribute face nil :height 1.0))
-  (add-hook 'org-mode-hook '(lambda ()
-                              (auto-fill-mode nil) ; 不自动换行
-                              (setq truncate-lines nil) ; 自动换行
-                              (org-indent-mode t) ; 自动缩进, * 和 ** etc.
-                              ))
-  )
+  ;; (dolist (face '(org-level-1
+  ;;   	  org-level-2
+  ;;   	  org-level-3
+  ;;   	  org-level-4
+  ;;   	  org-level-5
+  ;;   	  org-level-6
+  ;;   	  org-level-7))
+  ;;   (set-face-attribute face nil :height 1.0))
+  (add-hook 'org-mode-hook
+            '(lambda ()
+               (auto-fill-mode nil) ; 不自动换行
+               (setq truncate-lines nil) ; 自动换行
+               (if (display-graphic-p)
+                   (use-package org-bullets
+                     :init
+                     (org-bullets-mode 1))
+                 (org-indent-mode t) ; 自动缩进, * 和 ** etc.
+                 ))))
 
 (provide 'init-org)
 ;;; init-org.el ends here

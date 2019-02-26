@@ -102,15 +102,13 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(setq straight-process-buffer " *straight-process*")
 
 (eval-when-compile
   (require 'use-package))
 
 ;; Extensions
-(use-package package-utils
-  :init
-  (defalias 'upgrade-packages 'package-utils-upgrade-all)
-  (defalias 'upgrade-packages-and-restart 'package-utils-upgrade-all-and-restart))
+
 
 (provide 'init-package)
 ;;; init-package.el ends here
