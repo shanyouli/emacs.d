@@ -120,7 +120,9 @@
            (substring (format "%s" custom-enabled-themes) 1 -1)))
 
 (if (display-graphic-p)
-    (lye-load-theme lye-themes)
+    (use-package doom-themes
+      :init (load-theme 'doom-one t))
+    ;;(lye-load-theme lye-themes)
   (require 'init-theme))
 
 ;; Misc
@@ -141,7 +143,7 @@
                       (font-spec :family chinese :size chinese-size))))
 ;;(set-font "Source Code Pro" "simsun" 12 14)
 (when (display-graphic-p)
-  (set-font "Sarasa Mono T SC" "Sarasa Mono T SC" 14 14))
+  (set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14))
 
 ;; set startup frame-size
 (defun lye/reset-frame-size (&optional frame)
@@ -164,14 +166,19 @@
 ;; mode-line
 (if (display-graphic-p)
     (progn
-      (use-package awesome-tray
-        :straight (awesome-tray
-                   :type git
-                   :host github
-                   :repo "manateelazycat/awesome-tray")
-        :ensure nil
-        :commands (awesome-tray-mode)
-        :init (awesome-tray-mode 1)))
+      ;; (use-package awesome-tray
+      ;;   :straight (awesome-tray
+      ;;              :type git
+      ;;              :host github
+      ;;              :repo "manateelazycat/awesome-tray")
+      ;;   :ensure nil
+      ;;   :commands (awesome-tray-mode)
+      ;;   :init (awesome-tray-mode 1))
+      (use-package doom-modeline
+        :init
+        ;; Only display the file name, wait for the mouse to move to the file name in the display path
+        (setq doom-modeline-buffer-file-name-style 'buffer-name)
+        (doom-modeline-mode)))
   (require 'init-modeline))
 
 ;; Do not use the mouse in the graphical interface
