@@ -101,5 +101,18 @@
         (error "Cannot open tramp file")
       (browse-url (concat "file://" file-name)))))
 
+;; add emacs startup time, copy from emacs-git(2018.02.22)
+(defun lye/emacs-init-time ()
+  "Copy `emacs-git' 
+Return a string giving the duration of the Emacs initialization."
+  (interactive)
+  (let ((str
+         (format "%s seconds"
+                 (float-time
+                  (time-subtract after-init-time before-init-time)))))
+    (if (called-interactively-p 'interactive)
+        (message "%s" str)
+      str)))
+
 (provide 'init-funcs)
 ;;; init-funcs.el ends here

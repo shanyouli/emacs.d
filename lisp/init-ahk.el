@@ -24,6 +24,16 @@
 
 ;;; Code:
 
+;; When I use Windows system, I hope emacs start-directory is "HOME" at emacs starting
+(when *is-a-win*
+  (if (or (string-equal default-directory "c:/Applications/ScoopApps/apps/emacs/current/bin/")
+          (string-equal default-directory "c:/Applications/ScoopApps/apps/emacs-dev/current/bin/")
+          (string-equal default-directory "c:/emacs/bin/")
+          (string-equal default-directory "d:/Applications/emacs/bin/")
+          (string-equal default-directory "c:/ScoopApps/apps/emacs-dev/current/bin/")
+          (string-equal default-directory "c:/ScoopApps/apps/emacs/current/bin/"))
+      (cd "~")))
+
 (use-package ahk-mode
   :mode "\\.ahk\\'"
   :defer t)
@@ -35,6 +45,7 @@
   (interactive)
   (let ((shell-file-name "C:\\Windows\\System32\\bash.exe"))
     (shell "*bash*")))
+
 
 (provide 'init-ahk)
 ;;; init-ahk.el ends here

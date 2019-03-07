@@ -146,44 +146,7 @@
   :diminish which-key
   :hook (after-init . which-key-mode))
 
-;; When I use Windows system, I hope emacs start-directory is "HOME" at emacs starting
-(when *is-a-win*
-  (if (or (string-equal default-directory "c:/Applications/ScoopApps/apps/emacs/current/bin/")
-          (string-equal default-directory "c:/Applications/ScoopApps/apps/emacs-dev/current/bin/")
-          (string-equal default-directory "c:/emacs/bin/")
-          (string-equal default-directory "d:/Applications/emacs/bin/")
-          (string-equal default-directory "c:/ScoopApps/apps/emacs-dev/current/bin/")
-          (string-equal default-directory "c:/ScoopApps/apps/emacs/current/bin/"))
-      (cd "~")))
 
-;; add emacs startup time, copy from emacs-git(2018.02.22)
-(defun lye/emacs-init-time ()
-  "Copy `emacs-git' 
-Return a string giving the duration of the Emacs initialization."
-  (interactive)
-  (let ((str
-         (format "%s seconds"
-                 (float-time
-                  (time-subtract after-init-time before-init-time)))))
-    (if (called-interactively-p 'interactive)
-        (message "%s" str)
-      str)))
-
-;; buffer list use awesome-tab
-(use-package awesome-tab
-  :ensure nil
-  :straight (awesome-tab
-             :type git
-             :host github
-             :repo "manateelazycat/awesome-tab")
-  :defer t
-  :init
-  (setq tabbar-active-color "#c678dd")
-  (setq tabbar-inactive-color "gray")
-  ;; :config
-  ;; (set-face-attribute :inherit 'default
-  ;; :height 1.2)
-  )
 
 (provide 'init-basic)
 ;;; init-basic.el ends here

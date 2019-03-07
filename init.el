@@ -105,9 +105,7 @@
   (with-temp-message ""              ; Erase the output of the plugin startup
 
     ;; Set the color at startup to avoid flickering
-    (if (display-graphic-p)
-        (custom-set-faces
-         '(default ((t (:background "#282c34" :foreground "#bbc2cf")))))
+    (unless (display-graphic-p)
       (custom-set-faces
        '(default ((t (:background "black" :foreground "#137D11"))))))
 
@@ -126,8 +124,6 @@
     (require 'init-flycheck)
     (require 'init-eshell)
     (require 'init-magit)
-    
-    ;;(require 'init-pair)
     
     ;; RSS Reader
     (require 'init-elfeed)

@@ -36,11 +36,9 @@
 ;;                    %b))))
 ;;   (setq icon-title-format frame-title-format))
 
-;; Suppress GUI features
-(when (display-graphic-p) 
-  (setq use-file-dialog nil
-        use-dialog-box nil
-        inhibit-startup-screen t))
+;; Suppress GUI features 
+(setq use-file-dialog nil)
+(setq use-dialog-box nil)
 (setq initial-major-mode 'emacs-lisp-mode
       initial-buffer-choice nil)
 
@@ -67,56 +65,6 @@
   (add-to-list 'default-frame-alist no-border)
   (add-to-list 'initial-frame-alist no-border))
 
-;; Make *Scratch* buffer undelete
-(defun lye/unkillable-scratch-buffer ()
-  "Don't delete *Scratch*."
-  (if (string= (buffer-name (current-buffer)) "*scratch*")
-      (progn
-	    (delete-region (point-min) (point-max))
-	    (insert initial-scratch-message)
-	    nil)
-    t))
-(add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
-
-;; Theme
-;; Understand the topics currently in use
-(defun lye/current-theme ()
-  "what is the Current theme?"
-  (interactive)
-  (message "The Current theme is %s"
-           (substring (format "%s" custom-enabled-themes) 1 -1)))
-
-(if (display-graphic-p)
-    (use-package doom-themes
-      :init (load-theme 'doom-one t))
-  (straight-use-package '(lazycat-theme :tyep git :host github
-                                        :repo "lye95/lazycat-theme"))
-    (require 'lazycat-theme))
-
-;; Misc
-(fset 'yes-or-no-p 'y-or-n-p) ; 以 y/n 取代 yes/no
-(setq inhibit-startup-screen t) ; 不展示开始界面
-;; (setq initial-scratch-message "") ; 不显示 scratch 中默认信息
-;;(setq visible-bell t)
-(setq ring-bell-function 'ignore) ; Turn off the error ringtone
-(setq mouse-yank-at-point t) ; Paste at the cursor position instead of the mouse pointer
-(setq x-select-enable-clipboard t) ; 支持 emacs 和外部程序的粘贴
-(setq track-eol t) ; keep cursor at end of lines, Require line-move-visual is nil
-(setq line-move-visual nil)
-(setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
-
-;; Don't ask me when close emacs with process is running
-(straight-use-package '(noflet :type git :host github :repo "nicferrier/emacs-noflet"))
-(require 'noflet)
-(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
-  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
-  (noflet ((process-list ())) ad-do-it))
-
-;;Don't ask me when kill process buffers
-(setq kill-buffer-query-functions
-      (remq 'process-kill-buffer-query-function
-            kill-buffer-query-functions))
-
 ;; set font
 ;; @see https://emacs-china.org/t/emacs/7268/2
 (defun set-font (english chinese english-size chinese-size)
@@ -133,42 +81,83 @@
 (defun lye/reset-frame-size (&optional frame)
   "set the frame-size."
   (interactive)
-  (when frame
-    (select-frame frame))
+  (when frame (select-frame frame))
   (if *is-a-win*
       (progn
         (set-frame-width (selected-frame) 96)
         (set-frame-height (selected-frame) 32))
     (set-frame-size (selected-frame) 96 32)))
-
 (when window-system
   (lye/reset-frame-size))
 ;;(add-hook 'emacs-startup-hook 'lye/reset-frame-size)
 ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
 (add-hook 'after-make-frame-functions 'lye/reset-frame-size)
+;; Theme
+;; Understand the topics currently in use
+(defun lye/current-theme ()
+  "what is the Current theme?"
+  (interactive)
+  (message "The Current theme is %s"
+           (substring (format "%s" custom-enabled-themes) 1 -1)))
+
+(if (display-graphic-p)
+    (use-package doom-themes
+      :init (load-theme 'doom-one t))
+  (straight-use-package '(lazycat-theme
+                          :tyep git :host github :repo "lye95/lazycat-theme"))
+  (require 'lazycat-theme))
 
 ;; mode-line
 (if (display-graphic-p)
-    (progn
-      ;; (use-package awesome-tray
-      ;;   :straight (awesome-tray
-      ;;              :type git
-      ;;              :host github
-      ;;              :repo "manateelazycat/awesome-tray")
-      ;;   :ensure nil
-      ;;   :commands (awesome-tray-mode)
-      ;;   :init (awesome-tray-mode 1))
-      (use-package doom-modeline
-        :init
-        ;; Only display the file name, wait for the mouse to move to the file name in the display path
-        (setq doom-modeline-buffer-file-name-style 'buffer-name)
-        (doom-modeline-mode)))
+    (use-package doom-modeline
+      :init (doom-modeline-mode)
+      :config
+      ;; Only display the file name
+      (setq doom-modeline-buffer-file-name-style 'buffer-name))
   (require 'init-modeline))
+
+;; Misc
+(setq ad-redefinition-action 'accept)  ;不要烦人的 redefine warning
+(setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
+(fset 'yes-or-no-p 'y-or-n-p) ; 以 y/n 取代 yes/no
+(setq inhibit-startup-screen t) ; 不展示开始界面
+;; (setq initial-scratch-message "") ; 不显示 scratch 中默认信息
+;;(setq visible-bell t)
+(setq ring-bell-function 'ignore) ; Turn off the error ringtone
+(setq mouse-yank-at-point t) ; Paste at the cursor position instead of the mouse pointer
+(setq x-select-enable-clipboard t) ; 支持 emacs 和外部程序的粘贴
+(setq track-eol t) ; keep cursor at end of lines, Require line-move-visual is nil
+(setq line-move-visual nil)
+(setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
+
+;; Don't ask me when close emacs with process is running
+
+(straight-use-package '(noflet :type git :host github :repo "nicferrier/emacs-noflet"))
+(require 'noflet)
+(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+  (noflet ((process-list ())) ad-do-it))
+
+;;Don't ask me when kill process buffers
+(setq kill-buffer-query-functions
+      (remq 'process-kill-buffer-query-function
+            kill-buffer-query-functions))
 
 ;; Do not use the mouse in the graphical interface
 (when (display-graphic-p)
   (use-package disable-mouse
     :init (global-disable-mouse-mode)))
+
+;; Make *Scratch* buffer undelete
+(defun lye/unkillable-scratch-buffer ()
+  "Don't delete *Scratch*."
+  (if (string= (buffer-name (current-buffer)) "*scratch*")
+      (progn
+	    (delete-region (point-min) (point-max))
+	    (insert initial-scratch-message)
+	    nil)
+    t))
+(add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
 
 (provide 'init-ui)
 ;;; init-ui.el ends here
