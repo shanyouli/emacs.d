@@ -24,7 +24,6 @@
 
 ;;; Code:
 
-
 ;; Logo
 ;; (setq facy-splash-image logo)
 
@@ -38,7 +37,7 @@
 ;;   (setq icon-title-format frame-title-format))
 
 ;; Suppress GUI features
-(unless *is-a-term*
+(when (display-graphic-p) 
   (setq use-file-dialog nil
         use-dialog-box nil
         inhibit-startup-screen t))
@@ -80,38 +79,6 @@
 (add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
 
 ;; Theme
-
-;;;Setting a Hook run after a color theme is loaded using `load-theme'.
-(defun after-load-theme-hook nil
-  "Hook run after a color theme is loaded using `load-theme'.")
-(defadvice load-theme (after run-after-load-theme-hook activate)
-  "Run `after-load-theme-hook'."
-  (run-hooks 'after-load-theme-hook))
-
-;; Theme
-(defun standardize-theme (theme)
-  "Standardize THEME."
-  (pcase theme
-    ('default 'monokai)
-    ('light 'tao)
-    ))
-(defun lye-load-theme (theme)
-  "Set color THEME."
-  (interactive
-   (list
-    (intern (completing-read "Load theme:"
-			     '(default light dark)))))
-  (pcase theme
-    ('default
-     (use-package monokai-theme
-       :init (load-theme 'monokai t)))
-    ('light
-     (use-package tao-theme
-       :init (load-theme 'tao-yang t)))
-    ('dark
-     (use-package dakrone-theme
-       :init (load-theme 'dakrone t)))))
-
 ;; Understand the topics currently in use
 (defun lye/current-theme ()
   "what is the Current theme?"
@@ -122,22 +89,33 @@
 (if (display-graphic-p)
     (use-package doom-themes
       :init (load-theme 'doom-one t))
-  ;;(lye-load-theme lye-themes)
-  (use-package lazycat-theme
-    :ensure nil
-    :straight (lazycat-theme
-               :tyep git
-               :host github
-               :repo "lye95/lazycat-theme")
-    :init (require 'lazycat-theme)))
+  (straight-use-package '(lazycat-theme :tyep git :host github
+                                        :repo "lye95/lazycat-theme"))
+    (require 'lazycat-theme))
 
 ;; Misc
-(fset 'yes-or-no-p 'y-or-n-p)
-(setq inhibit-startup-screen t)
-(setq visible-bell t)
+(fset 'yes-or-no-p 'y-or-n-p) ; 以 y/n 取代 yes/no
+(setq inhibit-startup-screen t) ; 不展示开始界面
+;; (setq initial-scratch-message "") ; 不显示 scratch 中默认信息
+;;(setq visible-bell t)
+(setq ring-bell-function 'ignore) ; Turn off the error ringtone
+(setq mouse-yank-at-point t) ; Paste at the cursor position instead of the mouse pointer
+(setq x-select-enable-clipboard t) ; 支持 emacs 和外部程序的粘贴
 (setq track-eol t) ; keep cursor at end of lines, Require line-move-visual is nil
 (setq line-move-visual nil)
 (setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
+
+;; Don't ask me when close emacs with process is running
+(straight-use-package '(noflet :type git :host github :repo "nicferrier/emacs-noflet"))
+(require 'noflet)
+(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+  (noflet ((process-list ())) ad-do-it))
+
+;;Don't ask me when kill process buffers
+(setq kill-buffer-query-functions
+      (remq 'process-kill-buffer-query-function
+            kill-buffer-query-functions))
 
 ;; set font
 ;; @see https://emacs-china.org/t/emacs/7268/2
