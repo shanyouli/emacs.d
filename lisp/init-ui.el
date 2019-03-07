@@ -110,10 +110,12 @@
 ;; mode-line
 (if (display-graphic-p)
     (use-package doom-modeline
-      :init (doom-modeline-mode)
+      :init (doom-modeline-mode 1)
       :config
       ;; Only display the file name
-      (setq doom-modeline-buffer-file-name-style 'buffer-name))
+      (setq doom-modeline-buffer-file-name-style 'truncate-all)
+      ;; Wheter show `all-the-icons' or not
+      (setq doom-modeline-icon t))
   (require 'init-modeline))
 
 ;; Misc
