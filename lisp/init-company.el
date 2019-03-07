@@ -88,20 +88,19 @@ In that case, insert the number."
            10
          (string-to-number k))))))
 (with-eval-after-load 'company
-(let ((map company-active-map))
-  (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
-        (number-sequence 0 9))))
+  (let ((map company-active-map))
+    (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
+          (number-sequence 0 9))))
 
 (with-eval-after-load 'company
-(let ((map company-active-map))
-  (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
-        (number-sequence 0 9))
-  (define-key map [escape] (lambda()
-                          (interactive)
-                          (company-abort)
-                          (evil-force-normal-state)
-                          (self-insert-command 1))))
-  )
+  (let ((map company-active-map))
+    (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
+          (number-sequence 0 9))
+    (define-key map [escape] (lambda()
+                               (interactive)
+                               (company-abort)
+                               (evil-force-normal-state)
+                               (self-insert-command 1)))))
 
 ;; Popup documentation for completion candidates
 (when (display-graphic-p)

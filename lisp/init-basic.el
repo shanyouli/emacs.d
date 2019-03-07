@@ -25,9 +25,6 @@
 ;;; Code:
 
 ;; Set name and mail-address
-(eval-when-compile
-  (require 'init-const)
-  (require 'init-custom))
 
 (setq user-full-name lye-full-name)
 (setq user-mail-address lye-mail-address)
@@ -157,7 +154,6 @@
           (string-equal default-directory "d:/Applications/emacs/bin/")
           (string-equal default-directory "c:/ScoopApps/apps/emacs-dev/current/bin/")
           (string-equal default-directory "c:/ScoopApps/apps/emacs/current/bin/"))
-      
       (cd "~")))
 
 ;; add emacs startup time, copy from emacs-git(2018.02.22)

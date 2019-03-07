@@ -24,9 +24,6 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'init-custom))
-
 (require 'package)
 ;; HACK: DO NOT save the variable "package-selected-packages" in init/custom file
 ;; @see https://github.com/jwiegley/use-package/issues/383#issuecomment-247801751

@@ -30,7 +30,7 @@
 	 ("C-c l" . org-store-link)
 	 ("C-c c" . org-capture)
 	 ("C-c b" . org-switchb))
-  :mode ("\\.org\\'" . org-mode)
+  :mode ("\\.org$\\'" . org-mode)
   :ensure nil
   :config
   ;;Align tag
@@ -52,6 +52,10 @@
                      (org-bullets-mode 1))
                  (org-indent-mode t) ; 自动缩进, * 和 ** etc.
                  ))))
+
+(add-hook (quote org-mode-hook)
+          (lambda ()
+            (org-shifttab 3)))
 
 (provide 'init-org)
 ;;; init-org.el ends here

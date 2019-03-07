@@ -144,5 +144,8 @@
   (setq whitespace-action '(face lines-tail))
   (whitespace-mode))
 
+;; Automatically refresh files that have been changed elsewhere
+(add-hook 'after-init-hook (lambda () (global-auto-revert-mode t)))
+
 (provide 'init-edit)
 ;;; init-edit.el ends here

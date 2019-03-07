@@ -3,13 +3,13 @@
 (defun lye/simplify-major-mode-name ()
   "Return simplifyed major mode name"
   (let* ((major-name (format-mode-line "%m"))
-         (replace-table '(Emacs-Lisp "𝝀"
-                                     Python "Py"
+         (replace-table '(Emacs-Lisp "Elisp"
+                                     Python "PY"
                                      Shell ">"
-                                     Markdown "𝓜"
-                                     Org "𝒪"
-                                     Text "𝓣"
-                                     Fundamental "ℱ"))
+                                     Markdown "MD"
+                                     Org "ORG"
+                                     Text "TEXT"
+                                     Fundamental "FDM"))
          (replace-name (plist-get replace-table (intern major-name))))
     (if replace-name replace-name major-name
         )))

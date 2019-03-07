@@ -122,8 +122,14 @@
 (if (display-graphic-p)
     (use-package doom-themes
       :init (load-theme 'doom-one t))
-    ;;(lye-load-theme lye-themes)
-  (require 'init-theme))
+  ;;(lye-load-theme lye-themes)
+  (use-package lazycat-theme
+    :ensure nil
+    :straight (lazycat-theme
+               :tyep git
+               :host github
+               :repo "lye95/lazycat-theme")
+    :init (require 'lazycat-theme)))
 
 ;; Misc
 (fset 'yes-or-no-p 'y-or-n-p)

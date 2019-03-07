@@ -33,7 +33,7 @@
 (defun lye/wsl-bash ()
   "Running windows subsystem Linux in emacs!"
   (interactive)
-  (let ((shell-file-name "C:\\Windows\\System32\\wsl.exe"))
+  (let ((shell-file-name "C:\\Windows\\System32\\bash.exe"))
     (shell "*bash*")))
 
 (provide 'init-ahk)
