@@ -88,8 +88,8 @@
       (progn
         (set-frame-width (selected-frame) 96)
         (set-frame-height (selected-frame) 32))
-    ;; (set-frame-size (selected-frame) 96 32))
-  )
+    ;; (set-frame-size (selected-frame) 96 32)
+    ))
 (when window-system
   (lye/reset-frame-size))
 ;;(add-hook 'emacs-startup-hook 'lye/reset-frame-size)
@@ -116,7 +116,7 @@
       :init (doom-modeline-mode 1)
       :config
       ;; Only display the file name
-      (setq doom-modeline-buffer-file-name-style 'truncate-all)
+      (setq doom-modeline-buffer-file-name-style 'truncate-upto-root)
       ;; Wheter show `all-the-icons' or not
       (setq doom-modeline-icon t))
   (require 'init-modeline))
