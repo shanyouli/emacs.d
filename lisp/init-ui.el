@@ -36,7 +36,7 @@
 ;;                    %b))))
 ;;   (setq icon-title-format frame-title-format))
 
-;; Suppress GUI features 
+;; Suppress GUI features
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)
 (setq initial-major-mode 'emacs-lisp-mode
@@ -48,7 +48,7 @@
     (tool-bar-mode -1))
   (when (fboundp 'set-scroll-bar-mode)
     (set-scroll-bar-mode nil))
-  
+
   ;; I generally prefer to hide the menu bar, but doing this on OS X
   ;; simply makes it update unreliably in GUI frames, so we make an
   ;; exception.
@@ -75,7 +75,9 @@
                       (font-spec :family chinese :size chinese-size))))
 ;;(set-font "Source Code Pro" "simsun" 12 14)
 (when (display-graphic-p)
-  (set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14))
+  (cond
+   ((member "等距更纱黑体 SC" (font-family-list))
+    (set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14))))
 
 ;; set startup frame-size
 (defun lye/reset-frame-size (&optional frame)
@@ -155,9 +157,9 @@
   "Don't delete *Scratch*."
   (if (string= (buffer-name (current-buffer)) "*scratch*")
       (progn
-	    (delete-region (point-min) (point-max))
-	    (insert initial-scratch-message)
-	    nil)
+        (delete-region (point-min) (point-max))
+        (insert initial-scratch-message)
+        nil)
     t))
 (add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
 
