@@ -63,9 +63,9 @@
 
 ;; Beautify line breaks
 (use-package page-break-lines
-  :hook
-  (emacs-lisp-mode . turn-on-page-break-lines-mode)
-  (compilation-mode . turn-on-page-break-lines-mode))
+  :init
+  (add-hook 'compilation-mode-hook #'turn-on-page-break-lines-mode)
+  (add-hook 'emacs-lisp-mode-hook #'turn-on-page-break-lines-mode))
 
 (provide 'init-elisp)
 ;;; init-elisp.el ends here

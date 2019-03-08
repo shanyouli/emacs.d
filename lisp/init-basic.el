@@ -146,7 +146,5 @@
   :diminish which-key
   :hook (after-init . which-key-mode))
 
-
-
 (provide 'init-basic)
 ;;; init-basic.el ends here
