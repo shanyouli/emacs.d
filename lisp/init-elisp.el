@@ -19,16 +19,16 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
 
 (use-package elisp-mode
   :ensure nil
   :bind (:map emacs-lisp-mode-map
-	      ("C-c C-x" . ielm)
-	      ("C-c C-c" . eval-defun)
-	      ("C-c C-b" . eval-buffer)))
+          ("C-c C-x" . ielm)
+          ("C-c C-c" . eval-defun)
+          ("C-c C-b" . eval-buffer)))
 
 ;; Show function arglist or variable docstring
 ;; `global-edloc-mode' is enabled by default.
@@ -40,9 +40,9 @@
 ;; Interacitve macro expander
 (use-package macrostep
   :bind (:map emacs-lisp-mode-map
-	      ("C-c e" . macrostep-expand)
-	      :map lisp-interaction-mode-map
-	      ("C-c e" . macrostep-expand)))
+          ("C-c e" . macrostep-expand)
+          :map lisp-interaction-mode-map
+          ("C-c e" . macrostep-expand)))
 
 ;; Semantic code search for emacs lisp
 (use-package elisp-refs)
@@ -54,16 +54,18 @@
   :config
   (with-eval-after-load 'ivy
     (dolist (cmd '(helpful-callable
-		   helpful-variable
-		   helpful-function
-		   helpful-macro
-		   helpful-command))
+           helpful-variable
+           helpful-function
+           helpful-macro
+           helpful-command))
       (cl-pushnew `(,cmd . "^") ivy-initial-inputs-alist))))
 
 
 ;; Beautify line breaks
 (use-package page-break-lines
-  :hook (emacs-lisp-mode . turn-on-page-break-lines-mode))
+  :hook
+  (emacs-lisp-mode . turn-on-page-break-lines-mode)
+  (compilation-mode . turn-on-page-break-lines-mode))
 
 (provide 'init-elisp)
 ;;; init-elisp.el ends here

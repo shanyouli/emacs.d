@@ -164,5 +164,18 @@
     t))
 (add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
 
+;; Line and column
+(setq-default fill-column 80)
+(setq column-number-mode t)
+(setq line-number-mode t)
+
+(use-package time
+  :ensure nil
+  :unless (display-graphic-p)
+  :hook (after-init . display-time-mode)
+  :init
+  (setq display-time-24hr-format t)
+  (setq display-time-day-and-date t))
+
 (provide 'init-ui)
 ;;; init-ui.el ends here
