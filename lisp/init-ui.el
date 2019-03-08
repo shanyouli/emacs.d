@@ -88,7 +88,8 @@
       (progn
         (set-frame-width (selected-frame) 96)
         (set-frame-height (selected-frame) 32))
-    (set-frame-size (selected-frame) 96 32)))
+    ;; (set-frame-size (selected-frame) 96 32))
+  )
 (when window-system
   (lye/reset-frame-size))
 ;;(add-hook 'emacs-startup-hook 'lye/reset-frame-size)
