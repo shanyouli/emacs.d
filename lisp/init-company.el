@@ -111,11 +111,11 @@ In that case, insert the number."
     :config (setq company-quickhelp-delay 0.8)))
 
 ;; Use company-posframe
-(use-package company-posframe
-  :after company
-  :config
-  (if (display-graphic-p)
-      (company-posframe-mode 1)))
+(when (display-graphic-p)
+  (use-package company-posframe
+    :after company
+    :config
+    (company-posframe-mode 1)))
 
 (provide 'init-company)
 ;;; init-company.el ends here

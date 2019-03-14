@@ -92,18 +92,16 @@
   (setq display-line-numbers-grow-only t)
   ;; (set-face-foreground 'line-number-current-line "#859393")
   ;; (set-face-background 'line-number "#313335")
-  (use-package linum-relative
-    :commands linum-relative-mode
-    :init
-    (setq linum-relative-backend 'display-line-numbers-mode)
-    (dolist (hook (list
+  (dolist (hook (list
                    'c-mode-common-hook
                    'emacs-lisp-mode-hook
                    'sh-mode-hook
                    'org-mode-hook))
-      (add-hook hook (lambda () (display-line-numbers-mode)))
-      ;;(add-hook hook (lambda () (linum-relative-mode 1)))
-      )))
+      (add-hook hook (lambda () (display-line-numbers-mode 1)))))
+;; (use-package linum-relative
+;;   :commands linum-relative-mode
+;;   :init
+;;   (setq linum-relative-backend 'display-line-numbers-mode))
 
 ;; Don't display `symbolic link to Git-controlled source file....'
 ;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links

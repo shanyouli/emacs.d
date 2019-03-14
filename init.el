@@ -127,7 +127,7 @@
     (require 'init-org)
     (require 'init-scheme)
     (require 'init-lsp)
-    (require 'init-sh)
+    ;;(require 'init-sh)
     (require 'init-markdown)))
 
 (provide 'init)
