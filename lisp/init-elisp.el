@@ -63,7 +63,7 @@
 
 ;; Beautify line breaks
 (use-package page-break-lines
-  :init
+  :config
   (add-hook 'compilation-mode-hook #'turn-on-page-break-lines-mode)
   (add-hook 'emacs-lisp-mode-hook #'turn-on-page-break-lines-mode))
 

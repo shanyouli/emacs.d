@@ -33,15 +33,7 @@
       (gc-cons-threshold most-positive-fixnum)
       ;; Empty to avoid analyzing files when loading remote files.
       (file-name-handler-alist nil))
-  ;;(defvar default-file-name-handler-alist file-name-handler-alist)
-  ;;(setq file-name-handler-alist nil)
-  ;;(setq gc-cons-threshold 80000000)
-  ;; (add-hook 'emacs-startup-hook
-  ;;           (lambda ()
-  ;;             "Restore default values after init."
-  ;;             (setq file-name-handler-alist default-file-name-handler-alist)
-  ;;             (setq gc-cons-threshold 800000)
-  ;;             (add-hook 'focus-out-hook 'garbage-collect)))
+
   ;; Load path
   ;; Optimize: Force `lisp' at the head to reduce the startup time.
   (defun update-load-path (&rest _)
@@ -51,7 +43,7 @@
   (if (version< emacs-version "27.0")
       (update-load-path)
     (push (expand-file-name "lisp" user-emacs-directory) load-path))
-  
+
   ;; Constants
   (defconst lye-homepage  "https://github.com/lye95/emacs.d"
     "The Github page of My Emacs Configurations.")
@@ -84,9 +76,9 @@
   (defcustom lye-package-archives 'emacs-china
     "Set package archives from which to fetch."
     :type '(choice (const :tag "Melpa" melpa)
-	               (const :tag "Melpa-mirror" melpa-mirror)
-	               (const :tag "Emacs-china" emacs-china)
-	               (const :tag "Netease" netease)))
+                   (const :tag "Melpa-mirror" melpa-mirror)
+                   (const :tag "Emacs-china" emacs-china)
+                   (const :tag "Netease" netease)))
 
   (defcustom lye-company-enable-yas nil
     "Enable yasnippet for company backends or not."
@@ -96,12 +88,12 @@
   (defcustom lye-themes 'default
     "Set color theme."
     :type '(choice (const :tag "Monokai Theme" default)
-	               (const :tag "Tao theme" light)
-	               (const :tag "Tao theme" dark)))
+                   (const :tag "Tao theme" light)
+                   (const :tag "Tao theme" dark)))
   ;; Load `custom-file'
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (when (file-exists-p custom-file) (load custom-file))
-  
+
   (with-temp-message ""              ; Erase the output of the plugin startup
 
     ;; Set the color at startup to avoid flickering
@@ -124,13 +116,13 @@
     (require 'init-flycheck)
     (require 'init-eshell)
     (require 'init-magit)
-    
+
     ;; RSS Reader
     (require 'init-elfeed)
-    
+
     (when *is-a-win*
       (require 'init-ahk))
-    
+
     (require 'init-elisp)
     (require 'init-org)
     (require 'init-scheme)

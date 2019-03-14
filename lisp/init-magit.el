@@ -25,7 +25,11 @@
 ;;; Code:
 
 (use-package magit
-  :bind ("C-x g" . magit-status))
+  :bind ("C-x g" . magit-status)
+  :config
+  (setq transient-history-file (concat lye-emacs-temporal-dir "transient/history.el")
+        transient-values-file (concat lye-emacs-temporal-dir "transient/values.el")
+        transient-levels-file (concat lye-emacs-temporal-dir "transient/levels.el")))
 
 (provide 'init-magit)
 ;;; init-magit.el ends here

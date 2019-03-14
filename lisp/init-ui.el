@@ -76,7 +76,8 @@
 ;;(set-font "Source Code Pro" "simsun" 12 14)
 (when (display-graphic-p)
   (cond
-   ((member "等距更纱黑体 SC" (font-family-list))
+   ((or (member "等距更纱黑体 SC" (font-family-list))
+        (member "Sarasa Mono SC" (font-family-list)))
     (set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14))))
 
 ;; set startup frame-size
@@ -106,9 +107,10 @@
 (if (display-graphic-p)
     (use-package doom-themes
       :init (load-theme 'doom-one t))
-  (straight-use-package '(lazycat-theme
-                          :tyep git :host github :repo "lye95/lazycat-theme"))
-  (require 'lazycat-theme))
+  ;;(straight-use-package '(lazycat-theme
+  ;;                        :tyep git :host github :repo "lye95/lazycat-theme"))
+  ;;(require 'lazycat-theme)
+  )
 
 ;; mode-line
 (if (display-graphic-p)
@@ -118,8 +120,10 @@
       ;; Only display the file name
       (setq doom-modeline-buffer-file-name-style 'truncate-upto-root)
       ;; Wheter show `all-the-icons' or not
-      (setq doom-modeline-icon t))
-  (require 'init-modeline))
+      ;;(setq doom-modeline-icon t)
+      )
+  ;;(require 'init-modeline)
+  )
 
 ;; Misc
 (setq ad-redefinition-action 'accept)  ;不要烦人的 redefine warning
