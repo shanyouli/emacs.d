@@ -96,7 +96,8 @@
                    'c-mode-common-hook
                    'emacs-lisp-mode-hook
                    'sh-mode-hook
-                   'org-mode-hook))
+                   ;; 'org-mode-hook
+                   ))
       (add-hook hook (lambda () (display-line-numbers-mode 1)))))
 ;; (use-package linum-relative
 ;;   :commands linum-relative-mode
