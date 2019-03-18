@@ -103,7 +103,7 @@
 
 ;; add emacs startup time, copy from emacs-git(2018.02.22)
 (defun lye/emacs-init-time ()
-  "Copy `emacs-git' 
+  "Copy `emacs-git'
 Return a string giving the duration of the Emacs initialization."
   (interactive)
   (let ((str
@@ -113,6 +113,27 @@ Return a string giving the duration of the Emacs initialization."
     (if (called-interactively-p 'interactive)
         (message "%s" str)
       str)))
+
+;;Edit files with root privileges
+;; see @https://github.com/hlissner/doom-emacs/blob/develop/core/autoload/files.el
+(defun lye/sudo-find-file (file)
+  "Open FILE as root."
+  (interactive
+   (list (read-file-name "Open as root: ")))
+  (when (file-writable-p file)
+    (user-error "File is user writeable, aborting sudo"))
+  (find-file (if (file-remote-p file)
+                 (concat "/" (file-remote-p file 'method) ":"
+                         (file-remote-p file 'user) "@"
+                         (file-remote-p 'host) "|sudo:root@"
+                         (file-remote-p file 'host) ":"
+                         (file-remote-p file 'localname))
+               (concat "/sudo:root@localhost:" file))))
+
+(defun lye/sudo-this-file ()
+  "Open the current file as root."
+  (interactive)
+  (lye/sudo-find-file (file-truename buffer-file-name)))
 
 (provide 'init-funcs)
 ;;; init-funcs.el ends here

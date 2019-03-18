@@ -116,9 +116,9 @@
     (require 'init-flycheck)
     (require 'init-eshell)
     (require 'init-magit)
+    (require 'init-dired)
 
-    ;; RSS Reader
-    (require 'init-elfeed)
+    (require 'init-elfeed) ; RSS Reader
 
     (when *is-a-win*
       (require 'init-ahk))

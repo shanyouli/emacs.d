@@ -3,7 +3,7 @@
 ;; Copyright (C) 2019  lye li
 
 ;; Author: lye li <shanyouli6@gmail.com>
-;; Keywords: 
+;; Keywords:
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 ;;; Commentary:
 
-;; 
+;;
 
 ;;; Code:
 
@@ -39,4 +39,3 @@
 
 (provide 'early-init)
 ;;; early-init.el ends here
-

@@ -1,4 +1,4 @@
-;;; init-yaml.el ---Initalize Yaml Configure         -*- lexical-binding: t; -*-
+;;; init-dired.el --- Initialize Dired               -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  lye li
 
@@ -24,10 +24,18 @@
 
 ;;; Code:
 
-(use-package yaml-mode
-  :init
-  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-  (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode)))
+;; see @https://stackoverflow.com/questions/95631/open-a-file-with-su-sudo-inside-emacs
+(add-hook 'dired-mode-hook
+    (lambda ()
+      ;; open current file as sudo
+      (local-set-key (kbd "C-x <M-S-return>") (lambda()
+        (interactive)
+        (message "!!! SUDO opening %s" (dired-file-name-at-point))
+        (lye/sudo-find-file (dired-file-name-at-point))
+      ))
+    )
+)
 
-(provide 'init-yaml)
-;;; init-yaml.el ends here
+
+(provide 'init-dired)
+;;; init-dired.el ends here
