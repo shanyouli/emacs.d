@@ -24,12 +24,11 @@
 
 ;;; Code:
 
-(use-package lsp
-  :ensure lsp-mode
-  :diminish lsp-mode
-  :hook ((json-mode . lsp)
-         (lsp-after-open . lsp-enable-imenu)))
+(use-package lsp-mode :commands lsp)
+(use-package lsp-ui :commands lsp-ui-mode)
+(use-package company-lsp :commands company-lsp)
 
+(add-hook 'sh-mode-hook #'lsp)
 
 (provide 'init-lsp)
 ;;; init-lsp.el ends here

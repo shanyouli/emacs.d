@@ -94,7 +94,6 @@
 
 ;;translate Chinese to English, or translate English to Chinese
 (if (executable-find "sdcv")
-    ;;(eq (shell-command "type sdcv 2>&1 >/dev/null") 0)
     (progn
       (message "You Installed sdcv in the computer!")
       (use-package sdcv
