@@ -77,6 +77,7 @@
 (when (display-graphic-p)
   (cond
    ((or (member "等距更纱黑体 SC" (font-family-list))
+        (member "Sarasa Term SC" (font-family-list))
         (member "Sarasa Mono SC" (font-family-list)))
     (set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14))))
 

@@ -80,6 +80,5 @@
   :bind ([remap other-window] . ace-window)
   :hook (after-init . ace-window-display-mode))
 
-
 (provide 'init-window)
 ;;; init-windows.el ends here
