@@ -40,11 +40,12 @@
   (use-package live-py-mode)
    ;; Format using YAPF
   ;; Install: pip install yapf
-  (use-package yapfify
-    :diminish yapf-mode
-    :hook (python-mode . yapf-mode))
   (use-package pyenv-mode)
   (use-package pyenv-mode-auto))
+;; Format using YAPF
+;; Install: pip install yapf
+(use-package py-yapf :commands (py-yapf-enable-on-save))
+(add-hook 'python-mode-hook 'py-yapf-enable-on-save)
 
 (add-hook 'python-mode-hook (lambda () (require 'pyenv-mode-auto)))
 
