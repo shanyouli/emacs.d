@@ -28,14 +28,14 @@
   :diminish ivy-mode counsel-mode
   :bind (("C-s" . swiper)
          ("C-x f" . counsel-recentf)
-	     ("C-x C-b" . ivy-switch-buffer)
-	     :map ivy-minibuffer-map
-	     ([escape] . minibuffer-keyboard-quit)
-	     ("<C-return>" . ivy-immediate-done)
-	     :map swiper-map
-	     ([escape] . minibuffer-keyboard-quit))
+         ("C-x C-b" . ivy-switch-buffer)
+         :map ivy-minibuffer-map
+         ([escape] . minibuffer-keyboard-quit)
+         ("<C-return>" . ivy-immediate-done)
+         :map swiper-map
+         ([escape] . minibuffer-keyboard-quit))
   :hook ((after-init . ivy-mode)
-	     (ivy-mode . counsel-mode))
+         (ivy-mode . counsel-mode))
   :config
   (setq enable-recursive-minibuffers t) ; Allow commands in minibuffers
   (setq ivy-use-selectable-prompt t)
@@ -51,9 +51,9 @@
 
   ;; Use faster search tools: rigprep
   (let ((command
-	 (cond
-	  ((executable-find "rg")
-	   "rg -i M 120 --no-beading --line-number --color never '%s' %s"))))
+     (cond
+      ((executable-find "rg")
+       "rg -i M 120 --no-beading --line-number --color never '%s' %s"))))
     (setq counsel-grep-base-command command))
 
   )

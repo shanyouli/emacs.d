@@ -31,6 +31,12 @@
 ;; Set the temporal directory
 (unless (file-exists-p lye-emacs-temporal-dir)
   (make-directory lye-emacs-temporal-dir))
+
+;;
+(when (memq window-system '(mac ns x))
+  (use-package exec-path-from-shell
+    :init (exec-path-from-shell-initialize)))
+
 ;; Store all temporal files in a temporal directory instead of being
 ;; disseminated in the $HOME directory
 (setq-default

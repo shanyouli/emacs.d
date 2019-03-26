@@ -96,6 +96,7 @@
                    'c-mode-common-hook
                    'emacs-lisp-mode-hook
                    'sh-mode-hook
+                   'python-mode-hook
                    ;; 'org-mode-hook
                    ))
       (add-hook hook (lambda () (display-line-numbers-mode 1)))))

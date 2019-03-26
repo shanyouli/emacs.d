@@ -126,8 +126,10 @@
     (require 'init-yaml)
     (require 'init-elisp)
     (require 'init-org)
+    (require 'init-hugo)
     (require 'init-scheme)
     (require 'init-lsp)
+    (require 'init-python)
     ;;(require 'init-sh)
     (require 'init-markdown)))
 

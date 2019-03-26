@@ -34,7 +34,7 @@
   :bind ("C-c t" . insert-translated-name-insert))
 
 ;; Configure Chinese input method
-(if (package-installed-p 'pyim)
+(unless (package-installed-p 'pyim)
     (package-install 'pyim))
 (require 'pyim)
 
@@ -97,9 +97,7 @@
     (progn
       (message "You Installed sdcv in the computer!")
       (use-package sdcv
-        :straight (sdcv :type git
-                        :host github
-                        :repo "manateelazycat/sdcv")
+        :straight (sdcv :type git :host github :repo "manateelazycat/sdcv")
         :ensure nil
         :commands (sdcv-search-pointer+ sdcv-search-pointer sdcv-search-input sdcv-search-input+)
         :bind (("C-c y" . sdcv-search-pointer+)
@@ -114,8 +112,7 @@
                 "懒虫简明英汉词典"
                 "懒虫简明汉英词典"))
         (setq sdcv-dictionary-complete-list ; setup dictionary list for complete search
-              '(
-                "KDic11万英汉词典"
+              '("KDic11万英汉词典"
                 "懒虫简明英汉词典"
                 "懒虫简明汉英词典"
                 "21世纪英汉汉英双向词典"
@@ -127,8 +124,7 @@
                 "朗道汉英字典5.0"
                 "朗道英汉字典5.0"
                 "quick_eng-zh_CN"
-                "CDICT5英汉辞典"
-                ))))
+                "CDICT5英汉辞典"))))
   (progn
     (message "Not Installed sdcv, Using YouDao dictionary")
     (use-package youdao-dictionary

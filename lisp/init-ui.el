@@ -74,12 +74,33 @@
     (set-fontset-font (frame-parameter nil 'font) charset
                       (font-spec :family chinese :size chinese-size))))
 ;;(set-font "Source Code Pro" "simsun" 12 14)
+;; (set-font "Noto Sans Mono CJK SC" "Noto Sans Mono CJK SC" 14 14)
 (when (display-graphic-p)
+  ;;Chinese and English font alignment
   (cond
    ((or (member "等距更纱黑体 SC" (font-family-list))
         (member "Sarasa Term SC" (font-family-list))
         (member "Sarasa Mono SC" (font-family-list)))
-    (set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14))))
+    (set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14))
+   ((member "Noto Sans Mono CJK SC" (font-family-list))
+    (set-font "Noto Sans Mono CJK SC" "Noto Sans Mono CJK SC" 13 13))
+   ((and (member "Source Code Pro" (font-family-list))
+         (member "simusn" (font-family-list)))
+    (set-font "Source Code Pro" "simsun" 12 14)))
+
+   ;; Specify fonts for all unicode characters
+   (cond
+    ((member "Apple Color Emoji" (font-family-list))
+     (set-fontset-font t 'unicode "Apple Color Emoki" nil 'prepend))
+    ((member "Noto Color Emoji" (font-family-list))
+     (set-fontset-font t 'unicode "Noto Color Emoji" nil 'prepend))
+    ((member "Symbola" (font-family-list))
+     (set-fontset-font t 'unicode "Symbola" nil 'prepend))))
+
+;; Set line height
+(when (display-graphic-p)
+  (setq-default line-spacing nil)
+  (add-hook 'prog-mode-hook (lambda () (setq line-spacing 0.21))))
 
 ;; set startup frame-size
 (defun lye/reset-frame-size (&optional frame)

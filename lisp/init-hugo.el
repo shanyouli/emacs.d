@@ -1,4 +1,4 @@
-;;; init-dired.el --- Initialize Dired               -*- lexical-binding: t; -*-
+;;; init-hugo.el --- Initalize Hugo                  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  lye li
 
@@ -23,18 +23,14 @@
 ;;
 
 ;;; Code:
-(require 'dired)
-(setq dired-recursive-copies t) ; Recursive copying
-(setq dired-recursive-deletes t) ; Recursive deletion
 
-;; see @https://stackoverflow.com/questions/95631/open-a-file-with-su-sudo-inside-emacs
-(add-hook 'dired-mode-hook
-    (lambda ()
-      ;; open current file as sudo
-      (local-set-key (kbd "C-x <M-S-return>") (lambda()
-        (interactive)
-        (message "!!! SUDO opening %s" (dired-file-name-at-point))
-        (lye/sudo-find-file (dired-file-name-at-point))))))
+(use-package ox-hugo)
+(with-eval-after-load 'ox
+  (require 'ox-hugo)
+  (setq org-hugo-section "post"))
 
-(provide 'init-dired)
-;;; init-dired.el ends here
+(use-package easy-hugo)
+
+
+(provide 'init-hugo)
+;;; init-hugo.el ends here
