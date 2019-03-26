@@ -47,13 +47,13 @@
   ;; Constants
   (defconst lye-homepage  "https://github.com/lye95/emacs.d"
     "The Github page of My Emacs Configurations.")
-  (defconst *is-a-win* (eq system-type 'windows-nt)
+  (defconst system/windows (eq system-type 'windows-nt)
     "Are we running on a Windows System?")
 
-  (defconst *is-a-mac* (eq system-type 'darwin)
+  (defconst system/mac (eq system-type 'darwin)
     "Are we running on a Mac System?")
 
-  (defconst *is-a-linux* (eq system-type 'gnu/linux)
+  (defconst system/root (eq system-type 'gnu/linux)
     "Are we running on a GNU/Linux System?")
 
   (defconst *root* (string-equal "root" (getenv "USER"))
@@ -102,12 +102,12 @@
        '(default ((t (:background "black" :foreground "#137D11"))))))
 
     (require 'init-package)          ; Packages
+    (require 'init-funcs)
 
     ;; Preferences
     (require 'init-ui)
     (require 'init-basic)
     (require 'init-edit)
-    (require 'init-funcs)
     (require 'init-window)
     (require 'init-ivy)
     (require 'init-company)
@@ -120,16 +120,15 @@
 
     (require 'init-elfeed) ; RSS Reader
 
-    (when *is-a-win*
-      (require 'init-ahk))
+    (if system/windows (require 'init-ahk))
 
     (require 'init-yaml)
     (require 'init-elisp)
     (require 'init-org)
     (require 'init-hugo)
     (require 'init-scheme)
-    (require 'init-lsp)
     (require 'init-python)
+    (require 'init-lsp)
     ;;(require 'init-sh)
     (require 'init-markdown)))
 

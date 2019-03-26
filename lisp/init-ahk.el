@@ -25,18 +25,20 @@
 ;;; Code:
 
 ;; When I use Windows system, I hope emacs start-directory is "HOME" at emacs starting
-(when *is-a-win*
   (if (or (string-equal default-directory "c:/Applications/ScoopApps/apps/emacs/current/bin/")
           (string-equal default-directory "c:/Applications/ScoopApps/apps/emacs-dev/current/bin/")
           (string-equal default-directory "c:/emacs/bin/")
           (string-equal default-directory "d:/Applications/emacs/bin/")
           (string-equal default-directory "d:/ScoopApps/apps/emacs-dev/current/bin/")
           (string-equal default-directory "d:/ScoopApps/apps/emacs/current/bin/"))
-      (cd "~")))
+      (cd "~"))
 
-(use-package ahk-mode
-  :mode "\\.ahk\\'"
-  :defer t)
+;; confirmedto prevent misoperation.
+(setq comfirm-kill-emacs (lambda (prompt)
+                           (y-or-n-p-with-timeout "Exit Emacs after 3s?" 3 "y")))
+
+;; autohotkey-mode
+(use-package ahk-mode :mode "\\.ahk\\'"  :defer t)
 
 ;; Runninng Wsl in Emacs
 ;; see @https://github.com/MatthewZMD/.emacs.d#bash-command
@@ -45,7 +47,6 @@
   (interactive)
   (let ((shell-file-name "C:\\Windows\\System32\\bash.exe"))
     (shell "*bash*")))
-
 
 (provide 'init-ahk)
 ;;; init-ahk.el ends here

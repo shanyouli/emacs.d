@@ -44,26 +44,18 @@
 
 ;; Window size and features
 (when (version< emacs-version  "27.0.0")
-  (when (fboundp 'tool-bar-mode)
-    (tool-bar-mode -1))
-  (when (fboundp 'set-scroll-bar-mode)
-    (set-scroll-bar-mode nil))
+  (when (fboundp 'tool-bar-mode) (tool-bar-mode -1))
+  (when (fboundp 'set-scroll-bar-mode) (set-scroll-bar-mode nil))
 
   ;; I generally prefer to hide the menu bar, but doing this on OS X
   ;; simply makes it update unreliably in GUI frames, so we make an
   ;; exception.
-  (if *is-a-mac*
+  (if system/mac
       (add-hook 'after-make-frame-functions
                 (lambda (frame)
                 (set-frame-parameter frame 'menu-bar-lines
-                                     (if (display-graphic-p frame)
-                                         1 0))))
-    (when (fboundp 'menu-bar-mode)
-      (menu-bar-mode -1))))
-
-(let ((no-border '(internal-border-width . 0)))
-  (add-to-list 'default-frame-alist no-border)
-  (add-to-list 'initial-frame-alist no-border))
+                                     (if (display-graphic-p frame) 1 0))))
+    (when (fboundp 'menu-bar-mode) (menu-bar-mode -1))))
 
 ;; set font
 ;; @see https://emacs-china.org/t/emacs/7268/2
@@ -73,8 +65,7 @@
   (dolist (charset '(kana han symbol cjk-misc bopomofo))
     (set-fontset-font (frame-parameter nil 'font) charset
                       (font-spec :family chinese :size chinese-size))))
-;;(set-font "Source Code Pro" "simsun" 12 14)
-;; (set-font "Noto Sans Mono CJK SC" "Noto Sans Mono CJK SC" 14 14)
+
 (when (display-graphic-p)
   ;;Chinese and English font alignment
   (cond
@@ -92,8 +83,6 @@
    (cond
     ((member "Apple Color Emoji" (font-family-list))
      (set-fontset-font t 'unicode "Apple Color Emoki" nil 'prepend))
-    ((member "Noto Color Emoji" (font-family-list))
-     (set-fontset-font t 'unicode "Noto Color Emoji" nil 'prepend))
     ((member "Symbola" (font-family-list))
      (set-fontset-font t 'unicode "Symbola" nil 'prepend))))
 
@@ -107,7 +96,7 @@
   "set the frame-size."
   (interactive)
   (when frame (select-frame frame))
-  (if *is-a-win*
+  (if system/windows
       (progn
         (set-frame-width (selected-frame) 96)
         (set-frame-height (selected-frame) 32))
@@ -115,9 +104,9 @@
     ))
 (when window-system
   (lye/reset-frame-size))
-;;(add-hook 'emacs-startup-hook 'lye/reset-frame-size)
 ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
 (add-hook 'after-make-frame-functions 'lye/reset-frame-size)
+
 ;; Theme
 ;; Understand the topics currently in use
 (defun lye/current-theme ()
@@ -128,11 +117,7 @@
 
 (if (display-graphic-p)
     (use-package doom-themes
-      :init (load-theme 'doom-one t))
-  ;;(straight-use-package '(lazycat-theme
-  ;;                        :tyep git :host github :repo "lye95/lazycat-theme"))
-  ;;(require 'lazycat-theme)
-  )
+      :init (load-theme 'doom-one t)))
 
 ;; mode-line
 (if (display-graphic-p)
@@ -140,12 +125,7 @@
       :init (doom-modeline-mode 1)
       :config
       ;; Only display the file name
-      (setq doom-modeline-buffer-file-name-style 'truncate-upto-root)
-      ;; Wheter show `all-the-icons' or not
-      ;;(setq doom-modeline-icon t)
-      )
-  ;;(require 'init-modeline)
-  )
+      (setq doom-modeline-buffer-file-name-style 'truncate-upto-root)))
 
 ;; Misc
 (setq ad-redefinition-action 'accept)  ;不要烦人的 redefine warning
@@ -162,7 +142,6 @@
 (setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
 
 ;; Don't ask me when close emacs with process is running
-
 (straight-use-package '(noflet :type git :host github :repo "nicferrier/emacs-noflet"))
 (require 'noflet)
 (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
@@ -173,11 +152,6 @@
 (setq kill-buffer-query-functions
       (remq 'process-kill-buffer-query-function
             kill-buffer-query-functions))
-
-;; Do not use the mouse in the graphical interface
-(when (display-graphic-p)
-  (use-package disable-mouse
-    :init (global-disable-mouse-mode)))
 
 ;; Make *Scratch* buffer undelete
 (defun lye/unkillable-scratch-buffer ()
@@ -191,17 +165,14 @@
 (add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
 
 ;; Line and column
-(setq-default fill-column 80)
 (setq column-number-mode t)
 (setq line-number-mode t)
 
-(use-package time
-  :ensure nil
-  :unless (display-graphic-p)
-  :hook (after-init . display-time-mode)
-  :init
+;; dispaly time
+(unless (display-graphic-p)
   (setq display-time-24hr-format t)
-  (setq display-time-day-and-date t))
+  (setq display-time-day-and-date nil)
+  (display-time-mode))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

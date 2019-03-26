@@ -36,7 +36,7 @@
 
 (setq-default major-mode 'text-mode)
 (add-hook 'text-mode-hook
-      (lambda ()
+          (lambda ()
         (turn-on-auto-fill)
         (diminish 'auto-fill-function)))
 (setq sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
@@ -45,8 +45,12 @@
 ;; Tab and Space
 ;; Permanently indent with spaces, never with TABs
 (setq-default c-basic-offset 4
-          tab-width 4
-          indent-tabs-mode nil)
+              tab-width 4
+              indent-tabs-mode nil)
+
+;; Do not use the mouse in the graphical interface
+(when (display-graphic-p)
+  (use-package disable-mouse :init (global-disable-mouse-mode)))
 
 ;; Delete selection if you insert
 (use-package delsel
@@ -66,8 +70,7 @@
 ;;Brackets highlighted
 (use-package highlight-parentheses
   :diminish highlight-parentheses-mode
-  :hook (after-init . (lambda ()
-            (global-highlight-parentheses-mode))))
+  :hook (after-init . global-highlight-parentheses-mode)))
 
 ;; Pair Automatic completion
 (use-package autopair
@@ -109,29 +112,13 @@
 ;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links
 (setq vc-follow-symlinks nil)
 
-;; Some major-mode are used manateelazycat/vi-navigate
-(use-package vi-navigate
-  :straight (vi-navigate :type git
-                         :host github
-                         :repo "manateelazycat/vi-navigate")
-  :ensure nil
-  :commands (vi-navigate-load-keys)
-  :hook (after-init . vi-navigate-load-keys))
-
 ;;Set blank highlight when use display graphic
 (if  (display-graphic-p)
     (use-package highlight-indent-guides
       :hook (prog-mode . highlight-indent-guides-mode)
       :config
       (setq highlight-indent-guides-method 'character)
-      (setq highlight-indent-guides-responsive t))
-  (use-package indent-guide
-    :hook (prog-mode . indent-guide-mode)
-    :config
-    (set-face-background 'indent-guide-face "dimgray")
-    (setq indent-guide-delay 0.1)
-    (setq indent-guide-recursive t)
-    (setq indent-guide-char "|")))
+      (setq highlight-indent-guides-responsive t)))
 
 (use-package whitespace
   :ensure nil

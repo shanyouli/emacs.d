@@ -32,10 +32,24 @@
 (unless (file-exists-p lye-emacs-temporal-dir)
   (make-directory lye-emacs-temporal-dir))
 
-;;
+;; exec-path config
 (when (memq window-system '(mac ns x))
   (use-package exec-path-from-shell
     :init (exec-path-from-shell-initialize)))
+
+;; Use undo-tree
+(use-package undo-tree
+  :init (global-undo-tree-mode))
+
+;; Save Emacs buffers when they lose focus after 2s
+(use-package auto-save
+  :straight (auto-save :type git :host github :repo "manateelazycat/auto-save")
+  :ensure nil
+  :commands (auto-save-enable)
+  :hook (after-init . auto-save-enable)
+  :config
+  (setq auto-save-idle 2)
+  (setq auto-save-silent t))
 
 ;; Store all temporal files in a temporal directory instead of being
 ;; disseminated in the $HOME directory
@@ -53,7 +67,6 @@
 ;; Game score
  gamegrid-user-score-file-directory (concat lye-emacs-temporal-dir "games")
  )
-
 
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
@@ -110,17 +123,6 @@
   (add-to-list 'recentf-exclude "COMMIT_EDITMSG\\'")
   (add-to-list 'recentf-exclude "COMMIT_MSG"))
 
-;; Delete useless spaces before saving the file
-(use-package files
-  :ensure nil
-  :config
-  ;; When Emacs is closed under the Window system, it is forcibly
-  ;; confirmedto prevent misoperation.
-  ;; @see https://lujun9972.github.io/blog/2017/04/15/%E9%98%B2%E6%AD%A2%E6%84%8F%E5%A4%96%E9%80%80%E5%87%BAemacs/
-  (when *is-a-win*
-    (setq confirm-kill-emacs (lambda (prompt)
-                               (y-or-n-p-with-timeout "Exit Emacs after 3s?" 3 "y")))))
-
 ;; (use-package simple
 ;;   :ensure nil
 ;;   :hook (before-save . (lambda ()
@@ -129,23 +131,6 @@
 (setq auto-save-list-file-prefix nil;not.# and #.# file
       auto-save-default nil
       make-backup-files nil) ; not ~ file
-
-;; Save Emacs buffers when they lose focus after 2s
-(use-package auto-save
-  :straight (auto-save :type git :host github :repo "manateelazycat/auto-save")
-  :ensure nil
-  :commands (auto-save-enable)
-  :hook (after-init . auto-save-enable)
-  :config
-  (setq auto-save-idle 2)
-  (setq auto-save-silent t))
-
-
-;; Use undo-tree
-(use-package undo-tree
-  ;; :ensure nil
-  :diminish
-  :hook (after-init . global-undo-tree-mode))
 
 ;; Displays the key bindings following your currently entered incomplete command
 (use-package which-key
