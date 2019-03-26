@@ -44,8 +44,8 @@
   (use-package pyenv-mode-auto))
 ;; Format using YAPF
 ;; Install: pip install yapf
-(use-package py-yapf :commands (py-yapf-enable-on-save))
-(add-hook 'python-mode-hook 'py-yapf-enable-on-save)
+(use-package yapfify :commands (yapf-mode))
+(add-hook 'python-mode-hook #'yapf-mode)
 
 (add-hook 'python-mode-hook (lambda () (require 'pyenv-mode-auto)))
 

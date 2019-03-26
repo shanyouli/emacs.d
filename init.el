@@ -121,6 +121,8 @@
     (require 'init-elfeed) ; RSS Reader
 
     (if system/windows (require 'init-ahk))
+    (load "~/Git/repo/auto-save/auto-save.el")
+    (auto-save-enable)
 
     (require 'init-yaml)
     (require 'init-elisp)

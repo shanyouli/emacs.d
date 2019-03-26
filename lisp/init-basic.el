@@ -42,8 +42,9 @@
   :init (global-undo-tree-mode))
 
 ;; Save Emacs buffers when they lose focus after 2s
+
 (use-package auto-save
-  :straight (auto-save :type git :host github :repo "manateelazycat/auto-save")
+  :straight (auto-save :type git :host github :repo "shanyouli/auto-save")
   :ensure nil
   :commands (auto-save-enable)
   :hook (after-init . auto-save-enable)
