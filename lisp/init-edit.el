@@ -67,13 +67,16 @@
   :config (setq avy-background 1))
 
 ;;Brackets highlighted
-(use-package highlight-parentheses
-  :diminish highlight-parentheses-mode
-  :hook (after-init . global-highlight-parentheses-mode))
+;; (use-package highlight-parentheses
+;;   :diminish highlight-parentheses-mode
+;;   :hook (after-init . global-highlight-parentheses-mode))
+
 ;; Pair Automatic completion
 (use-package autopair
   :diminish autopair-mode
   :hook (after-init . autopair-global-mode))
+(use-package rainbow-delimiters
+  :hook (autopair-mode . rainbow-delimiters-mode))
 
 ;;Chinese input automatically adds spaces in Chinese
 ;;(use-package pangu-spacing
@@ -151,6 +154,10 @@
 
 ;; Automatically refresh files that have been changed elsewhere
 (add-hook 'after-init-hook (lambda () (global-auto-revert-mode t)))
+
+;; add color display
+(use-package rainbow-mode
+  :hook (prog-mode . rainbow-mode))
 
 (provide 'init-edit)
 ;;; init-edit.el ends here
