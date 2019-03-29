@@ -35,7 +35,11 @@
 ;; exec-path config
 (when (memq window-system '(mac ns x))
   (use-package exec-path-from-shell
-    :init (exec-path-from-shell-initialize)))
+    :init
+    (setq exec-path-from-shell-check-startup-files nil)
+    (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
+    (setq exec-path-from-shell-arguments '("-l"))
+    (exec-path-from-shell-initialize)))
 
 ;; Use undo-tree
 (use-package undo-tree
@@ -75,18 +79,14 @@
   (use-package server
     :ensure nil
     :commands (server-running-p)
-    :hook (after-init . (lambda ()
-                          (unless (server-running-p)
-                            (server-start))))
+    :hook (after-init . (lambda () (unless (server-running-p) (server-start))))
     :init (setq server-auth-dir (concat lye-emacs-temporal-dir "server"))))
 
 ;; Save cursor position for everyfile you opened. So,  next time you open
 ;; the file, the cursor will be at the position you last opened it.
 (use-package saveplace
   :ensure nil
-  :config
-  (progn
-    (setq save-place-file (concat lye-emacs-temporal-dir "saveplace")))
+  :config (setq save-place-file (concat lye-emacs-temporal-dir "saveplace"))
   :hook (after-init . save-place-mode))
 
 ;; Miantain a history of past actions and a resonable number of lists
@@ -109,20 +109,24 @@
 ;; Save recentf file and open them
 (use-package recentf
   :ensure nil
-  :hook (find-file . (lambda () (unless recentf-mode
-                             (recentf-mode)
-                             (recentf-track-opened-file))))
+  :hook (find-file . (lambda ()
+                       (unless recentf-mode
+                         (recentf-mode)
+                         (recentf-track-opened-file))))
   :init
   ;;(add-hook 'after-init-hook #'recentf-mode)
   (setq recentf-max-saved-items 200
         recentf-save-file (concat lye-emacs-temporal-dir "recentf"))
-  :config
-  (add-to-list 'recentf-exclude (expand-file-name package-user-dir))
-  (add-to-list 'recentf-exclude ".cache")
-  (add-to-list 'recentf-exclude ".cask")
-  (add-to-list 'recentf-exclude "bookmarks")
-  (add-to-list 'recentf-exclude "COMMIT_EDITMSG\\'")
-  (add-to-list 'recentf-exclude "COMMIT_MSG"))
+  ;;Do not add these files to the recently opened text
+  (setq recentf-exclude '((expand-file-name package-user-dir)
+                          ".cache"
+                          ".cask"
+                          "bookmarks"
+                          "ido.*"
+                          "recentf"
+                          "url"
+                          "COMMIT_EDITMSG\\'"
+                          "COMMIT_MSG")))
 
 ;; (use-package simple
 ;;   :ensure nil
@@ -135,7 +139,6 @@
 
 ;; Displays the key bindings following your currently entered incomplete command
 (use-package which-key
-  :diminish which-key
   :hook (after-init . which-key-mode))
 
 (provide 'init-basic)
