@@ -79,9 +79,20 @@
 ;; Set 5 candidate words
 (setq pyim-page-length 9)
 
-(setq pyim-punctuation-translate-p '(no yes auto))
+(setq-default pyim-punctuation-translate-p '(no yes auto))
 (setq-default pyim-english-input-switch-functions
               '(pyim-probe-isearch-mode))
+
+;; No Chinese company
+(with-eval-after-load 'company
+   (defun lye/company-dabbrev--prefix (orig-fun)
+    "取消中文补全"
+    (let ((string (pyim-char-before-to-string 0)))
+      (if (pyim-string-match-p "\\cc" string)
+          nil
+        (funcall orig-fun))))
+  (advice-add 'company-dabbrev--prefix
+               :around #'lye/company-dabbrev--prefix))
 
 ;; Prompt English words when writing English
 (use-package company-english-helper

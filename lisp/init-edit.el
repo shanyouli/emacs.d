@@ -35,9 +35,9 @@
 (setq set-mark-command-repeat-pop t) ; Repeating C-SPC after poping mark pops it again
 
 (setq-default major-mode 'text-mode)
-(add-hook 'text-mode-hook (lambda ()
-                            (turn-on-auto-fill)
-                            (diminish 'auto-fill-function)))
+;; (add-hook 'text-mode-hook (lambda ()
+;;                             (turn-on-auto-fill)
+;;                             (diminish 'auto-fill-function)))
 (setq sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
 (setq sentence-end-double-space nil)
 

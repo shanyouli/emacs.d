@@ -96,11 +96,6 @@
 
   (with-temp-message ""              ; Erase the output of the plugin startup
 
-    ;; Set the color at startup to avoid flickering
-    (unless (display-graphic-p)
-      (custom-set-faces
-       '(default ((t (:background "black" :foreground "#137D11"))))))
-
     (require 'init-package)          ; Packages
     (require 'init-funcs)
 
@@ -121,8 +116,6 @@
     (require 'init-elfeed) ; RSS Reader
 
     (if system/windows (require 'init-ahk))
-    (load "~/Git/repo/auto-save/auto-save.el")
-    (auto-save-enable)
 
     (require 'init-yaml)
     (require 'init-elisp)

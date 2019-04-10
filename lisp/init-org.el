@@ -61,7 +61,15 @@
        (screen . nil)
        (,(if (locate-library "ob-sh") 'sh 'shell) . t)
        (sql . t)
-       (sqlite . t)))))
+       (sqlite . t))))
+  (add-to-list 'org-src-lang-modes '("plantuml" . puml))
+  (if (file-exists-p (concat user-emacs-directory "plantuml.jar"))
+      (setq org-plantuml-jar-path (concat user-emacs-directory "plantuml.jar"))
+    (setq org-plantuml-jar-path "~/plantuml.jar")))
+
+(use-package plantuml-mode
+  :config
+  (setq plantuml-jar-path (concat user-emacs-directory "plantuml.jar")))
 
 (provide 'init-org)
 ;;; init-org.el ends here
