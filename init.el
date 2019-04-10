@@ -28,8 +28,7 @@
   (error "This requires Emacs 25.1 and above!"))
 
 ;; Speed up startup
-(let (
-      ;; Temporarily increase `gc-cons-threhold' when loading
+(let ( ;; Temporarily increase `gc-cons-threhold' when loading
       (gc-cons-threshold most-positive-fixnum)
       ;; Empty to avoid analyzing files when loading remote files.
       (file-name-handler-alist nil))
@@ -45,7 +44,7 @@
     (push (expand-file-name "lisp" user-emacs-directory) load-path))
 
   ;; Constants
-  (defconst lye-homepage  "https://github.com/lye95/emacs.d"
+  (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
     "The Github page of My Emacs Configurations.")
   (defconst system/windows (eq system-type 'windows-nt)
     "Are we running on a Windows System?")
@@ -84,12 +83,6 @@
     "Enable yasnippet for company backends or not."
     :type  'boolean)
 
-  ;; Set theme
-  (defcustom lye-themes 'default
-    "Set color theme."
-    :type '(choice (const :tag "Monokai Theme" default)
-                   (const :tag "Tao theme" light)
-                   (const :tag "Tao theme" dark)))
   ;; Load `custom-file'
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (when (file-exists-p custom-file) (load custom-file))
@@ -113,19 +106,22 @@
     (require 'init-magit)
     (require 'init-dired)
 
-    (require 'init-elfeed) ; RSS Reader
+    (run-with-idle-timer
+     1 nil
+     #'(lambda ()
+         (require 'init-elfeed) ; RSS Reader
 
-    (if system/windows (require 'init-ahk))
+         (if system/windows (require 'init-ahk))
 
-    (require 'init-yaml)
-    (require 'init-elisp)
-    (require 'init-org)
-    (require 'init-hugo)
-    (require 'init-scheme)
-    (require 'init-python)
-    (require 'init-lsp)
-    ;;(require 'init-sh)
-    (require 'init-markdown)))
+         (require 'init-yaml)
+         (require 'init-elisp)
+         (require 'init-org)
+         (require 'init-hugo)
+         (require 'init-scheme)
+         (require 'init-python)
+         (require 'init-lsp)
+         ;;(require 'init-sh)
+         (require 'init-markdown)))))
 
 (provide 'init)
 ;;; init.el ends here
