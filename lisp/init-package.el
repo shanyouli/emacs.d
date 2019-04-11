@@ -35,7 +35,6 @@
     (add-hook 'after-init-hook #'package--save-selected-packages)))
 (advice-add 'package--save-selected-packages :override #'my-save-selected-packages)
 
-;;
 ;; ELPA: refer to https://melpa.org and https://elpa.emacs-china.org
 (defun set-package-archives (archives)
   "Set specific package ARCHIVES repository"
@@ -71,11 +70,10 @@
   (package-initialize))
 
 ;; Setup `use-package'
-(defvar my-necessary-packages '(
-                                use-package
-                                diminish
-                                bind-key))
-(dolist (package my-necessary-packages)
+(dolist (package '(
+                   use-package
+                   diminish
+                   bind-key))
   (unless (package-installed-p package)
     (package-refresh-contents)
     (package-install package)))
@@ -101,8 +99,7 @@
 
 (setq straight-process-buffer " *straight-process*")
 
-(eval-when-compile
-  (require 'use-package))
+(eval-when-compile (require 'use-package))
 
 ;; Extensions
 

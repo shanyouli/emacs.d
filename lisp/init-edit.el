@@ -92,7 +92,7 @@
 (use-package display-line-numbers
   :ensure nil
   :init
-  (setq display-line-numbers-width 2)
+  (setq-default display-line-numbers-width 2)
   (setq display-line-numbers-grow-only t)
   ;; (set-face-foreground 'line-number-current-line "#859393")
   ;; (set-face-background 'line-number "#313335")

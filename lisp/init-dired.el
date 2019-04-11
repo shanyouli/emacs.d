@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+
 (require 'dired)
 (setq dired-recursive-copies t) ; Recursive copying
 (setq dired-recursive-deletes t) ; Recursive deletion

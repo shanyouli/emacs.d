@@ -36,6 +36,7 @@
         backend
       (append (if (consp backend) backend (list backend))
               '(:with company-yasnippet))))
+
   :bind (
          :map company-active-map
          ("C-p" . company-select-previous)
@@ -44,6 +45,7 @@
          ("C-p" . company-select-previous)
          ("C-n" . company-select-next))
   :hook (after-init . global-company-mode)
+
   :config
   ;; aligns annotation to the right hand side
   (setq company-tooltip-align-annotations t)
@@ -92,15 +94,15 @@
 ;;     (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
 ;;           (number-sequence 0 9))))
 
-(with-eval-after-load 'company
-  (let ((map company-active-map))
-    (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
-          (number-sequence 0 9))
-    (define-key map [escape] (lambda()
-                               (interactive)
-                               (company-abort)
-                               (evil-force-normal-state)
-                               (self-insert-command 1)))))
+;; (with-eval-after-load 'company
+;;   (let ((map company-active-map))
+;;     (mapc (lambda (x) (define-key map (format "%d" x) 'ora-company-number))
+;;           (number-sequence 0 9))
+;;     (define-key map [escape] (lambda()
+;;                                (interactive)
+;;                                (company-abort)
+;;                                (evil-force-normal-state)
+;;                                (self-insert-command 1)))))
 
 ;; Popup documentation for completion candidates
 (when (display-graphic-p)

@@ -26,6 +26,52 @@
 
 (when (version< emacs-version "25.1")
   (error "This requires Emacs 25.1 and above!"))
+  ;; Constants
+(defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
+  "The Github page of My Emacs Configurations.")
+
+(defconst system/windows (eq system-type 'windows-nt)
+  "Are we running on a Windows System?")
+
+(defconst system/mac (eq system-type 'darwin)
+  "Are we running on a Mac System?")
+
+(defconst system/root (eq system-type 'gnu/linux)
+  "Are we running on a GNU/Linux System?")
+
+(defconst *root* (string-equal "root" (getenv "USER"))
+  "Are you using ROOT user?")
+
+;; Set the temporal directory
+(defconst lye-emacs-temporal-dir (concat user-emacs-directory "tmp/")
+  "Is the temporal diirectory this?")
+
+;; customization
+(defcustom lye-full-name "lye li"
+  "Set user full name."
+  :type 'string)
+
+(defcustom lye-mail-address "shanyouli6@gmail.com"
+  "Set user mail address."
+  :type 'string)
+
+;;Set package archives from which to fetch
+(defcustom lye-package-archives 'emacs-china
+  "Set package archives from which to fetch."
+  :type '(choice (const :tag "Melpa" melpa)
+                 (const :tag "Melpa-mirror" melpa-mirror)
+                 (const :tag "Emacs-china" emacs-china)
+                 (const :tag "Netease" netease)))
+
+;;Set the format of the line number (relative or default)
+(defcustom lye-linum-format 'default
+  "Set the format of the line number (relative or default)."
+  :type '(choice (const :tag "Default" default)
+                 (const :tag "Relative" relative)))
+
+(defcustom lye-company-enable-yas nil
+  "Enable yasnippet for company backends or not."
+  :type  'boolean)
 
 ;; Speed up startup
 (let ( ;; Temporarily increase `gc-cons-threhold' when loading
@@ -42,46 +88,6 @@
   (if (version< emacs-version "27.0")
       (update-load-path)
     (push (expand-file-name "lisp" user-emacs-directory) load-path))
-
-  ;; Constants
-  (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
-    "The Github page of My Emacs Configurations.")
-  (defconst system/windows (eq system-type 'windows-nt)
-    "Are we running on a Windows System?")
-
-  (defconst system/mac (eq system-type 'darwin)
-    "Are we running on a Mac System?")
-
-  (defconst system/root (eq system-type 'gnu/linux)
-    "Are we running on a GNU/Linux System?")
-
-  (defconst *root* (string-equal "root" (getenv "USER"))
-    "Are you using ROOT user?")
-
-  ;; Set the temporal directory
-  (defconst lye-emacs-temporal-dir (concat user-emacs-directory "tmp/")
-    "Is the temporal diirectory this?")
-
-  ;; customization
-  (defcustom lye-full-name "lye li"
-    "Set user full name."
-    :type 'string)
-
-  (defcustom lye-mail-address "shanyouli6@gmail.com"
-    "Set user mail address."
-    :type 'string)
-
-  ;;Set package archives from which to fetch
-  (defcustom lye-package-archives 'emacs-china
-    "Set package archives from which to fetch."
-    :type '(choice (const :tag "Melpa" melpa)
-                   (const :tag "Melpa-mirror" melpa-mirror)
-                   (const :tag "Emacs-china" emacs-china)
-                   (const :tag "Netease" netease)))
-
-  (defcustom lye-company-enable-yas nil
-    "Enable yasnippet for company backends or not."
-    :type  'boolean)
 
   ;; Load `custom-file'
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
