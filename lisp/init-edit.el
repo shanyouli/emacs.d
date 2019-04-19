@@ -97,13 +97,13 @@
   ;; (set-face-foreground 'line-number-current-line "#859393")
   ;; (set-face-background 'line-number "#313335")
   (dolist (hook (list
-                   'c-mode-common-hook
-                   'emacs-lisp-mode-hook
-                   'sh-mode-hook
-                   'python-mode-hook
-                   ;; 'org-mode-hook
-                   ))
-      (add-hook hook (lambda () (display-line-numbers-mode 1)))))
+                 'c-mode-common-hook
+                 'emacs-lisp-mode-hook
+                 'sh-mode-hook
+                 'python-mode-hook
+                 ;; 'org-mode-hook
+                 ))
+    (add-hook hook (lambda () (display-line-numbers-mode 1)))))
 ;; (use-package linum-relative
 ;;   :commands linum-relative-mode
 ;;   :init
@@ -123,7 +123,6 @@
 
 (use-package whitespace
   :ensure nil
-  :diminish
   :hook ((prog-mode outline-mode conf-mode) . whitespace-mode)
   :config
   (setq whitespace-line-column fill-column) ;; limit line length
@@ -156,8 +155,7 @@
 (add-hook 'after-init-hook (lambda () (global-auto-revert-mode t)))
 
 ;; add color display
-(use-package rainbow-mode
-  :hook (prog-mode . rainbow-mode))
+(use-package rainbow-mode :hook (prog-mode . rainbow-mode))
 
 (provide 'init-edit)
 ;;; init-edit.el ends here

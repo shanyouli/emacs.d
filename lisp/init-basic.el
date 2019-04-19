@@ -28,6 +28,7 @@
 
 (setq user-full-name lye-full-name)
 (setq user-mail-address lye-mail-address)
+
 ;; Set the temporal directory
 (unless (file-exists-p lye-emacs-temporal-dir)
   (make-directory lye-emacs-temporal-dir))
@@ -43,24 +44,23 @@
 
 ;; Use undo-tree
 (use-package undo-tree
-  :config
+  :init
   (setq undo-tree-auto-save-history t)
   (setq undo-tree-history-directory-alist
         `(("." . ,(concat lye-emacs-temporal-dir "undo"))))
   (unless (file-exists-p (concat lye-emacs-temporal-dir "undo"))
     (make-directory (concat lye-emacs-temporal-dir "undo")))
-  :init (global-undo-tree-mode))
+  (global-undo-tree-mode))
 
 ;; Save Emacs buffers when they lose focus after 2s
-
 (use-package auto-save
   :straight (auto-save :type git :host github :repo "shanyouli/auto-save")
   :ensure nil
   :commands (auto-save-enable)
-  :hook (after-init . auto-save-enable)
-  :config
-  (setq auto-save-idle 2)
-  (setq auto-save-silent t))
+  :init
+  (setq-default auto-save-silent t)
+  (setq-default auto-save-idle 2)
+  (auto-save-enable))
 
 ;; Store all temporal files in a temporal directory instead of being
 ;; disseminated in the $HOME directory
@@ -115,10 +115,9 @@
 ;; Save recentf file and open them
 (use-package recentf
   :ensure nil
-  :hook (find-file . (lambda ()
-                       (unless recentf-mode
-                         (recentf-mode)
-                         (recentf-track-opened-file))))
+  :hook
+  (find-file . (lambda () (unless recentf-mode (recentf-mode)
+                                  (recentf-track-opened-file))))
   :init
   ;;(add-hook 'after-init-hook #'recentf-mode)
   (setq recentf-max-saved-items 200
@@ -139,13 +138,20 @@
 ;;   :hook (before-save . (lambda ()
 ;;                          (delete-trailing-whitespace))))
 
-(setq auto-save-list-file-prefix nil;not.# and #.# file
+(setq auto-save-list-file-prefix nil ;not.# and #.# file
       auto-save-default nil
       make-backup-files nil) ; not ~ file
+
+;; @see https://emacs-china.org/t/spacemacs/9000
+(setq create-lockfiles nil) ; not .#*** file
 
 ;; Displays the key bindings following your currently entered incomplete command
 (use-package which-key
   :hook (after-init . which-key-mode))
+
+;; restart emacs
+(use-package restart-emacs
+  :commands (restart-emacs))
 
 (provide 'init-basic)
 ;;; init-basic.el ends here

@@ -26,7 +26,8 @@
 
 (when (version< emacs-version "25.1")
   (error "This requires Emacs 25.1 and above!"))
-  ;; Constants
+
+;; Constants
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
 
@@ -112,12 +113,12 @@
     (require 'init-magit)
     (require 'init-dired)
 
+    (if system/windows (require 'init-ahk)) ; windows-system
+
     (run-with-idle-timer
      1 nil
      #'(lambda ()
          (require 'init-elfeed) ; RSS Reader
-
-         (if system/windows (require 'init-ahk))
 
          (require 'init-yaml)
          (require 'init-elisp)
