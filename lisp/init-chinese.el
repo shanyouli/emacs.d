@@ -76,7 +76,8 @@
 (setq pyim-fuzzy-pinyin-alist
       '(("en" "eng") ("in" "ing") ("l" "n") ("z" "zh") ("c" "ch")
         ("s" "sh") ("an" "ang")))
-;; Set 5 candidate words
+
+;; Set 9 candidate words
 (setq pyim-page-length 9)
 
 (setq-default pyim-punctuation-translate-p '(no yes auto))

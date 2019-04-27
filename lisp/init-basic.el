@@ -25,13 +25,15 @@
 ;;; Code:
 
 ;; Set name and mail-address
-
 (setq user-full-name lye-full-name)
 (setq user-mail-address lye-mail-address)
 
 ;; Set the temporal directory
 (unless (file-exists-p lye-emacs-temporal-dir)
   (make-directory lye-emacs-temporal-dir))
+
+;; Use real line movement instead of visual line movement
+(setq line-move-visual nil)
 
 ;; exec-path config
 (when (memq window-system '(mac ns x))
@@ -45,11 +47,8 @@
 ;; Use undo-tree
 (use-package undo-tree
   :init
-  (setq undo-tree-auto-save-history t)
-  (setq undo-tree-history-directory-alist
-        `(("." . ,(concat lye-emacs-temporal-dir "undo"))))
-  (unless (file-exists-p (concat lye-emacs-temporal-dir "undo"))
-    (make-directory (concat lye-emacs-temporal-dir "undo")))
+ ;; (setq undo-tree-history-directory-alist
+ ;;       `(("." . ,(concat lye-emacs-temporal-dir "undo"))))
   (global-undo-tree-mode))
 
 ;; Save Emacs buffers when they lose focus after 2s
@@ -152,6 +151,10 @@
 ;; restart emacs
 (use-package restart-emacs
   :commands (restart-emacs))
+
+;; some major mode
+(use-package vimrc-mode
+  :mode ("\\.vim\\(rc\\)?\\'" . ovimrc-mode))
 
 (provide 'init-basic)
 ;;; init-basic.el ends here
