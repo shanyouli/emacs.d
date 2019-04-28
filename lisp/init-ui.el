@@ -79,12 +79,12 @@
          (member "simusn" (font-family-list)))
     (set-font "Source Code Pro" "simsun" 12 14)))
 
-   ;; Specify fonts for all unicode characters
-   (cond
-    ((member "Apple Color Emoji" (font-family-list))
-     (set-fontset-font t 'unicode "Apple Color Emoki" nil 'prepend))
-    ((member "Symbola" (font-family-list))
-     (set-fontset-font t 'unicode "Symbola" nil 'prepend))))
+  ;; Specify fonts for all unicode characters
+  (cond
+   ((member "Apple Color Emoji" (font-family-list))
+    (set-fontset-font t 'unicode "Apple Color Emoki" nil 'prepend))
+   ((member "Symbola" (font-family-list))
+    (set-fontset-font t 'unicode "Symbola" nil 'prepend))))
 
 ;; Set line height
 (when (display-graphic-p)
@@ -100,7 +100,7 @@
       (progn
         (set-frame-width (selected-frame) 96)
         (set-frame-height (selected-frame) 32))
-    ;; (set-frame-size (selected-frame) 96 32)
+    ;;(set-frame-size (selected-frame) 96 32)
     ))
 (when window-system
   (lye/reset-frame-size))
@@ -152,17 +152,6 @@
 (setq kill-buffer-query-functions
       (remq 'process-kill-buffer-query-function
             kill-buffer-query-functions))
-
-;; Make *Scratch* buffer undelete
-(defun lye/unkillable-scratch-buffer ()
-  "Don't delete *Scratch*."
-  (if (string= (buffer-name (current-buffer)) "*scratch*")
-      (progn
-        (delete-region (point-min) (point-max))
-        (insert initial-scratch-message)
-        nil)
-    t))
-(add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
 
 ;; Line and column
 (setq column-number-mode t)

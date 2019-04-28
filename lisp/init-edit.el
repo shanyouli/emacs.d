@@ -157,5 +157,8 @@
 ;; add color display
 (use-package rainbow-mode :hook (prog-mode . rainbow-mode))
 
+;; Highlight the line where the cursor is
+(run-with-idle-timer 2 nil #'(lambda () (global-hl-line-mode 1)))
+
 (provide 'init-edit)
 ;;; init-edit.el ends here

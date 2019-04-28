@@ -67,5 +67,8 @@
   (add-hook 'compilation-mode-hook #'page-break-lines-mode)
   (add-hook 'emacs-lisp-mode-hook #'page-break-lines-mode))
 
+;; Load .el if newer than corresponding .elc
+(setq load-prefer-newer t)
+
 (provide 'init-elisp)
 ;;; init-elisp.el ends here

@@ -32,7 +32,8 @@
         '("http://planet.emacsen.org/atom.xml"
           "http://www.masteringemacs.org/feed/"
           "https://oremacs.com/atom.xml"
-          "https://pinecast.com/feed/emacscast")))
+          "https://pinecast.com/feed/emacscast"
+          "https://emacs-china.github.io/rss.xml")))
 
 (provide 'init-elfeed)
 ;;; init-elfeed.el ends here
