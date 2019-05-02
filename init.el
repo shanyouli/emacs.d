@@ -123,8 +123,8 @@
          (require 'init-elfeed) ; RSS Reader
 
          (require 'init-yaml)
-         (require 'init-org)
          (require 'init-hugo)
+         (require 'init-org)
          (require 'init-scheme)
          (require 'init-python)
          (require 'init-lsp)

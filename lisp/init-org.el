@@ -35,7 +35,7 @@
   :config
   (add-hook 'org-mode-hook
             '(lambda ()
-               (auto-fill-mode nil) ; 不自动换行
+               ;; (auto-fill-mode nil) ; 不自动换行
                (setq truncate-lines nil) ; 不自动换行
                (if (display-graphic-p)
                    (use-package org-bullets
