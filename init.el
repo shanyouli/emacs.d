@@ -122,7 +122,6 @@
      #'(lambda ()
          (require 'init-elfeed) ; RSS Reader
          (require 'init-lang)
-         ;;         (require 'init-yaml)
          (require 'init-hugo)
          (require 'init-org)
          (require 'init-scheme)

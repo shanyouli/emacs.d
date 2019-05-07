@@ -36,10 +36,17 @@
 
 ;; yaml
 (use-package yaml-mode
-  :init
-  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-  (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode)))
+  ;; :init
+  ;; (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+  ;; (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode))
+  :mode (("\\.yml\\'" . yaml-mode)
+         ("\\.yaml\\'" . yaml-mode))
+  :defer t)
 
+;; markdown, md
+(use-package markdown-mode
+  :mode (("\\.md\\'" . gfm-mode))
+  :defer t)
 
 (provide 'init-lang)
 ;;; init-lang.el ends here
