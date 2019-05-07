@@ -102,6 +102,7 @@
     ;; Preferences
     (require 'init-ui)
     (require 'init-scratch)
+    (require 'init-elisp)
     (require 'init-basic)
     (require 'init-edit)
     (require 'init-window)
@@ -113,7 +114,6 @@
     (require 'init-eshell)
     (require 'init-magit)
     (require 'init-dired)
-    (require 'init-elisp)
 
     (if system/windows (require 'init-ahk)) ; windows-system
 
@@ -121,8 +121,8 @@
      1 nil
      #'(lambda ()
          (require 'init-elfeed) ; RSS Reader
-
-         (require 'init-yaml)
+         (require 'init-lang)
+         ;;         (require 'init-yaml)
          (require 'init-hugo)
          (require 'init-org)
          (require 'init-scheme)

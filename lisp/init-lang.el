@@ -1,9 +1,9 @@
-;;; init-yaml.el ---Initalize Yaml Configure         -*- lexical-binding: t; -*-
+;;; init-lang.el ---Some Program Language Initialize  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  lye li
 
 ;; Author: lye li <shanyouli6@gmail.com>
-;; Keywords:
+;; Keywords: languages
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,10 +24,22 @@
 
 ;;; Code:
 
+;; json
+(use-package json-mode
+  :mode "\\.json\\'"
+  :defer t)
+
+;; xml
+(use-package web-mode
+  :mode "\\.xml\\'"
+  :defer t)
+
+;; yaml
 (use-package yaml-mode
   :init
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
   (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode)))
 
-(provide 'init-yaml)
-;;; init-yaml.el ends here
+
+(provide 'init-lang)
+;;; init-lang.el ends here

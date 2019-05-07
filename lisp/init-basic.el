@@ -114,9 +114,9 @@
 ;; Save recentf file and open them
 (use-package recentf
   :ensure nil
-  :hook
-  (find-file . (lambda () (unless recentf-mode (recentf-mode)
-                                  (recentf-track-opened-file))))
+  :hook (after-init . recentf-mode)
+  ;; (find-file . (lambda () (unless recentf-mode (recentf-mode)
+  ;;                                 (recentf-track-opened-file))))
   :init
   ;;(add-hook 'after-init-hook #'recentf-mode)
   (setq recentf-max-saved-items 200
