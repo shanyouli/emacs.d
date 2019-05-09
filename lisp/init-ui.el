@@ -69,9 +69,7 @@
 (when (display-graphic-p)
   ;;Chinese and English font alignment
   (cond
-   ((or (member "等距更纱黑体 SC" (font-family-list))
-        (member "Sarasa Term SC" (font-family-list))
-        (member "Sarasa Mono SC" (font-family-list)))
+   ((member "Sarasa Mono SC" (font-family-list))
     (set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14))
    ((member "Noto Sans Mono CJK SC" (font-family-list))
     (set-font "Noto Sans Mono CJK SC" "Noto Sans Mono CJK SC" 13 13))
@@ -122,8 +120,8 @@
 ;; mode-line
 (if (display-graphic-p)
     (use-package doom-modeline
-      :init (doom-modeline-mode 1)
-      :config
+      :hook  (after-init . doom-modeline-mode)
+      :init
       ;; Only display the file name
       (setq doom-modeline-buffer-file-name-style 'truncate-upto-root)))
 

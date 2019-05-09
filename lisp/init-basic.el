@@ -156,5 +156,9 @@
 (use-package vimrc-mode
   :mode ("\\.vim\\(rc\\)?\\'" . ovimrc-mode))
 
+;; Esup,Start time adjustment<Emacs Start Up Profiler>
+;; @see https://github.com/jschaf/esup
+(use-package esup)
+
 (provide 'init-basic)
 ;;; init-basic.el ends here

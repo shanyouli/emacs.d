@@ -49,7 +49,7 @@
 
 ;; Do not use the mouse in the graphical interface
 (when (display-graphic-p)
-  (use-package disable-mouse :init (global-disable-mouse-mode)))
+  (use-package disable-mouse :hook  (after-init . global-disable-mouse-mode)))
 
 ;; Delete selection if you insert
 (use-package delsel
@@ -65,11 +65,6 @@
          ("M-g e" . avy-goto-worf-0))
   :hook (after-init . avy-setup-default)
   :config (setq avy-background 1))
-
-;;Brackets highlighted
-;; (use-package highlight-parentheses
-;;   :diminish highlight-parentheses-mode
-;;   :hook (after-init . global-highlight-parentheses-mode))
 
 ;; Pair Automatic completion
 (use-package autopair
@@ -183,7 +178,6 @@
   :hook ((prog-mode . symbol-overlay-mode)
          (iedit-mode . (lambda () (symbol-overlay-mode -1)))
          (iedit-mode-end . symbol-overlay-mode)))
-
 
 (provide 'init-edit)
 ;;; init-edit.el ends here

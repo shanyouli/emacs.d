@@ -109,7 +109,7 @@
     (require 'init-ivy)
     (require 'init-company)
     (require 'init-chinese)
-    (require 'init-eshell)
+;;    (require 'init-eshell)
     (require 'init-magit)
     (require 'init-dired)
 
