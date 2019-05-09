@@ -26,6 +26,7 @@
 (use-package aweshell
   :straight (aweshell :type git
                       :host github
+                      :depth 1
                       :repo "manateelazycat/aweshell")
   :ensure nil
   :commands (aweshell-toggle aweshell-next aweshell-prev aweshell-next))

@@ -25,13 +25,25 @@
 ;;; Code:
 
 ;; When I use Windows system, I hope emacs start-directory is "HOME" at emacs starting
-  (if (or (string-equal default-directory "c:/Applications/ScoopApps/apps/emacs/current/bin/")
-          (string-equal default-directory "c:/Applications/ScoopApps/apps/emacs-dev/current/bin/")
-          (string-equal default-directory "c:/emacs/bin/")
-          (string-equal default-directory "d:/Applications/emacs/bin/")
-          (string-equal default-directory "d:/ScoopApps/apps/emacs-dev/current/bin/")
-          (string-equal default-directory "d:/ScoopApps/apps/emacs/current/bin/"))
-      (cd "~"))
+(defun lye/default_dir_eq (list)
+  "Make sure to open the directory for HOME on windows system!"
+  (if (string-equal default-directory (car list))
+      (cd "~/")
+    (unless (not list)
+      (lye/default_dir_eq (cdr list)))))
+
+(add-hook 'after-init-hook
+          (lambda ()
+            (let ((dir_list
+                   '(
+                     "c:/Applications/ScoopApps/apps/emacs/current/bin/"
+                     "c:/Applications/ScoopApps/apps/emacs-dev/current/bin/"
+                     "c:/emacs/bin/"
+                     "c:/Applications/emacs/bin/"
+                     "d:/ScoopApps/apps/emacs-dev/current/bin/"
+                     "d:/ScoopApps/apps/emacs/current/bin/"
+                     )))
+              (lye/default_dir_eq dir_list))))
 
 ;; confirmedto prevent misoperation.
 (setq comfirm-kill-emacs (lambda (prompt)

@@ -31,7 +31,8 @@
 
 ;; xml
 (use-package web-mode
-  :mode "\\.xml\\'"
+  :mode (("\\.xml\\'" . web-mode)
+         ("\\fonts.conf\\'" . web-mode))
   :defer t)
 
 ;; yaml
@@ -47,6 +48,11 @@
 (use-package markdown-mode
   :mode (("\\.md\\'" . gfm-mode))
   :defer t)
+
+;; sh-mode
+(add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
+(add-to-list 'auto-mode-alist '(".zshrc" . sh-mode))
+(add-hook 'sh-mode-hook #'(lambda() (sh-set-shell "bash")))
 
 (provide 'init-lang)
 ;;; init-lang.el ends here

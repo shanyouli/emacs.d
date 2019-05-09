@@ -53,7 +53,7 @@
 
 ;; Save Emacs buffers when they lose focus after 2s
 (use-package auto-save
-  :straight (auto-save :type git :host github :repo "shanyouli/auto-save")
+  :straight (auto-save :type git :host github :repo "shanyouli/auto-save" :depth 1)
   :ensure nil
   :commands (auto-save-enable)
   :init

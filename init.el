@@ -79,7 +79,6 @@
       (gc-cons-threshold most-positive-fixnum)
       ;; Empty to avoid analyzing files when loading remote files.
       (file-name-handler-alist nil))
-
   ;; Load path
   ;; Optimize: Force `lisp' at the head to reduce the startup time.
   (defun update-load-path (&rest _)
@@ -105,12 +104,11 @@
     (require 'init-elisp)
     (require 'init-basic)
     (require 'init-edit)
+
     (require 'init-window)
     (require 'init-ivy)
     (require 'init-company)
-    (require 'init-yasnippet)
     (require 'init-chinese)
-    (require 'init-flycheck)
     (require 'init-eshell)
     (require 'init-magit)
     (require 'init-dired)
@@ -120,6 +118,9 @@
     (run-with-idle-timer
      1 nil
      #'(lambda ()
+         (require 'init-flycheck)
+         (require 'init-yasnippet)
+
          (require 'init-elfeed) ; RSS Reader
          (require 'init-lang)
          (require 'init-hugo)
@@ -128,7 +129,8 @@
          (require 'init-python)
          (require 'init-lsp)
          ;;(require 'init-sh)
-         (require 'init-markdown)))))
+         ;; (require 'init-markdown)
+         ))))
 
 (provide 'init)
 ;;; init.el ends here

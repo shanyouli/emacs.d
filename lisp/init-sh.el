@@ -24,7 +24,8 @@
 
 ;;; Code:
 
-;; @see: https://stackoverflow.com/questions/20558402/open-zsh-scripts-in-sh-mode-in-emacs;; (add-hook 'sh-mode-hook
+;; @see: https://stackoverflow.com/questions/20558402/open-zsh-scripts-in-sh-mode-in-emacs
+;; (add-hook 'sh-mode-hook
 ;; (lambda ()
 ;;   (if (string-match "\\.zsh$" buffer-file-name)
 ;;       (sh-set-shell "zsh")

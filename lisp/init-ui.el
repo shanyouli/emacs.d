@@ -142,7 +142,9 @@
 (setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
 
 ;; Don't ask me when close emacs with process is running
-(straight-use-package '(noflet :type git :host github :repo "nicferrier/emacs-noflet"))
+(straight-use-package
+ '(noflet :type git :host github :repo "nicferrier/emacs-noflet" :depth 1))
+
 (require 'noflet)
 (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
   "Prevent annoying \"Active processes exist\" query when you quit Emacs."

@@ -26,6 +26,7 @@
 ;; ZH Automatically translated as EN
 (use-package insert-translated-name
   :straight (insert-translated-name-insert
+             :depth 1
              :type git
              :host github
              :repo "manateelazycat/insert-translated-name")
@@ -98,6 +99,7 @@
 ;; Prompt English words when writing English
 (use-package company-english-helper
   :straight (comany-english-helper
+             :depth 1
              :type git
              :host github
              :repo "manateelazycat/company-english-helper")
@@ -109,7 +111,7 @@
     (progn
       (message "You Installed sdcv in the computer!")
       (use-package sdcv
-        :straight (sdcv :type git :host github :repo "manateelazycat/sdcv")
+        :straight (sdcv :type git :host github :repo "manateelazycat/sdcv" :depth 1)
         :ensure nil
         :commands (sdcv-search-pointer+ sdcv-search-pointer sdcv-search-input sdcv-search-input+)
         :bind (("C-c y" . sdcv-search-pointer+)

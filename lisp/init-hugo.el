@@ -24,14 +24,17 @@
 
 ;;; Code:
 
-(use-package ox-hugo
-  :after ox
-  :config
-  (setq org-hugo-section "post"))
+;; (use-package ox-hugo
+  ;; :after ox
+  ;; :config
+  ;; (setq org-hugo-section "post"))
 
-;; (with-eval-after-load 'ox
-;;   (require 'ox-hugo)
-;;   (setq org-hugo-section "post"))
+(unless (package-installed-p 'ox-hugo)
+  (package-install 'ox-hugo t))
+
+(with-eval-after-load 'ox
+  (require 'ox-hugo)
+  (setq org-hugo-section "post"))
 
 (use-package easy-hugo)
 
