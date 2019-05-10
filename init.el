@@ -90,8 +90,9 @@
     (push (expand-file-name "lisp" user-emacs-directory) load-path))
 
   ;; Load `custom-file'
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (when (file-exists-p custom-file) (load custom-file))
+  (let ((custom-file (expand-file-name "custom.el" user-emacs-directory)))
+    (when (file-exists-p custom-file)
+      (load custom-file)))
 
   (with-temp-message ""              ; Erase the output of the plugin startup
 

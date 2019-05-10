@@ -103,6 +103,18 @@
 
 ;; Extensions
 
+;; Use the more modern package management menu paradox
+(use-package paradox
+  :init
+  (setq paradox-execute-asynchronously t)
+  (setq paradox-github-token t)
+  (setq paradox-display-star-count nil)
+
+  (defalias 'upgrade-packages #'paradox-upgrade-packages)
+
+  ;; Replace default `list-packages'
+  (defadvice list-packages (before my-list-packages activate)
+    (paradox-enable)))
 
 (provide 'init-package)
 ;;; init-package.el ends here
