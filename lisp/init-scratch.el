@@ -34,8 +34,9 @@
 
 (defun lye/scratch-save ()
   (ignore-errors
-    (with-current-buffer "*scratch*"
-      (write-region nil nil lye/scratch-save-file))))
+    (with-temp-message (with-current-buffer " *Minibuf-0*" (buffer-string))
+      (with-current-buffer "*scratch*"
+        (write-region nil nil lye/scratch-save-file)))))
 
 (defun lye/scratch-restore()
   (let ((f lye/scratch-save-file))

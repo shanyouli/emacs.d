@@ -43,7 +43,7 @@
   (interactive)
   (message "Revert this buffer.")
   (revert-buffer t t))
-(bind-keys ("C-M-r" . revert-current-buffer))
+;; (bind-keys ("C-M-r" . revert-current-buffer))
 
 ;; Save a file as utf-8
 (defun save-buffer-as-utf-8 (coding-system)

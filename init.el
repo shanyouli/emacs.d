@@ -93,10 +93,10 @@
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
   (when (file-exists-p custom-file) (load custom-file))
 
-  (with-temp-message ""              ; Erase the output of the plugin startup
-
-    (require 'init-package)          ; Packages
+  (with-temp-message "" ; Erase the output of the plugin startup
+    ;; Package and functions
     (require 'init-funcs)
+    (require 'init-package)
 
     ;; Preferences
     (require 'init-ui)
