@@ -127,7 +127,6 @@
   ;; (find-file . (lambda () (unless recentf-mode (recentf-mode)
   ;;                                 (recentf-track-opened-file))))
   :init
-  ;;(add-hook 'after-init-hook #'recentf-mode)
   (setq recentf-max-saved-items 200
         recentf-save-file (concat lye-emacs-temporal-dir "recentf"))
   ;;Do not add these files to the recently opened text
@@ -140,11 +139,6 @@
                           "url"
                           "COMMIT_EDITMSG\\'"
                           "COMMIT_MSG")))
-
-;; (use-package simple
-;;   :ensure nil
-;;   :hook (before-save . (lambda ()
-;;                          (delete-trailing-whitespace))))
 
 (setq auto-save-list-file-prefix nil ;not.# and #.# file
       auto-save-default nil
@@ -160,10 +154,6 @@
 ;; restart emacs
 (use-package restart-emacs
   :commands (restart-emacs))
-
-;; some major mode
-(use-package vimrc-mode
-  :mode ("\\.vim\\(rc\\)?\\'" . ovimrc-mode))
 
 ;; Esup,Start time adjustment<Emacs Start Up Profiler>
 ;; @see https://github.com/jschaf/esup

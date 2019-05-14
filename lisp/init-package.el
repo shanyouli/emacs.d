@@ -105,7 +105,7 @@
 
 (setq straight-process-buffer " *straight-process*")
 
-(eval-when-compile (require 'use-package))
+;; (eval-when-compile (require 'use-package))
 
 ;; Extensions
 (use-package diminish)

@@ -25,9 +25,7 @@
 ;;; Code:
 
 ;; json
-(use-package json-mode
-  :mode "\\.json\\'"
-  :defer t)
+(use-package json-mode :mode "\\.json\\'"   :defer t)
 
 ;; xml
 (use-package web-mode
@@ -53,6 +51,9 @@
 (add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
 (add-to-list 'auto-mode-alist '(".zshrc" . sh-mode))
 (add-hook 'sh-mode-hook #'(lambda() (sh-set-shell "bash")))
+
+;; vimrc-major mode
+(use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . ovimrc-mode))
 
 (provide 'init-lang)
 ;;; init-lang.el ends here
