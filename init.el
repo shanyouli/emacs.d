@@ -99,15 +99,15 @@
     (require 'init-package)
 
     ;; Preferences
-    (require 'init-ui)
-    (require 'init-scratch)
-    (require 'init-elisp)
-    (require 'init-basic)
-    (require 'init-edit)
+   (require 'init-ui)
+   (require 'init-scratch)
+   (require 'init-elisp)
+   (require 'init-basic)
+   (require 'init-edit)
 
-    (require 'init-window)
-    (require 'init-ivy)
-    (require 'init-company)
+   (require 'init-window)
+   (require 'init-ivy)
+   (require 'init-company)
     (require 'init-chinese)
 ;;    (require 'init-eshell)
     (require 'init-magit)

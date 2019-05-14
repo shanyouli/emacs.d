@@ -74,7 +74,7 @@
    ((member "Noto Sans Mono CJK SC" (font-family-list))
     (set-font "Noto Sans Mono CJK SC" "Noto Sans Mono CJK SC" 13 13))
    ((and (member "Source Code Pro" (font-family-list))
-         (member "simusn" (font-family-list)))
+         (member "simsun" (font-family-list)))
     (set-font "Source Code Pro" "simsun" 12 14)))
 
   ;; Specify fonts for all unicode characters
@@ -140,13 +140,14 @@
 (setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
 
 ;; Don't ask me when close emacs with process is running
-(straight-use-package
- '(noflet :type git :host github :repo "nicferrier/emacs-noflet" :depth 1))
+;; (straight-use-package
+;;  '(noflet :type git :host github :repo "nicferrier/emacs-noflet" :depth 1))
 
-(require 'noflet)
-(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
-  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
-  (noflet ((process-list ())) ad-do-it))
+
+;; (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+;;   "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+;;   (require 'noflet)
+;;   (noflet ((process-list ())) ad-do-it))
 
 ;;Don't ask me when kill process buffers
 (setq kill-buffer-query-functions

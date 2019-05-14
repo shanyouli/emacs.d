@@ -70,13 +70,17 @@
   (package-initialize))
 
 ;; Setup `use-package'
-(dolist (package '(
-                   use-package
-                   diminish
-                   bind-key))
-  (unless (package-installed-p package)
-    (package-refresh-contents)
-    (package-install package)))
+;; (dolist (package '(
+;;                    use-package
+;;                    diminish
+;;                    bind-key))
+;;   (unless (package-installed-p package)
+;;     (package-refresh-contents)
+;;     (package-install package)))
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
 ;; Should set before loading 'use-packge'
 ;; Should set before loading `use-package'
 (eval-and-compile
@@ -104,7 +108,8 @@
 (eval-when-compile (require 'use-package))
 
 ;; Extensions
-
+(use-package diminish)
+(use-package bind-key)
 ;; Use the more modern package management menu paradox
 (use-package paradox
   :init
