@@ -103,7 +103,7 @@
 (when window-system
   (lye/reset-frame-size))
 ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-(add-hook 'after-make-frame-functions 'lye/reset-frame-size)
+(add-hook 'after-make-frame-functions #'lye/reset-frame-size)
 
 ;; Theme
 ;; Understand the topics currently in use
@@ -130,7 +130,6 @@
 (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
 (fset 'yes-or-no-p 'y-or-n-p) ; 以 y/n 取代 yes/no
 (setq inhibit-startup-screen t) ; 不展示开始界面
-;; (setq initial-scratch-message "") ; 不显示 scratch 中默认信息
 ;;(setq visible-bell t)
 (setq ring-bell-function 'ignore) ; Turn off the error ringtone
 (setq mouse-yank-at-point t) ; Paste at the cursor position instead of the mouse pointer
@@ -138,16 +137,6 @@
 (setq track-eol t) ; keep cursor at end of lines, Require line-move-visual is nil
 (setq line-move-visual nil)
 (setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
-
-;; Don't ask me when close emacs with process is running
-;; (straight-use-package
-;;  '(noflet :type git :host github :repo "nicferrier/emacs-noflet" :depth 1))
-
-
-;; (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
-;;   "Prevent annoying \"Active processes exist\" query when you quit Emacs."
-;;   (require 'noflet)
-;;   (noflet ((process-list ())) ad-do-it))
 
 ;;Don't ask me when kill process buffers
 (setq kill-buffer-query-functions

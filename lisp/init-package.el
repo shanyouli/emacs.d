@@ -37,31 +37,38 @@
 
 ;; ELPA: refer to https://melpa.org and https://elpa.emacs-china.org
 (defun set-package-archives (archives)
-  "Set specific package ARCHIVES repository"
+  "Set specific package ARCHIVES repository."
   (interactive
-   (list
-    (intern (completing-read "Switch to archives: "
-                             '(melpa melpa-mirror emacs-china netease)))))
-  (let* ((no-ssl (and (memq system-type '(window-nt ms-dos))
-                     (not (gnutls-available-p))))
-        (proto (if no-ssl "http" "https")))
-    (cond
-     ((eq archives 'melpa)
-      (setq package-archives `(,(cons "gnu"  (concat proto "://elpa.gnu.org/packages/"))
-                               ,(cons "melpa" (concat proto "://melpa.org/packages/")))))
-     ((eq archives 'melpa-mirror)
-      (setq package-archives `(,(cons "gnu"  (concat proto "://elpa.gnu.org/packages/"))
-                               ,(cons "melpa" (concat proto "://www.mirrorservice.org/sites/melpa.org/packages/")))))
-     ((eq archives 'emacs-china)
-      (setq package-archives `(,(cons "gnu"  (concat proto "://elpa.emacs-china.org/gnu/"))
-                               ,(cons "melpa" (concat proto "://elpa.emacs-china.org/melpa/")))))
-     ((eq archives 'netease)
-      (setq package-archives `(,(cons "gnu"  (concat proto "://mirrors.163.com/elpa/gnu/"))
-                               ,(cons "melpa" (concat proto "://mirrors.163.com/elpa/melpa/")))))
-     (t
-      (error "Unknown archives: '%s'" archives))))
-  (message "Set package archives to '%s' ." archives))
+   (list (intern (completing-read "Choose package archives: "
+                                  '(melpa melpa-mirror emacs-china netease tuna)))))
+
+  (setq package-archives
+        (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                            (not (gnutls-available-p))))
+               (proto (if no-ssl "http" "https")))
+          (pcase archives
+            ('melpa
+             `(,(cons "gnu"   (concat proto "://elpa.gnu.org/packages/"))
+               ,(cons "melpa" (concat proto "://melpa.org/packages/"))))
+            ('melpa-mirror
+             `(,(cons "gnu"   (concat proto "://elpa.gnu.org/packages/"))
+               ,(cons "melpa" (concat proto "://www.mirrorservice.org/sites/melpa.org/packages/"))))
+            ('emacs-china
+             `(,(cons "gnu"   (concat proto "://elpa.emacs-china.org/gnu/"))
+               ,(cons "melpa" (concat proto "://elpa.emacs-china.org/melpa/"))))
+            ('netease
+             `(,(cons "gnu"   (concat proto "://mirrors.163.com/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.163.com/elpa/melpa/"))))
+            ('tuna
+             `(,(cons "gnu"   (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/"))))
+            (archives
+             (error "Unknown archives: `%s'" archives)))))
+
+  (message "Set package archives to `%s'." archives))
+
 ;; Set package archives
+(setq lye-package-archives 'tuna)
 (set-package-archives lye-package-archives)
 
 ;; Initialize packages
@@ -70,13 +77,6 @@
   (package-initialize))
 
 ;; Setup `use-package'
-;; (dolist (package '(
-;;                    use-package
-;;                    diminish
-;;                    bind-key))
-;;   (unless (package-installed-p package)
-;;     (package-refresh-contents)
-;;     (package-install package)))
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))

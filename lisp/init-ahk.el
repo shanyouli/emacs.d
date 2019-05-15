@@ -24,33 +24,15 @@
 
 ;;; Code:
 
-;; When I use Windows system, I hope emacs start-directory is "HOME" at emacs starting
-(defun lye/default_dir_eq (list)
-  "Make sure to open the directory for HOME on windows system!"
-  (if (string-equal default-directory (car list))
-      (cd "~/")
-    (unless (not list)
-      (lye/default_dir_eq (cdr list)))))
-
-(add-hook 'after-init-hook
-          (lambda ()
-            (let ((dir_list
-                   '(
-                     "c:/Applications/ScoopApps/apps/emacs/current/bin/"
-                     "c:/Applications/ScoopApps/apps/emacs-dev/current/bin/"
-                     "c:/emacs/bin/"
-                     "c:/Applications/emacs/bin/"
-                     "d:/ScoopApps/apps/emacs-dev/current/bin/"
-                     "d:/ScoopApps/apps/emacs/current/bin/"
-                     )))
-              (lye/default_dir_eq dir_list))))
-
 ;; confirmedto prevent misoperation.
-(setq comfirm-kill-emacs (lambda (prompt)
+(setq confirm-kill-emacs (lambda (prompt)
                            (y-or-n-p-with-timeout "Exit Emacs after 3s?" 3 "y")))
 
 ;; autohotkey-mode
 (use-package ahk-mode :mode "\\.ahk\\'"  :defer t)
+
+;; powershell-mode
+(use-package powershell :mode ("\\.ps1\\'" . powershell-mode) :defer t)
 
 ;; Runninng Wsl in Emacs
 ;; see @https://github.com/MatthewZMD/.emacs.d#bash-command
@@ -59,6 +41,31 @@
   (interactive)
   (let ((shell-file-name "C:\\Windows\\System32\\bash.exe"))
     (shell "*bash*")))
+
+;; Us ido-mode
+(use-package ido
+  :ensure nil
+  :hook (after-init . ido-mode)
+  :config
+  (setq ido-enable-flex-matching t)
+  (setq ido-everywhere t)
+  ;; Guess if the cursor position is an openable directory or file
+  (setq ido-use-filename-at-point 'guess)
+  ;;(setq ido-use-url-at-point)
+  ;; Ido does not automatically create a new buffer, need to ask
+  (setq ido-create-new-buffer 'prompt)
+  (setq ido-file-extensions-order '(".org" ".txt" ".py" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf"))
+  (setq ido-save-directory-list-file (concat lye-emacs-temporal-dir "ido.last")))
+
+;; use smex
+(use-package smex
+  :ensure t
+  :bind (("M-x" . smex)
+         ("C-c M-x" . smex-major-mode-commands))
+  :config
+  (setq smex-save-file  (concat lye-emacs-temporal-dir "smex-items"))
+  (setq smex-history-length 10)
+  (smex-initialize))
 
 (provide 'init-ahk)
 ;;; init-ahk.el ends here

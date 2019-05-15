@@ -55,10 +55,9 @@
 
 ;; Use undo-tree
 (use-package undo-tree
-  :init
+  :hook (after-init . global-undo-tree-mode))
  ;; (setq undo-tree-history-directory-alist
  ;;       `(("." . ,(concat lye-emacs-temporal-dir "undo"))))
-  (global-undo-tree-mode))
 
 ;; Save Emacs buffers when they lose focus after 2s
 (use-package auto-save

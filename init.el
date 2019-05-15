@@ -62,7 +62,8 @@
   :type '(choice (const :tag "Melpa" melpa)
                  (const :tag "Melpa-mirror" melpa-mirror)
                  (const :tag "Emacs-china" emacs-china)
-                 (const :tag "Netease" netease)))
+                 (const :tag "Netease" netease)
+                 (const :tag "Tuna" tuna)))
 
 ;;Set the format of the line number (relative or default)
 (defcustom lye-linum-format 'default
@@ -105,12 +106,15 @@
     (require 'init-edit)
 
     (require 'init-window)
-    (require 'init-ivy)
     (require 'init-company)
     ;; (require 'init-eshell)
     (require 'init-magit)
     (require 'init-dired)
     (require 'init-chinese)
+
+    (unless system/windows
+      (require 'init-ivy)
+      (require 'init-pyim))
 
     (if system/windows (require 'init-ahk)) ; windows-system
 
