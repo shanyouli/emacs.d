@@ -23,19 +23,56 @@
 ;;
 
 ;;; Code:
+(use-package dired
+  :ensure nil
+  :config
+  (setq dired-recursive-copies t) ; Recursive copying
+  (setq dired-recursive-deletes t) ; Recursive deletion
 
-(require 'dired)
-(setq dired-recursive-copies t) ; Recursive copying
-(setq dired-recursive-deletes t) ; Recursive deletion
+  ;; Use asynchronous file management
+  (use-package dired-async
+    :ensure async
+    :diminish dired-async-mode
+    :hook (dired-mode-hook . dired-async-mode))
 
-;; see @https://stackoverflow.com/questions/95631/open-a-file-with-su-sudo-inside-emacs
-(add-hook 'dired-mode-hook
-    (lambda ()
-      ;; open current file as sudo
-      (local-set-key (kbd "C-x <M-S-return>") (lambda()
-        (interactive)
-        (message "!!! SUDO opening %s" (dired-file-name-at-point))
-        (lye/sudo-find-file (dired-file-name-at-point))))))
+  (use-package dired-x
+    :ensure nil
+    :demand
+    :hook (dired-mode . dired-omit-mode)
+    :config
+    (setq dired-omit-verbose nil
+          dired-omit-files
+          (concat dired-omit-files "\\|^\\..+$\\|\\.pdf$\\|\\.tex$\\|\\*~$")))
+
+  (use-package all-the-icons-dired
+    :if (and (display-graphic-p) (not system/windows))
+    :hook (dired-mode . all-the-icons-dired-mode))
+  :bind (:map dired-mode-map
+              ("H" . dired-omit-mode)
+              ("RET" . dired-find-alternate-file)
+              ("C-c C-e" . wdired-change-to-wdired-mode))
+  ;; see @https://stackoverflow.com/questions/95631/open-a-file-with-su-sudo-inside-emacs
+  :hook (dired-mode .
+                    (lambda ()
+                      ;; open current file as sudo
+                      (local-set-key
+                       (kbd "C-x <M-S-return>")
+                       (lambda()
+                         (interactive)
+                         (message "!!! SUDO opening %s" (dired-file-name-at-point))
+                         (lye/sudo-find-file (dired-file-name-at-point)))))))
+
+
+(use-package image-dired
+  :ensure nil
+  :commands (image-dired)
+  :config
+  (setq image-dired-dir (concat maple-cache-directory "image-dired")
+        image-dired-thumbnail-storage 'standard))
+
+(use-package image-mode :ensure nil)
+
+
 
 (provide 'init-dired)
 ;;; init-dired.el ends here

@@ -27,7 +27,7 @@
 (global-set-key (kbd "C-x 4 u") 'winner-undo)
 (global-set-key (kbd "C-x 4 r") 'winner-redo)
 
-(defvar lye/ration-dict
+(defvar lye-ration-dict
   '((1 . 1.618033988875)
     (2 . 2)
     (3 . 3)
@@ -38,12 +38,12 @@
 (defun lye/split-window-horizontally (&optional ratio)
   "Split window horizontally and resize the new window.
 'C-u number M-x lye/split-window-horizontally' uses pre-defined ration from
-`lye/ration-dict'. Always focus on bigger window."
+`lye-ration-dict'. Always focus on bigger window."
   (interactive "P")
   (let* (ratio-val)
     (cond
      (ratio
-      (setq ration-val (cdr (assoc ratio lye/ration-dict)))
+      (setq ration-val (cdr (assoc ratio lye-ration-dict)))
       (split-window-horizontally (floor (/ (window-body-width)
                                            (1+ ratio-val)))))
      (t
