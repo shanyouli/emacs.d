@@ -133,8 +133,6 @@
          (require 'init-scheme)
          (require 'init-python)
          (require 'init-lsp)
-         ;;(require 'init-sh)
-         ;; (require 'init-markdown)
          ))))
 
 (provide 'init)
