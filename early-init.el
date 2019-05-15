@@ -26,7 +26,7 @@
 
 ;; Defer garbage collection further back in the startup process
 (setq gc-cons-threshold 80000000)
-
+(setq gc-cons-percentage 0.1)
 (setq package-enable-at-startup nil)
 
 (unless (and (display-graphic-p) (eq system-type 'darwin))

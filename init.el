@@ -78,6 +78,7 @@
 ;; Speed up startup
 (let ( ;; Temporarily increase `gc-cons-threhold' when loading
       (gc-cons-threshold most-positive-fixnum)
+      (gc-cons-percentage 0.6)
       ;; Empty to avoid analyzing files when loading remote files.
       (file-name-handler-alist nil))
   ;; Load path
