@@ -110,13 +110,13 @@
     ;; (require 'init-eshell)
     (require 'init-magit)
     (require 'init-dired)
+    (require 'init-chinese)
 
     (if system/windows (require 'init-ahk)) ; windows-system
 
     (run-with-idle-timer
      1 nil
      #'(lambda ()
-         (require 'init-chinese)
          (require 'init-flycheck)
          (require 'init-yasnippet)
 
