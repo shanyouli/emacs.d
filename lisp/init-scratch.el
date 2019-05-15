@@ -30,16 +30,16 @@
 
 ;; scratch-save
 ;; see @https://emacs-china.org/t/topic/4714/2?u=twlz0ne
-(defvar lye/scratch-save-file (concat lye-emacs-temporal-dir "scratch"))
+(defvar lye-scratch-save-file (concat lye-emacs-temporal-dir "scratch"))
 
 (defun lye/scratch-save ()
   (ignore-errors
     (with-temp-message (with-current-buffer " *Minibuf-0*" (buffer-string))
       (with-current-buffer "*scratch*"
-        (write-region nil nil lye/scratch-save-file)))))
+        (write-region nil nil lye-scratch-save-file)))))
 
 (defun lye/scratch-restore()
-  (let ((f lye/scratch-save-file))
+  (let ((f lye-scratch-save-file))
     (with-current-buffer "*scratch*"
       (erase-buffer)
       (if (file-exists-p f)
