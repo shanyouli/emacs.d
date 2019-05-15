@@ -113,6 +113,9 @@
     (require 'init-dired)
     (require 'init-chinese)
 
+    (require 'init-flycheck)
+    (require 'init-yasnippet)
+
     (unless system/windows
       (require 'init-ivy)
       (require 'init-pyim))
@@ -122,8 +125,6 @@
     (run-with-idle-timer
      1 nil
      #'(lambda ()
-         (require 'init-flycheck)
-         (require 'init-yasnippet)
 
          (require 'init-elfeed) ; RSS Reader
          (require 'init-lang)
