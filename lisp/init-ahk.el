@@ -24,10 +24,6 @@
 
 ;;; Code:
 
-;; confirmedto prevent misoperation.
-(setq confirm-kill-emacs (lambda (prompt)
-                           (y-or-n-p-with-timeout "Exit Emacs after 3s?" 3 "y")))
-
 ;; autohotkey-mode
 (use-package ahk-mode :mode "\\.ahk\\'"  :defer t)
 
@@ -45,7 +41,7 @@
 ;; Us ido-mode
 (use-package ido
   :ensure nil
-  :hook (after-init . ido-mode)
+  :bind (("C-x C-f" . ido-find-file))
   :config
   (setq ido-enable-flex-matching t)
   (setq ido-everywhere t)
@@ -55,7 +51,9 @@
   ;; Ido does not automatically create a new buffer, need to ask
   (setq ido-create-new-buffer 'prompt)
   (setq ido-file-extensions-order '(".org" ".txt" ".py" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf"))
-  (setq ido-save-directory-list-file (concat lye-emacs-temporal-dir "ido.last")))
+  (setq ido-save-directory-list-file (concat lye-emacs-temporal-dir "ido.last"))
+
+  (ido-mode 1))
 
 ;; use smex
 (use-package smex
@@ -66,6 +64,10 @@
   (setq smex-save-file  (concat lye-emacs-temporal-dir "smex-items"))
   (setq smex-history-length 10)
   (smex-initialize))
+
+;; confirmedto prevent misoperation.
+(setq confirm-kill-emacs (lambda (prompt)
+                           (y-or-n-p-with-timeout "Exit Emacs after 3s?" 3 "y")))
 
 (provide 'init-ahk)
 ;;; init-ahk.el ends here
