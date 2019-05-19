@@ -69,7 +69,8 @@
 (when (display-graphic-p)
   ;;Chinese and English font alignment
   (cond
-   ((member "Sarasa Mono SC" (font-family-list))
+   ((or (member "Sarasa Term SC" (font-family-list))
+        (member "Sarasa Mono SC" (font-family-list)))
     (set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14))
    ((member "Noto Sans Mono CJK SC" (font-family-list))
     (set-font "Noto Sans Mono CJK SC" "Noto Sans Mono CJK SC" 13 13))
@@ -81,6 +82,8 @@
   (cond
    ((member "Apple Color Emoji" (font-family-list))
     (set-fontset-font t 'unicode "Apple Color Emoki" nil 'prepend))
+   ((member "Segoe UI Emoji" (font-family-list))
+    (set-fontset-font t 'unicode "Segoe UI Emoji" nil 'prepend))
    ((member "Symbola" (font-family-list))
     (set-fontset-font t 'unicode "Symbola" nil 'prepend))))
 

@@ -81,6 +81,7 @@
       (gc-cons-percentage 0.6)
       ;; Empty to avoid analyzing files when loading remote files.
       (file-name-handler-alist nil))
+
   ;; Load path
   ;; Optimize: Force `lisp' at the head to reduce the startup time.
   (defun update-load-path (&rest _)
@@ -90,6 +91,14 @@
   (if (version< emacs-version "27.0")
       (update-load-path)
     (push (expand-file-name "lisp" user-emacs-directory) load-path))
+
+  ;; Some non-package installed packages
+  (require 'init-extensions)
+
+  ;; Test and optimize startup
+  (require 'benchmark-init-modes)
+  (require 'benchmark-init)
+  (benchmark-init/activate)
 
   ;; Load `custom-file'
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
@@ -137,4 +146,3 @@
 
 (provide 'init)
 ;;; init.el ends here
-(put 'dired-find-alternate-file 'disabled nil)

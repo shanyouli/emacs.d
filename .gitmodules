@@ -1,0 +1,6 @@
+[submodule "extensions/use-package"]
+	path = extensions/use-package
+	url = https://github.com/jwiegley/use-package.git
+[submodule "extensions/benchmark-init-el"]
+	path = extensions/benchmark-init-el
+	url = https://github.com/dholm/benchmark-init-el.git

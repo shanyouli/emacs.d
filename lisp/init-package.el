@@ -77,9 +77,9 @@
   (package-initialize))
 
 ;; Setup `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
+;; (unless (package-installed-p 'use-package)
+;; (package-refresh-contents)
+;; (package-install 'use-package))
 
 ;; Should set before loading 'use-packge'
 ;; Should set before loading `use-package'
@@ -105,8 +105,7 @@
 
 (setq straight-process-buffer " *straight-process*")
 
-;; (eval-when-compile (require 'use-package))
-
+(eval-when-compile (require 'use-package))
 ;; Extensions
 (use-package diminish)
 (use-package bind-key)

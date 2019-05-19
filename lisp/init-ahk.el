@@ -41,7 +41,8 @@
 ;; Us ido-mode
 (use-package ido
   :ensure nil
-  :bind (("C-x C-f" . ido-find-file))
+  :bind (("C-x C-f" . ido-find-file)
+         ("C-x C-r" . ido-recentf-open))
   :config
   (setq ido-enable-flex-matching t)
   (setq ido-everywhere t)
@@ -53,6 +54,12 @@
   (setq ido-file-extensions-order '(".org" ".txt" ".py" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf"))
   (setq ido-save-directory-list-file (concat lye-emacs-temporal-dir "ido.last"))
 
+  (defun ido-recentf-open ()
+    "Use `ido-completing-read' to find a recent file."
+    (interactive)
+    (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+        (message "Opening file...")
+      (message "Aborting")))
   (ido-mode 1))
 
 ;; use smex
