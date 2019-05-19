@@ -61,12 +61,11 @@
 
 ;; Save Emacs buffers when they lose focus after 2s
 (use-package auto-save
-  :straight (auto-save :type git :host github :repo "shanyouli/auto-save" :depth 1)
   :ensure nil
   :commands (auto-save-enable)
   :init
-  (setq-default auto-save-silent t)
-  (setq-default auto-save-idle 2)
+  (setq auto-save-silent t)
+  (setq auto-save-idle 1.5)
   (auto-save-enable))
 
 ;; Store all temporal files in a temporal directory instead of being

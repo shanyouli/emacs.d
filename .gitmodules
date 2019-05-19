@@ -4,3 +4,15 @@
 [submodule "extensions/benchmark-init-el"]
 	path = extensions/benchmark-init-el
 	url = https://github.com/dholm/benchmark-init-el.git
+[submodule "extensions/auto-save"]
+	path = extensions/auto-save
+	url = https://github.com/shanyouli/auto-save.git
+[submodule "extensions/insert-translated-name"]
+	path = extensions/insert-translated-name
+	url = https://github.com/manateelazycat/insert-translated-name.git
+[submodule "extensions/company-english-helper"]
+	path = extensions/company-english-helper
+	url = https://github.com/manateelazycat/company-english-helper.git
+[submodule "extensions/sdcv"]
+	path = extensions/sdcv
+	url = https://github.com/manateelazycat/sdcv.git

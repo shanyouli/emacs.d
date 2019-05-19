@@ -23,8 +23,8 @@
 ;; Emacs Package Management configurations.
 
 ;;; Code:
+(eval-when-compile (require 'package))
 
-(require 'package)
 ;; HACK: DO NOT save the variable "package-selected-packages" in init/custom file
 ;; @see https://github.com/jwiegley/use-package/issues/383#issuecomment-247801751
 (defun my-save-selected-packages (&optional value)
@@ -77,33 +77,12 @@
   (package-initialize))
 
 ;; Setup `use-package'
-;; (unless (package-installed-p 'use-package)
-;; (package-refresh-contents)
-;; (package-install 'use-package))
-
-;; Should set before loading 'use-packge'
 ;; Should set before loading `use-package'
 (eval-and-compile
   (setq use-package-always-ensure t)
   (setq use-package-always-defer t)
   (setq use-package-expand-minimally t)
   (setq use-package-enable-imenu-support t))
-
-;; Install straight.el
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(setq straight-process-buffer " *straight-process*")
 
 (eval-when-compile (require 'use-package))
 ;; Extensions

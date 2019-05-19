@@ -95,10 +95,10 @@
   ;; Some non-package installed packages
   (require 'init-extensions)
 
-  ;; Test and optimize startup
-  (require 'benchmark-init-modes)
-  (require 'benchmark-init)
-  (benchmark-init/activate)
+  ;; ;; Test and optimize startup
+  ;; (require 'benchmark-init-modes)
+  ;; (require 'benchmark-init)
+  ;; (benchmark-init/activate)
 
   ;; Load `custom-file'
   (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
