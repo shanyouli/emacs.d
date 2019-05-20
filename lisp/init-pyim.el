@@ -25,65 +25,66 @@
 ;;; Code:
 
 ;; Configure Chinese input method
-(use-package pyim
-  :init
-  (defun pyim-bigdict-enable ()
-    "Add bigdict to pyim"
-    (interactive)
-    (let* ((file (concat
-                  (file-name-as-directory user-emacs-directory)
-                  (file-name-as-directory "pyim-dict")
-                  "pyim-bigdict.pyim.gz")))
-      (when (file-exists-p file)
-        (if (featurep 'pyim)
-            (pyim-extra-dicts-add-dict
-             `(:name "Bigdict-elpa"
-                     :file ,file
-                     :coding utf-8-unix
-                     :dict-type pinyin-dict
-                     :elpa t))
-          (message "Pyim didn't pretend, pyim-bigdict failed to start.")))))
+(use-package pyim)
 
-  (pyim-bigdict-enable)
-  ;; Set pyim as the default input method
-  (setq default-input-method "pyim")
-  ;;Use Emacs thread to generate dcache
-  (setq pyim-dcache-prefer-emacs-thread t)
-  (setq pyim-dcache-directory (concat lye-emacs-temporal-dir "pyim/dcache"))
-  ;; Use full spell
-  (setq pyim-default-scheme 'quanpin)
-
-  ;; Set the way the word box is drawn
-  (if (and (display-graphic-p)
-           (>= emacs-major-version 26))
-      (use-package posframe
-        :config
-        (setq pyim-page-tooltip 'posframe)
-        (setq pyim-posframe-min-width 0))
-    (setq pyim-page-tooltip 'popup))
-
-  ;; Fuzzy pinyin
-  (setq pyim-fuzzy-pinyin-alist
-        '(("en" "eng") ("in" "ing") ("l" "n") ("z" "zh") ("c" "ch")
-          ("s" "sh") ("an" "ang")))
-
-  ;; Set 9 candidate words
-  (setq pyim-page-length 9)
-
-  (setq-default pyim-punctuation-translate-p '(no yes auto))
-  (setq-default pyim-english-input-switch-functions
-                '(pyim-probe-isearch-mode))
-
-  ;; No Chinese company
-  (with-eval-after-load 'company
-    (defun lye/company-dabbrev--prefix (orig-fun)
-      "取消中文补全"
-      (let ((string (pyim-char-before-to-string 0)))
-        (if (pyim-string-match-p "\\cc" string)
-            nil
-          (funcall orig-fun))))
-    (advice-add 'company-dabbrev--prefix
-                :around #'lye/company-dabbrev--prefix)))
 (require 'pyim)
+(defun pyim-bigdict-enable ()
+  "Add bigdict to pyim"
+  (interactive)
+  (let* ((file (concat
+                (file-name-as-directory user-emacs-directory)
+                (file-name-as-directory "pyim-dict")
+                "pyim-bigdict.pyim.gz")))
+    (when (file-exists-p file)
+      (if (featurep 'pyim)
+          (pyim-extra-dicts-add-dict
+           `(:name "Bigdict-elpa"
+                   :file ,file
+                   :coding utf-8-unix
+                   :dict-type pinyin-dict
+                   :elpa t))
+        (message "Pyim didn't pretend, pyim-bigdict failed to start.")))))
+
+(pyim-bigdict-enable)
+;; Set pyim as the default input method
+(setq default-input-method "pyim")
+;;Use Emacs thread to generate dcache
+(setq pyim-dcache-prefer-emacs-thread t)
+(setq pyim-dcache-directory (concat lye-emacs-temporal-dir "pyim/dcache"))
+;; Use full spell
+(setq pyim-default-scheme 'quanpin)
+
+;; Set the way the word box is drawn
+(if (and (display-graphic-p)
+         (>= emacs-major-version 26))
+    (use-package posframe
+      :config
+      (setq pyim-page-tooltip 'posframe)
+      (setq pyim-posframe-min-width 0))
+  (setq pyim-page-tooltip 'popup))
+
+;; Fuzzy pinyin
+(setq pyim-fuzzy-pinyin-alist
+      '(("en" "eng") ("in" "ing") ("l" "n") ("z" "zh") ("c" "ch")
+        ("s" "sh") ("an" "ang")))
+
+;; Set 9 candidate words
+(setq pyim-page-length 9)
+
+(setq-default pyim-punctuation-translate-p '(no yes auto))
+(setq-default pyim-english-input-switch-functions
+              '(pyim-probe-isearch-mode))
+
+;; No Chinese company
+(with-eval-after-load 'company
+  (defun lye/company-dabbrev--prefix (orig-fun)
+    "取消中文补全"
+    (let ((string (pyim-char-before-to-string 0)))
+      (if (pyim-string-match-p "\\cc" string)
+          nil
+        (funcall orig-fun))))
+  (advice-add 'company-dabbrev--prefix
+              :around #'lye/company-dabbrev--prefix))
+
 (provide 'init-pyim)
 ;;; init-pyim.el ends here

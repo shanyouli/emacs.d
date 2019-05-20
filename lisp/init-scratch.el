@@ -24,6 +24,9 @@
 
 ;;; Code:
 
+;; Set scratch default major-mode
+(setq initial-major-mode 'emacs-lisp-mode)
+
 (setq-default initial-scratch-message
               (concat ";; Happy hacking, "
                       user-login-name " - Emacs ♥ you!\n\n"))

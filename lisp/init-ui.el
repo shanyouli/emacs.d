@@ -39,8 +39,7 @@
 ;; Suppress GUI features
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)
-(setq initial-major-mode 'emacs-lisp-mode
-      initial-buffer-choice nil)
+(setq initial-buffer-choice nil)
 
 ;; Window size and features
 (when (version< emacs-version  "27.0.0")

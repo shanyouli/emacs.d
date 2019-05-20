@@ -29,6 +29,7 @@
   (setq dired-recursive-copies t) ; Recursive copying
   (setq dired-recursive-deletes t) ; Recursive deletion
 
+  (put 'dired-find-alternate-file 'disabled nil)
   ;; Use asynchronous file management
   (use-package dired-async
     :ensure async

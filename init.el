@@ -37,13 +37,12 @@
 (defconst system/mac (eq system-type 'darwin)
   "Are we running on a Mac System?")
 
-(defconst system/root (eq system-type 'gnu/linux)
+(defconst system/linux (eq system-type 'gnu/linux)
   "Are we running on a GNU/Linux System?")
 
 (defconst *root* (string-equal "root" (getenv "USER"))
   "Are you using ROOT user?")
 
-;; Set the temporal directory
 (defconst lye-emacs-temporal-dir (concat user-emacs-directory "tmp/")
   "Is the temporal diirectory this?")
 
@@ -56,7 +55,6 @@
   "Set user mail address."
   :type 'string)
 
-;;Set package archives from which to fetch
 (defcustom lye-package-archives 'emacs-china
   "Set package archives from which to fetch."
   :type '(choice (const :tag "Melpa" melpa)
@@ -65,7 +63,6 @@
                  (const :tag "Netease" netease)
                  (const :tag "Tuna" tuna)))
 
-;;Set the format of the line number (relative or default)
 (defcustom lye-linum-format 'default
   "Set the format of the line number (relative or default)."
   :type '(choice (const :tag "Default" default)
@@ -134,7 +131,6 @@
     (run-with-idle-timer
      1 nil
      #'(lambda ()
-
          (require 'init-elfeed) ; RSS Reader
          (require 'init-lang)
          (require 'init-hugo)
