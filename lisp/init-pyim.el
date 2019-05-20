@@ -27,7 +27,8 @@
 ;; Configure Chinese input method
 (use-package pyim)
 
-(require 'pyim)
+(add-hook 'after-init-hook (lambda () (require 'pyim)))
+;; (require 'pyim)
 (defun pyim-bigdict-enable ()
   "Add bigdict to pyim"
   (interactive)
