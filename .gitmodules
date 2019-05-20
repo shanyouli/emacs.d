@@ -16,3 +16,6 @@
 [submodule "extensions/sdcv"]
 	path = extensions/sdcv
 	url = https://github.com/manateelazycat/sdcv.git
+[submodule "extensions/lazycat-theme"]
+	path = extensions/lazycat-theme
+	url = https://github.com/lye95/lazycat-theme.git

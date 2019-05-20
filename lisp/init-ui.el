@@ -125,7 +125,8 @@
       :hook  (after-init . doom-modeline-mode)
       :init
       ;; Only display the file name
-      (setq doom-modeline-buffer-file-name-style 'truncate-upto-root)))
+      (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
+  (require 'lazycat-theme))
 
 ;; Misc
 (setq ad-redefinition-action 'accept)  ;不要烦人的 redefine warning
