@@ -89,7 +89,7 @@
 ;; Set line height
 (when (display-graphic-p)
   (setq-default line-spacing nil)
-  (add-hook 'prog-mode-hook (lambda () (setq line-spacing 0.21))))
+  (add-hook 'prog-mode-hook (lambda () (setq line-spacing 0.16))))
 
 ;; set startup frame-size
 (defun lye/reset-frame-size (&optional frame)
@@ -98,8 +98,8 @@
   (when frame (select-frame frame))
   (if system/windows
       (progn
-        (set-frame-width (selected-frame) 96)
-        (set-frame-height (selected-frame) 32))
+        (set-frame-width (selected-frame) 88)
+        (set-frame-height (selected-frame) 30))
     ;;(set-frame-size (selected-frame) 96 32)
     ))
 (when window-system

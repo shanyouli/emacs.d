@@ -73,8 +73,16 @@
   (smex-initialize))
 
 ;; confirmedto prevent misoperation.
-(setq confirm-kill-emacs (lambda (prompt)
-                           (y-or-n-p-with-timeout "Exit Emacs after 3s?" 3 "y")))
+(setq confirm-kill-emacs
+      (lambda (prompt)
+        (y-or-n-p-with-timeout "Exit Emacs after 1.5s?" 1.5 "y")))
+
+
+(setq default-directory "~")
+
+;; Return the button at the beginning of win other than Win+L to Emacs
+;; see @https://emacs-china.org/t/superkey/9387
+(w32-register-hot-key [s-])
 
 (provide 'init-ahk)
 ;;; init-ahk.el ends here
