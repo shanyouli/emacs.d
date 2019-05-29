@@ -82,7 +82,15 @@
 
 (cond
  ((or system/windows (not (executable-find "sdcv")))
-  (lye/use-youdao-dic))
+  (lye/use-youdao-dic)
+  (when (and (display-graphic-p) (featurep 'avy))
+    ;;@https://emacs-china.org/t/topic/3676/4
+    (defun lye/avy-youdao-dictionary ()
+      (interactive)
+      (save-excursion
+        (call-interactively #'avy-goto-char)
+        (youdao-dictionary-search-at-point-tooltip)))
+    (bind-key "C-c y" #'lye/avy-youdao-dictionary)))
  (t
   (lye/use-sdcv)))
 

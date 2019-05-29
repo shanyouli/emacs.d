@@ -137,6 +137,7 @@
          (require 'init-org)
          (require 'init-scheme)
          (require 'init-python)
+         (require 'init-lua)
          (require 'init-lsp)
          ))))
 

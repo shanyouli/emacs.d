@@ -55,5 +55,11 @@
 ;; vimrc-major mode
 (use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . ovimrc-mode))
 
+;; PKGBUILD-mode
+(use-package pkgbuild-mode
+  :ensure t
+  :mode (("/PKGBUILD\\'" . pkgbuild-mode))
+  :defer t)
+
 (provide 'init-lang)
 ;;; init-lang.el ends here

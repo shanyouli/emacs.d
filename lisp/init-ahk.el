@@ -77,7 +77,6 @@
       (lambda (prompt)
         (y-or-n-p-with-timeout "Exit Emacs after 1.5s?" 1.5 "y")))
 
-
 (setq default-directory "~")
 
 ;; Return the button at the beginning of win other than Win+L to Emacs

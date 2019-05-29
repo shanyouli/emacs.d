@@ -100,7 +100,7 @@
       (progn
         (set-frame-width (selected-frame) 88)
         (set-frame-height (selected-frame) 30))
-    ;;(set-frame-size (selected-frame) 96 32)
+    (set-frame-size (selected-frame) 88 30)
     ))
 (when window-system
   (lye/reset-frame-size))

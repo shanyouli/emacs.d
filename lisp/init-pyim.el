@@ -26,9 +26,7 @@
 
 ;; Configure Chinese input method
 (use-package pyim)
-
-(add-hook 'after-init-hook (lambda () (require 'pyim)))
-;; (require 'pyim)
+(require 'pyim)
 (defun pyim-bigdict-enable ()
   "Add bigdict to pyim"
   (interactive)
@@ -49,8 +47,9 @@
 (pyim-bigdict-enable)
 ;; Set pyim as the default input method
 (setq default-input-method "pyim")
-;;Use Emacs thread to generate dcache
-(setq pyim-dcache-prefer-emacs-thread t)
+
+;; Use Emacs async to dcache, Emacs thread is more stagnation than asynchronous
+(setq pyim-dcache-prefer-emacs-thread nil)
 (setq pyim-dcache-directory (concat lye-emacs-temporal-dir "pyim/dcache"))
 ;; Use full spell
 (setq pyim-default-scheme 'quanpin)
@@ -86,6 +85,13 @@
         (funcall orig-fun))))
   (advice-add 'company-dabbrev--prefix
               :around #'lye/company-dabbrev--prefix))
+
+;; Start Emacs automatically load the thesaurus
+;; (add-hook 'emacs-startup-hook
+;;           #'(lambda ()
+;;               (with-temp-message
+;;                   (with-current-buffer " *Minibuf-0*" (buffer-string))
+;;                 (pyim-restart-1 t))))
 
 (provide 'init-pyim)
 ;;; init-pyim.el ends here
