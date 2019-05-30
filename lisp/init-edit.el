@@ -91,15 +91,17 @@
   (setq display-line-numbers-grow-only t)
   ;; (set-face-foreground 'line-number-current-line "#859393")
   ;; (set-face-background 'line-number "#313335")
-  (dolist (hook (list
-                 'c-mode-common-hook
-                 'emacs-lisp-mode-hook
-                 'sh-mode-hook
-                 'python-mode-hook
-                 ;; 'org-mode-hook
-                 ))
-    (add-hook hook (lambda () (display-line-numbers-mode 1)))))
-;; (use-package linum-relative
+  ;; (dolist (hook (list
+  ;;                'c-mode-common-hook
+  ;;                'emacs-lisp-mode-hook
+  ;;                'sh-mode-hook
+  ;;                'python-mode-hook
+  ;;                ;; 'org-mode-hook
+  ;;                ))
+  ;;   (add-hook hook (lambda () (display-line-numbers-mode 1))))
+  :hook (prog-mode . display-line-numbers-mode))
+
+  ;; (use-package linum-relative
 ;;   :commands linum-relative-mode
 ;;   :init
 ;;   (setq linum-relative-backend 'display-line-numbers-mode))

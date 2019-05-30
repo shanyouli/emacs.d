@@ -53,7 +53,7 @@
 (add-hook 'sh-mode-hook #'(lambda() (sh-set-shell "bash")))
 
 ;; vimrc-major mode
-(use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . ovimrc-mode))
+(use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))
 
 ;; PKGBUILD-mode
 (use-package pkgbuild-mode
