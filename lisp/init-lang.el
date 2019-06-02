@@ -30,7 +30,8 @@
 ;; xml
 (use-package web-mode
   :mode (("\\.xml\\'" . web-mode)
-         ("\\fonts.conf\\'" . web-mode))
+         ("\\fonts.conf\\'" . web-mode)
+         ("\\.html\\'" . web-mode))
   :defer t)
 
 ;; yaml

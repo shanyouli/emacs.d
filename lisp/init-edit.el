@@ -83,28 +83,20 @@
   :diminish hungry-delete-mode
   :hook (after-init . global-hungry-delete-mode))
 
-;; Displays line-number.el
-(use-package display-line-numbers
-  :ensure nil
-  :init
-  (setq-default display-line-numbers-width 2)
-  (setq display-line-numbers-grow-only t)
-  ;; (set-face-foreground 'line-number-current-line "#859393")
-  ;; (set-face-background 'line-number "#313335")
-  ;; (dolist (hook (list
-  ;;                'c-mode-common-hook
-  ;;                'emacs-lisp-mode-hook
-  ;;                'sh-mode-hook
-  ;;                'python-mode-hook
-  ;;                ;; 'org-mode-hook
-  ;;                ))
-  ;;   (add-hook hook (lambda () (display-line-numbers-mode 1))))
-  :hook (prog-mode . display-line-numbers-mode))
-
-  ;; (use-package linum-relative
-;;   :commands linum-relative-mode
-;;   :init
-;;   (setq linum-relative-backend 'display-line-numbers-mode))
+;; Show native line numbers if possible, otherwise use linum
+(if (fboundp 'display-line-numbers-mode)
+    (use-package display-line-numbers
+      :ensure nil
+      :hook (prog-mode . display-line-numbers-mode)
+      :config
+      (setq line-number-display-limit large-file-warning-threshold)
+      (setq line-number-display-limit-width 1000))
+  (use-package linum-off
+    :demand
+    :defines linum-format
+    :hook (after-init . global-linum-mode)
+    :config
+    (setq linum-format "%4d ")))
 
 ;; Don't display `symbolic link to Git-controlled source file....'
 ;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links

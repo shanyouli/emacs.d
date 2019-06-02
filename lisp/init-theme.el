@@ -1,9 +1,9 @@
-;;; early-init.el --- Lye Emacs Early Init File      -*- lexical-binding: t; -*-
+;;; init-theme.el --- Initialize theme configuration  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  lye li
 
 ;; Author: lye li <shanyouli6@gmail.com>
-;; Keywords:
+;; Keywords:theme
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -24,21 +24,26 @@
 
 ;;; Code:
 
-;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold 80000000)
-(setq gc-cons-percentage 0.1)
-(setq package-enable-at-startup nil)
+;; Theme
+;; Understand the topics currently in use
+(defun lye/current-theme ()
+  "what is the Current theme?"
+  (interactive)
+  (message "The Current theme is %s"
+           (substring (format "%s" custom-enabled-themes) 1 -1)))
 
-(unless (and (display-graphic-p) (eq system-type 'darwin))
-  ;;(setq menu-bar-mode nil)
-  (menu-bar-mode -1))
+(if (display-graphic-p)
+    (use-package doom-themes
+      :init (load-theme 'doom-one t)))
 
-(setq tool-bar-mode nil)
-(setq scroll-bar-mode nil)
+;; mode-line
+(if (display-graphic-p)
+    (use-package doom-modeline
+      :hook  (after-init . doom-modeline-mode)
+      :init
+      ;; Only display the file name
+      (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
+  (require 'lazycat-theme))
 
-(setq default-frame-alist
-      '((width . 86) (height . 32)))
-(modify-all-frames-parameters '((vertical-scroll-bars)))
-
-(provide 'early-init)
-;;; early-init.el ends here
+(provide 'init-theme)
+;;; init-theme.el ends here

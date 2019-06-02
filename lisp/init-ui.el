@@ -28,18 +28,13 @@
 ;; (setq facy-splash-image logo)
 
 ;; Title
-;; (when (display-graphic-p)
-;;   (setq frame-title-format
-;;         '("Lye Emacs - "
-;;           (:eval (if (buffer-file-name)
-;;                      (abbreviate-file-name (buffer-file-name))
-;;                    %b))))
-;;   (setq icon-title-format frame-title-format))
-
-;; Suppress GUI features
-(setq use-file-dialog nil)
-(setq use-dialog-box nil)
-(setq initial-buffer-choice nil)
+(when (display-graphic-p)
+  (setq frame-title-format
+        '("Lye Emacs - "
+          (:eval (if (buffer-file-name)
+                     (abbreviate-file-name (buffer-file-name))
+                   (buffer-name)))))
+  (setq icon-title-format frame-title-format))
 
 ;; Window size and features
 (when (version< emacs-version  "27.0.0")
@@ -58,77 +53,133 @@
 
 ;; set font
 ;; @see https://emacs-china.org/t/emacs/7268/2
-(defun set-font (english chinese english-size chinese-size)
-  (set-face-attribute 'default nil :font
-                      (format   "%s:pixelsize=%d"  english english-size))
-  (dolist (charset '(kana han symbol cjk-misc bopomofo))
-    (set-fontset-font (frame-parameter nil 'font) charset
-                      (font-spec :family chinese :size chinese-size))))
+(defun lye/set-font (english chinese  &optional english-size chinese-size)
+  (if english-size
+      (set-face-attribute 'default nil :font
+                          (font-spec :family english :size english-size))
+    (set-face-attribute 'default nil :font english))
+  (dolist (charset '(kana han cjk-misc bopomofo))
+    (if chinese-size
+        (set-fontset-font (frame-parameter nil 'font) charset
+                          (font-spec :family chinese :size chinese-size))
+      (set-fontset-font (frame-parameter nil 'font) charset chinese))))
+
+  ;;Chinese and English font alignment
+(defun lye/monospaced-chinese-and-english-fonts ()
+  ;;  (interactive)
+  ;; FantasqueSansMono and chinese font
+  (if (member "Fantasque Sans Mono" (font-family-list))
+      (if (member "Sarasa Term SC" (font-family-list))
+          (lye/set-font "Fantasque Sans Mono" "Sarasa Mono SC" 11.5 12.0)
+
+        (catch 'loop
+          (dolist (font '("Sarasa Mono SC"
+                          "WenQuanYi Micro Hei"
+                          "Source Han Sans SC"
+                          "Hiragino Sans GB"
+                          "Noto Sans Mono CJK SC"))
+            (when (member font (font-family-list))
+              (lye/set-font "Fantasque Sans Mono" font 11.5 12.0)
+              (throw 'loop t)))))
+
+    ;; Fira Code, Hack, Source Code Pro
+    (unless (catch 'loop1
+              (dolist (en-font '("Fira Code" "Hack" "Source Code Pro"))
+                (when (member en-font (font-family-list))
+                  (catch 'loop
+                    (dolist (ch-font '("Sarasa Mono SC"
+                                       "WenQuanYi Micro Hei"
+                                       "Hiragino Sans GB"
+                                       "Source Han Sans SC"
+                                       "Noto Sans Mono CJK SC"))
+                      (when (member ch-font (font-family-list))
+                        (lye/set-font en-font ch-font 10.5 12.0)
+                        (throw 'loop t))))
+                  (throw 'loop1 t))))
+      (setq lye-enable-zh-and-en-same-width t))))
+
+;; {%org-mode%}
+;; here are 20 hanzi and 40 english chars, see if they are the same width
+;; 你你你你你你你你你你你你你你你你你你你你
+;; aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+;; /aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/
+;; {%/org-mode%}
+;; (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 
 (when (display-graphic-p)
-  ;;Chinese and English font alignment
-  (cond
-   ((or (member "Sarasa Term SC" (font-family-list))
-        (member "Sarasa Mono SC" (font-family-list)))
-    (set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14))
-   ((member "Noto Sans Mono CJK SC" (font-family-list))
-    (set-font "Noto Sans Mono CJK SC" "Noto Sans Mono CJK SC" 13 13))
-   ((and (member "Source Code Pro" (font-family-list))
-         (member "simsun" (font-family-list)))
-    (set-font "Source Code Pro" "simsun" 12 14)))
+  (lye/monospaced-chinese-and-english-fonts)
 
-  ;; Specify fonts for all unicode characters
+  ;; Specify fonts for symbol characters
   (cond
    ((member "Apple Color Emoji" (font-family-list))
-    (set-fontset-font t 'unicode "Apple Color Emoki" nil 'prepend))
+    (set-fontset-font t 'symbol "Apple Color Emoji" nil 'prepend))
    ((member "Segoe UI Emoji" (font-family-list))
-    (set-fontset-font t 'unicode "Segoe UI Emoji" nil 'prepend))
-   ((member "Symbola" (font-family-list))
-    (set-fontset-font t 'unicode "Symbola" nil 'prepend))))
+    (set-fontset-font t 'symbol "Segoe UI Emoji" nil 'prepend)))
 
-;; Set line height
-(when (display-graphic-p)
-  (setq-default line-spacing nil)
-  (add-hook 'prog-mode-hook (lambda () (setq line-spacing 0.16))))
+  ;; Spectify font for all unicode characters
+  (catch 'loop
+    (dolist (font '("Symbola" "Apple Symbols" "Symbol"))
+      (when (member font (font-family-list))
+        (set-fontset-font t 'unicode font nil 'prepend)
+        (throw 'loop t))))
 
-;; set startup frame-size
+  ;; Single font setting instead of Chinese and English width settings
+  (when lye-enable-zh-and-en-same-width
+    (catch 'loop
+      (dolist (font '("Fira Code" "Hack" "DejaVu Sans Mono" "Source Code Pro"))
+        (when (member font (font-family-list))
+          (set-face-attribute 'default nil :font font
+                              :height (cond
+                                       (system/mac 130)
+                                       (system/windows 110)
+                                       (t 100)))
+          (throw 'loop t))))
+
+    ;; Specify font for Chinese Characters
+    (catch 'loop
+      (dolist (font '("WenQuanYi Micro Hei" "Microsoft Yahei"
+                      "Noto Sans Mono CJK SC"))
+        (when (member font (font-family-list))
+          (set-fontset-font t 'han font nil 'append)
+          (throw 'loop t)))))
+  )
+
+;;; Frame Size
+
+;; Set the initial window size
+(setq initial-frame-alist
+      '((width . 86) (height . 32)))
+
 (defun lye/reset-frame-size (&optional frame)
   "set the frame-size."
   (interactive)
   (when frame (select-frame frame))
   (if system/windows
       (progn
-        (set-frame-width (selected-frame) 88)
-        (set-frame-height (selected-frame) 30))
-    (set-frame-size (selected-frame) 88 30)
-    ))
-(when window-system
-  (lye/reset-frame-size))
+        (set-frame-width (selected-frame) 86)
+        (set-frame-height (selected-frame) 32))
+    (set-frame-size (selected-frame) 86 32)))
 ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
 (add-hook 'after-make-frame-functions #'lye/reset-frame-size)
 
-;; Theme
-;; Understand the topics currently in use
-(defun lye/current-theme ()
-  "what is the Current theme?"
+;; toggle-fullscreen
+
+(defun lye/toggle-fullscreen ()
   (interactive)
-  (message "The Current theme is %s"
-           (substring (format "%s" custom-enabled-themes) 1 -1)))
-
-(if (display-graphic-p)
-    (use-package doom-themes
-      :init (load-theme 'doom-one t)))
-
-;; mode-line
-(if (display-graphic-p)
-    (use-package doom-modeline
-      :hook  (after-init . doom-modeline-mode)
-      :init
-      ;; Only display the file name
-      (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
-  (require 'lazycat-theme))
-
-;; Misc
+  (if lye-toggle-fullscreen
+      (let ((font "Sarasa Mono SC"))
+        (setq lye-toggle-fullscreen nil)
+        (toggle-frame-fullscreen)
+        (when (member font (font-family-list))
+          (lye/set-font font  font 14 14))
+        )
+    (setq lye-toggle-fullscreen t)
+    (lye/monospaced-chinese-and-english-fonts)
+    (toggle-frame-fullscreen)
+    ))
+(global-unset-key [f11])
+(global-set-key (kbd "<f11>") 'lye/toggle-fullscreen)
+;;; Misc
 (setq ad-redefinition-action 'accept)  ;不要烦人的 redefine warning
 (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
 (fset 'yes-or-no-p 'y-or-n-p) ; 以 y/n 取代 yes/no
@@ -141,11 +192,7 @@
 (setq line-move-visual nil)
 (setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
 
-;;Don't ask me when kill process buffers
-(setq kill-buffer-query-functions
-      (remq 'process-kill-buffer-query-function
-            kill-buffer-query-functions))
-
+;;; Line number
 ;; Line and column
 (setq column-number-mode t)
 (setq line-number-mode t)
@@ -155,6 +202,12 @@
   (setq display-time-24hr-format t)
   (setq display-time-day-and-date nil)
   (display-time-mode))
+
+;; Suppress GUI features
+(setq use-file-dialog nil)
+(setq use-dialog-box nil)
+(setq initial-buffer-choice nil)
+
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

@@ -27,7 +27,7 @@
 (when (version< emacs-version "25.1")
   (error "This requires Emacs 25.1 and above!"))
 
-;; Constants
+;;; Constants
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
 
@@ -46,8 +46,8 @@
 (defconst lye-emacs-temporal-dir (concat user-emacs-directory "tmp/")
   "Is the temporal diirectory this?")
 
-;; customization
-(defcustom lye-full-name "lye li"
+;;; customization
+(defcustom lye-full-name "shanyouli"
   "Set user full name."
   :type 'string)
 
@@ -72,7 +72,15 @@
   "Enable yasnippet for company backends or not."
   :type  'boolean)
 
-;; Speed up startup
+(defcustom lye-enable-zh-and-en-same-width nil
+  "Chinese and English fonts are the same width configuration!"
+  :type 'boolean)
+
+(defcustom  lye-toggle-fullscreen t
+  "Set different fonts for full screen!"
+  :type 'boolean)
+
+;;; Speed up startup
 (let ( ;; Temporarily increase `gc-cons-threhold' when loading
       (gc-cons-threshold most-positive-fixnum)
       (gc-cons-percentage 0.6)
@@ -92,6 +100,7 @@
   ;; Some non-package installed packages
   (require 'init-extensions)
 
+  (require 'init-ui)
   ;; ;; Test and optimize startup
   ;; (require 'benchmark-init-modes)
   ;; (require 'benchmark-init)
@@ -106,7 +115,7 @@
     (require 'init-funcs)
     (require 'init-package)
     ;; Preferences
-    (require 'init-ui)
+    (require 'init-theme)
     (require 'init-scratch)
     (require 'init-elisp)
     (require 'init-basic)
