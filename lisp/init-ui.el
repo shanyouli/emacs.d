@@ -174,9 +174,24 @@
 ;;; Frame Size
 
 ;; Set the initial window size
-(setq initial-frame-alist
-      `((width . ,(lye/frame-width))
-        (height . ,(lye/frame-heigh))))
+;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
+(when (display-graphic-p)
+  ;; top, left ...
+  (add-to-list 'default-frame-alist
+               (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
+
+  (add-to-list 'default-frame-alist
+               (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
+  (add-to-list 'default-frame-alist
+               (cons 'height (/ (* 618 (x-display-pixel-height))
+                                (* 1000 (frame-char-height)))))
+  (add-to-list 'default-frame-alist
+               (cons 'width (- (/ (x-display-pixel-width)
+                                  (* 2 (frame-char-width)))
+                               2))))
+;; (setq initial-frame-alist
+      ;; `((width . ,(lye/frame-width))
+        ;; (height . ,(lye/frame-heigh))))
 
 (defun lye/reset-frame-size (&optional frame)
   "set the frame-size."
