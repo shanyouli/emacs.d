@@ -67,7 +67,7 @@
   "Enable yasnippet for company backends or not."
   :type  'boolean)
 
-(defcustom lye-enable-zh-and-en-same-width 0
+(defcustom lye-enable-zh-and-en-same-width nil
   "Chinese and English fonts are the same width configuration!"
   :type 'boolean)
 
