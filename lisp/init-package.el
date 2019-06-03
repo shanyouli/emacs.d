@@ -86,8 +86,10 @@
 
 (eval-when-compile (require 'use-package))
 ;; Extensions
-(use-package diminish)
-(use-package bind-key)
+(use-package diminish
+  :ensure nil)
+(use-package bind-key
+  :ensure nil)
 ;; Use the more modern package management menu paradox
 (use-package paradox
   :init

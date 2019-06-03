@@ -64,7 +64,16 @@
                           (font-spec :family chinese :size chinese-size))
       (set-fontset-font (frame-parameter nil 'font) charset chinese))))
 
-  ;;Chinese and English font alignment
+;;Chinese and English font alignment
+;; sarasa-font configurations
+(defun lye/sarasa-font()
+  (if (or (member "Sarasa Mono SC" (font-family-list))
+          (member "Sarasa Term SC" (font-family-list)))
+      (progn
+        (lye/set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14)
+        nil)
+    t))
+
 (defun lye/monospaced-chinese-and-english-fonts ()
   ;;  (interactive)
   ;; FantasqueSansMono and chinese font
@@ -96,7 +105,32 @@
                         (lye/set-font en-font ch-font 10.5 12.0)
                         (throw 'loop t))))
                   (throw 'loop1 t))))
-      (setq lye-enable-zh-and-en-same-width t))))
+      (setq lye-enable-zh-and-en-same-width (lye/sarasa-font)))))
+
+;; Non-equal width Chinese and English font settings
+(defun lye/Non-equal-width-font ()
+  "Configure Chinese and English fonts separately instead of forcing the Chinese
+ and English to be equal."
+
+  (catch 'loop
+    (dolist (font '("Fira Code" "Hack" "DejaVu Sans Mono" "Source Code Pro"))
+      (when (member font (font-family-list))
+        (set-face-attribute 'default nil :font font
+                            :height (cond
+                                     (system/mac 130)
+                                     (system/windows 110)
+                                     (t 100)))
+        (throw 'loop t))))
+
+  ;; Specify font for Chinese Characters
+  (catch 'loop
+    (dolist (font '("WenQuanYi Micro Hei"
+                    "Microsoft Yahei"
+                    "Noto Sans Mono CJK SC"))
+      (when (member font (font-family-list))
+        (set-fontset-font t 'han font nil 'append)
+        (throw 'loop t))))
+  )
 
 ;; {%org-mode%}
 ;; here are 20 hanzi and 40 english chars, see if they are the same width
@@ -107,7 +141,11 @@
 ;; (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 
 (when (display-graphic-p)
-  (lye/monospaced-chinese-and-english-fonts)
+
+  (unless lye-enable-zh-and-en-same-width
+    (lye/monospaced-chinese-and-english-fonts))
+  (when lye-enable-zh-and-en-same-width
+    (lye/Non-equal-width-font))
 
   ;; Specify fonts for symbol characters
   (cond
@@ -122,33 +160,23 @@
       (when (member font (font-family-list))
         (set-fontset-font t 'unicode font nil 'prepend)
         (throw 'loop t))))
-
-  ;; Single font setting instead of Chinese and English width settings
-  (when lye-enable-zh-and-en-same-width
-    (catch 'loop
-      (dolist (font '("Fira Code" "Hack" "DejaVu Sans Mono" "Source Code Pro"))
-        (when (member font (font-family-list))
-          (set-face-attribute 'default nil :font font
-                              :height (cond
-                                       (system/mac 130)
-                                       (system/windows 110)
-                                       (t 100)))
-          (throw 'loop t))))
-
-    ;; Specify font for Chinese Characters
-    (catch 'loop
-      (dolist (font '("WenQuanYi Micro Hei" "Microsoft Yahei"
-                      "Noto Sans Mono CJK SC"))
-        (when (member font (font-family-list))
-          (set-fontset-font t 'han font nil 'append)
-          (throw 'loop t)))))
   )
+
+(defun lye/frame-heigh ()
+  (/ (* 618 (x-display-pixel-height))
+     (* 1000 (frame-char-height))))
+(defun lye/frame-width ()
+  (- (/ (x-display-pixel-width)
+        (* 2 (frame-char-width)))
+     2))
+
 
 ;;; Frame Size
 
 ;; Set the initial window size
 (setq initial-frame-alist
-      '((width . 86) (height . 32)))
+      `((width . ,(lye/frame-width))
+        (height . ,(lye/frame-heigh))))
 
 (defun lye/reset-frame-size (&optional frame)
   "set the frame-size."
@@ -156,29 +184,30 @@
   (when frame (select-frame frame))
   (if system/windows
       (progn
-        (set-frame-width (selected-frame) 86)
-        (set-frame-height (selected-frame) 32))
-    (set-frame-size (selected-frame) 86 32)))
+        (set-frame-width (selected-frame) (lye/frame-width))
+        (set-frame-height (selected-frame) (lye/frame-heigh)))
+    (set-frame-size (selected-frame) (lye/frame-width) (lye/frame-heigh))))
 ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
 (add-hook 'after-make-frame-functions #'lye/reset-frame-size)
 
-;; toggle-fullscreen
-
-(defun lye/toggle-fullscreen ()
+;;; toggle-fullscreen
+(defun lye/toggle-fullscreen (&optional frame)
   (interactive)
   (if lye-toggle-fullscreen
-      (let ((font "Sarasa Mono SC"))
+      (progn
         (setq lye-toggle-fullscreen nil)
-        (toggle-frame-fullscreen)
-        (when (member font (font-family-list))
-          (lye/set-font font  font 14 14))
-        )
+        (toggle-frame-fullscreen frame)
+        (lye/sarasa-font)
+        (global-display-line-numbers-mode t))
     (setq lye-toggle-fullscreen t)
     (lye/monospaced-chinese-and-english-fonts)
-    (toggle-frame-fullscreen)
+    (global-display-line-numbers-mode -1)
+    (toggle-frame-fullscreen frame)
     ))
+
 (global-unset-key [f11])
 (global-set-key (kbd "<f11>") 'lye/toggle-fullscreen)
+
 ;;; Misc
 (setq ad-redefinition-action 'accept)  ;不要烦人的 redefine warning
 (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙

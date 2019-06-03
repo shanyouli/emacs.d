@@ -62,6 +62,7 @@
 ;; Save Emacs buffers when they lose focus after 2s
 (use-package auto-save
   :ensure nil
+  :defines (auto-save-silent auto-save-idle)
   :commands (auto-save-enable)
   :init
   (setq auto-save-silent t)

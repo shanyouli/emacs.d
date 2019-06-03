@@ -63,16 +63,11 @@
                  (const :tag "Netease" netease)
                  (const :tag "Tuna" tuna)))
 
-(defcustom lye-linum-format 'default
-  "Set the format of the line number (relative or default)."
-  :type '(choice (const :tag "Default" default)
-                 (const :tag "Relative" relative)))
-
 (defcustom lye-company-enable-yas nil
   "Enable yasnippet for company backends or not."
   :type  'boolean)
 
-(defcustom lye-enable-zh-and-en-same-width nil
+(defcustom lye-enable-zh-and-en-same-width 0
   "Chinese and English fonts are the same width configuration!"
   :type 'boolean)
 

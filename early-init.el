@@ -36,8 +36,16 @@
 (setq tool-bar-mode nil)
 (setq scroll-bar-mode nil)
 
-(setq default-frame-alist
-      '((width . 86) (height . 32)))
+;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
+(when (display-graphic-p)
+  (add-to-list 'default-frame-alist
+               (cons 'height (/ (* 618 (x-display-pixel-height))
+                                (* 1000 (frame-char-height)))))
+  (add-to-list 'default-frame-alist
+               (cons 'width (- (/ (x-display-pixel-width)
+                                  (* 2 (frame-char-width)))
+                               2))))
+
 (modify-all-frames-parameters '((vertical-scroll-bars)))
 
 (provide 'early-init)
