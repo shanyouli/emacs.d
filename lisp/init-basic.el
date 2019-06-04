@@ -36,21 +36,14 @@
 (setq line-move-visual nil)
 
 ;; exec-path config
+
 (when (memq window-system '(mac ns x))
+  (require 'cache-path-from-shell)
   (use-package exec-path-from-shell
     :init
     (setq exec-path-from-shell-check-startup-files nil)
     (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
     (setq exec-path-from-shell-arguments '("-l"))
-
-    ;; Only run exec-path-from-shell-initialize once,
-    ;; at see@https://github.com/manateelazycat/cache-path-from-shell
-    (setq cache-path-from-shell-loaded-p nil)
-    (defadvice exec-path-from-shell-initialize (around cache-path-from-shell-advice activate)
-      (if cache-path-from-shell-loaded-p
-          (message "All shell environment variables has loaded in Emacs, yow!")
-        (setq cache-path-from-shell-loaded-p t)
-        ad-do-it))
     (exec-path-from-shell-initialize)))
 
 ;; Use undo-tree

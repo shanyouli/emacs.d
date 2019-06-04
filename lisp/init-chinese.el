@@ -29,7 +29,6 @@
   :commands (insert-translated-name-insert-original-translation)
   :init (setq-default insert-translated-name-default-style "origin")
   :bind ("C-c t" . insert-translated-name-insert-original-translation))
-
 ;; Prompt English words when writing English
 (use-package company-english-helper
   :ensure nil

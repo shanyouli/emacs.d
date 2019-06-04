@@ -19,3 +19,6 @@
 [submodule "extensions/lazycat-theme"]
 	path = extensions/lazycat-theme
 	url = https://github.com/lye95/lazycat-theme.git
+[submodule "extensions/cache-path-from-shell"]
+	path = extensions/cache-path-from-shell
+	url = https://github.com/manateelazycat/cache-path-from-shell.git

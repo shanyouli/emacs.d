@@ -25,6 +25,7 @@
 ;;; Code:
 
 (use-package counsel
+  :ensure nil
   :diminish ivy-mode counsel-mode
   :bind (("C-s" . swiper)
          ("C-x f" . counsel-recentf)

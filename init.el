@@ -27,54 +27,6 @@
 (when (version< emacs-version "25.1")
   (error "This requires Emacs 25.1 and above!"))
 
-;;; Constants
-(defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
-  "The Github page of My Emacs Configurations.")
-
-(defconst system/windows (eq system-type 'windows-nt)
-  "Are we running on a Windows System?")
-
-(defconst system/mac (eq system-type 'darwin)
-  "Are we running on a Mac System?")
-
-(defconst system/linux (eq system-type 'gnu/linux)
-  "Are we running on a GNU/Linux System?")
-
-(defconst *root* (string-equal "root" (getenv "USER"))
-  "Are you using ROOT user?")
-
-(defconst lye-emacs-temporal-dir (concat user-emacs-directory "tmp/")
-  "Is the temporal diirectory this?")
-
-;;; customization
-(defcustom lye-full-name "shanyouli"
-  "Set user full name."
-  :type 'string)
-
-(defcustom lye-mail-address "shanyouli6@gmail.com"
-  "Set user mail address."
-  :type 'string)
-
-(defcustom lye-package-archives 'emacs-china
-  "Set package archives from which to fetch."
-  :type '(choice (const :tag "Melpa" melpa)
-                 (const :tag "Melpa-mirror" melpa-mirror)
-                 (const :tag "Emacs-china" emacs-china)
-                 (const :tag "Netease" netease)
-                 (const :tag "Tuna" tuna)))
-
-(defcustom lye-company-enable-yas nil
-  "Enable yasnippet for company backends or not."
-  :type  'boolean)
-
-(defcustom lye-enable-zh-and-en-same-width nil
-  "Chinese and English fonts are the same width configuration!"
-  :type 'boolean)
-
-(defcustom  lye-toggle-fullscreen t
-  "Set different fonts for full screen!"
-  :type 'boolean)
-
 ;;; Speed up startup
 (let ( ;; Temporarily increase `gc-cons-threhold' when loading
       (gc-cons-threshold most-positive-fixnum)
@@ -82,36 +34,60 @@
       ;; Empty to avoid analyzing files when loading remote files.
       (file-name-handler-alist nil))
 
+  (defun lye/minibuffer-setup-hook ()
+    (setq gc-cons-threshold most-positive-fixnum))
+  (defun lye/minibuffer-exit-hook ()
+    (setq gc-cons-threshold 800000))
+
+  (add-hook 'minibuffer-setup-hook #'lye/minibuffer-setup-hook)
+  (add-hook 'minibuffer-exit-hook #'lye/minibuffer-exit-hook)
+
   ;; Load path
   ;; Optimize: Force `lisp' at the head to reduce the startup time.
   (defun update-load-path (&rest _)
     "Update `load-path'."
     (push (expand-file-name "lisp" user-emacs-directory) load-path))
+
+  ;; Add the package in the extensions folder to `load-path'
+  (defun add-extensions-to-load-path (&rest _)
+    (eval-when-compile (require 'cl))
+    (if (fboundp 'normal-top-level-add-to-load-path)
+        (let* ((my-lisp-dir (expand-file-name "extensions/" user-emacs-directory))
+               (default-directory my-lisp-dir))
+          (progn
+            (setq load-path
+                  (append
+                   (loop for dir in (directory-files my-lisp-dir)
+                         unless (string-match "^\\." dir)
+                         collecting (expand-file-name dir))
+                   load-path))))))
+
   (advice-add #'package-initialize :after #'update-load-path)
-  (if (version< emacs-version "27.0")
-      (update-load-path)
-    (push (expand-file-name "lisp" user-emacs-directory) load-path))
+  (advice-add #'package-initialize :after #'add-extensions-to-load-path)
 
-  ;; Some non-package installed packages
-  (require 'init-extensions)
+  (update-load-path)
+  (add-extensions-to-load-path)
 
+
+  (require 'init-const)
+  (require 'init-custom)
   (require 'init-ui)
-  ;; ;; Test and optimize startup
-  ;; (require 'benchmark-init-modes)
-  ;; (require 'benchmark-init)
-  ;; (benchmark-init/activate)
+  (require 'init-scratch)
+  (require 'init-funcs)
 
-  ;; Load `custom-file'
-  (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-  (when (file-exists-p custom-file) (load custom-file))
+  (when lye-enable-benchmark
+    ;; Test and optimize startup
+    (require 'benchmark-init-modes)
+    (require 'benchmark-init)
+    (benchmark-init/activate))
 
   (with-temp-message "" ; Erase the output of the plugin startup
+
     ;; Package and functions
-    (require 'init-funcs)
     (require 'init-package)
+
     ;; Preferences
     (require 'init-theme)
-    (require 'init-scratch)
     (require 'init-elisp)
     (require 'init-basic)
     (require 'init-edit)

@@ -42,7 +42,13 @@
                      :init (org-bullets-mode 1)))
                ;; 自动缩进，* or ** etc..
                (org-indent-mode t)))
-  (with-eval-after-load 'org
+
+  (add-to-list 'org-src-lang-modes '("plantuml" . puml))
+  (if (file-exists-p (concat user-emacs-directory "plantuml.jar"))
+      (setq org-plantuml-jar-path (concat user-emacs-directory "plantuml.jar"))
+    (setq org-plantuml-jar-path "~/plantuml.jar")))
+
+(with-eval-after-load 'org
     (org-babel-do-load-languages
      'org-babel-load-languages
      `((R . t)
@@ -62,10 +68,9 @@
        (,(if (locate-library "ob-sh") 'sh 'shell) . t)
        (sql . t)
        (sqlite . t))))
-  (add-to-list 'org-src-lang-modes '("plantuml" . puml))
-  (if (file-exists-p (concat user-emacs-directory "plantuml.jar"))
-      (setq org-plantuml-jar-path (concat user-emacs-directory "plantuml.jar"))
-    (setq org-plantuml-jar-path "~/plantuml.jar")))
+
+(use-package org-cliplink
+  :bind ("C-x p i" . org-cliplink))
 
 (use-package plantuml-mode
   :config

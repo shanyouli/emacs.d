@@ -84,21 +84,22 @@
   :hook (after-init . global-hungry-delete-mode))
 
 ;; Show native line numbers if possible, otherwise use linum
-(if (> (lye/frame-width) 86)
-    (if (fboundp 'display-line-numbers-mode)
-        (use-package display-line-numbers
-          :ensure nil
-          :hook (prog-mode . display-line-numbers-mode)
-          :config
-          (setq line-number-display-limit large-file-warning-threshold)
-          (setq line-number-display-limit-width 1000))
-      (use-package linum-off
-        :demand
-        :defines linum-format
-        :hook (after-init . global-linum-mode)
+(if (and (display-graphic-p) (< (lye/frame-width) 86))
+    (global-display-line-numbers-mode -1)
+
+  (if (fboundp 'display-line-numbers-mode)
+      (use-package display-line-numbers
+        :ensure nil
+        :hook (prog-mode . display-line-numbers-mode)
         :config
-        (setq linum-format "%4d ")))
-  (global-display-line-numbers-mode -1))
+        (setq line-number-display-limit large-file-warning-threshold)
+        (setq line-number-display-limit-width 1000))
+    (use-package linum-off
+      :demand
+      :defines linum-format
+      :hook (after-init . global-linum-mode)
+      :config
+      (setq linum-format "%4d "))))
 
 ;; Don't display `symbolic link to Git-controlled source file....'
 ;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links

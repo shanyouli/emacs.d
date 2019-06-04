@@ -61,7 +61,7 @@
   (let* (ratio-val)
     (cond
      (ratio
-      (setq ratio-val (cdr (assoc ratio lye/ratio-dict)))
+      (setq ratio-val (cdr (assoc ratio lye-ration-dict)))
       (split-window-vertically (floor (/ (window-body-height)))))
      (t
       (split-window-vertically)))
