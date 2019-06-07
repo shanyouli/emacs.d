@@ -22,3 +22,6 @@
 [submodule "extensions/cache-path-from-shell"]
 	path = extensions/cache-path-from-shell
 	url = https://github.com/manateelazycat/cache-path-from-shell.git
+[submodule "extensions/swiper"]
+	path = extensions/swiper
+	url = https://github.com/abo-abo/swiper.git

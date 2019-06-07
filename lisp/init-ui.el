@@ -211,13 +211,17 @@
   (if lye-toggle-fullscreen
       (progn
         (setq lye-toggle-fullscreen nil)
-        (toggle-frame-fullscreen frame)
+        (if (version< emacs-version "27.0")
+            (toggle-frame-fullscreen)
+          (toggle-frame-fullscreen frame))
         (lye/sarasa-font)
         (global-display-line-numbers-mode t))
     (setq lye-toggle-fullscreen t)
     (lye/monospaced-chinese-and-english-fonts)
     (global-display-line-numbers-mode -1)
-    (toggle-frame-fullscreen frame)
+    (if (version< emacs-version "27.0")
+        (toggle-frame-fullscreen)
+      (toggle-frame-fullscreen frame))
     ))
 
 (global-unset-key [f11])
