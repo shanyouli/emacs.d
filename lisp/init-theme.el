@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+;; https://github.com/honmaple/dotfiles/blob/master/emacs.d/site-lisp/maple/maple-theme.el
 
 ;; Theme
 (use-package doom-themes
@@ -90,18 +91,20 @@
   (interactive)
   (lye/theme-cycle -1))
 
-(if (display-graphic-p)
-    (progn
-      ;;; mode-line
-      ;; Preventflash of unstyled moduleine at startup
-      (unless after-init-time
-        (setq-default mode-line-format nil))
-      (use-package doom-modeline
-        :hook  (after-init . doom-modeline-mode)
-        :init
-        ;; Only display the file name
-        (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
-      (load-theme lye-emacs-theme t))
+(when (display-graphic-p)
+  ;; Preventflash of unstyled moduleine at startup
+  (unless after-init-time
+    (setq-default mode-line-format nil))
+
+  ;;remove modeline
+  (use-package awesome-tray
+    :ensure nil
+    :commands (awesome-tray-mode)
+    :hook (after-init . awesome-tray-mode))
+
+  (load-theme lye-emacs-theme t))
+
+(unless (display-graphic-p)
   (require 'lazycat-theme))
 
 (provide 'init-theme)

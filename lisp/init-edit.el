@@ -176,5 +176,13 @@
          (iedit-mode . (lambda () (symbol-overlay-mode -1)))
          (iedit-mode-end . symbol-overlay-mode)))
 
+;; open line in browser
+;; at see@https://github.com/noctuid/link-hint.el/
+(use-package link-hint
+  :bind
+  ("C-c C-l o" . link-hint-open-link)
+  ("C-c C-l c" .  link-hint-copy-link))
+
+
 (provide 'init-edit)
 ;;; init-edit.el ends here

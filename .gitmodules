@@ -25,3 +25,6 @@
 [submodule "extensions/swiper"]
 	path = extensions/swiper
 	url = https://github.com/abo-abo/swiper.git
+[submodule "extensions/awesome-tray"]
+	path = extensions/awesome-tray
+	url = https://github.com/manateelazycat/awesome-tray.git
