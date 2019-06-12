@@ -71,6 +71,7 @@
 
   (require 'init-const)
   (require 'init-custom)
+  (require 'init-font)
   (require 'init-ui)
   (require 'init-scratch)
   (require 'init-funcs)

@@ -25,24 +25,83 @@
 ;;; Code:
 
 ;; Theme
+(use-package doom-themes
+  :defines (doom-themes-enable-blod doom-themes-enable-italic)
+  :config
+  (setq doom-themes-enable-bold t      ; enable blod
+        doom-themes-enable-italic t)   ; enable italic
+  (doom-themes-org-config) ; org-mode
+  )
+(use-package zenburn-theme)
+(use-package material-theme)
+(use-package dracula-theme)
+
+
+(defvar lye-emacs-theme-list '(doom-molokai
+                               doom-one
+                               zenburn
+                               material
+                               dracula)
+  "Some theme cycle!")
+
+(defvar lye-emacs-theme 'doom-one)
+
+(defun lye/theme-cycle (&optional step)
+  "Loop emacs theme!"
+  (let ((next-theme lye-emacs-theme-list))
+    (if step
+        (progn
+          (if (memq (car custom-enabled-themes) next-theme)
+              (progn
+                (setq next-theme (if (< step 0)
+                                     (reverse lye-emacs-theme-list)
+                                   lye-emacs-theme-list))
+
+                (setq lye-emacs-theme
+                      (or (cadr (member lye-emacs-theme next-theme))
+                          (car next-theme)))
+                (when lye-emacs-theme
+                  (let ((progress-reporter
+                         (make-progress-reporter
+                          (format "Loading theme %s..." lye-emacs-theme))))
+                    (mapc 'disable-theme custom-enabled-themes)
+                    (load-theme lye-emacs-theme t)
+                    (progress-reporter-done progress-reporter))))
+            (message "The current theme does not belong to one of lye-emacs-theme-list.
+ To loop, add it to lye-emacs-theme-list.")))
+
+      ;; (substring (format "%s" custom-enabled-themes) 1 -1)
+      (message "The Current theme is %s" (car custom-enabled-themes))
+      )))
+
 ;; Understand the topics currently in use
 (defun lye/current-theme ()
   "what is the Current theme?"
   (interactive)
-  (message "The Current theme is %s"
-           (substring (format "%s" custom-enabled-themes) 1 -1)))
+  (lye/theme-cycle))
+
+(defun lye/next-theme ()
+  "Netx theme!"
+  (interactive)
+  (lye/theme-cycle 1))
+
+(defun lye/previous-theme ()
+  "Previous theme."
+  (interactive)
+  (lye/theme-cycle -1))
 
 (if (display-graphic-p)
-    (use-package doom-themes
-      :init (load-theme 'doom-one t)))
-
-;; mode-line
-(if (display-graphic-p)
-    (use-package doom-modeline
-      :hook  (after-init . doom-modeline-mode)
-      :init
-      ;; Only display the file name
-      (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
+    (progn
+      ;;; mode-line
+      ;; Preventflash of unstyled moduleine at startup
+      (unless after-init-time
+        (setq-default mode-line-format nil))
+      (use-package doom-modeline
+        :hook  (after-init . doom-modeline-mode)
+        :init
+        ;; Only display the file name
+        (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
+      (load-theme lye-emacs-theme t))
   (require 'lazycat-theme))
 
 (provide 'init-theme)

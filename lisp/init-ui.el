@@ -51,117 +51,7 @@
                                      (if (display-graphic-p frame) 1 0))))
     (when (fboundp 'menu-bar-mode) (menu-bar-mode -1))))
 
-;; set font
-;; @see https://emacs-china.org/t/emacs/7268/2
-(defun lye/set-font (english chinese  &optional english-size chinese-size)
-  (if english-size
-      (set-face-attribute 'default nil :font
-                          (font-spec :family english :size english-size))
-    (set-face-attribute 'default nil :font english))
-  (dolist (charset '(kana han cjk-misc bopomofo))
-    (if chinese-size
-        (set-fontset-font (frame-parameter nil 'font) charset
-                          (font-spec :family chinese :size chinese-size))
-      (set-fontset-font (frame-parameter nil 'font) charset chinese))))
-
-;;Chinese and English font alignment
-;; sarasa-font configurations
-(defun lye/sarasa-font()
-  (if (or (member "Sarasa Mono SC" (font-family-list))
-          (member "Sarasa Term SC" (font-family-list)))
-      (progn
-        (lye/set-font "Sarasa Mono SC" "Sarasa Mono SC" 14 14)
-        nil)
-    t))
-
-(defun lye/monospaced-chinese-and-english-fonts ()
-  ;;  (interactive)
-  ;; FantasqueSansMono and chinese font
-  (if (member "Fantasque Sans Mono" (font-family-list))
-      (if (member "Sarasa Term SC" (font-family-list))
-          (lye/set-font "Fantasque Sans Mono" "Sarasa Mono SC" 11.5 12.0)
-
-        (catch 'loop
-          (dolist (font '("Sarasa Mono SC"
-                          "WenQuanYi Micro Hei"
-                          "Source Han Sans SC"
-                          "Hiragino Sans GB"
-                          "Noto Sans Mono CJK SC"))
-            (when (member font (font-family-list))
-              (lye/set-font "Fantasque Sans Mono" font 11.5 12.0)
-              (throw 'loop t)))))
-
-    ;; Fira Code, Hack, Source Code Pro
-    (unless (catch 'loop1
-              (dolist (en-font '("Fira Code" "Hack" "Source Code Pro"))
-                (when (member en-font (font-family-list))
-                  (catch 'loop
-                    (dolist (ch-font '("Sarasa Mono SC"
-                                       "WenQuanYi Micro Hei"
-                                       "Hiragino Sans GB"
-                                       "Source Han Sans SC"
-                                       "Noto Sans Mono CJK SC"))
-                      (when (member ch-font (font-family-list))
-                        (lye/set-font en-font ch-font 10.5 12.0)
-                        (throw 'loop t))))
-                  (throw 'loop1 t))))
-      (setq lye-enable-zh-and-en-same-width (lye/sarasa-font)))))
-
-;; Non-equal width Chinese and English font settings
-(defun lye/Non-equal-width-font ()
-  "Configure Chinese and English fonts separately instead of forcing the Chinese
- and English to be equal."
-
-  (catch 'loop
-    (dolist (font '("Fira Code" "Hack" "DejaVu Sans Mono" "Source Code Pro"))
-      (when (member font (font-family-list))
-        (set-face-attribute 'default nil :font font
-                            :height (cond
-                                     (system/mac 130)
-                                     (system/windows 110)
-                                     (t 100)))
-        (throw 'loop t))))
-
-  ;; Specify font for Chinese Characters
-  (catch 'loop
-    (dolist (font '("WenQuanYi Micro Hei"
-                    "Microsoft Yahei"
-                    "Noto Sans Mono CJK SC"))
-      (when (member font (font-family-list))
-        (set-fontset-font t 'han font nil 'append)
-        (throw 'loop t))))
-  )
-
-;; {%org-mode%}
-;; here are 20 hanzi and 40 english chars, see if they are the same width
-;; 你你你你你你你你你你你你你你你你你你你你
-;; aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-;; /aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/
-;; {%/org-mode%}
 ;; (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
-
-(when (display-graphic-p)
-
-  (unless lye-enable-zh-and-en-same-width
-    (lye/monospaced-chinese-and-english-fonts))
-  (when lye-enable-zh-and-en-same-width
-    (lye/Non-equal-width-font))
-
-  ;; Specify fonts for symbol characters
-  (cond
-   ((member "Apple Color Emoji" (font-family-list))
-    (set-fontset-font t 'symbol "Apple Color Emoji" nil 'prepend))
-   ((member "Segoe UI Emoji" (font-family-list))
-    (set-fontset-font t 'symbol "Segoe UI Emoji" nil 'prepend)))
-
-  ;; Spectify font for all unicode characters
-  (catch 'loop
-    (dolist (font '("Symbola" "Apple Symbols" "Symbol"))
-      (when (member font (font-family-list))
-        (set-fontset-font t 'unicode font nil 'prepend)
-        (throw 'loop t))))
-  )
-
 (defun lye/frame-heigh ()
   (/ (* 618 (x-display-pixel-height))
      (* 1000 (frame-char-height))))
@@ -217,7 +107,7 @@
         (lye/sarasa-font)
         (global-display-line-numbers-mode t))
     (setq lye-toggle-fullscreen t)
-    (lye/monospaced-chinese-and-english-fonts)
+    (lye/load-font)
     (global-display-line-numbers-mode -1)
     (if (version< emacs-version "27.0")
         (toggle-frame-fullscreen)
@@ -255,7 +145,6 @@
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)
 (setq initial-buffer-choice nil)
-
 
 (provide 'init-ui)
 ;;; init-ui.el ends here
