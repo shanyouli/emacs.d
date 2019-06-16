@@ -49,10 +49,11 @@
   :defer t)
 
 ;; sh-mode
-(add-to-list 'auto-mode-alist '("\\.zsh\\'" . sh-mode))
-(add-to-list 'auto-mode-alist '(".zshrc" . sh-mode))
-(add-hook 'sh-mode-hook #'(lambda() (sh-set-shell "bash")))
-
+(use-package sh-script
+  :ensure nil
+  :mode (("\\.zsh\\'" . sh-mode)
+         (".zshrc" . sh-mode))
+  :hook (sh-mode . (lambda () (sh-set-shell "bash"))))
 ;; vimrc-major mode
 (use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))
 

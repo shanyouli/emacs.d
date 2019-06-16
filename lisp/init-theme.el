@@ -93,14 +93,30 @@
 
 (when (display-graphic-p)
   ;; Preventflash of unstyled moduleine at startup
-  (unless after-init-time
-    (setq-default mode-line-format nil))
+  ;; (unless after-init-time
+  ;;   (setq-default mode-line-format nil))
 
-  ;;remove modeline
+  ;; remove modeline
+
+  ;; Avoid long bars when calling pyim (at the original mode-line)
+  (setq-default mode-line-format
+                '("%e" mode-line-front-space
+                  mode-line-client
+                  mode-line-modified
+                  mode-line-remote
+                  mode-line-frame-identification
+                  mode-line-buffer-identification
+                  "   "
+                  mode-line-position
+                  (vc-mode vc-mode)
+                  "  " mode-line-modes
+                  mode-line-misc-info
+                  mode-line-end-spaces))
   (use-package awesome-tray
     :ensure nil
     :commands (awesome-tray-mode)
-    :hook (after-init . awesome-tray-mode))
+    :hook (after-init . awesome-tray-mode)
+    :config)
 
   (load-theme lye-emacs-theme t))
 

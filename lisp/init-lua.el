@@ -26,12 +26,28 @@
 
 (use-package lua-mode
   :defer t
-  :mode ("\\.lua\\'" . lua-mode))
+  :mode ("\\.lua\\'" . lua-mode)
+ ;; :interpreter (.lua . lua-mode)
+  :config
+  (setq lua-indent-level 2
+        lua-indent-string-contents t))
 
 (use-package company-lua
-  :after (company)
-  :config
-  )
+  :after (company))
+
+(defun set-company-backends-for-lua ()
+    "Set lua company backend."
+  (setq-local company-backends '(
+                                (company-lsp
+                                 company-lua
+                                 company-keywords
+                                 company-gtags)
+                                company-capf
+                                company-dabbrev-code
+                                company-files
+                                )))
+
+(add-hook 'lua-mode-hook #'set-company-backends-for-lua)
 
 (provide 'init-lua)
 ;;; init-lua.el ends here
