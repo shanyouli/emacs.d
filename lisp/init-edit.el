@@ -180,8 +180,8 @@
 ;; at see@https://github.com/noctuid/link-hint.el/
 (use-package link-hint
   :bind
-  ("C-c C-l o" . link-hint-open-link)
-  ("C-c C-l c" .  link-hint-copy-link))
+  ("C-x p o" . link-hint-open-link)
+  ("C-x p c" .  link-hint-copy-link))
 
 
 (provide 'init-edit)
