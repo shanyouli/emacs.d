@@ -59,7 +59,7 @@
   :commands (auto-save-enable)
   :init
   (setq auto-save-silent t)
-  (setq auto-save-idle 1.5)
+  (setq auto-save-idle 2)
   (auto-save-enable))
 
 ;; Store all temporal files in a temporal directory instead of being
