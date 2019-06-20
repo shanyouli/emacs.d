@@ -104,8 +104,8 @@
     (require 'init-yasnippet)
 
     (unless system/windows
-      (require 'init-ivy)
-      (require 'init-pyim))
+      (require 'init-ivy))
+    (require 'init-pyim)
 
     (if system/windows (require 'init-ahk)) ; windows-system
 

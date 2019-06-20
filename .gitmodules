@@ -16,15 +16,12 @@
 [submodule "extensions/sdcv"]
 	path = extensions/sdcv
 	url = https://github.com/manateelazycat/sdcv.git
-[submodule "extensions/lazycat-theme"]
-	path = extensions/lazycat-theme
-	url = https://github.com/lye95/lazycat-theme.git
 [submodule "extensions/cache-path-from-shell"]
 	path = extensions/cache-path-from-shell
 	url = https://github.com/manateelazycat/cache-path-from-shell.git
 [submodule "extensions/swiper"]
 	path = extensions/swiper
 	url = https://github.com/abo-abo/swiper.git
-[submodule "extensions/awesome-tray"]
-	path = extensions/awesome-tray
-	url = https://github.com/manateelazycat/awesome-tray.git
+[submodule "extensions/lazycat-theme"]
+	path = extensions/lazycat-theme
+	url = https://github.com/shanyouli/lazycat-theme.git

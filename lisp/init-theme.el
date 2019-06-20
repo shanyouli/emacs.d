@@ -92,31 +92,20 @@
   (lye/theme-cycle -1))
 
 (when (display-graphic-p)
-  ;; Preventflash of unstyled moduleine at startup
-  ;; (unless after-init-time
-  ;;   (setq-default mode-line-format nil))
 
-  ;; remove modeline
+  ;; Mode-line
+  (use-package doom-modeline
+    :hook (after-init . doom-modeline-mode)
+    :init
+    ;; prevent flash of unstyled modeline at startup
+    (unless after-init-time
+      (setq-default mode-line-format nil))
 
-  ;; Avoid long bars when calling pyim (at the original mode-line)
-  (setq-default mode-line-format
-                '("%e" mode-line-front-space
-                  mode-line-client
-                  mode-line-modified
-                  mode-line-remote
-                  mode-line-frame-identification
-                  mode-line-buffer-identification
-                  "   "
-                  mode-line-position
-                  (vc-mode vc-mode)
-                  "  " mode-line-modes
-                  mode-line-misc-info
-                  mode-line-end-spaces))
-  (use-package awesome-tray
-    :ensure nil
-    :commands (awesome-tray-mode)
-    :hook (after-init . awesome-tray-mode)
-    :config)
+    (setq doom-modeline-major-mode-color-icon t
+          doom-modeline-minor-modes nil
+          doom-modeline-mu4e nil
+          doom-modeline-github t
+          doom-modeline-github-interval 300))
 
   (load-theme lye-emacs-theme t))
 
