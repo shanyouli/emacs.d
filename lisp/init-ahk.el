@@ -42,10 +42,17 @@
 (use-package ido
   :ensure nil
   :bind (("C-x C-f" . ido-find-file)
-         ("C-x C-r" . ido-recentf-open))
+         ("C-x f" . ido-recentf-open))
+  :init
+  (defun ido-recentf-open ()
+    "Use `ido-completing-read' to find a recent file."
+    (interactive)
+    (if (find-file (ido-completing-read "Find recent file: " recentf-list))
+        (message "Opening file...")
+      (message "Aborting")))
   :config
   (setq ido-enable-flex-matching t)
-  (setq ido-everywhere t)
+  (setq ido-everywhere nil) ;禁用ido everyting, 拷贝操作不方便
   ;; Guess if the cursor position is an openable directory or file
   (setq ido-use-filename-at-point 'guess)
   ;;(setq ido-use-url-at-point)
@@ -54,13 +61,13 @@
   (setq ido-file-extensions-order '(".org" ".txt" ".py" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf"))
   (setq ido-save-directory-list-file (concat lye-emacs-temporal-dir "ido.last"))
 
-  (defun ido-recentf-open ()
-    "Use `ido-completing-read' to find a recent file."
-    (interactive)
-    (if (find-file (ido-completing-read "Find recent file: " recentf-list))
-        (message "Opening file...")
-      (message "Aborting")))
-  (ido-mode 1))
+  :hook (after-init . ido-mode))
+
+;; use ido-vertical-mode
+(use-package ido-vertical-mode
+  :hook (after-init . ido-vertical-mode)
+  :config
+  (setq ido-vertical-define-keys 'C-n-and-C-p-only))
 
 ;; use smex
 (use-package smex
@@ -77,7 +84,7 @@
       (lambda (prompt)
         (y-or-n-p-with-timeout "Exit Emacs after 1.5s?" 1.5 "y")))
 
-(setq default-directory "~")
+(cd "~")
 
 ;; Return the button at the beginning of win other than Win+L to Emacs
 ;; see @https://emacs-china.org/t/superkey/9387

@@ -1,41 +1,23 @@
-;;; init-font.el ---Initialize Font Management            -*- lexical-binding: t; -*-
+;;;; init-font.el ---Initalize Font Management        -*- lexical-binding: t; -*-
 
-;; Copyright (C) 2019  shanyouli
+;;;; Code
 
-;; Author: shanyouli <shanyouli6@gmail.com>
-;; Keywords:Font
-
-;; This program is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
-;;; Commentary:
-
-;;
-
-;;; Code:
-;; https://gist.github.com/Superbil/7113937
 (defvar emacs-english-font nil
   "The font name of English.")
-
 (defvar emacs-cjk-font nil
-  "The font name for CJK.")
-
+  "The font name of CJK.")
 (defvar emacs-font-size-pair nil
   "Default font size pair for (english . chinese)")
-
 (defvar emacs-font-size-pair-list nil
-  "This is used to store matching (english .chinese) font-size.")
+  "This is used to store matching (english . chinese font-size).
+Corresponding English font pixelsize is 12px, 14px, 16px, 19px, 21px, 22px,
+24px, 29px, 32px, 35px, (40px), 48px, (56px).
+Corresponding English font size is 9pt, 10.5pt, 12pt, 15pt, 16pt, 18pt, 22pt,
+ 24pt, 26pt, (30pt), 36pt, (42pt)
+使用中文字号分别对应为: 小五, 五号, 小四, 四号, 小三, 三号, 小二, 二号, 小一,
+一号, (30pt), 小初, (初号)")
 
+;;; some functions
 (defun font-exist-p (fontname)
   "Test this font is exist or not."
   (if (or (not fontname) (string= fontname ""))
@@ -44,19 +26,17 @@
         nil
       t)))
 
-(defun set-font (english chinese &optional size-pair)
-  "Setup Emacs English and Chinese font on x window-system."
-  (if size-pair
-      (set-face-attribute 'default nil :font
-                          (font-spec :family english :size (car size-pair)))
-    (set-face-attribute 'default nil :font english))
+;; see @https://github.com/syl20bnr/spacemacs/blob/c7a103a772d808101d7635ec10f292ab9202d9ee/layers/%2Bintl/chinese/config.el#L26
+(defun lye/set-monospaced-font (english chinese size-pair)
+  "Set the monospaced font size when mixed Chinese and English words"
+  (set-face-attribute 'default nil :font
+                      (font-spec :family english :size (car size-pair)))
   (dolist (charset '(kana han cjk-misc bopomofo))
-    (if size-pair
-        (set-fontset-font (frame-parameter nil 'font) charset
-                          (font-spec :family chinese :size (cdr size-pair)))
-      (set-fontset-font (frame-parameter nil 'font) charset chinese))))
+    (set-fontset-font (frame-parameter nil 'font) charset
+                      (font-spec :family chinese :size (cdr size-pair)))))
 
 
+;; see @https://gist.github.com/Superbil/7113937#file-fix-font-org-mode-el-L31
 (defun emacs-step-font-size (step)
   "Increase/Decrease emacs's font size."
   (let ((scale-steps emacs-font-size-pair-list))
@@ -66,8 +46,8 @@
           (or (cadr (member emacs-font-size-pair scale-steps))
               emacs-font-size-pair))
     (when emacs-font-size-pair
-      (message "emacs font size set to %.1f" (car emacs-font-size-pair))
-      (set-font emacs-english-font emacs-cjk-font emacs-font-size-pair))))
+      (message "Emacs font size set to %.1f" (car emacs-font-size-pair))
+      (lye/set-monospaced-font emacs-english-font emacs-cjk-font emacs-font-size-pair))))
 
 (defun increase-emacs-font-size ()
   "Increase emacs's font-size acording emacs-font-size-pair-list."
@@ -79,135 +59,63 @@
   (interactive)
   (emacs-step-font-size -1))
 
-;; Set the emacs font to `Sarasa Mono SC'
-(defun lye/sarasa-font ()
-  (if (or (font-exist-p "Sarasa Mono SC")
-          (font-exist-p "Sarasa Term SC"))
-      (progn
-        (setq emacs-english-font "Sarasa Mono SC")
-        (setq emacs-cjk-font "Sarasa Mono SC")
-        (setq emacs-font-size-pair '(14 . 14))
-        (setq emacs-font-size-pair-list
-              '((10 . 10)  (12 . 12) (14 . 14)
-                (16 . 16) (18 . 18) (19 . 19)
-                (21 . 21) (22 . 22) (24 . 24)
-                (26 . 26) (29 . 29) (32 . 32)
-                (35 . 35) (38 . 38) (48 . 48)))
-        (set-font emacs-english-font emacs-cjk-font emacs-font-size-pair)
-        t)
-    nil))
+(when (display-graphic-p)
+  ;; CJK font set
+  (catch 'loop
+    (dolist (font '("WenQuanYi Micro Hei"
+                    "Hiragino Sans GB"
+                    "Microsoft Yahei"
+                    "楷体"
+                    "Noto Sans Mono CJK SC"))
+      (when (font-exist-p font)
+        (setq emacs-cjk-font font)
+        (throw 'loop t))))
 
-(defun lye/fantasque-sans-mono ()
-  (if (font-exist-p "Fantasque Sans Mono")
-      (progn
-        (setq emacs-english-font "Fantasque Sans Mono")
+  ;; English font set
+  (catch 'loop
+    (dolist (font '("Fantasque Sans Mono"
+                    "Fira Code"
+                    "Source Code Pro"
+                    "Hack"
+                    "DejaVu Sans Mono"
+                    "Consolas"))
+      (when (font-exist-p font)
+        (setq emacs-english-font font)
+        (throw 'loop t))))
 
-        ;; set cjk font
-        (catch 'loop
-          (dolist (font '("Sarasa Mono SC"
-                          "WenQuanYi Micro Hei"
-                          "Hiragino Sans GB"
-                          "Source Han Sans SC"
-                          "Noto Sans Mono CJK SC"))
-            (when (font-exist-p font)
-              (setq emacs-cjk-font font)
-              (throw 'loop t))))
-
-        (setq emacs-font-size-pair '(11.5 . 12.0))
-        (setq emacs-font-size-pair-list
-              '((9.0 .  9.0)  (10.0 . 10.5) (11.5 . 12.0)
-                (12.5 . 13.5) (14.0 . 15.0) (15.0 . 15.0)
-                (16.0 . 16.5) (18.0 . 18.0) (20.0 . 21.0)
-                (22.0 . 22.5) (24.0 . 25.5) (26.0 . 27.0)
-                (28.0 . 28.5) (30.0 . 31.5) (32.0 . 33.5)))
-        (set-font emacs-english-font emacs-cjk-font emacs-font-size-pair)
-        t)
-    nil))
-
-;;; Hack, Fira Code, Source Code Pro, etc.
-(defun lye/fc-hack-sourcep-font ()
-
-
-  (let ((english-font-exist emacs-english-font))
-    (catch 'loop
-      (dolist (font '("Fira Code"
-                      "Hack"
-                      "Source Code Pro"))
-        (when (font-exist-p font)
-          (setq emacs-english-font font)
-          (throw 'loop t))))
-
-    (if (string= english-font-exist emacs-english-font)
-      (progn
-        ;; set cjk font
-        (catch 'loop
-          (dolist (font '("Sarasa Mono SC"
-                          "WenQuanYi Micro Hei"
-                          "Hiragino Sans GB"
-                          "Source Han Sans SC"
-                          "Noto Sans Mono CJK SC"))
-            (when (font-exist-p font)
-              (setq emacs-cjk-font font)
-              (throw 'loop t))))
-
-        (setq emacs-font-size-pair '(10.5 . 12.0))
-        (setq emacs-font-size-pair-list
-              '((9.0 .  10.5)  (10.5 . 12.0) (11.5 . 13.5)
-                (12.0 . 15.0) (14.0 . 16.5) (15.0 . 18.0)
-                (16.0 . 19.5) (18.0 . 21.0) (20.0 . 24.0)
-                (22.0 . 25.5) (24.0 . 28.5) (26.0 . 31.5)
-                (28.0 . 33.0) (30.0 . 36.0) (32.0 . 39.0)))
-        (set-font emacs-english-font emacs-cjk-font emacs-font-size-pair)
-        t)
-    nil)))
-
-(defun lye/load-font ()
+  ;; Font size and font size up or down configuration
   (cond
-   ((lye/fantasque-sans-mono) t)
-   ((lye/sarasa-font) t)
-   ((lye/fc-hack-sourcep-font) t)
-   (t nil)))
+   ((string= emacs-english-font "Fantasque Sans Mono")
+    (setq emacs-font-size-pair '(14 . 14))
+    (setq emacs-font-size-pair-list
+          '((12 . 12) (14 . 14) (16 . 16) (19 . 20)
+            (21 . 22) (22 . 22) (24 . 24) (29 . 30)
+            (32 . 34) (35 . 37) (48 . 50) (56 . 56)
+            )))
+   (t
+    ;; Applicable fonts have Fira Code, Hack, Source Code Pro
+    (setq emacs-font-size-pair '(14 . 16))
+    (setq emacs-font-size-pair-list
+          '((12 . 14) (14 . 16) (16 . 20) (19 . 22)
+            (21 . 26) (22 . 26) (24 . 28) (29 . 34)
+            (32 . 38) (35 . 42) (40 . 48) (48 . 56)
+            ))
+    ))
+  ;;(setq emacs-english-font "Source Code Pro")
+  (lye/set-monospaced-font emacs-english-font
+                           emacs-cjk-font
+                           emacs-font-size-pair)
 
-(when window-system
   ;; setup change size font, base on emacs-font-size pair-list
   (global-set-key (kbd "C-M-=") 'increase-emacs-font-size)
   (global-set-key (kbd "C-M--") 'decrease-emacs-font-size)
 
-  ;; setup default english font and cjk font.
-  (unless (lye/load-font)
-    (catch 'loop
-      (dolist (font '("Fira Code" "Hack"
-                      "DejaVu Sans Mono" "Source Code Pro"))
-        (when (font-exist-p font)
-          ;; (member font (font-family-list))
-          (set-face-attribute 'default nil :font font
-                              :height (cond
-                                       (system/mac 130)
-                                       (system/windows 110)
-                                       (t 100)))
-          (throw 'loop t))))
-
-    (catch 'loop
-      (dolist (font '("WenQuanYi Micro Hei"
-                      "Microsoft Yahei"
-                      "Noto Sans Mono CJK SC"))
-        (when (font-exist-p font)
-          (set-fontset-font t 'han font nil 'append)
-          (throw 'loop t)))))
-
-  ;; Specify fonts for symbol characters
-  (cond
-   ((font-exist-p "Apple Color Emoji")
-    (set-fontset-font t 'symbol "Apple Color Emoji" nil 'prepend))
-   ((font-exist-p "Segoe UI Emoji")
-    (set-fontset-font t 'symbol "Segoe UI Emoji" nil 'prepend)))
-
-  ;; Spectify font for all unicode characters
+    ;; Specify font for all unicode characters
   (catch 'loop
     (dolist (font '("Symbola" "Apple Symbols" "Symbol"))
-      (when (font-exist-p font)
-    (set-fontset-font t 'unicode font nil 'prepend)
-    (throw 'loop t)))))
+      (when (member font (font-family-list))
+        (set-fontset-font t 'unicode font nil 'prepend)
+        (throw 'loop t)))))
 
 ;; {%org-mode%}
 ;; here are 20 hanzi and 40 english chars, see if they are the same width

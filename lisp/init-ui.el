@@ -95,28 +95,6 @@
 ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
 (add-hook 'after-make-frame-functions #'lye/reset-frame-size)
 
-;;; toggle-fullscreen
-(defun lye/toggle-fullscreen (&optional frame)
-  (interactive)
-  (if lye-toggle-fullscreen
-      (progn
-        (setq lye-toggle-fullscreen nil)
-        (if (version< emacs-version "27.0")
-            (toggle-frame-fullscreen)
-          (toggle-frame-fullscreen frame))
-        (lye/sarasa-font)
-        (global-display-line-numbers-mode t))
-    (setq lye-toggle-fullscreen t)
-    (lye/load-font)
-    (global-display-line-numbers-mode -1)
-    (if (version< emacs-version "27.0")
-        (toggle-frame-fullscreen)
-      (toggle-frame-fullscreen frame))
-    ))
-
-(global-unset-key [f11])
-(global-set-key (kbd "<f11>") 'lye/toggle-fullscreen)
-
 ;;; Misc
 (setq ad-redefinition-action 'accept)  ;不要烦人的 redefine warning
 (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
