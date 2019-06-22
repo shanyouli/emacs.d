@@ -27,12 +27,14 @@
   :diminish company-mode
   :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
   :preface
+  (setq lye-company-enable-yas t)
+
   (defvar company-enable-yas lye-company-enable-yas
     "Enable yasnippet for all backends.")
 
   (defun company-backend-with-yas (backend)
     (if (or (not company-enable-yas)
-            (add (listp backend) (member 'company-yasnippet backend)))
+            (and (listp backend) (member 'company-yasnippet backend)))
         backend
       (append (if (consp backend) backend (list backend))
               '(:with company-yasnippet))))
@@ -50,9 +52,10 @@
   ;; aligns annotation to the right hand side
   (setq company-tooltip-align-annotations t)
 
-  (setq company-idle-delay 0.2
+  (setq company-idle-delay 0
+        compant-echo-delay (if (display-graphic-p) nil 0)
         company-tooltip-limit 10
-        company-minimum-prefix-length 2
+        company-minimum-prefix-length 1 ; When using company-yasnippet, you can prompt
         company-require-match nil
         company-dabbrev-ignore-case nil
         company-dabbrev-downcase nil

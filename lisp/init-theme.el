@@ -105,8 +105,8 @@
     (setq doom-modeline-bar-width 3)
 
     ;;It seems that you cannot use the all-the-icons font on windows.
-    (if (and (boundp 'system/windows) system/windows)
-        (setq doom-modeline-icon nil))
+    ;; (if (and (boundp 'system/windows) system/windows)
+    ;; (setq doom-modeline-icon nil))
 
     (setq doom-modeline-major-mode-color-icon t
           doom-modeline-minor-modes nil
