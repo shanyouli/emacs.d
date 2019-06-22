@@ -1,27 +1,27 @@
-[submodule "extensions/use-package"]
-	path = extensions/use-package
+[submodule "site-lisp/use-package"]
+	path = site-lisp/use-package
 	url = https://github.com/jwiegley/use-package.git
-[submodule "extensions/benchmark-init-el"]
-	path = extensions/benchmark-init-el
+[submodule "site-lisp/benchmark-init-el"]
+	path = site-lisp/benchmark-init-el
 	url = https://github.com/dholm/benchmark-init-el.git
-[submodule "extensions/auto-save"]
-	path = extensions/auto-save
+[submodule "site-lisp/auto-save"]
+	path = site-lisp/auto-save
 	url = https://github.com/shanyouli/auto-save.git
-[submodule "extensions/insert-translated-name"]
-	path = extensions/insert-translated-name
-	url = https://github.com/manateelazycat/insert-translated-name.git
-[submodule "extensions/company-english-helper"]
-	path = extensions/company-english-helper
+[submodule "site-lisp/company-english-helper"]
+	path = site-lisp/company-english-helper
 	url = https://github.com/manateelazycat/company-english-helper.git
-[submodule "extensions/sdcv"]
-	path = extensions/sdcv
+[submodule "site-lisp/sdcv"]
+	path = site-lisp/sdcv
 	url = https://github.com/manateelazycat/sdcv.git
-[submodule "extensions/cache-path-from-shell"]
-	path = extensions/cache-path-from-shell
+[submodule "site-lisp/insert-translated-name"]
+	path = site-lisp/insert-translated-name
+	url = https://github.com/manateelazycat/insert-translated-name.git
+[submodule "site-lisp/cache-path-from-shell"]
+	path = site-lisp/cache-path-from-shell
 	url = https://github.com/manateelazycat/cache-path-from-shell.git
-[submodule "extensions/swiper"]
-	path = extensions/swiper
+[submodule "site-lisp/swiper"]
+	path = site-lisp/swiper
 	url = https://github.com/abo-abo/swiper.git
-[submodule "extensions/lazycat-theme"]
-	path = extensions/lazycat-theme
+[submodule "site-lisp/lazycat-theme"]
+	path = site-lisp/lazycat-theme
 	url = https://github.com/shanyouli/lazycat-theme.git

@@ -74,7 +74,7 @@
   :config
   ;; Interaction with magit
   (if (locate-library "magit")
-      (setq magit-completing-read-function 'magit-ido-completion-read)))
+      (setq magit-completing-read-function 'magit-ido-completing-read)))
 
 ;; ido-yes-or-no
 (use-package ido-yes-or-no

@@ -73,7 +73,7 @@
   (defun add-extensions-to-load-path (&rest _)
     (eval-when-compile (require 'cl))
     (if (fboundp 'normal-top-level-add-to-load-path)
-        (let* ((my-lisp-dir (expand-file-name "extensions/" user-emacs-directory))
+        (let* ((my-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory))
                (default-directory my-lisp-dir))
           (progn
             (setq load-path
