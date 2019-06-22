@@ -189,25 +189,15 @@
   ("C-x p c" .  link-hint-copy-link))
 
 ;; 80-columns
-;; see @https://www.emacswiki.org/emacs/FillColumnIndicator
-(use-package fill-column-indicator
+(use-package column-enforce-mode
+  :custom-face
+  (column-enforce-face
+   ((t :inherit nil :foreground "OrangeRed")))
+  :hook (after-init . global-column-enforce-mode)
+  ;; :hook ((prog-mode gfm-mode) . column-enforce-mode)
   :config
-  (setq fci-rule-column 80)
-  (setq fci-rule-width 1)
-  (setq fci-rule-color "orange")
-  :hook ((prog-mode . fci-mode)
-         (gfm-mode .  fci-mode))
-  :config
-  ;; Display compatibility issue with company
-  ;; @https://github.com/alpaker/fill-column-indicator/issues/54#issuecomment-218344694
-  (when  (featurep 'company)
-    (defun on-off-fci-before-company(command)
-      (when (string= "show" command)
-        (turn-off-fci-mode))
-      (when (string= "hide" command)
-        (turn-on-fci-mode)))
-
-    (advice-add 'company-call-frontends :before #'on-off-fci-before-company)))
+  (setq column-enforce-comments nil) ;Ignore long notes
+  (setq column-enforce-column 80))
 
 ;; Search and refactoring tool based on ripgrep
 ;; see @https://github.com/manateelazycat/color-rg
