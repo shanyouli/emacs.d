@@ -60,7 +60,6 @@
   (setq ido-create-new-buffer 'prompt)
   (setq ido-file-extensions-order '(".org" ".txt" ".py" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf"))
   (setq ido-save-directory-list-file (concat lye-emacs-cache-dir "ido.last"))
-
   :hook (after-init . ido-mode))
 
 ;; use ido-vertical-mode
@@ -69,6 +68,17 @@
   :config
   (setq ido-vertical-define-keys 'C-n-and-C-p-only))
 
+;; ido-completing-read+
+(use-package ido-completing-read+
+  :hook (after-init . ido-ubiquitous-mode)
+  :config
+  ;; Interaction with magit
+  (if (locate-library "magit")
+      (setq magit-completing-read-function 'magit-ido-completion-read)))
+
+;; ido-yes-or-no
+(use-package ido-yes-or-no
+  :hook (ido-setup . ido-yes-or-no-mode))
 ;; use smex
 (use-package smex
   :ensure t
