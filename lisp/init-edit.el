@@ -196,7 +196,18 @@
   (setq fci-rule-width 1)
   (setq fci-rule-color "orange")
   :hook ((prog-mode . fci-mode)
-         (gfm-mode .  fci-mode)))
+         (gfm-mode .  fci-mode))
+  :preface
+  ;; Display compatibility issue with company
+  ;; @https://github.com/alpaker/fill-column-indicator/issues/54#issuecomment-218344694
+  (when  (featurep 'company)
+    (defun on-off-fci-before-company(command)
+      (when (string= "show" command)
+        (turn-off-fci-mode))
+      (when (string= "hide" command)
+        (turn-on-fci-mode)))
+
+    (advice-add 'company-call-frontends :before #'on-off-fci-before-company)))
 
 ;; Search and refactoring tool based on ripgrep
 ;; see @https://github.com/manateelazycat/color-rg
