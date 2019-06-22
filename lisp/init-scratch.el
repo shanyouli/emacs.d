@@ -33,7 +33,7 @@
 
 ;; scratch-save
 ;; see @https://emacs-china.org/t/topic/4714/2?u=twlz0ne
-(defvar lye-scratch-save-file (concat lye-emacs-temporal-dir "scratch"))
+(defvar lye-scratch-save-file (concat lye-emacs-cache-dir "scratch"))
 
 (defun lye/scratch-save ()
   (ignore-errors

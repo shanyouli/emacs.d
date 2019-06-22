@@ -29,8 +29,8 @@
 (setq user-mail-address lye-mail-address)
 
 ;; Set the temporal directory
-(unless (file-exists-p lye-emacs-temporal-dir)
-  (make-directory lye-emacs-temporal-dir))
+(unless (file-exists-p lye-emacs-cache-dir)
+  (make-directory lye-emacs-cache-dir))
 
 ;; Use real line movement instead of visual line movement
 (setq line-move-visual nil)
@@ -50,7 +50,7 @@
 (use-package undo-tree
   :hook (after-init . global-undo-tree-mode))
  ;; (setq undo-tree-history-directory-alist
- ;;       `(("." . ,(concat lye-emacs-temporal-dir "undo"))))
+ ;;       `(("." . ,(concat lye-emacs-cache-dir "undo"))))
 
 ;; Save Emacs buffers when they lose focus after 2s
 (use-package auto-save
@@ -66,17 +66,17 @@
 ;; disseminated in the $HOME directory
 (setq-default
  ;; Tramp history
- tramp-persistency-file-name (concat lye-emacs-temporal-dir "tramp")
+ tramp-persistency-file-name (concat lye-emacs-cache-dir "tramp")
  ;; Bookmark-default-file
- bookmark-default-file (concat lye-emacs-temporal-dir "bookmarks")
+ bookmark-default-file (concat lye-emacs-cache-dir "bookmarks")
  ;; SemanticDB files
- semanticdb-default-save-directory (concat lye-emacs-temporal-dir "semanticdb")
+ semanticdb-default-save-directory (concat lye-emacs-cache-dir "semanticdb")
  ;; url files
- url-configuration-directory (concat lye-emacs-temporal-dir "url")
+ url-configuration-directory (concat lye-emacs-cache-dir "url")
  ;; eshell files
- eshell-directory-name (concat lye-emacs-temporal-dir "eshell")
+ eshell-directory-name (concat lye-emacs-cache-dir "eshell")
 ;; Game score
- gamegrid-user-score-file-directory (concat lye-emacs-temporal-dir "games")
+ gamegrid-user-score-file-directory (concat lye-emacs-cache-dir "games")
  )
 
 ;; Start server
@@ -86,13 +86,13 @@
     :ensure nil
     :commands (server-running-p)
     :hook (after-init . (lambda () (unless (server-running-p) (server-start))))
-    :init (setq server-auth-dir (concat lye-emacs-temporal-dir "server"))))
+    :init (setq server-auth-dir (concat lye-emacs-cache-dir "server"))))
 
 ;; Save cursor position for everyfile you opened. So,  next time you open
 ;; the file, the cursor will be at the position you last opened it.
 (use-package saveplace
   :ensure nil
-  :config (setq save-place-file (concat lye-emacs-temporal-dir "saveplace"))
+  :config (setq save-place-file (concat lye-emacs-cache-dir "saveplace"))
   :hook (after-init . save-place-mode))
 
 ;; Miantain a history of past actions and a resonable number of lists
@@ -102,7 +102,7 @@
   :init
   (progn
     (setq-default history-length 1000)
-    (setq savehist-file (concat lye-emacs-temporal-dir "history")
+    (setq savehist-file (concat lye-emacs-cache-dir "history")
           enable-recursive-minibuffers t
           history-delete-duplicates t
           savehist-additional-variables '(mark-ring
@@ -120,7 +120,7 @@
   ;;                                 (recentf-track-opened-file))))
   :init
   (setq recentf-max-saved-items 200
-        recentf-save-file (concat lye-emacs-temporal-dir "recentf"))
+        recentf-save-file (concat lye-emacs-cache-dir "recentf"))
   ;;Do not add these files to the recently opened text
   (setq recentf-exclude '((expand-file-name package-user-dir)
                           ".cache"

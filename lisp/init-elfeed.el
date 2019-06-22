@@ -27,7 +27,7 @@
 (use-package elfeed
   :bind ("C-x w" . elfeed)
   :config
-  (setq elfeed-db-directory (concat lye-emacs-temporal-dir "elfeed"))
+  (setq elfeed-db-directory (concat lye-emacs-cache-dir "elfeed"))
   (setq elfeed-feeds
         '("http://planet.emacsen.org/atom.xml"
           "http://www.masteringemacs.org/feed/"

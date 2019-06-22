@@ -75,7 +75,7 @@
     ;; Cache documents
     (setq url-automatic-caching t)
     ;; Set file path for saving search history
-    (setq youdao-dictionary-search-history-file (concat lye-emacs-temporal-dir "youdaohs"))
+    (setq youdao-dictionary-search-history-file (concat lye-emacs-cache-dir "youdaohs"))
     ;; Enable Chinese word segmentation support (支持中文分词)
     (setq youdao-dictionary-use-chinese-word-segmentation t)))
 

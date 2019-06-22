@@ -59,7 +59,7 @@
   ;; Ido does not automatically create a new buffer, need to ask
   (setq ido-create-new-buffer 'prompt)
   (setq ido-file-extensions-order '(".org" ".txt" ".py" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf"))
-  (setq ido-save-directory-list-file (concat lye-emacs-temporal-dir "ido.last"))
+  (setq ido-save-directory-list-file (concat lye-emacs-cache-dir "ido.last"))
 
   :hook (after-init . ido-mode))
 
@@ -75,7 +75,7 @@
   :bind (("M-x" . smex)
          ("C-c M-x" . smex-major-mode-commands))
   :config
-  (setq smex-save-file  (concat lye-emacs-temporal-dir "smex-items"))
+  (setq smex-save-file  (concat lye-emacs-cache-dir "smex-items"))
   (setq smex-history-length 10)
   (smex-initialize))
 

@@ -29,7 +29,7 @@
   :init
   (setq lsp-auto-guess-root nil) ; Detect project root
   (setq lsp-prefer-flymake nil) ; Use lsp-ui and flycheck
-  (setq lsp-session-file (concat lye-emacs-temporal-dir "lsp-session"))
+  (setq lsp-session-file (concat lye-emacs-cache-dir "lsp-session"))
   :config
   ;; see @https://github.com/emacs-lsp/lsp-mode/issues/641
   (setq lsp-restart 'auto-restart) ; auto-pyls

@@ -71,16 +71,17 @@
 
   (require 'init-const)
   (require 'init-custom)
+
+  ;; Test and optimize startup
+  (when lye-enable-benchmark
+    (require 'benchmark-init-modes)
+    (require 'benchmark-init)
+    (benchmark-init/activate))
+
   (require 'init-font)
   (require 'init-ui)
   (require 'init-scratch)
   (require 'init-funcs)
-
-  (when lye-enable-benchmark
-    ;; Test and optimize startup
-    (require 'benchmark-init-modes)
-    (require 'benchmark-init)
-    (benchmark-init/activate))
 
   (with-temp-message "" ; Erase the output of the plugin startup
 
@@ -109,18 +110,15 @@
 
     (if system/windows (require 'init-ahk)) ; windows-system
 
-    (run-with-idle-timer
-     1 nil
-     #'(lambda ()
-         (require 'init-elfeed) ; RSS Reader
-         (require 'init-lang)
-         (require 'init-hugo)
-         (require 'init-org)
-         (require 'init-scheme)
-         (require 'init-python)
-         (require 'init-lua)
-         (require 'init-lsp)
-         ))))
+    (require 'init-elfeed) ; RSS Reader
+    (require 'init-lang)
+    (require 'init-hugo)
+    (require 'init-org)
+    (require 'init-scheme)
+    (require 'init-python)
+    (require 'init-lua)
+    (require 'init-lsp)
+    ))
 
 (provide 'init)
 ;;; init.el ends here

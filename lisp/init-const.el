@@ -40,9 +40,8 @@
 (defconst *root* (string-equal "root" (getenv "USER"))
   "Are you using ROOT user?")
 
-(defconst lye-emacs-temporal-dir (concat user-emacs-directory "tmp/")
-  "Is the temporal diirectory this?")
-
+(defconst lye-emacs-cache-dir (concat user-emacs-directory "cache/")
+  "Is the cache directory this?")
 
 
 (provide 'init-const)

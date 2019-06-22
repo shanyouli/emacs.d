@@ -50,7 +50,7 @@
 
 ;; Use Emacs async to dcache, Emacs thread is more stagnation than asynchronous
 (setq pyim-dcache-prefer-emacs-thread nil)
-(setq pyim-dcache-directory (concat lye-emacs-temporal-dir "pyim/dcache"))
+(setq pyim-dcache-directory (concat lye-emacs-cache-dir "pyim/dcache"))
 ;; Use full spell
 (setq pyim-default-scheme 'quanpin)
 

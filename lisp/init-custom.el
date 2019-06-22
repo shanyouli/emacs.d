@@ -45,10 +45,6 @@
   "Enable yasnippet for company backends or not."
   :type  'boolean)
 
-(defcustom  lye-toggle-fullscreen t
-  "Set different fonts for full screen!"
-  :type 'boolean)
-
 (defcustom lye-enable-benchmark nil
   "Enable the init benchmark or not."
   :type 'boolean)
