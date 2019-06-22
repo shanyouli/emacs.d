@@ -67,13 +67,17 @@
 ;; Optimize: Force `lisp' at the head to reduce the startup time.
 (defun update-load-path (&rest _)
   "Update `load-path'."
-  (push (expand-file-name "lisp" user-emacs-directory) load-path))
+  (push (expand-file-name "lisp" user-emacs-directory) load-path)
+  ;; Constants
+  (require 'init-const)
+  ; Customization
+  (require 'init-custom))
 
 ;; Add the package in the extensions folder to `load-path'
 (defun add-extensions-to-load-path (&rest _)
   (eval-when-compile (require 'cl))
   (if (fboundp 'normal-top-level-add-to-load-path)
-      (let* ((my-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory))
+      (let* ((my-lisp-dir lye-emacs-site-lisp-dir)
              (default-directory my-lisp-dir))
         (progn
           (setq load-path
@@ -89,12 +93,6 @@
 (update-load-path)
 (add-extensions-to-load-path)
 
-;; Constants
-(require 'init-const)
-
-;; Customization
-(require 'init-custom)
-
 ;; Test and optimize startup
 (when lye-enable-benchmark
   (require 'benchmark-init-modes)
@@ -109,7 +107,6 @@
 (with-temp-message ""                   ; Erase the output of the plugin startup
 
   (require 'init-package)               ; Package and functions
-
 
   ;; Preferences
   (require 'init-theme)
