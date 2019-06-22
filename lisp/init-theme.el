@@ -101,8 +101,8 @@
     (unless after-init-time
       (setq-default mode-line-format nil))
 
-    (setq doom-modeline-height 25)
-    (setq doom-modeline-bar-width 3)
+    ;; (setq doom-modeline-height 25)
+    ;; (setq doom-modeline-bar-width 3)
 
     ;;It seems that you cannot use the all-the-icons font on windows.
     ;; (if (and (boundp 'system/windows) system/windows)

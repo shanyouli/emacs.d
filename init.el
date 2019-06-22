@@ -28,19 +28,40 @@
   (error "This requires Emacs 25.1 and above!"))
 
 ;;; Speed up startup
-(let ( ;; Temporarily increase `gc-cons-threhold' when loading
-      (gc-cons-threshold most-positive-fixnum)
-      (gc-cons-percentage 0.6)
-      ;; Empty to avoid analyzing files when loading remote files.
-      (file-name-handler-alist nil))
+(defvar default-file-name-handler-alist file-name-handler-alist)
+(setq file-name-handler-alist nil)
+(setq gc-cons-threshold most-positive-fixnum)
+(setq gc-cons-percentage 0.6)
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            "Restore default values after startup."
+            (setq file-name-handler-alist default-file-name-handler-alist)
+            (setq gc-cons-percentage 0.1)
+            (setq gc-cons-threshold 800000)
 
-  (defun lye/minibuffer-setup-hook ()
-    (setq gc-cons-threshold most-positive-fixnum))
-  (defun lye/minibuffer-exit-hook ()
-    (setq gc-cons-threshold 800000))
+            ;;GC automatically while unfocusing the frame
+            ;; `focus-out-hook' is obsolete since 27.1
+            (if (boundp 'after-focus-change-function)
+                (add-function :after after-focus-change-function
+                              (lambda ()
+                                (unless (frame-focus-state)
+                                  (garbage-collect))))
+              (add-hook 'focus-out-hook 'garbage-collect))
 
-  (add-hook 'minibuffer-setup-hook #'lye/minibuffer-setup-hook)
-  (add-hook 'minibuffer-exit-hook #'lye/minibuffer-exit-hook)
+
+            ;; Avoid GCs while using `ivy' `counsel'/ `swiper' and `helm', etc.
+            ;; @see http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
+            (defun my-minibuffer-setup-hook ()
+              (setq gc-cons-threshold most-positive-fixnum)
+              (setq gc-cons-percentage 0.6))
+
+            (defun my-minibuffer-exit-hook ()
+              (garbage-collect)
+              (setq gc-cons-percentage 0.1)
+              (setq gc-cons-threshold 800000))
+
+            (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
+            (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)))
 
   ;; Load path
   ;; Optimize: Force `lisp' at the head to reduce the startup time.
@@ -66,59 +87,59 @@
   (advice-add #'package-initialize :after #'add-extensions-to-load-path)
 
   (update-load-path)
-  (add-extensions-to-load-path)
+(add-extensions-to-load-path)
+
+;; Constants
+(require 'init-const)
+
+;; Customization
+(require 'init-custom)
+
+;; Test and optimize startup
+(when lye-enable-benchmark
+  (require 'benchmark-init-modes)
+  (require 'benchmark-init)
+  (benchmark-init/activate))
+
+(require 'init-font)                    ; font set
+(require 'init-ui)                      ; frame size set
+(require 'init-scratch)                 ; scratch configure
+(require 'init-funcs)                   ; some useful functions
+
+(with-temp-message ""                   ; Erase the output of the plugin startup
+
+  (require 'init-package)               ; Package and functions
 
 
-  (require 'init-const)
-  (require 'init-custom)
+  ;; Preferences
+  (require 'init-theme)
+  (require 'init-elisp)
+  (require 'init-basic)
+  (require 'init-edit)
 
-  ;; Test and optimize startup
-  (when lye-enable-benchmark
-    (require 'benchmark-init-modes)
-    (require 'benchmark-init)
-    (benchmark-init/activate))
+  (require 'init-window)
+  (require 'init-company)
+  ;; (require 'init-eshell)
+  (require 'init-magit)
+  (require 'init-dired)
+  (require 'init-chinese)
 
-  (require 'init-font)
-  (require 'init-ui)
-  (require 'init-scratch)
-  (require 'init-funcs)
+  (require 'init-flycheck)
+  (require 'init-yasnippet)
 
-  (with-temp-message "" ; Erase the output of the plugin startup
+  (unless system/windows (require 'init-ivy))
+  (require 'init-pyim)
 
-    ;; Package and functions
-    (require 'init-package)
+  (if system/windows (require 'init-ahk)) ; windows-system
 
-    ;; Preferences
-    (require 'init-theme)
-    (require 'init-elisp)
-    (require 'init-basic)
-    (require 'init-edit)
-
-    (require 'init-window)
-    (require 'init-company)
-    ;; (require 'init-eshell)
-    (require 'init-magit)
-    (require 'init-dired)
-    (require 'init-chinese)
-
-    (require 'init-flycheck)
-    (require 'init-yasnippet)
-
-    (unless system/windows
-      (require 'init-ivy))
-    (require 'init-pyim)
-
-    (if system/windows (require 'init-ahk)) ; windows-system
-
-    (require 'init-elfeed) ; RSS Reader
-    (require 'init-lang)
-    (require 'init-hugo)
-    (require 'init-org)
-    (require 'init-scheme)
-    (require 'init-python)
-    (require 'init-lua)
-    (require 'init-lsp)
-    ))
+  (require 'init-elfeed) ; RSS Reader
+  (require 'init-lang)
+  (require 'init-hugo)
+  (require 'init-org)
+  (require 'init-scheme)
+  (require 'init-python)
+  (require 'init-lua)
+  (require 'init-lsp))
 
 (provide 'init)
 ;;; init.el ends here
