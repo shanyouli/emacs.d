@@ -150,7 +150,7 @@
 (use-package rainbow-mode :hook (prog-mode . rainbow-mode))
 
 ;; Highlight the line where the cursor is
-(run-with-idle-timer 2 nil #'(lambda () (global-hl-line-mode 1)))
+;; (run-with-idle-timer 2 nil #'(lambda () (global-hl-line-mode 1)))
 
 ;; Highlight symbols
 (use-package symbol-overlay
@@ -183,6 +183,12 @@
   ("C-x p o" . link-hint-open-link)
   ("C-x p c" .  link-hint-copy-link))
 
-
+;; 80-columns
+(use-package fill-column-indicator
+  :hook (after-init . fci-mode)
+  :config
+  (setq fci-rule-column 80)
+  (setq fci-rule-width 1)
+  (setq fci-rule-use-dashes 1))
 (provide 'init-edit)
 ;;; init-edit.el ends here
