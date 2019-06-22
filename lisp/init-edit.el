@@ -197,7 +197,7 @@
   (setq fci-rule-color "orange")
   :hook ((prog-mode . fci-mode)
          (gfm-mode .  fci-mode))
-  :preface
+  :config
   ;; Display compatibility issue with company
   ;; @https://github.com/alpaker/fill-column-indicator/issues/54#issuecomment-218344694
   (when  (featurep 'company)
