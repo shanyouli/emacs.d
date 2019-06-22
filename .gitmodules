@@ -25,3 +25,6 @@
 [submodule "site-lisp/lazycat-theme"]
 	path = site-lisp/lazycat-theme
 	url = https://github.com/shanyouli/lazycat-theme.git
+[submodule "site-lisp/lazy-search"]
+	path = site-lisp/lazy-search
+	url = https://github.com/manateelazycat/lazy-search.git

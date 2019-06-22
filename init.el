@@ -63,30 +63,30 @@
             (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
             (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)))
 
-  ;; Load path
-  ;; Optimize: Force `lisp' at the head to reduce the startup time.
-  (defun update-load-path (&rest _)
-    "Update `load-path'."
-    (push (expand-file-name "lisp" user-emacs-directory) load-path))
+;; Load path
+;; Optimize: Force `lisp' at the head to reduce the startup time.
+(defun update-load-path (&rest _)
+  "Update `load-path'."
+  (push (expand-file-name "lisp" user-emacs-directory) load-path))
 
-  ;; Add the package in the extensions folder to `load-path'
-  (defun add-extensions-to-load-path (&rest _)
-    (eval-when-compile (require 'cl))
-    (if (fboundp 'normal-top-level-add-to-load-path)
-        (let* ((my-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory))
-               (default-directory my-lisp-dir))
-          (progn
-            (setq load-path
-                  (append
-                   (loop for dir in (directory-files my-lisp-dir)
-                         unless (string-match "^\\." dir)
-                         collecting (expand-file-name dir))
-                   load-path))))))
+;; Add the package in the extensions folder to `load-path'
+(defun add-extensions-to-load-path (&rest _)
+  (eval-when-compile (require 'cl))
+  (if (fboundp 'normal-top-level-add-to-load-path)
+      (let* ((my-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory))
+             (default-directory my-lisp-dir))
+        (progn
+          (setq load-path
+                (append
+                 (loop for dir in (directory-files my-lisp-dir)
+                       unless (string-match "^\\." dir)
+                       collecting (expand-file-name dir))
+                 load-path))))))
 
-  (advice-add #'package-initialize :after #'update-load-path)
-  (advice-add #'package-initialize :after #'add-extensions-to-load-path)
+(advice-add #'package-initialize :after #'update-load-path)
+(advice-add #'package-initialize :after #'add-extensions-to-load-path)
 
-  (update-load-path)
+(update-load-path)
 (add-extensions-to-load-path)
 
 ;; Constants

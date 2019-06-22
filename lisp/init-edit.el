@@ -152,29 +152,20 @@
 ;; Highlight the line where the cursor is
 ;; (run-with-idle-timer 2 nil #'(lambda () (global-hl-line-mode 1)))
 
-;; Highlight symbols
-(use-package symbol-overlay
-  :diminish
-  :custom-face
-  (symbol-overlay-default-face ((t (:inherit 'region))))
-  (symbol-overlay-face-1 ((t (:inherit 'highlight))))
-  (symbol-overlay-face-2 ((t (:inherit 'font-lock-builtin-face :inverse-video t))))
-  (symbol-overlay-face-3 ((t (:inherit 'warning :inverse-video t))))
-  (symbol-overlay-face-4 ((t (:inherit 'font-lock-constant-face :inverse-video t))))
-  (symbol-overlay-face-5 ((t (:inherit 'error :inverse-video t))))
-  (symbol-overlay-face-6 ((t (:inherit 'dired-mark :inverse-video t :bold nil))))
-  (symbol-overlay-face-7 ((t (:inherit 'success :inverse-video t))))
-  (symbol-overlay-face-8 ((t (:inherit 'dired-symlink :inverse-video t :bold nil))))
-  :bind (("M-i" . symbol-overlay-put)
-         ("M-n" . symbol-overlay-jump-next)
-         ("M-p" . symbol-overlay-jump-prev)
-         ("M-N" . symbol-overlay-switch-forward)
-         ("M-P" . symbol-overlay-switch-backward)
-         ("M-C" . symbol-overlay-remove-all)
-         ([M-f3] . symbol-overlay-remove-all))
-  :hook ((prog-mode . symbol-overlay-mode)
-         (iedit-mode . (lambda () (symbol-overlay-mode -1)))
-         (iedit-mode-end . symbol-overlay-mode)))
+;;; Highlight symbols
+;; Usage:
+;; When press M-s active lazy-search, it will mark current symbol or region.
+;; You can press below keys to jump in all matching symbols,
+;; or press `q' to quitlazy-search mode.
+(use-package lazy-search
+  :ensure nil
+  :commands (lazy-search)
+  :bind ("M-s" . lazy-search)
+  :init
+  (advice-add #'lazy-search :after
+            #'(lambda () (rainbow-mode -1)))
+  (advice-add #'lazy-search-quit :after
+              #'(lambda () (rainbow-mode t))))
 
 ;; open line in browser
 ;; at see@https://github.com/noctuid/link-hint.el/
@@ -184,11 +175,14 @@
   ("C-x p c" .  link-hint-copy-link))
 
 ;; 80-columns
+;; see @https://www.emacswiki.org/emacs/FillColumnIndicator
 (use-package fill-column-indicator
-  :hook (after-init . fci-mode)
   :config
   (setq fci-rule-column 80)
   (setq fci-rule-width 1)
-  (setq fci-rule-use-dashes 1))
+  (setq fci-rule-color "orange")
+  :hook ((prog-mode . fci-mode)
+         (gfm-mode .  fci-mode)))
+
 (provide 'init-edit)
 ;;; init-edit.el ends here
