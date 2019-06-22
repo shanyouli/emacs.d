@@ -161,7 +161,10 @@
 (use-package isearch
   :ensure nil
   :bind (("C-s s" . isearch-forward)
-         ("C-s r" . isearch-backward)))
+         ("C-s r" . isearch-backward)
+         :map isearch-mode-map
+         ("C-n" . isearch-repeat-forward)
+         ("C-p" . isearch-repeat-backward)))
 
 ;;; Highlight symbols
 ;; Usage:
