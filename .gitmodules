@@ -28,3 +28,6 @@
 [submodule "site-lisp/lazy-search"]
 	path = site-lisp/lazy-search
 	url = https://github.com/manateelazycat/lazy-search.git
+[submodule "site-lisp/color-rg"]
+	path = site-lisp/color-rg
+	url = https://github.com/manateelazycat/color-rg.git

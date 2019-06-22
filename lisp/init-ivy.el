@@ -27,7 +27,7 @@
 (use-package counsel
   :ensure nil
   :diminish ivy-mode counsel-mode
-  :bind (("C-s" . swiper)
+  :bind (("C-s s" . counsel-grep-or-swiper)
          ("C-x f" . counsel-recentf)
          ("C-x C-b" . ivy-switch-buffer)
          :map ivy-minibuffer-map

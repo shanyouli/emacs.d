@@ -36,7 +36,6 @@
 (setq line-move-visual nil)
 
 ;; exec-path config
-
 (when (memq window-system '(mac ns x))
   (use-package exec-path-from-shell
     :init

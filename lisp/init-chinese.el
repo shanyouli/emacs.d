@@ -89,7 +89,7 @@
       (save-excursion
         (call-interactively #'avy-goto-char)
         (youdao-dictionary-search-at-point-tooltip)))
-    (bind-key "C-c y" #'lye/avy-youdao-dictionary)))
+    (bind-key "C-s y" #'lye/avy-youdao-dictionary)))
  (t
   (lye/use-sdcv)))
 

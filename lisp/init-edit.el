@@ -152,6 +152,17 @@
 ;; Highlight the line where the cursor is
 ;; (run-with-idle-timer 2 nil #'(lambda () (global-hl-line-mode 1)))
 
+;;; Uninstall some global shortcuts that may cause conflicts
+(global-unset-key (kbd "C-s"))
+(global-unset-key (kbd "C-r"))
+;; (global-unset-key [^s])
+
+;; isearch
+(use-package isearch
+  :ensure nil
+  :bind (("C-s s" . isearch-forward)
+         ("C-s r" . isearch-backward)))
+
 ;;; Highlight symbols
 ;; Usage:
 ;; When press M-s active lazy-search, it will mark current symbol or region.
@@ -160,7 +171,7 @@
 (use-package lazy-search
   :ensure nil
   :commands (lazy-search)
-  :bind ("M-s" . lazy-search)
+  :bind ("C-s l" . lazy-search)
   :init
   (advice-add #'lazy-search :after
             #'(lambda () (rainbow-mode -1)))
@@ -183,6 +194,25 @@
   (setq fci-rule-color "orange")
   :hook ((prog-mode . fci-mode)
          (gfm-mode .  fci-mode)))
+
+;; Search and refactoring tool based on ripgrep
+;; see @https://github.com/manateelazycat/color-rg
+(when  (executable-find "rg")
+  (use-package color-rg
+    :ensure nil
+;;    :preface (unbind-key "C-s")
+    :commands (color-rg-search-input
+               color-rg-search-symbol
+               color-rg-search-input-in-project
+               color-rg-search-symbol-in-project
+               color-rg-search-input-in-current-file
+               color-rg-search-symbol-in-current-file)
+    :bind (("C-s g" . color-rg-search-symbol)
+           ("C-s h" . color-rg-search-input)
+           ("C-s j" . color-rg-search-symbol-in-project)
+           ("C-s k" . color-rg-search-input-in-project)
+           ("C-s ," . color-rg-search-symbol-in-current-file)
+           ("C-s ." . color-rg-search-input-in-current-file))))
 
 (provide 'init-edit)
 ;;; init-edit.el ends here
