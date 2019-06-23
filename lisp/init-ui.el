@@ -124,5 +124,7 @@
 (setq use-dialog-box nil)
 (setq initial-buffer-choice nil)
 
+;;; modeline configuration
+
 (provide 'init-ui)
 ;;; init-ui.el ends here

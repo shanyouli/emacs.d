@@ -37,37 +37,76 @@
             '(lambda ()
                ;; (auto-fill-mode nil) ; 不自动换行
                (setq truncate-lines nil) ; 不自动换行
-               (if (display-graphic-p)
-                   (use-package org-bullets
-                     :init (org-bullets-mode 1)))
                ;; 自动缩进，* or ** etc..
                (org-indent-mode t)))
 
-  (add-to-list 'org-src-lang-modes '("plantuml" . puml))
+  (add-to-list 'org-src-lang-modes '("plantuml" . puml)))
+
+;; Prettify UI
+(use-package org-bullets
+  :if (char-displayable-p ?◉)
+  :hook (org-mode . org-bullets-mode))
+
+(use-package org-indent
+  :ensure nil
+  :hook ((org-mode . org-indent-mode)
+         (org-indent . (lambda ()
+                         ;; @see https://github.com/seagle0128/.emacs.d/issues/88
+                         (make-variable-buffer-local 'show-paren-mode)
+                         (setq show-paren-mode nil)))))
+
+
+;;; org-babel
+;; (with-eval-after-load 'org
+;;     (org-babel-do-load-languages
+;;      'org-babel-load-languages
+;;      `((R . t)
+
+;;        (emacs-lisp . t)
+;;        (haskell . nil)
+
+;;        (,(if (locate-library "ob-sh") 'sh 'shell) . t)
+;;        (sql . t)
+;;        (sqlite . t))))
+
+(use-package org-babel
+  :defer t
+  :ensure nil
+  :init
+  ;; Don't ask to eval code in SRC blocks.
+  (setq org-confirm-babel-evaluate nil))
+
+;; ob-python
+(use-package ob-python
+  :defer t
+  :ensure nil
+  :commands (org-babel-execute:python))
+
+;; ob-shell
+(use-package ob-shell
+  :defer t
+  :ensure nil
+  :commands
+  (org-babel-excute:sh
+   org-babel-expand-body:sh
+
+   org-babel-excute:bash
+   org-babel-expand-body:bash))
+
+;; ob-emacs-lisp
+(use-package ob-emacs-lisp
+  :ensure nil
+  :defer t
+  :commands (org-babel-execute:emacs-lisp))
+
+(use-package ob-plantuml
+  :ensure nil
+  :defer t
+  :commands (org-babel-execute:plantuml)
+  :config
   (if (file-exists-p (concat user-emacs-directory "plantuml.jar"))
       (setq org-plantuml-jar-path (concat user-emacs-directory "plantuml.jar"))
     (setq org-plantuml-jar-path "~/plantuml.jar")))
-
-(with-eval-after-load 'org
-    (org-babel-do-load-languages
-     'org-babel-load-languages
-     `((R . t)
-       (ditaa . t)
-       (dot . t)
-       (emacs-lisp . t)
-       (gnuplot . t)
-       (haskell . nil)
-       (latex . t)
-       (ledger . t)
-       (ocaml . nil)
-       (octave . t)
-       (plantuml . t)
-       (python . t)
-       (ruby . t)
-       (screen . nil)
-       (,(if (locate-library "ob-sh") 'sh 'shell) . t)
-       (sql . t)
-       (sqlite . t))))
 
 (use-package org-cliplink
   :bind ("C-x p i" . org-cliplink))

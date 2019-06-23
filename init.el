@@ -37,7 +37,7 @@
             "Restore default values after startup."
             (setq file-name-handler-alist default-file-name-handler-alist)
             (setq gc-cons-percentage 0.1)
-            (setq gc-cons-threshold 800000)
+            (setq gc-cons-threshold (* 2 1000 1000))
 
             ;;GC automatically while unfocusing the frame
             ;; `focus-out-hook' is obsolete since 27.1
@@ -58,7 +58,7 @@
             (defun my-minibuffer-exit-hook ()
               (garbage-collect)
               (setq gc-cons-percentage 0.1)
-              (setq gc-cons-threshold 800000))
+              (setq gc-cons-threshold (* 2 1024 1024)))
 
             (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
             (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)))
@@ -137,6 +137,14 @@
   (require 'init-python)
   (require 'init-lua)
   (require 'init-lsp))
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (message "Emacs ready in %s with %d garbage collections."
+                     (format "%.2f seconds"
+                             (float-time
+                              (time-subtract after-init-time before-init-time)))
+                     gcs-done)))
 
 (provide 'init)
 ;;; init.el ends here
