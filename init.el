@@ -123,7 +123,7 @@
   (require 'init-chinese)
 
   (require 'init-flycheck)
-  (require 'init-yasnippet)
+
 
   (unless system/windows (require 'init-ivy))
   (require 'init-pyim)

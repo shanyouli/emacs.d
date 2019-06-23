@@ -63,5 +63,10 @@
   :mode (("/PKGBUILD\\'" . pkgbuild-mode))
   :defer t)
 
+;;; yasnippet
+(use-package yasnippet
+  :hook (after-init . yas-global-mode)
+  :config (use-package yasnippet-snippets))
+
 (provide 'init-lang)
 ;;; init-lang.el ends here
