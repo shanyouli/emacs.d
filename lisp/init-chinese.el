@@ -29,6 +29,7 @@
   :commands (insert-translated-name-insert-original-translation)
   :init (setq-default insert-translated-name-default-style "origin")
   :bind ("C-c t" . insert-translated-name-insert-original-translation))
+
 ;; Prompt English words when writing English
 (use-package company-english-helper
   :ensure nil
@@ -39,9 +40,12 @@
   "Installing sdcv and using sdcv package"
   (use-package sdcv
     :ensure nil
-    :commands (sdcv-search-pointer+ sdcv-search-pointer sdcv-search-input sdcv-search-input+)
+    :commands (sdcv-search-pointer+
+               sdcv-search-pointer
+               sdcv-search-input
+               sdcv-search-input+)
     :bind (("C-c y" . sdcv-search-pointer+)
-               ("C-c Y" . sdcv-search-input+))
+           ("C-c Y" . sdcv-search-input+))
     :config
     (unless (featurep 'posframe) ; sdcv need posframe
       (use-package posframe))
@@ -66,6 +70,7 @@
             "quick_eng-zh_CN"
             "CDICT5英汉辞典")))
   )
+
 (defun lye/use-youdao-dic ()
   "Installing and Using youdao-dictionary"
   (use-package youdao-dictionary
@@ -75,23 +80,25 @@
     ;; Cache documents
     (setq url-automatic-caching t)
     ;; Set file path for saving search history
-    (setq youdao-dictionary-search-history-file (concat lye-emacs-cache-dir "youdaohs"))
+    (setq youdao-dictionary-search-history-file
+          (concat lye-emacs-cache-dir "youdaohs"))
     ;; Enable Chinese word segmentation support (支持中文分词)
     (setq youdao-dictionary-use-chinese-word-segmentation t)))
 
-(cond
- ((or system/windows (not (executable-find "sdcv")))
-  (lye/use-youdao-dic)
-  (when (and (display-graphic-p) (featurep 'avy))
-    ;;@https://emacs-china.org/t/topic/3676/4
-    (defun lye/avy-youdao-dictionary ()
-      (interactive)
-      (save-excursion
-        (call-interactively #'avy-goto-char)
-        (youdao-dictionary-search-at-point-tooltip)))
-    (bind-key "C-s y" #'lye/avy-youdao-dictionary)))
- (t
-  (lye/use-sdcv)))
+(if (or (and (boundp system/windows) system/windows)
+        (not (executable-find "sdcv")))
+    (progn
+      (lye/use-youdao-dic)
+      (when (locate-library "avy")
+        (defun lye/avy-youdao-dictionary ()
+          (interactive)
+          (save-excursion
+            (call-interactively #'avy-goto-char)
+            (if (display-graphic-p)
+                (youdao-dictionary-search-at-point-tooltip)
+              (youdao-dictionary-search-at-point))))
+        (bind-key "C-s y" #'lye/avy-youdao-dictionary)))
+  (lye/use-sdcv))
 
 (provide 'init-chinese)
 ;;; init-chinese.el ends here

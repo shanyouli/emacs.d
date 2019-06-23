@@ -67,6 +67,11 @@ management for Emacs."
   (setq transient-levels-file
         (concat lye-emacs-cache-dir "transient/levels.el"))
 
+  ;; unset C-x g
+  ;; @see https://github.com/magit/magit/issues/3522#issuecomment-407640436
+  (with-eval-after-load "magit-files"
+    (define-key magit-file-mode-map (kbd "C-x g") nil))
+
   :bind (("C-x g s" . magit-status+)
          ("C-x g c" . magit-checkout)
          ("C-x g C" . magit-commit)

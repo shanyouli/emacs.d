@@ -132,6 +132,7 @@
 
 (use-package doom-modeline
   :hook (after-init . doom-modeline-mode)
+  :ensure nil
   :init
   (unless (display-graphic-p)
     (setq doom-modeline-icon nil))
@@ -140,7 +141,8 @@
           doom-modeline-minor-modes nil
           doom-modeline-mu4e nil
           doom-modeline-github t
-          doom-modeline-github-interval 300))
+          doom-modeline-github-interval 300)
+  (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here
