@@ -34,3 +34,6 @@
 [submodule "kill-ring-search.el"]
 	path = site-lisp/kill-ring-search.el
 	url = https://github.com/nschum/kill-ring-search.el.git
+[submodule "pyim"]
+	path = site-lisp/pyim
+	url = https://github.com/tumashu/pyim.git

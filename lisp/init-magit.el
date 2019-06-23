@@ -54,6 +54,11 @@ management for Emacs."
        (concat parent-dir (file-name-base url))
        (file-name-base url))))
 
+  (defun magit-status+ ()
+    (interactive)
+    (magit-status)
+    (other-window 1))
+
   :config
   (setq transient-history-file
         (concat lye-emacs-cache-dir "transient/history.el"))
@@ -62,7 +67,7 @@ management for Emacs."
   (setq transient-levels-file
         (concat lye-emacs-cache-dir "transient/levels.el"))
 
-  :bind (("C-x g s" . magit-status)
+  :bind (("C-x g s" . magit-status+)
          ("C-x g c" . magit-checkout)
          ("C-x g C" . magit-commit)
          ("C-x g u" . magit-push-current-to-pushremote)
