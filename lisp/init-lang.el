@@ -63,10 +63,37 @@
   :mode (("/PKGBUILD\\'" . pkgbuild-mode))
   :defer t)
 
+;;; prettify-mode
+(use-package prettify-symbols-mode
+  :ensure nil
+  :init
+  (setq-default prettify-symbols-alist
+                '(
+                  ("<-" . "←")
+                  ("->" . ?→)
+                  ("->>" . ?↠)
+                  ("=>" . ?⇒)
+                  ("map" . ?↦)
+                  ("/=" . ?≠)
+                  ("!=" . ?≠)
+                  ("==" . ?≡)
+                  ("<=" . ?≤)
+                  (">=" . ?≥)
+                  ("=<<" . (?= (Br . Bl) ?≪))
+                  (">>=" . (?≫ (Br . Bl) ?=))
+                  ("<=<" . ?↢)
+                  (">=>" . ?↣)
+                  ("&&" . ?∧)
+                  ("||" . ?∨)
+                  ("not" . ?¬)))
+  (setq prettify-symbols-unprettify-at-point 'right-edge))
+
 ;;; yasnippet
 (use-package yasnippet
   :hook (after-init . yas-global-mode)
   :config (use-package yasnippet-snippets))
+
+
 
 (provide 'init-lang)
 ;;; init-lang.el ends here

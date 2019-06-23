@@ -26,19 +26,19 @@
 
 (use-package flycheck
   :diminish flycheck-mode
-  :init (dolist (hook (list
-		       'scheme-mode-hook
-		       'python-mode-hook
-               'sh-mode-hook))
-	  (add-hook hook '(lambda ()
-			    (flycheck-mode 1))))
+  :hook ((scheme-mode python-mode sh-mode) . flycheck-mode)
+  ;; :init (dolist (hook (list
+  ;; 'scheme-mode-hook
+  ;; 'python-mode-hook
+  ;; 'sh-mode-hook))
+  ;; (add-hook hook '(lambda ()
+  ;; (flycheck-mode 1))))
   :config
   (setq flycheck-indication-mode 'right-fringe)
   (setq flycheck-emacs-lisp-load-path 'inherit)
 
   ;; Only check while saving and opening files
-  (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  )
+  (setq flycheck-check-syntax-automatically '(save mode-enabled)))
 
 (when (display-graphic-p)
   (use-package flycheck-posframe

@@ -28,7 +28,11 @@
   :bind (:map emacs-lisp-mode-map
           ("C-c C-x" . ielm)
           ("C-c C-c" . eval-defun)
-          ("C-c C-b" . eval-buffer)))
+          ("C-c C-b" . eval-buffer))
+  :hook (emacs-lisp-mode  . (lambda ()
+                              "Beautify emasc-lisp"
+                              (push '("lambda" .  "λ") prettify-symbols-alist)
+                              (prettify-symbols-mode))))
 
 ;; Show function arglist or variable docstring
 ;; `global-edloc-mode' is enabled by default.
