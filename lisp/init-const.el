@@ -44,7 +44,7 @@
   "Is the cache directory this?")
 
 ;; (expand-file-name "site-lisp/" user-emacs-directory)
-(defconst lye-emacs-site-lisp-dir (concat user-emacs-directory "site-lisp/")
+(defconst lye-emacs-site-lisp-dir (concat user-emacs-directory "site-lisp")
   "Use the git-submodule managed plugin to store the location.")
 
 (provide 'init-const)

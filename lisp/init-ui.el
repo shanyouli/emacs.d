@@ -125,6 +125,22 @@
 (setq initial-buffer-choice nil)
 
 ;;; modeline configuration
+(defvar default-modeline-format mode-line-format)
+;; prevent flash of unstyled modeline at startup
+(unless after-init-time
+  (setq mode-line-format nil))
+
+(use-package doom-modeline
+  :hook (after-init . doom-modeline-mode)
+  :init
+  (unless (display-graphic-p)
+    (setq doom-modeline-icon nil))
+
+  (setq doom-modeline-major-mode-color-icon t
+          doom-modeline-minor-modes nil
+          doom-modeline-mu4e nil
+          doom-modeline-github t
+          doom-modeline-github-interval 300))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

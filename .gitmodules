@@ -37,3 +37,6 @@
 [submodule "pyim"]
 	path = site-lisp/pyim
 	url = https://github.com/tumashu/pyim.git
+[submodule "doom-modeline"]
+	path = site-lisp/doom-modeline
+	url = https://github.com/seagle0128/doom-modeline.git

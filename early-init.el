@@ -25,7 +25,7 @@
 ;;; Code:
 
 ;; Defer garbage collection further back in the startup process
-;; (setq gc-cons-threshold 800000)
+(setq gc-cons-threshold (* 2 1024 1024))
 ;; (setq gc-cons-percentage 0.1)
 (setq package-enable-at-startup nil)
 

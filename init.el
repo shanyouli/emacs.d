@@ -93,6 +93,7 @@
 (update-load-path)
 (add-extensions-to-load-path)
 
+(require 'use-package)
 ;; Test and optimize startup
 (when lye-enable-benchmark
   (require 'benchmark-init-modes)

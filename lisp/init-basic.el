@@ -56,10 +56,9 @@
   :ensure nil
   :defines (auto-save-silent auto-save-idle)
   :commands (auto-save-enable)
-  :init
-  (setq auto-save-silent t)
-  (setq auto-save-idle 2)
-  (auto-save-enable))
+  :init (setq auto-save-silent t
+              auto-save-idle 2)
+  :hook (after-init . auto-save-enable))
 
 ;; Store all temporal files in a temporal directory instead of being
 ;; disseminated in the $HOME directory

@@ -27,6 +27,7 @@
 ;; Configure Chinese input method
 (use-package pyim
   :demand t
+  :defer 0.5
   :ensure nil
   :preface
   (defun pyim-bigdict-enable ()
