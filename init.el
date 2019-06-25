@@ -94,11 +94,15 @@
 (add-extensions-to-load-path)
 
 (require 'use-package)
+
 ;; Test and optimize startup
 (when lye-enable-benchmark
-  (require 'benchmark-init-modes)
-  (require 'benchmark-init)
-  (benchmark-init/activate))
+  (use-package benchmark-init
+    :hook (after-init . bechmark-init-/deactivate))
+  ;; (require 'benchmark-init-modes)
+  ;; (require 'benchmark-init)
+  ;; (benchmark-init/activate)
+  )
 
 (require 'init-font)                    ; font set
 (require 'init-ui)                      ; frame size set

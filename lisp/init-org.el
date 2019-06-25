@@ -32,21 +32,31 @@
      ("C-c b" . org-switchb))
   :mode ("\\.org$\\'" . org-mode)
   :ensure nil
-  :config
-  (add-hook 'org-mode-hook
-            '(lambda ()
-               ;; (auto-fill-mode nil) ; 不自动换行
-               (setq truncate-lines nil) ; 不自动换行
-               ;; 自动缩进，* or ** etc..
-               (org-indent-mode t)))
+  :hook (org-mode . (lambda ()
+                      ;; (auto-fill-mode nil) ; 不自动换行
+                      (setq truncate-lines nil) ; 不自动换行
 
-  (add-to-list 'org-src-lang-modes '("plantuml" . puml)))
+                      ;; Beautify Org Checkbox Symbol
+                      ;; @seehttps://github.com/seagle0128/.emacs.d/blob/master/lisp/init-org.el#L44
+                      (when (char-displayable-p ?☐)
+                        (push '("[ ]" . "☐") prettify-symbols-alist))
+                      (when (char-displayable-p ?☑)
+                        (push '("[X]" . "☑") prettify-symbols-alist))
+                      (when (char-displayable-p ?❍)
+                        (push '("[-]" . "❍") prettify-symbols-alist))
+                      (when (char-displayable-p ?λ)
+                        (push '("#+BEGIN_SRC" . "λ") prettify-symbols-alist)
+                        (push '("#+END_SRC" . "λ") prettify-symbols-alist))
+                      (prettify-symbols-mode)))
+  ;;  :config
+  )
 
 ;; Prettify UI
 (use-package org-bullets
   :if (char-displayable-p ?◉)
   :hook (org-mode . org-bullets-mode))
 
+;; 自动缩进，* or ** etc..
 (use-package org-indent
   :ensure nil
   :hook ((org-mode . org-indent-mode)
@@ -74,7 +84,9 @@
   :ensure nil
   :init
   ;; Don't ask to eval code in SRC blocks.
-  (setq org-confirm-babel-evaluate nil))
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-src-fontify-natively t
+        org-src-tab-acts-natively t))
 
 ;; ob-python
 (use-package ob-python
