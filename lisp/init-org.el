@@ -116,16 +116,12 @@
   :defer t
   :commands (org-babel-execute:plantuml)
   :config
-  (if (file-exists-p (concat user-emacs-directory "plantuml.jar"))
-      (setq org-plantuml-jar-path (concat user-emacs-directory "plantuml.jar"))
-    (setq org-plantuml-jar-path "~/plantuml.jar")))
+  (when (file-exists-p (concat user-emacs-directory "plantuml/plantuml.jar"))
+    (setq plantuml-jar-path
+          (concat user-emacs-directory "plantuml/plantuml.jar"))))
 
 (use-package org-cliplink
   :bind ("C-x p i" . org-cliplink))
-
-(use-package plantuml-mode
-  :config
-  (setq plantuml-jar-path (concat user-emacs-directory "plantuml.jar")))
 
 (provide 'init-org)
 ;;; init-org.el ends here

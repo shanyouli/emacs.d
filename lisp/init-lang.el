@@ -88,6 +88,13 @@
                   ("not" . ?¬)))
   (setq prettify-symbols-unprettify-at-point 'right-edge))
 
+;; plantuml
+(use-package plantuml-mode
+  :config
+  (when (file-exists-p (concat user-emacs-directory "plantuml/plantuml.jar"))
+    (setq plantuml-jar-path
+          (concat user-emacs-directory "plantuml/plantuml.jar"))))
+
 ;;; yasnippet
 (use-package yasnippet
   :hook (after-init . yas-global-mode)
