@@ -33,6 +33,7 @@
     "Enable yasnippet for all backends.")
 
   (defun company-backend-with-yas (backend)
+
     (if (or (not company-enable-yas)
             (and (listp backend) (member 'company-yasnippet backend)))
         backend
@@ -55,12 +56,13 @@
   (setq company-idle-delay 0
         compant-echo-delay (if (display-graphic-p) nil 0)
         company-tooltip-limit 10
-        company-minimum-prefix-length 1 ; When using company-yasnippet, you can prompt
         company-require-match nil
         company-dabbrev-ignore-case nil
         company-dabbrev-downcase nil
         company-dabbrev-code-other-buffers t
         company-show-numbers t)
+  ;; Avoid entering code blocks quickly in org-mode because the prompts don't respond
+  (setq company-minimum-prefix-length 2)
 
   ;;Do not use it in these major modes
   (setq company-global-modes
@@ -70,10 +72,6 @@
         '(company-pseudo-tooltip-unless-just-one-frontend
           company-preview-if-just-one-frontend))
 
-  (define-key company-active-map (kbd "<return>") nil)
-  (define-key company-active-map (kbd "RET") nil)
-  (define-key company-active-map (kbd "TAB") #'company-complete-selection)
-  (define-key company-active-map (kbd "<tab>") #'company-complete-selection)
   ;; Support yas in commpany
   ;; Note: Must be the last to involve all backends
   (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
