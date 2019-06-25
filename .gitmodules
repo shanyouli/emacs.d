@@ -4,9 +4,6 @@
 [submodule "pyim"]
 	path = site-lisp/pyim
 	url = https://github.com/tumashu/pyim.git
-[submodule "doom-modeline"]
-	path = site-lisp/doom-modeline
-	url = https://github.com/seagle0128/doom-modeline.git
 [submodule "auto-save"]
 	path = site-lisp/auto-save
 	url = https://github.com/shanyouli/auto-save.git
@@ -46,3 +43,9 @@
 [submodule "dash.el"]
 	path = site-lisp/dash.el
 	url = https://github.com/magnars/dash.el.git
+[submodule "doom-modeline"]
+	path = site-lisp/doom-modeline
+	url = https://github.com/seagle0128/doom-modeline.git
+[submodule "swiper"]
+	path = site-lisp/swiper
+	url = https://github.com/abo-abo/swiper.git

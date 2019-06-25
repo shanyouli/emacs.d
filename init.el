@@ -109,6 +109,14 @@
 
   (require 'init-package)               ; Package and functions
 
+  ;; Import self-configuration of different systems
+  (when (file-exists-p (format "%s/init-%s.el"
+                               (expand-file-name "lisp" user-emacs-directory)
+                               (symbol-name system-type)))
+    (load (format "%s/init-%s.el"
+                  (expand-file-name "lisp" user-emacs-directory)
+                  (symbol-name system-type))))
+
   ;; Preferences
   (require 'init-theme)
   (require 'init-basic)
@@ -118,16 +126,14 @@
   (require 'init-company)
   (require 'init-lang)
   (require 'init-elisp)
+
   ;; (require 'init-eshell)
   (require 'init-magit)
   (require 'init-dired)
   (require 'init-chinese)
 
   (require 'init-flycheck)
-
   (require 'init-pyim)
-
-  (if system/windows (require 'init-ahk)) ; windows-system
 
   (require 'init-elfeed) ; RSS Reader
   (require 'init-hugo)
