@@ -111,12 +111,13 @@
 
   ;; Preferences
   (require 'init-theme)
-  (require 'init-elisp)
   (require 'init-basic)
   (require 'init-edit)
-
+  (require 'init-ivy)
   (require 'init-window)
   (require 'init-company)
+  (require 'init-lang)
+  (require 'init-elisp)
   ;; (require 'init-eshell)
   (require 'init-magit)
   (require 'init-dired)
@@ -124,14 +125,11 @@
 
   (require 'init-flycheck)
 
-
-  (unless system/windows (require 'init-ivy))
   (require 'init-pyim)
 
   (if system/windows (require 'init-ahk)) ; windows-system
 
   (require 'init-elfeed) ; RSS Reader
-  (require 'init-lang)
   (require 'init-hugo)
   (require 'init-org)
   (require 'init-scheme)

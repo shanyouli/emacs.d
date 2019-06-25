@@ -38,57 +38,6 @@
   (let ((shell-file-name "C:\\Windows\\System32\\bash.exe"))
     (shell "*bash*")))
 
-;; Us ido-mode
-(use-package ido
-  :ensure nil
-  :bind (("C-x C-f" . ido-find-file)
-         ("C-x f" . ido-recentf-open))
-  :init
-  (defun ido-recentf-open ()
-    "Use `ido-completing-read' to find a recent file."
-    (interactive)
-    (if (find-file (ido-completing-read "Find recent file: " recentf-list))
-        (message "Opening file...")
-      (message "Aborting")))
-  :config
-  (setq ido-enable-flex-matching t)
-  (setq ido-everywhere nil) ;禁用ido everyting, 拷贝操作不方便
-  ;; Guess if the cursor position is an openable directory or file
-  (setq ido-use-filename-at-point 'guess)
-  ;;(setq ido-use-url-at-point)
-  ;; Ido does not automatically create a new buffer, need to ask
-  (setq ido-create-new-buffer 'prompt)
-  (setq ido-file-extensions-order '(".org" ".txt" ".py" ".emacs" ".xml" ".el" ".ini" ".cfg" ".cnf"))
-  (setq ido-save-directory-list-file (concat lye-emacs-cache-dir "ido.last"))
-  :hook (after-init . ido-mode))
-
-;; use ido-vertical-mode
-(use-package ido-vertical-mode
-  :hook (after-init . ido-vertical-mode)
-  :config
-  (setq ido-vertical-define-keys 'C-n-and-C-p-only))
-
-;; ido-completing-read+
-(use-package ido-completing-read+
-  :hook (after-init . ido-ubiquitous-mode)
-  :config
-  ;; Interaction with magit
-  (if (locate-library "magit")
-      (setq magit-completing-read-function 'magit-ido-completing-read)))
-
-;; ido-yes-or-no
-(use-package ido-yes-or-no
-  :hook (ido-setup . ido-yes-or-no-mode))
-;; use smex
-(use-package smex
-  :ensure t
-  :bind (("M-x" . smex)
-         ("C-c M-x" . smex-major-mode-commands))
-  :config
-  (setq smex-save-file  (concat lye-emacs-cache-dir "smex-items"))
-  (setq smex-history-length 10)
-  (smex-initialize))
-
 ;; confirmedto prevent misoperation.
 (setq confirm-kill-emacs
       (lambda (prompt)
