@@ -4,6 +4,7 @@
 
 ;; Required plugin package
 (use-package doom-themes
+  :demand t
   :ensure nil
   :defines (doom-themes-enable-blod doom-themes-enable-italic)
   :config
@@ -28,7 +29,7 @@
     (if (member hour (number-sequence 8 19))
         (setq now-theme lye-light-theme)
       (setq now-theme lye-dark-theme))
-    (when now-theme
+    (when (and now-theme (not (eq current-theme now-theme)))
       (let ((progress-reporter
              (make-progress-reporter
               (format "Loading theme %s..." now-theme))))
@@ -37,9 +38,14 @@
         (progress-reporter-done progress-reporter)))))
 
 (when (display-graphic-p)
+  ;;Set bright and dark theme
   (setq lye-light-theme 'doom-solarized-light)
   (setq lye-dark-theme 'doom-one)
-  (run-with-timer 0 3600 'exchange-bright-and-dark-theme))
+
+  (exchange-bright-and-dark-theme)
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (run-with-timer 0 3600 'exchange-bright-and-dark-theme))))
 
 (provide 'init-theme)
 ;;; init-theme.el ends here
