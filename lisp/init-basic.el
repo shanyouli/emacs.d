@@ -38,6 +38,7 @@
 ;; exec-path config
 (when (memq window-system '(mac ns x))
   (use-package exec-path-from-shell
+    :ensure nil
     :init
     (require 'cache-path-from-shell)
     (setq exec-path-from-shell-check-startup-files nil)
@@ -47,6 +48,8 @@
 
 ;; Use undo-tree
 (use-package undo-tree
+  :ensure nil
+  :commands global-undo-tree-mode
   :hook (after-init . global-undo-tree-mode))
  ;; (setq undo-tree-history-directory-alist
  ;;       `(("." . ,(concat lye-emacs-cache-dir "undo"))))
@@ -139,15 +142,18 @@
 
 ;; Displays the key bindings following your currently entered incomplete command
 (use-package which-key
+  :ensure nil
+  :commands which-key-mode
   :hook (after-init . which-key-mode))
 
 ;; restart emacs
 (use-package restart-emacs
+  :ensure nil
   :commands (restart-emacs))
 
 ;; Esup,Start time adjustment<Emacs Start Up Profiler>
 ;; @see https://github.com/jschaf/esup
-(use-package esup)
+(use-package esup :ensure nil :commands esup)
 
 (provide 'init-basic)
 ;;; init-basic.el ends here

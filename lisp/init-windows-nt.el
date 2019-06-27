@@ -52,20 +52,6 @@
                          mingw64-bin ";"
                          (getenv "PATH"))))
 
-;; autohotkey-mode
-(use-package ahk-mode :mode "\\.ahk\\'"  :defer t)
-
-;; powershell-mode
-(use-package powershell
-  :mode ("\\.ps1\\'" . powershell-mode)
-  :defer t
-  :init
-  (setq explicit-shell-file-name
-        "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe")
-  ;; interactive, but no command prompt
-  (setq explicit-powershell.exe-args '("-Command" "-"))
-  )
-
 ;; Runninng Wsl in Emacs
 ;; see @https://github.com/MatthewZMD/.emacs.d#bash-command
 (defun lye/wsl-bash ()
@@ -82,6 +68,9 @@
 ;; Return the button at the beginning of win other than Win+L to Emacs
 ;; see @https://emacs-china.org/t/superkey/9387
 (w32-register-hot-key [s-])
+
+;;Set windows, emacs startup working directory
+(cd "~/")
 
 (provide 'init-windows-nt)
 ;;; init-ahk.el ends here

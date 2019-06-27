@@ -52,3 +52,18 @@
 [submodule "emacs-doom-themes"]
 	path = site-lisp/emacs-doom-themes
 	url = https://github.com/hlissner/emacs-doom-themes.git
+[submodule "exec-path-from-shell"]
+	path = site-lisp/exec-path-from-shell
+	url = https://github.com/purcell/exec-path-from-shell.git
+[submodule "undo-tree"]
+	path = site-lisp/undo-tree
+	url = https://github.com/emacsmirror/undo-tree.git
+[submodule "emacs-which-key"]
+	path = site-lisp/emacs-which-key
+	url = https://github.com/justbur/emacs-which-key.git
+[submodule "restart-emacs"]
+	path = site-lisp/restart-emacs
+	url = https://github.com/iqbalansari/restart-emacs.git
+[submodule "esup"]
+	path = site-lisp/esup
+	url = https://github.com/jschaf/esup.git

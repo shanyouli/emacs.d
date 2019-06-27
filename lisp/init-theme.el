@@ -42,10 +42,7 @@
   (setq lye-light-theme 'doom-solarized-light)
   (setq lye-dark-theme 'doom-one)
 
-  (exchange-bright-and-dark-theme)
-  (add-hook 'emacs-startup-hook
-            (lambda ()
-              (run-with-timer 0 3600 'exchange-bright-and-dark-theme))))
+  (run-with-timer 0 3600 'exchange-bright-and-dark-theme))
 
 (provide 'init-theme)
 ;;; init-theme.el ends here

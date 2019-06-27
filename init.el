@@ -105,26 +105,25 @@
   ;; (benchmark-init/activate)
   )
 
+;; Import self-configuration of different systems
+(let ((system-file (format "%s/init-%s.el"
+                           (expand-file-name "lisp" user-emacs-directory)
+                           (symbol-name system-type))))
+  (if (file-exists-p system-file)
+      (load-file system-file)))
+
 (require 'init-font)                    ; font set
 (require 'init-ui)                      ; frame size set
+(require 'init-theme)                   ; load theme
 (require 'init-scratch)                 ; scratch configure
 (require 'init-funcs)                   ; some useful functions
+(require 'init-basic)
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
 
-  (require 'init-package)               ; Package and functions
-
-  ;; Import self-configuration of different systems
-  (when (file-exists-p (format "%s/init-%s.el"
-                               (expand-file-name "lisp" user-emacs-directory)
-                               (symbol-name system-type)))
-    (load (format "%s/init-%s.el"
-                  (expand-file-name "lisp" user-emacs-directory)
-                  (symbol-name system-type))))
+  (require 'init-package)               ; Package
 
   ;; Preferences
-  (require 'init-theme)
-  (require 'init-basic)
   (require 'init-edit)
   (require 'init-ivy)
   (require 'init-window)
@@ -148,6 +147,7 @@
   (require 'init-lua)
   (require 'init-lsp))
 
+;; get emascs startup time
 (add-hook 'emacs-startup-hook
           (lambda ()
             (message "Emacs ready in %s with %d garbage collections."

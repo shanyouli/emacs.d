@@ -24,6 +24,38 @@
 
 ;;; Code:
 
+;;; yasnippet
+(use-package yasnippet
+  :hook (after-init . yas-global-mode)
+  :config (use-package yasnippet-snippets))
+
+;;; prettify-mode
+(use-package prettify-symbols-mode
+  :ensure nil
+  :init
+  (setq-default prettify-symbols-alist
+                '(
+                  ("<-" . "←")
+                  ("->" . ?→)
+                  ("->>" . ?↠)
+                  ("=>" . ?⇒)
+                  ("map" . ?↦)
+                  ("/=" . ?≠)
+                  ("!=" . ?≠)
+                  ("==" . ?≡)
+                  ("<=" . ?≤)
+                  (">=" . ?≥)
+                  ("=<<" . (?= (Br . Bl) ?≪))
+                  (">>=" . (?≫ (Br . Bl) ?=))
+                  ("<=<" . ?↢)
+                  (">=>" . ?↣)
+                  ("&&" . ?∧)
+                  ("||" . ?∨)
+                  ("not" . ?¬)))
+  (setq prettify-symbols-unprettify-at-point 'right-edge))
+
+;;; Program Languages
+
 ;; json
 (use-package json-mode :mode "\\.json\\'"   :defer t)
 
@@ -59,34 +91,10 @@
 
 ;; PKGBUILD-mode
 (use-package pkgbuild-mode
+  :if (executable-find "pacman")
   :ensure t
   :mode (("/PKGBUILD\\'" . pkgbuild-mode))
   :defer t)
-
-;;; prettify-mode
-(use-package prettify-symbols-mode
-  :ensure nil
-  :init
-  (setq-default prettify-symbols-alist
-                '(
-                  ("<-" . "←")
-                  ("->" . ?→)
-                  ("->>" . ?↠)
-                  ("=>" . ?⇒)
-                  ("map" . ?↦)
-                  ("/=" . ?≠)
-                  ("!=" . ?≠)
-                  ("==" . ?≡)
-                  ("<=" . ?≤)
-                  (">=" . ?≥)
-                  ("=<<" . (?= (Br . Bl) ?≪))
-                  (">>=" . (?≫ (Br . Bl) ?=))
-                  ("<=<" . ?↢)
-                  (">=>" . ?↣)
-                  ("&&" . ?∧)
-                  ("||" . ?∨)
-                  ("not" . ?¬)))
-  (setq prettify-symbols-unprettify-at-point 'right-edge))
 
 ;; plantuml
 (use-package plantuml-mode
@@ -95,12 +103,20 @@
     (setq plantuml-jar-path
           (concat user-emacs-directory "plantuml/plantuml.jar"))))
 
-;;; yasnippet
-(use-package yasnippet
-  :hook (after-init . yas-global-mode)
-  :config (use-package yasnippet-snippets))
+;; Only suitable for Windows Languages-Packages major-mode
+(when (and (boundp system/windows) system/windows)
+  ;; ahk-mode
+  (use-package ahk-mode :mode "\\.ahk\\'"  :defer t)
 
-
+  ;; powershell-mode
+  (use-package powershell
+    :mode ("\\.ps1\\'" . powershell-mode)
+    :defer t
+    :init
+    (setq explicit-shell-file-name
+          "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe")
+    ;; interactive, but no command prompt
+    (setq explicit-powershell.exe-args '("-Command" "-"))))
 
 (provide 'init-lang)
 ;;; init-lang.el ends here
