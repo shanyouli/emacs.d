@@ -26,7 +26,7 @@
   (let ((hour (string-to-number (substring (current-time-string) 11 13)))
         (current-theme (car custom-enabled-themes))
         (now-theme nil))
-    (if (member hour (number-sequence 8 19))
+    (if (member hour (number-sequence 8 18))
         (setq now-theme lye-light-theme)
       (setq now-theme lye-dark-theme))
     (when (and now-theme (not (eq current-theme now-theme)))
@@ -42,7 +42,7 @@
   (setq lye-light-theme 'doom-solarized-light)
   (setq lye-dark-theme 'doom-one)
 
-  (run-with-timer 0 3600 'exchange-bright-and-dark-theme))
+  (run-with-timer 0 1800 'exchange-bright-and-dark-theme))
 
 (provide 'init-theme)
 ;;; init-theme.el ends here
