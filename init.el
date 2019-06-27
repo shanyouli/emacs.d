@@ -68,6 +68,7 @@
 (defun update-load-path (&rest _)
   "Update `load-path'."
   (push (expand-file-name "lisp" user-emacs-directory) load-path)
+
   ;; Constants
   (require 'init-const)
   ; Customization
