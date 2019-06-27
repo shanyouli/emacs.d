@@ -49,3 +49,6 @@
 [submodule "swiper"]
 	path = site-lisp/swiper
 	url = https://github.com/abo-abo/swiper.git
+[submodule "emacs-doom-themes"]
+	path = site-lisp/emacs-doom-themes
+	url = https://github.com/hlissner/emacs-doom-themes.git

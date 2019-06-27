@@ -4,6 +4,7 @@
 
 ;; Required plugin package
 (use-package doom-themes
+  :ensure nil
   :defines (doom-themes-enable-blod doom-themes-enable-italic)
   :config
   (setq doom-themes-enable-bold t      ; enable blod
