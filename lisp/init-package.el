@@ -35,6 +35,13 @@
     (add-hook 'after-init-hook #'package--save-selected-packages)))
 (advice-add 'package--save-selected-packages :override #'my-save-selected-packages)
 
+
+;; Set the location where the elpa folder is stored
+(if (file-exists-p lye-emacs-cache-dir)
+    (setq package-user-dir (expand-file-name
+                            (format "elpa-%s" emacs-major-version)
+                            lye-emacs-cache-dir)))
+
 ;; ELPA: refer to https://melpa.org and https://elpa.emacs-china.org
 (defun set-package-archives (archives)
   "Set specific package ARCHIVES repository."
