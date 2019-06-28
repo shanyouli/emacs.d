@@ -29,6 +29,9 @@
 
 ;;; Speed up startup
 (defvar default-file-name-handler-alist file-name-handler-alist)
+(defvar lye-require-initialize nil
+  "Avoid loading init-const and init-custom multiple times.")
+
 (setq file-name-handler-alist nil)
 (setq gc-cons-threshold most-positive-fixnum)
 (setq gc-cons-percentage 0.6)
@@ -69,10 +72,12 @@
   "Update `load-path'."
   (push (expand-file-name "lisp" user-emacs-directory) load-path)
 
-  ;; Constants
-  (require 'init-const)
-  ; Customization
-  (require 'init-custom))
+  (unless lye-require-initialize
+    ;; Constants
+    (require 'init-const)
+    ;; Customization
+    (require 'init-custom)
+    (setq lye-require-initialize t)))
 
 ;; Add the package in the extensions folder to `load-path'
 (defun add-extensions-to-load-path (&rest _)
@@ -99,11 +104,9 @@
 ;; Test and optimize startup
 (when lye-enable-benchmark
   (use-package benchmark-init
-    :hook (after-init . bechmark-init-/deactivate))
-  ;; (require 'benchmark-init-modes)
-  ;; (require 'benchmark-init)
-  ;; (benchmark-init/activate)
-  )
+    :commands bechmark-init/deactivate
+    :ensure nil
+    :hook (after-init . bechmark-init/deactivate)))
 
 ;; Import self-configuration of different systems
 (let ((system-file (format "%s/init-%s.el"
@@ -128,24 +131,27 @@
   (require 'init-ivy)
   (require 'init-window)
   (require 'init-company)
-  (require 'init-lang)
-  (require 'init-elisp)
 
+  ;; Tools
+  (require 'init-magit)                 ; Git
+  (require 'init-dired)                 ; Dired
+  (require 'init-elfeed)                ; RSS Reader
   ;; (require 'init-eshell)
-  (require 'init-magit)
-  (require 'init-dired)
+
   (require 'init-chinese)
 
+  ;; Program language common tool
+  (require 'init-lang)
   (require 'init-flycheck)
-  (require 'init-pyim)
-
-  (require 'init-elfeed) ; RSS Reader
-  (require 'init-hugo)
-  (require 'init-org)
+  (require 'init-elisp)
   (require 'init-scheme)
-  (require 'init-python)
   (require 'init-lua)
-  (require 'init-lsp))
+  (require 'init-lsp)
+  (require 'init-python)
+
+  ;; Org mode
+  (require 'init-hugo)
+  (require 'init-org))
 
 ;; get emascs startup time
 (add-hook 'emacs-startup-hook

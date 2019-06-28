@@ -7,11 +7,11 @@
   :demand t
   :ensure nil
   :defines (doom-themes-enable-blod doom-themes-enable-italic)
-  :config
+  :init
   (setq doom-themes-enable-bold t      ; enable blod
         doom-themes-enable-italic t)   ; enable italic
-  (doom-themes-org-config) ; org-mode
-  )
+  ;; org-mode config
+  (doom-themes-org-config))
 
 ;; variable
 (defvar lye-light-theme nil
