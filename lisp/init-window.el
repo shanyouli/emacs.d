@@ -23,61 +23,53 @@
 ;;
 
 ;;; Code:
-(add-hook 'after-init-hook #'(lambda () (winner-mode 1)))
-(global-set-key (kbd "C-x 4 u") 'winner-undo)
-(global-set-key (kbd "C-x 4 r") 'winner-redo)
 
-(defvar lye-ration-dict
-  '((1 . 1.618033988875)
-    (2 . 2)
-    (3 . 3)
-    (4 . 4)
-    (5 . 0.618803398875))
-  "The ratio dictionary.")
+;; Restore old window configurations
+(use-package winner
+  :ensure nil
+  :commands (winner-undo winner-redo)
+  :hook (after-init . winner-mode)
+  :bind (("C-x 4 u" . winner-undo)
+         ("C-x 4 r" . winner-redo)))
 
-(defun lye/split-window-horizontally (&optional ratio)
-  "Split window horizontally and resize the new window.
-'C-u number M-x lye/split-window-horizontally' uses pre-defined ration from
-`lye-ration-dict'. Always focus on bigger window."
-  (interactive "P")
-  (let* (ratio-val)
-    (cond
-     (ratio
-      (setq ration-val (cdr (assoc ratio lye-ration-dict)))
-      (split-window-horizontally (floor (/ (window-body-width)
-                                           (1+ ratio-val)))))
-     (t
-      (split-window-horizontally)))
-    (set-window-buffer (next-window) (current-buffer))
-    (if (or (not ratio-val)
-            (>= ration-val 1))
-        (windmove-right))))
-
-(defun lye/split-window-vertically (&optional ratio)
-  "Split window vertically and resize the new window.
-'C-u number M-x lye/split-window-vertically' uses pre-defined ratio from
-`lye/ratio-dict'. Always focus on bigger window."
-  (interactive "P")
-  (let* (ratio-val)
-    (cond
-     (ratio
-      (setq ratio-val (cdr (assoc ratio lye-ration-dict)))
-      (split-window-vertically (floor (/ (window-body-height)))))
-     (t
-      (split-window-vertically)))
-    ;; open another window with current-buffer
-    (setq-window-buffer (next-window) (current-buffer))
-    ;; move focus if new window bigger than current one
-    (if (or (not ratio-val)
-            (>= ratio-val 1))
-        (windmove-down))))
-
-(global-set-key (kbd "C-x 2") 'lye/split-window-vertically)
-(global-set-key (kbd "C-x 3") 'lye/split-window-horizontally)
-
+;; Quickly switch windows
 (use-package ace-window
   :bind ([remap other-window] . ace-window)
-  :hook (after-init . ace-window-display-mode))
+  :hook (after-init . ace-window-display-mode)
+  :custom-face
+  (aw-leading-char-face
+   ((t (:inherit font-lock-keyword-face :bold t :height 3.0))))
+  (aw-mode-line-face ((t :inherit mode-line-emphasis :bold t))))
+
+
+;; Enforce rules for popups
+(use-package shackle
+  :commands shackle-display-mode
+  :hook (after-init . shackle-mode)
+  :config
+  (setq shackle-default-size 0.4
+        shackle-default-alignment 'below
+        shackle-default-rule nil
+        shackle-rules
+        '(("*Help*" :select t :size 0.382 :align 'below :autoclose t)
+          ("*completions*" :select t :size 0.382 :align 'below :autoclose t)
+          ("*Backtrace*" :select t :size 0.382 :align 'below)
+          ("*Warnings*" :select t :size 0.382 :align 'below)
+          ("*Messages*" :size 0.382 :align 'below :autoclose t)
+          ("^\\*.*Shell Command.*\\*$" :regexp t :size 0.382 :align 'below :autoclose t)
+          ("\\*[Wo]*Man.*\\*" :regexp t :select t :align 'below :autoclose t)
+          ("*Calendar*" :select t :size 0.382 :align 'below)
+          ("\\*ivy-occur .*\\*" :regexp t :size 0.4 :select t :align 'below)
+          (" *undo-tree*" :select t)
+          ("*Paradox Report*" :size 0.382 :align 'below :autoclose t)
+          ("*Youdao Dictionary*" :size 0.382 :align 'below :autoclose t)
+          (Buffer-menu-mode :select t :size 20 :align 'below :autoclose t)
+          (comint-mode :align 'below)
+          (helpful-mode :select t :size 0.382 :align 'below :autoclose t)
+          (process-menu-mode :select t :size 0.382 :align 'below :autoclose t)
+          (list-environment-mode :select t :size 0.382 :align 'below :autoclose t)
+          (profiler-report-mode :select t :size 0.5 :align 'below))))
+
 
 (provide 'init-window)
 ;;; init-windows.el ends here
