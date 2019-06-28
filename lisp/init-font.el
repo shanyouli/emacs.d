@@ -17,7 +17,7 @@ Corresponding English font size is 9pt, 10.5pt, 12pt, 15pt, 16pt, 18pt, 22pt,
 使用中文字号分别对应为: 小五, 五号, 小四, 四号, 小三, 三号, 小二, 二号, 小一,
 一号, (30pt), 小初, (初号)")
 
-;;; some functions
+;;;  Functions
 (defun font-exist-p (fontname)
   "Test this font is exist or not."
   (if (or (not fontname) (string= fontname ""))
@@ -90,7 +90,7 @@ Corresponding English font size is 9pt, 10.5pt, 12pt, 15pt, 16pt, 18pt, 22pt,
     (setq emacs-font-size-pair-list
           '((12 . 12) (14 . 14) (16 . 16) (19 . 20)
             (21 . 22) (22 . 22) (24 . 24) (29 . 30)
-            (32 . 34) (35 . 37) (48 . 50) (56 . 56)
+            (32 . 34) (35 . 36) (48 . 50) (56 . 56)
             )))
    (t
     ;; Applicable fonts have Fira Code, Hack, Source Code Pro

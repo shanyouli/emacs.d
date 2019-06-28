@@ -169,6 +169,5 @@
   (setq-default pyim-english-input-switch-functions
                 '(pyim-probe-isearch-mode)))
 
-
 (provide 'init-chinese)
 ;;; init-chinese.el ends here
