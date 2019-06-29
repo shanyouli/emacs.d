@@ -82,8 +82,8 @@ decrease this. If you experience stuttering, increase this.")
 ;; Let 'er rip!
 (require 'init-load-path (concat user-emacs-directory "lisp/init-load-path"))
 (require 'init-variable (concat user-emacs-directory "lisp/init-variable"))
-
-(require 'use-package)
+(require 'init-use-package
+         (concat user-emacs-directory "lisp/init-use-package"))
 
 ;; Test and optimize startup
 (when lye-enable-benchmark
