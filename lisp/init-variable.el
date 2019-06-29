@@ -1,4 +1,4 @@
-;;; init-custom.el --- Define customizations.        -*- lexical-binding: t; -*-
+;;; init-variable.el --- Define customizations.        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  shanyouli
 
@@ -49,9 +49,32 @@
   "Enable the init benchmark or not."
   :type 'boolean)
 
+;;; Constants
+(defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
+  "The Github page of My Emacs Configurations.")
+
+(defconst system/windows (eq system-type 'windows-nt)
+  "Are we running on a Windows System?")
+
+(defconst system/mac (eq system-type 'darwin)
+  "Are we running on a Mac System?")
+
+(defconst system/linux (eq system-type 'gnu/linux)
+  "Are we running on a GNU/Linux System?")
+
+(defconst *root* (string-equal "root" (getenv "USER"))
+  "Are you using ROOT user?")
+
+(defconst lye-emacs-cache-dir (concat user-emacs-directory "cache/")
+  "Is the cache directory this?")
+
 ;;; Load `custom-file'
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (when (file-exists-p custom-file) (load custom-file))
 
-(provide 'init-custom)
-;;; init-custom.el ends here
+;; Set the temporal directory
+(unless (file-exists-p lye-emacs-cache-dir)
+  (make-directory lye-emacs-cache-dir))
+
+(provide 'init-variable)
+;;; init-variable.el ends here

@@ -81,10 +81,9 @@ decrease this. If you experience stuttering, increase this.")
 
 ;; Let 'er rip!
 (require 'init-load-path (concat user-emacs-directory "lisp/init-load-path"))
+(require 'init-variable (concat user-emacs-directory "lisp/init-variable"))
 
 (require 'use-package)
-(require 'init-const)
-(require 'init-custom)
 
 ;; Test and optimize startup
 (when lye-enable-benchmark
@@ -111,21 +110,17 @@ decrease this. If you experience stuttering, increase this.")
 (with-temp-message ""                   ; Erase the output of the plugin startup
 
   (require 'init-package)               ; Package
-
   ;; Preferences
   (require 'init-edit)
   (require 'init-ivy)
   (require 'init-window)
   (require 'init-company)
-
   ;; Tools
   (require 'init-magit)                 ; Git
   (require 'init-dired)                 ; Dired
   (require 'init-elfeed)                ; RSS Reader
   ;; (require 'init-eshell)
-
   (require 'init-chinese)
-
   ;; Program language common tool
   (require 'init-lang)
   (require 'init-flycheck)
@@ -134,7 +129,6 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-lua)
   (require 'init-lsp)
   (require 'init-python)
-
   ;; Org mode
   (require 'init-hugo)
   (require 'init-org))

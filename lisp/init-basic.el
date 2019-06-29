@@ -27,9 +27,7 @@
 ;; Set name and mail-address
 (setq user-full-name lye-full-name)
 (setq user-mail-address lye-mail-address)
-;; Set the temporal directory
-(unless (file-exists-p lye-emacs-cache-dir)
-  (make-directory lye-emacs-cache-dir))
+
 ;; Use real line movement instead of visual line movement
 (setq track-eol t) ; keep cursor at end of lines
 (setq line-move-visual nil)

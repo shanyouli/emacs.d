@@ -25,28 +25,7 @@
 ;;; Code:
 
 ;;; Constants
-(defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
-  "The Github page of My Emacs Configurations.")
 
-(defconst system/windows (eq system-type 'windows-nt)
-  "Are we running on a Windows System?")
-
-(defconst system/mac (eq system-type 'darwin)
-  "Are we running on a Mac System?")
-
-(defconst system/linux (eq system-type 'gnu/linux)
-  "Are we running on a GNU/Linux System?")
-
-(defconst *root* (string-equal "root" (getenv "USER"))
-  "Are you using ROOT user?")
-
-(defconst lye-emacs-cache-dir (concat user-emacs-directory "cache/")
-  "Is the cache directory this?")
-
-;; (expand-file-name "site-lisp/" user-emacs-directory)
-;; (defconst lye-emacs-site-lisp-dir
-  ;; (file-truename (concat user-emacs-directory "site-lisp"))
-  ;; "Use the git-submodule managed plugin to store the location.")
 
 (provide 'init-const)
 ;;; init-const.el ends here
