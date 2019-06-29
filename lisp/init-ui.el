@@ -24,8 +24,46 @@
 
 ;;; Code:
 
-;; Logo
-;; (setq facy-splash-image logo)
+;;; Variable
+(defvar lye-frame-default-height (/ (* 618 (x-display-pixel-height))
+                                    (* 1000 (frame-char-height)))
+  "The ratio of the default height to the screen height is 0.618.")
+(defvar lye-frame-default-width (- (/ (x-display-pixel-width)
+                                      (* 2 (frame-char-width))) 2)
+  "The default width is half of the screen, and the error is between 2px.")
+
+
+;;; funtcion
+
+(defun lye/restore-frame-size (&optional frame)
+  "Frame default size configuration."
+  (interactive)
+  (when frame (select-frame frame))
+  (if ( and (boundp system/windows) system/windows)
+      (progn
+        (set-frame-width (selected-frame) lye-frame-default-width)
+        (set-frame-height (selected-frame) lye-frame-default-height))
+    (set-frame-size (selected-frame)
+                    lye-frame-default-width lye-frame-default-heigh)))
+
+(defun lye/init-default-frame-size ()
+  "The frame default size setting at startup."
+  ;; Set the initial window size
+  ;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
+  (when (display-graphic-p)
+    ;; top, left ...
+    (add-to-list 'default-frame-alist
+                 (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
+    (add-to-list 'default-frame-alist
+                 (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
+    (add-to-list 'default-frame-alist
+                 (cons 'height lye-frame-default-height))
+    (add-to-list 'default-frame-alist
+                 (cons 'width lye-frame-default-width))))
+
+;;; Configuration
+
+;; (setq facy-splash-image logo) ; Logo
 
 ;; Title
 (when (display-graphic-p)
@@ -44,61 +82,21 @@
   ;; I generally prefer to hide the menu bar, but doing this on OS X
   ;; simply makes it update unreliably in GUI frames, so we make an
   ;; exception.
-  (if system/mac
+  (if (and (boundp system/mac) system/mac)
       (add-hook 'after-make-frame-functions
                 (lambda (frame)
-                (set-frame-parameter frame 'menu-bar-lines
-                                     (if (display-graphic-p frame) 1 0))))
+                  (set-frame-parameter frame 'menu-bar-lines
+                                       (if (display-graphic-p frame) 1 0))))
     (when (fboundp 'menu-bar-mode) (menu-bar-mode -1))))
 
-(defun lye/frame-heigh ()
-  (/ (* 618 (x-display-pixel-height))
-     (* 1000 (frame-char-height))))
-(defun lye/frame-width ()
-  (- (/ (x-display-pixel-width)
-        (* 2 (frame-char-width)))
-     2))
+(lye/init-default-frame-size)  ;; Frame Size after startup
 
-
-;;; Frame Size
-
-;; Set the initial window size
-;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
-(when (display-graphic-p)
-  ;; top, left ...
-  (add-to-list 'default-frame-alist
-               (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
-
-  (add-to-list 'default-frame-alist
-               (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
-  (add-to-list 'default-frame-alist
-               (cons 'height (/ (* 618 (x-display-pixel-height))
-                                (* 1000 (frame-char-height)))))
-  (add-to-list 'default-frame-alist
-               (cons 'width (- (/ (x-display-pixel-width)
-                                  (* 2 (frame-char-width)))
-                               2))))
-
-(defun lye/reset-frame-size (&optional frame)
-  "set the frame-size."
-  (interactive)
-  (when frame (select-frame frame))
-  (if system/windows
-      (progn
-        (set-frame-width (selected-frame) (lye/frame-width))
-        (set-frame-height (selected-frame) (lye/frame-heigh)))
-    (set-frame-size (selected-frame) (lye/frame-width) (lye/frame-heigh))))
 ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-(add-hook 'after-make-frame-functions #'lye/reset-frame-size)
+(add-hook 'after-make-frame-functions #'lye/restore-frame-size)
 
 ;;; Misc
-
 (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
 (setq inhibit-startup-screen t) ; 不展示开始界面
-
-
-
-
 ;; Suppress GUI features
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)

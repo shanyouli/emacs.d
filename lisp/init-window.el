@@ -59,6 +59,7 @@
           ("*Messages*" :size 0.382 :align 'below :autoclose t)
           ("^\\*.*Shell Command.*\\*$" :regexp t :size 0.382 :align 'below :autoclose t)
           ("\\*[Wo]*Man.*\\*" :regexp t :select t :align 'below :autoclose t)
+          ("*color-rg*" :size 0.382 :align 'below :autoclose t)
           ("*Calendar*" :select t :size 0.382 :align 'below)
           ("\\*ivy-occur .*\\*" :regexp t :size 0.4 :select t :align 'below)
           (" *undo-tree*" :select t)
@@ -70,7 +71,6 @@
           (process-menu-mode :select t :size 0.382 :align 'below :autoclose t)
           (list-environment-mode :select t :size 0.382 :align 'below :autoclose t)
           (profiler-report-mode :select t :size 0.5 :align 'below))))
-
 
 (provide 'init-window)
 ;;; init-windows.el ends here

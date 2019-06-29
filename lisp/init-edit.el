@@ -84,9 +84,8 @@
   :hook (after-init . global-hungry-delete-mode))
 
 ;; Show native line numbers if possible, otherwise use linum
-(if (and (display-graphic-p) (< (lye/frame-width) 86))
+(if (and (display-graphic-p) (< lye-frame-default-width 86))
     (global-display-line-numbers-mode -1)
-
   (if (fboundp 'display-line-numbers-mode)
       (use-package display-line-numbers
         :ensure nil

@@ -83,7 +83,6 @@ decrease this. If you experience stuttering, increase this.")
 (require 'init-load-path (concat user-emacs-directory "lisp/init-load-path"))
 
 (require 'use-package)
-
 (require 'init-const)
 (require 'init-custom)
 
