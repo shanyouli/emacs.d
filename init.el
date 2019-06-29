@@ -1,74 +1,87 @@
-;;; init.el --- Lye Emacs configurations.            -*- lexical-binding: t; -*-
+;;; init.el --- Initialize startup  -*- lexical-binding: t -*-
 
-;; Copyright (C) 2018  lye
+;; Author: shanyouli
+;; Maintainer: shanyouli
+;; Version: v0.1
+;; Package-Requires: ()
+;; Homepage: https://github.com/shanyouli/emacs.d
+;; Keywords: init
 
-;; Author: lye <shanyouli6@gemail.com>
-;; Keywords: .emacs.d lye
 
-;; This program is free software; you can redistribute it and/or modify
+;; This file is not part of GNU Emacs
+
+;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
 
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; For a full copy of the GNU General Public License
+;; see <http://www.gnu.org/licenses/>.
+
 
 ;;; Commentary:
 
-;; Lye Emacs Configurations
+;; Initialize startup
 
 ;;; Code:
 
-(when (version< emacs-version "25.1")
-  (error "This requires Emacs 25.1 and above!"))
+(defvar lye-gc-cons-threshold 16777216 ; 16mb
+  "The default value to use for `gc-cons-threshold'. If you experience freezing,
+decrease this. If you experience stuttering, increase this.")
+(defvar lye-gc-cons-upper-linit 536870921 ; 512mb
+  "The temporary value for `gc-cons-threshold' to defer it.")
 
-;;; Speed up startup
-(defvar default-file-name-handler-alist file-name-handler-alist)
-(defvar lye-require-initialize nil
-  "Avoid loading init-const and init-custom multiple times.")
+(defvar lye--file-name-handler-alist file-name-handler-alist)
 
-(setq file-name-handler-alist nil)
-(setq gc-cons-threshold most-positive-fixnum)
-(setq gc-cons-percentage 0.6)
-(add-hook 'emacs-startup-hook
-          (lambda ()
-            "Restore default values after startup."
-            (setq file-name-handler-alist default-file-name-handler-alist)
-            (setq gc-cons-percentage 0.1)
-            (setq gc-cons-threshold (* 2 1000 1000))
+(defun lye/restore-startup-optimizations ()
+  "Resets garbage collection settings to reasonable defaults (a large
+`gc-cons-threshold' can cause random freezes otherwise) and resets
+`file-name-handler-alist'."
+  (setq file-name-handler-alist lye--file-name-handler-alist)
+  ;; Do this on idle timer to defer a possible GC pause that could result; also
+  ;; allows deferred packages to take advantage of these optimizations.
+  (run-with-idle-timer
+   3 nil
+   (lambda ()
+     (setq-default gc-cons-threshold lye-gc-cons-threshold)
+     ;; To speed up minibuffer commands (like helm and ivy), we defer garbage
+     ;; collection while the minibuffer is active.
+     (defun lye/defer-garbage-collection ()
+       (setq gc-cons-threshold lye-gc-cons-upper-linit))
+     (defun lye/restore-garbage-collection ()
+       ;; Defer it so that commands launched from the minibuffer can enjoy the
+       ;; benefits.
+       (run-at-time 1 nil (lambda () (setq gc-cons-threshold lye-gc-cons-threshold))))
+     (add-hook 'minibuffer-setup-hook #'lye/defer-garbage-collection)
+     (add-hook 'minibuffer-exit-hook #'lye/restore-garbage-collection)
+     ;; GC all sneaky breaky like
+     (add-hook 'focus-out-hook #'garbage-collect))))
 
-            ;;GC automatically while unfocusing the frame
-            ;; `focus-out-hook' is obsolete since 27.1
-            (if (boundp 'after-focus-change-function)
-                (add-function :after after-focus-change-function
-                              (lambda ()
-                                (unless (frame-focus-state)
-                                  (garbage-collect))))
-              (add-hook 'focus-out-hook 'garbage-collect))
+(if (ignore-errors (or after-init-time noninteractive))
+    (setq gc-cons-threshold lye-gc-cons-threshold)
+  ;; A big contributor to startup times is garbage collection. We up the gc
+  ;; threshold to temporarily prevent it from running, then reset it later in
+  ;; `lye/restore-startup-optimizations'
+  (setq gc-cons-threshold lye-gc-cons-upper-linit)
+  ;; This is consulted on every `require', `load' andvarious path/io functions.
+  ;; you get a minor speed up by nooping this.
+  (setq file-name-handler-alist nil)
+  ;; Not restoring these to their defaults will cause stuttering/freezes.
+  (add-hook 'after-init-hook #'lye/restore-startup-optimizations))
+
+;; In noninteractive sessions,prioritize non-byte-compiled source files to
+;; prevent stable, byte-compiled code from running. However, if you're getting
+;; recursive load errors, it may help to set this to nil.
+(setq load-prefer-newer noninteractive)
 
 
-            ;; Avoid GCs while using `ivy' `counsel'/ `swiper' and `helm', etc.
-            ;; @see http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
-            (defun my-minibuffer-setup-hook ()
-              (setq gc-cons-threshold most-positive-fixnum)
-              (setq gc-cons-percentage 0.6))
-
-            (defun my-minibuffer-exit-hook ()
-              (garbage-collect)
-              (setq gc-cons-percentage 0.1)
-              (setq gc-cons-threshold (* 2 1024 1024)))
-
-            (add-hook 'minibuffer-setup-hook #'my-minibuffer-setup-hook)
-            (add-hook 'minibuffer-exit-hook #'my-minibuffer-exit-hook)))
-
-;; Load path
-;; Optimize: Force `lisp' at the head to reduce the startup time.
-(load-file "~/.emacs.d/lisp/init-load-path.el")
+;; Let 'er rip!
+(require 'init-load-path (concat user-emacs-directory "lisp/init-load-path"))
 
 (require 'use-package)
 
@@ -137,6 +150,6 @@
                               (time-subtract after-init-time before-init-time)))
                      gcs-done)))
 
-
 (provide 'init)
+
 ;;; init.el ends here
