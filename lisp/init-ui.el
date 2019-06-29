@@ -92,17 +92,12 @@
 (add-hook 'after-make-frame-functions #'lye/reset-frame-size)
 
 ;;; Misc
-(setq ad-redefinition-action 'accept)  ;不要烦人的 redefine warning
+
 (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
-(fset 'yes-or-no-p 'y-or-n-p) ; 以 y/n 取代 yes/no
 (setq inhibit-startup-screen t) ; 不展示开始界面
-;;(setq visible-bell t)
-(setq ring-bell-function 'ignore) ; Turn off the error ringtone
-(setq mouse-yank-at-point t) ; Paste at the cursor position instead of the mouse pointer
-(setq x-select-enable-clipboard t) ; 支持 emacs 和外部程序的粘贴
-(setq track-eol t) ; keep cursor at end of lines, Require line-move-visual is nil
-(setq line-move-visual nil)
-(setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
+
+
+
 
 ;; Suppress GUI features
 (setq use-file-dialog nil)

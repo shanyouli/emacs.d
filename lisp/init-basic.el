@@ -27,14 +27,46 @@
 ;; Set name and mail-address
 (setq user-full-name lye-full-name)
 (setq user-mail-address lye-mail-address)
-
 ;; Set the temporal directory
 (unless (file-exists-p lye-emacs-cache-dir)
   (make-directory lye-emacs-cache-dir))
-
 ;; Use real line movement instead of visual line movement
+(setq track-eol t) ; keep cursor at end of lines
 (setq line-move-visual nil)
+;; @see https://emacs-china.org/t/spacemacs/9000
+(setq auto-save-list-file-prefix nil ;not.# and #.# file
+      auto-save-default nil ; not auto-save file
+      make-backup-files nil ; not ~ file
+      create-lockfiles nil) ; not .#*** file
+;; Store all temporal files in a temporal directory instead of being
+;; disseminated in the $HOME directory
+(setq-default
+  ;; Tramp history
+ tramp-persistency-file-name (concat lye-emacs-cache-dir "tramp")
+ ;; Bookmark-default-file
+ bookmark-default-file (concat lye-emacs-cache-dir "bookmarks")
+ ;; SemanticDB files
+ semanticdb-default-save-directory (concat lye-emacs-cache-dir "semanticdb")
+ ;; url files
+ url-configuration-directory (concat lye-emacs-cache-dir "url")
+ ;; eshell files
+ eshell-directory-name (concat lye-emacs-cache-dir "eshell")
+;; Game score
+ gamegrid-user-score-file-directory (concat lye-emacs-cache-dir "games"))
+; Don't compact font caches during GC.
+(setq inhibit-compacting-font-caches t)
+;; y/n replace yes/no
+(fset 'yes-or-no-p 'y-or-n-p)
+;;不要烦人的 redefine warning
+(setq ad-redefinition-action 'accept)
+;; Turn off the error ringtone
+(setq ring-bell-function 'ignore)
+;; Paste at the cursor position instead of the mouse pointer
+(setq mouse-yank-at-point t)
+;; 支持 emacs 和外部程序的粘贴
+(setq x-select-enable-clipboard t)
 
+;;; some package initalize
 ;; exec-path config
 (when (memq window-system '(mac ns x))
   (use-package exec-path-from-shell
@@ -63,31 +95,14 @@
               auto-save-idle 2)
   :hook (after-init . auto-save-enable))
 
-;; Store all temporal files in a temporal directory instead of being
-;; disseminated in the $HOME directory
-(setq-default
- ;; Tramp history
- tramp-persistency-file-name (concat lye-emacs-cache-dir "tramp")
- ;; Bookmark-default-file
- bookmark-default-file (concat lye-emacs-cache-dir "bookmarks")
- ;; SemanticDB files
- semanticdb-default-save-directory (concat lye-emacs-cache-dir "semanticdb")
- ;; url files
- url-configuration-directory (concat lye-emacs-cache-dir "url")
- ;; eshell files
- eshell-directory-name (concat lye-emacs-cache-dir "eshell")
-;; Game score
- gamegrid-user-score-file-directory (concat lye-emacs-cache-dir "games")
- )
-
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
-(unless (eq system-type 'cygwin)
-  (use-package server
-    :ensure nil
-    :commands (server-running-p)
-    :hook (after-init . (lambda () (unless (server-running-p) (server-start))))
-    :init (setq server-auth-dir (concat lye-emacs-cache-dir "server"))))
+(use-package server
+  :if (not (eq system-type 'cygwin))
+  :ensure nil
+  :commands (server-running-p)
+  :hook (after-init . (lambda () (unless (server-running-p) (server-start))))
+  :init (setq server-auth-dir (concat lye-emacs-cache-dir "server")))
 
 ;; Save cursor position for everyfile you opened. So,  next time you open
 ;; the file, the cursor will be at the position you last opened it.
@@ -117,8 +132,6 @@
 (use-package recentf
   :ensure nil
   :hook (after-init . recentf-mode)
-  ;; (find-file . (lambda () (unless recentf-mode (recentf-mode)
-  ;;                                 (recentf-track-opened-file))))
   :init
   (setq recentf-max-saved-items 200
         recentf-save-file (concat lye-emacs-cache-dir "recentf"))
@@ -133,13 +146,6 @@
                           "COMMIT_EDITMSG\\'"
                           "COMMIT_MSG")))
 
-(setq auto-save-list-file-prefix nil ;not.# and #.# file
-      auto-save-default nil
-      make-backup-files nil) ; not ~ file
-
-;; @see https://emacs-china.org/t/spacemacs/9000
-(setq create-lockfiles nil) ; not .#*** file
-
 ;; Displays the key bindings following your currently entered incomplete command
 (use-package which-key
   :ensure nil
@@ -152,8 +158,8 @@
   :commands (restart-emacs))
 
 ;; Esup,Start time adjustment<Emacs Start Up Profiler>
-;; @see https://github.com/jschaf/esup
 (use-package esup :ensure nil :commands esup)
+
 
 (provide 'init-basic)
 ;;; init-basic.el ends here

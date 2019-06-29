@@ -79,7 +79,6 @@ decrease this. If you experience stuttering, increase this.")
 ;; recursive load errors, it may help to set this to nil.
 (setq load-prefer-newer noninteractive)
 
-
 ;; Let 'er rip!
 (require 'init-load-path (concat user-emacs-directory "lisp/init-load-path"))
 
@@ -100,7 +99,7 @@ decrease this. If you experience stuttering, increase this.")
                            (expand-file-name "lisp" user-emacs-directory)
                            (symbol-name system-type))))
   (if (file-exists-p system-file)
-      (load-file system-file)))
+      (load system-file)))
 
 (require 'init-font)                    ; font set
 (require 'init-ui)                      ; frame size set
