@@ -51,7 +51,6 @@
                                      (if (display-graphic-p frame) 1 0))))
     (when (fboundp 'menu-bar-mode) (menu-bar-mode -1))))
 
-;; (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 (defun lye/frame-heigh ()
   (/ (* 618 (x-display-pixel-height))
      (* 1000 (frame-char-height))))
@@ -79,9 +78,6 @@
                (cons 'width (- (/ (x-display-pixel-width)
                                   (* 2 (frame-char-width)))
                                2))))
-;; (setq initial-frame-alist
-      ;; `((width . ,(lye/frame-width))
-        ;; (height . ,(lye/frame-heigh))))
 
 (defun lye/reset-frame-size (&optional frame)
   "set the frame-size."
@@ -108,41 +104,11 @@
 (setq line-move-visual nil)
 (setq inhibit-compacting-font-caches t) ; Don't compact font caches during GC.
 
-;;; Line number
-;; Line and column
-(setq column-number-mode t)
-(setq line-number-mode t)
-
-;; dispaly time
-(unless (display-graphic-p)
-  (setq display-time-24hr-format t)
-  (setq display-time-day-and-date nil)
-  (display-time-mode))
-
 ;; Suppress GUI features
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)
 (setq initial-buffer-choice nil)
 
-;;; modeline configuration
-(defvar default-modeline-format mode-line-format)
-;; prevent flash of unstyled modeline at startup
-(unless after-init-time
-  (setq mode-line-format nil))
-
-(use-package doom-modeline
-  :hook (after-init . doom-modeline-mode)
-  :ensure nil
-  :init
-  (unless (display-graphic-p)
-    (setq doom-modeline-icon nil))
-
-  (setq doom-modeline-major-mode-color-icon t
-          doom-modeline-minor-modes nil
-          doom-modeline-mu4e nil
-          doom-modeline-github t
-          doom-modeline-github-interval 300)
-  (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
 
 (provide 'init-ui)
 ;;; init-ui.el ends here

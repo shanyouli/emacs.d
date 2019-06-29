@@ -68,38 +68,12 @@
 
 ;; Load path
 ;; Optimize: Force `lisp' at the head to reduce the startup time.
-(defun update-load-path (&rest _)
-  "Update `load-path'."
-  (push (expand-file-name "lisp" user-emacs-directory) load-path)
-
-  (unless lye-require-initialize
-    ;; Constants
-    (require 'init-const)
-    ;; Customization
-    (require 'init-custom)
-    (setq lye-require-initialize t)))
-
-;; Add the package in the extensions folder to `load-path'
-(defun add-extensions-to-load-path (&rest _)
-  (eval-when-compile (require 'cl))
-  (if (fboundp 'normal-top-level-add-to-load-path)
-      (let* ((my-lisp-dir lye-emacs-site-lisp-dir)
-             (default-directory my-lisp-dir))
-        (progn
-          (setq load-path
-                (append
-                 (loop for dir in (directory-files my-lisp-dir)
-                       unless (string-match "^\\." dir)
-                       collecting (expand-file-name dir))
-                 load-path))))))
-
-(advice-add #'package-initialize :after #'update-load-path)
-(advice-add #'package-initialize :after #'add-extensions-to-load-path)
-
-(update-load-path)
-(add-extensions-to-load-path)
+(load-file "~/.emacs.d/lisp/init-load-path.el")
 
 (require 'use-package)
+
+(require 'init-const)
+(require 'init-custom)
 
 ;; Test and optimize startup
 (when lye-enable-benchmark
@@ -117,6 +91,7 @@
 
 (require 'init-font)                    ; font set
 (require 'init-ui)                      ; frame size set
+(require 'init-modeline)                ; modeline
 (require 'init-theme)                   ; load theme
 (require 'init-scratch)                 ; scratch configure
 (require 'init-funcs)                   ; some useful functions
@@ -161,6 +136,7 @@
                              (float-time
                               (time-subtract after-init-time before-init-time)))
                      gcs-done)))
+
 
 (provide 'init)
 ;;; init.el ends here

@@ -1,78 +1,74 @@
-;;@see https://emacs-china.org/t/mode-line/374
-;;@see https://emacs-china.org/t/mode-line-window/6852
-(defun lye/simplify-major-mode-name ()
-  "Return simplifyed major mode name"
-  (let* ((major-name (format-mode-line "%m"))
-         (replace-table '(Emacs-Lisp "Elisp"
-                                     Python "PY"
-                                     Shell ">"
-                                     Markdown "MD"
-                                     Org "ORG"
-                                     Text "TEXT"
-                                     Fundamental "FDM"))
-         (replace-name (plist-get replace-table (intern major-name))))
-    (if replace-name replace-name major-name
-        )))
+;;; init-modeline.el --- modeline Initialize -*- lexical-binding: t -*-
 
-(setq-default mode-line-format
-              (list
-               ""
-               '(:eval (propertize "%b " 'face 'font-lock-keyword-face
-                                   'help-echo (buffer-file-name)))
-               "(" ;;%02 to set to 2 chars at  least; prevents flickering
-               ;;"%02l" "," "02c"
-               (propertize "%02l" 'face  'font-lock-type-face) ","
-               (propertize "%02c" 'face 'font-lock-type-face)
-               ") "
-               ;; relative position, size of file
-               "["
-               (propertize "%p" 'face 'font-lock-constant-face) ;;% above top
-               "/"
-               (propertize "%I" 'face 'font-lock-constant-face) ;; size
-               "] "
-               ;; the current major mode for the buffer.
-               "["
-               '(:eval (propertize (lye/simplify-major-mode-name) 'face 'font-lock-string-face
-                                   'help-echo buffer-file-coding-system))
-               ":"
-               '(:eval (format "%s" buffer-file-coding-system))
-               "] "
-
-               "["
-               ;; insert vs overwrite mode, input-method in a tooltip
-               '(:eval (propertize (if overwrite-mode "Ovr" "Ins")
-                                   'face nil
-                                   'help-echo (concat "Buffer is in "
-                                                      (if overwrite-mode "overwrite" "insert") " mode")))
+;; Author: shanyouli
+;; Maintainer: shanyouli
+;; Version: v0.1
+;; Package-Requires: (doom-modeline)
+;; Homepage: homepage
+;; Keywords: modeline, UI
 
 
-               ;; was this buffer modified since the last save?
-               '(:eval (when (buffer-modified-p)
-                         (concat ","  (propertize "Mod"
-                                                  'face nil
-                                                  'help-echo "Buffer has been modified"))))
+;; This file is not part of GNU Emacs
 
-               ;; is this buffer read-only?
-               '(:eval (when buffer-read-only
-                         (concat ","  (propertize "RO"
-                                                  'face nil
-                                                  'help-echo "Buffer is read-only"))))
-               "] "
+;; This file is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
 
-               ;;global-mode-string, org-timer-set-timer in org-mode need this
-               (propertize "%M" 'face nil)
-               '(:eval (if  (>= (window-width) 100)
-                           (progn (setq display-time-day-and-date t)
-                                  (setq display-time-default-load-average nil)
-                                  (display-time-mode t))
-                         (progn (setq display-time-day-and-date nil)
-                                (setq display-time-default-load-average nil)
-                                (display-time-mode t))))
-               " --"
-               ;; i don't want to see minor-modes; but if you want, uncomment this:
-               ;; minor-mode-alist  ;; list of minor modes
-               "%-" ;; fill with '-'
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
 
-               ))
+;; For a full copy of the GNU General Public License
+;; see <http://www.gnu.org/licenses/>.
+
+
+;;; Commentary:
+
+;; GUI and CUI
+
+;;; Code:
+
+(defvar default-modeline-format mode-line-format
+  "Default mode-line format.")
+
+;; Prevent flash of unstyled modeline at startup
+(unless after-init-time
+  (setq mode-line-format nil))
+
+(if (locate-library "doom-modeline")
+    (use-package doom-modeline
+      :ensure nil
+      :hook (after-init . doom-modeline-mode)
+      :init
+      (unless (display-graphic-p)
+        (setq doom-modeline-icon nil))
+
+      (setq doom-modeline-major-mode-color-icon t
+            doom-modeline-minor-modes nil
+            doom-modeline-mu4e nil
+            doom-modeline-github t
+            doom-modeline-github-interval 300)
+
+      (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
+
+  (add-hook 'after-init-hook
+            (lambda ()
+              (setq mode-line-format default-modeline-format))))
+
+;;; Display line, column and time on mode-line
+
+;; Line and column
+(setq column-number-mode t)
+(setq line-number-mode t)
+
+;; dispaly time
+(unless (display-graphic-p)
+  (setq display-time-24hr-format t)
+  (setq display-time-day-and-date nil)
+  (display-time-mode))
 
 (provide 'init-modeline)
+
+;;; init-modeline.el ends here
