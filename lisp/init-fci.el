@@ -54,47 +54,55 @@
       (setq column-enforce-comments nil) ;Ignore long notes
       (setq column-enforce-column 80))))
 
+;; Display compatibility issue with company
+;; @see https://github.com/alpaker/fill-column-indicator/issues/54#issuecomment-218344694
+(defun on-off-fci-before-company (command)
+  "Fix conflict between fci-mode and company-mode."
+  (when (string= "show" command)
+    (turn-off-fci-mode))
+  (when (string= "hide" command)
+    (turn-on-fci-mode)))
+
+;; Conflict with fci-mode
+;; @see https://github.com/tumashu/pyim/issues/205#issuecomment-386872146
+(defun lye/pyim-tooltip-show (orig-func string position)
+  "pyim turn off `fci-mode'."
+  ;;(message "turn off fci")
+  (funcall orig-func string position))
+
+(defun lye/pyim-terminate-translation (orig-func)
+  ;;(message "turn on fci")
+  (funcall orig-func))
+
 (defun lye/use-fci-mode ()
   "enable `fci-mode'."
   (when lye-use-fci-mode
     (use-package fill-column-indicator
       :ensure t
       :hook ((prog-mode . fci-mode)
-             (magit-mode . (lambda () (fci-mode -1))))
+             ((magit-mode esup-mode) . (lambda () (fci-mode -1))))
       :init
       (setq fci-rule-column 80)
       (setq fci-rule-width 1)
       :custom  ;; Avoid conflicts with fci-rule-color defined in doom-themes
       (fci-rule-color "orange") ;; (custom-set-variables '(fci-rule-color "orange"))
-      :config
-      ;; Display compatibility issue with company
-      ;; @see https://github.com/alpaker/fill-column-indicator/issues/54#issuecomment-218344694
-      (when (locate-library "company")
-        (defun on-off-fci-before-company(command)
-          "Fix conflict between fci-mode and company-mode."
-          (when (string= "show" command)
-            (turn-off-fci-mode))
-          (when (string= "hide" command)
-            (turn-on-fci-mode)))
-        (advice-add 'company-call-frontends :before #'on-off-fci-before-company))
-      ;; Conflict with fci-mode
-      ;; @see https://github.com/tumashu/pyim/issues/205#issuecomment-386872146
-      (when (locate-library "pyim")
-        (defun lye/pyim-tooltip-show (orig-func string position)
-          "pyim turn off `fci-mode'."
-          ;;(message "turn off fci")
-          (funcall orig-func string position))
-        (defun lye/pyim-terminate-translation (orig-func)
-          ;;(message "turn on fci")
-          (funcall orig-func))
-        (advice-add 'pyim-tooltip-show :around #'lye/pyim-tooltip-show)
-        (advice-add 'pyim-terminate-translation
-                    :around #'lye/pyim-terminate-translation)))
-    ))
+      )))
 
 ;;; Configurations
-(lye/use-fci-mode)
-(lye/use-column-enforce-mode)
+
+(add-hook
+ 'after-init-hook
+ (lambda ()
+   ;; enable fci-mode
+   (lye/use-fci-mode)
+   (when (locate-library "company")
+     (advice-add 'company-call-frontends :before #'on-off-fci-before-company))
+   (when (locate-library "pyim")
+     (advice-add 'pyim-tooltip-show :around #'lye/pyim-tooltip-show)
+     (advice-add 'pyim-terminate-translation
+                 :around #'lye/pyim-terminate-translation))
+   ;; enable column-enforce-mode
+   (lye/use-column-enforce-mode)))
 
 (provide 'init-fci)
 

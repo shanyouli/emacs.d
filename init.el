@@ -80,10 +80,15 @@ decrease this. If you experience stuttering, increase this.")
 (setq load-prefer-newer noninteractive)
 
 ;; Let 'er rip!
-(require 'init-load-path (concat user-emacs-directory "lisp/init-load-path"))
+(eval-when-compile
+  (if (version< emacs-version "25.3")
+      (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
+             emacs-version)))
 
+;; `load-path'
+(require 'init-load-path (concat user-emacs-directory "lisp/init-load-path"))
 ;; bechmark-init
-(require 'init-bechmark)
+(require 'init-bechmark (concat user-emacs-directory "lisp/init-bechmark"))
 ;; Variable
 (require 'init-variable (concat user-emacs-directory "lisp/init-variable"))
 ;; Use-package
@@ -108,7 +113,6 @@ decrease this. If you experience stuttering, increase this.")
 (require 'init-basic)
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
-
   (require 'init-package)               ; Package
   ;; Preferences
   (require 'init-edit)
@@ -116,12 +120,12 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-ivy)
   (require 'init-window)
   (require 'init-company)
+  (require 'init-chinese)
   ;; Tools
   (require 'init-magit)                 ; Git
   (require 'init-dired)                 ; Dired
   (require 'init-elfeed)                ; RSS Reader
-  ;; (require 'init-eshell)
-  (require 'init-chinese)
+  (require 'init-aweshell)              ; ESHELL
   ;; Program language common tool
   (require 'init-lang)
   (require 'init-flycheck)

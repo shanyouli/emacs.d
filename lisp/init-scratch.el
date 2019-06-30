@@ -24,16 +24,12 @@
 
 ;;; Code:
 
-;; Set scratch default major-mode
-(setq initial-major-mode 'emacs-lisp-mode)
+;;; Variables
 
-(setq-default initial-scratch-message
-              (concat ";; Happy hacking, "
-                      user-login-name " - Emacs ♥ you!\n\n"))
-
-;; scratch-save
 ;; see @https://emacs-china.org/t/topic/4714/2?u=twlz0ne
 (defvar lye-scratch-save-file (concat lye-emacs-cache-dir "scratch"))
+
+;;; Functions
 
 (defun lye/scratch-save ()
   (ignore-errors
@@ -50,20 +46,15 @@
         (insert initial-scratch-message))
       (goto-char (point-max)))))
 
-(add-hook 'kill-emacs-hook #'lye/scratch-save)
-(add-hook 'after-init-hook #'lye/scratch-restore)
-
 ;; Make *Scratch* buffer undelete
 (defun lye/unkillable-scratch-buffer ()
   "Don't delete *scratch*."
   (if (string= (buffer-name (current-buffer)) "*scratch*")
       (progn
         (delete-region (point-min) (point-max))
-        ;; (insert initial-scratch-message)
         (lye/scratch-restore)
         nil)
     t))
-(add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
 
 ;; default *Scratch*
 (defun lye/reset-scratch-buffer ()
@@ -75,6 +66,18 @@
         (insert initial-scratch-message)
         nil)
     t))
+
+
+;;; Configurations
+
+(setq-default initial-major-mode 'emacs-lisp-mode) ; Set scratch default major-mode
+(setq-default initial-scratch-message  ; The message of Scratch-Buffer
+              (concat ";; Happy hacking, "
+                      user-login-name " - Emacs ♥ you!\n\n"))
+
+(add-hook 'kill-emacs-hook #'lye/scratch-save)
+(add-hook 'after-init-hook #'lye/scratch-restore)
+(add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
 
 (provide 'init-scratch)
 ;;; init-scratch.el ends here

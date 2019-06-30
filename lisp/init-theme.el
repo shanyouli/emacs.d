@@ -18,9 +18,11 @@
   "Bright color theme used.")
 (defvar lye-dark-theme nil
   "Dark theme used.")
+(defvar lye-enable-doom-themes t
+  "Prevent importing the doom-themes package again.")
 
 ;; functions
-;;@see https://emacs-china.org/t/emacs-theme/7781
+;; @see https://emacs-china.org/t/emacs-theme/7781
 (defun exchange-bright-and-dark-theme ()
   "Use a specific topic for a specific time period."
   (let ((hour (string-to-number (substring (current-time-string) 11 13)))
@@ -41,8 +43,9 @@
   ;;Set bright and dark theme
   (setq lye-light-theme 'doom-solarized-light)
   (setq lye-dark-theme 'doom-one)
-
-  (run-with-timer 0 1800 'exchange-bright-and-dark-theme))
+  (add-hook 'after-init-hook
+            (lambda ()
+              (run-with-timer 0 1800 'exchange-bright-and-dark-theme))))
 
 (provide 'init-theme)
 ;;; init-theme.el ends here
