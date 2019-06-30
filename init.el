@@ -125,15 +125,18 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-magit)                 ; Git
   (require 'init-dired)                 ; Dired
   (require 'init-elfeed)                ; RSS Reader
-  (require 'init-aweshell)              ; ESHELL
-  ;; Program language common tool
-  (require 'init-lang)
-  (require 'init-flycheck)
-  (require 'init-elisp)
-  (require 'init-scheme)
-  (require 'init-lua)
-  (require 'init-lsp)
-  (require 'init-python)
+  (run-with-idle-timer
+   2 nil
+   (lambda ()
+     (require 'init-aweshell)              ; ESHELL
+     ;; Program language common tool
+     (require 'init-lang)
+     (require 'init-flycheck)
+     (require 'init-elisp)
+     (require 'init-scheme)
+     (require 'init-lua)
+     (require 'init-lsp)
+     (require 'init-python)))
   ;; Org mode
   (run-with-idle-timer
    3 nil

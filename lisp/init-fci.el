@@ -79,14 +79,14 @@
   (when lye-use-fci-mode
     (use-package fill-column-indicator
       :ensure t
-      :hook ((prog-mode . fci-mode)
-             ((magit-mode esup-mode) . (lambda () (fci-mode -1))))
+      :hook ((emacs-lisp-mode org-mode python-mode) . fci-mode)
       :init
       (setq fci-rule-column 80)
       (setq fci-rule-width 1)
+      ;; (custom-set-variables '(fci-rule-color "orange"))
       :custom  ;; Avoid conflicts with fci-rule-color defined in doom-themes
-      (fci-rule-color "orange") ;; (custom-set-variables '(fci-rule-color "orange"))
-      )))
+      (fci-rule-color "orange"))))
+
 
 ;;; Configurations
 
