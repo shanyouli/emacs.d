@@ -62,7 +62,6 @@
   "Update `load'."
   ;; add lye-emacs-user-load-path-dir to load-path
   (push lye-emacs-user-init-dir load-path)
-
   ;; add lye-emacs-site-lisp-dir to load-path
   (lye/add-subdidrs-to-load-path lye-emacs-site-lisp-dir))
 

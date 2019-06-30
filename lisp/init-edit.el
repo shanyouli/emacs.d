@@ -25,7 +25,13 @@
 
 ;; Explicitly set the prefered coding systems to avoid annoying prompt
 ;; from emacs (especially on Microsoft Windows)
+(when (fboundp 'set-charset-priority)
+  (set-charset-priority 'unicode))
 (prefer-coding-system 'utf-8)
+;; Optional
+;; (setq locale-coding-system 'utf-8)
+;; (unless system/windows
+;; (setq selection-coding-system 'utf-8))
 
 ;; Miscs
 (setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; Show path if name are same
@@ -219,9 +225,10 @@
 
 ;; Quickly search the copy history and paste it at the cursor
 ;; @https://emacs-china.org/t/c-k/6775/9
-(use-package kill-ring-search
-  :ensure nil
-  :commands (kill-ring-search)
-  :bind ("C-s p" . kill-ring-search))
+(use-package browse-kill-ring
+  :ensure t
+  :commands browse-kill-ring
+  :bind ("C-s p" . browse-kill-ring))
+
 (provide 'init-edit)
 ;;; init-edit.el ends here

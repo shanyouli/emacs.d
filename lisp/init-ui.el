@@ -42,13 +42,13 @@
         (set-frame-width (selected-frame) lye-frame-default-width)
         (set-frame-height (selected-frame) lye-frame-default-height))
     (set-frame-size (selected-frame)
-                    lye-frame-default-width lye-frame-default-heigh)))
+                    lye-frame-default-width lye-frame-default-height)))
 
 (defun lye/init-default-frame-size ()
   "The frame default size setting at startup."
   ;; Set the initial window size
   ;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
-    ;; top, left ...
+  ;; top, left ...
   (add-to-list 'default-frame-alist
                (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
   (add-to-list 'default-frame-alist
@@ -96,7 +96,7 @@
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
   (add-hook 'after-make-frame-functions #'lye/restore-frame-size))
 
-;;; Misc
+;; Misc
 (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
 (setq inhibit-startup-screen t) ; 不展示开始界面
 
