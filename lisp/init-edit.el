@@ -154,22 +154,20 @@
 ;; add color display
 (use-package rainbow-mode :hook (prog-mode . rainbow-mode))
 
-;; Highlight the line where the cursor is
-;; (run-with-idle-timer 2 nil #'(lambda () (global-hl-line-mode 1)))
-
 ;;; Uninstall some global shortcuts that may cause conflicts
 (global-unset-key (kbd "C-s"))
 (global-unset-key (kbd "C-r"))
 ;; (global-unset-key [^s])
 
-;; isearch
-(use-package isearch
-  :ensure nil
-  :bind (("C-s s" . isearch-forward)
-         ("C-s r" . isearch-backward)
-         :map isearch-mode-map
-         ("C-n" . isearch-repeat-forward)
-         ("C-p" . isearch-repeat-backward)))
+;; isearch or swiper
+(if (locate-library "swiper")
+    (use-package isearch
+      :ensure nil
+      :bind (("C-s s" . isearch-forward)
+             ("C-s r" . isearch-backward)
+             :map isearch-mode-map
+             ("C-n" . isearch-repeat-forward)
+             ("C-p" . isearch-repeat-backward))))
 
 ;;; Highlight symbols
 ;; Usage:
@@ -192,17 +190,6 @@
   :bind
   ("C-x p o" . link-hint-open-link)
   ("C-x p c" .  link-hint-copy-link))
-
-;; 80-columns
-(use-package column-enforce-mode
-  :custom-face
-  (column-enforce-face
-   ((t :inherit nil :foreground "OrangeRed")))
-  :hook (after-init . global-column-enforce-mode)
-  ;; :hook ((prog-mode gfm-mode) . column-enforce-mode)
-  :config
-  (setq column-enforce-comments nil) ;Ignore long notes
-  (setq column-enforce-column 80))
 
 ;; Search and refactoring tool based on ripgrep
 ;; see @https://github.com/manateelazycat/color-rg
