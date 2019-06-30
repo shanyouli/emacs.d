@@ -25,13 +25,11 @@
 ;;; Code:
 
 ;;; Variable
-(defvar lye-frame-default-height (/ (* 618 (x-display-pixel-height))
-                                    (* 1000 (frame-char-height)))
-  "The ratio of the default height to the screen height is 0.618.")
-(defvar lye-frame-default-width (- (/ (x-display-pixel-width)
-                                      (* 2 (frame-char-width))) 2)
-  "The default width is half of the screen, and the error is between 2px.")
 
+(defvar lye-frame-default-height nil
+  "The ratio of the default height to the screen height is 0.618.")
+(defvar lye-frame-default-width nil
+  "The default width is half of the screen, and the error is between 2px.")
 
 ;;; funtcion
 
@@ -50,16 +48,15 @@
   "The frame default size setting at startup."
   ;; Set the initial window size
   ;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
-  (when (display-graphic-p)
     ;; top, left ...
-    (add-to-list 'default-frame-alist
-                 (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
-    (add-to-list 'default-frame-alist
-                 (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
-    (add-to-list 'default-frame-alist
-                 (cons 'height lye-frame-default-height))
-    (add-to-list 'default-frame-alist
-                 (cons 'width lye-frame-default-width))))
+  (add-to-list 'default-frame-alist
+               (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
+  (add-to-list 'default-frame-alist
+               (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
+  (add-to-list 'default-frame-alist
+               (cons 'height lye-frame-default-height))
+  (add-to-list 'default-frame-alist
+               (cons 'width lye-frame-default-width)))
 
 ;;; Configuration
 
@@ -89,14 +86,20 @@
                                        (if (display-graphic-p frame) 1 0))))
     (when (fboundp 'menu-bar-mode) (menu-bar-mode -1))))
 
-(lye/init-default-frame-size)  ;; Frame Size after startup
-
-;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-(add-hook 'after-make-frame-functions #'lye/restore-frame-size)
+;; starup frame size at GUI
+(when (display-graphic-p)
+  (setq lye-frame-default-height (/ (* 618 (x-display-pixel-height))
+                                    (* 1000 (frame-char-height))))
+  (setq lye-frame-default-width (- (/ (x-display-pixel-width)
+                      (* 2 (frame-char-width))) 2))
+  (lye/init-default-frame-size)  ; Frame Size after startup
+  ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
+  (add-hook 'after-make-frame-functions #'lye/restore-frame-size))
 
 ;;; Misc
 (setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
 (setq inhibit-startup-screen t) ; 不展示开始界面
+
 ;; Suppress GUI features
 (setq use-file-dialog nil)
 (setq use-dialog-box nil)
