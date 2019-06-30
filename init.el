@@ -116,7 +116,6 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-package)               ; Package
   ;; Preferences
   (require 'init-edit)
-  (require 'init-fci)
   (require 'init-ivy)
   (require 'init-window)
   (require 'init-company)
