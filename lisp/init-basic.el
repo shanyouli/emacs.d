@@ -65,33 +65,6 @@
 (setq x-select-enable-clipboard t)
 
 ;;; some package initalize
-;; exec-path config
-(when (memq window-system '(mac ns x))
-  (use-package exec-path-from-shell
-    :ensure nil
-    :init
-    (require 'cache-path-from-shell)
-    (setq exec-path-from-shell-check-startup-files nil)
-    (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
-    (setq exec-path-from-shell-arguments '("-l"))
-    (exec-path-from-shell-initialize)))
-
-;; Use undo-tree
-(use-package undo-tree
-  :ensure nil
-  :commands global-undo-tree-mode
-  :hook (after-init . global-undo-tree-mode))
- ;; (setq undo-tree-history-directory-alist
- ;;       `(("." . ,(concat lye-emacs-cache-dir "undo"))))
-
-;; Save Emacs buffers when they lose focus after 2s
-(use-package auto-save
-  :ensure nil
-  :defines (auto-save-silent auto-save-idle)
-  :commands (auto-save-enable)
-  :init (setq auto-save-silent t
-              auto-save-idle 2)
-  :hook (after-init . auto-save-enable))
 
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
@@ -144,6 +117,34 @@
                           "COMMIT_EDITMSG\\'"
                           "COMMIT_MSG")))
 
+;; exec-path config
+(when (memq window-system '(mac ns x))
+  (use-package exec-path-from-shell
+    :ensure nil
+    :init
+    (require 'cache-path-from-shell)
+    (setq exec-path-from-shell-check-startup-files nil)
+    (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
+    (setq exec-path-from-shell-arguments '("-l"))
+    (exec-path-from-shell-initialize)))
+
+;; Use undo-tree
+(use-package undo-tree
+  :ensure nil
+  :commands global-undo-tree-mode
+  :hook (after-init . global-undo-tree-mode))
+ ;; (setq undo-tree-history-directory-alist
+ ;;       `(("." . ,(concat lye-emacs-cache-dir "undo"))))
+
+;; Save Emacs buffers when they lose focus after 2s
+(use-package auto-save
+  :ensure nil
+  :defines (auto-save-silent auto-save-idle)
+  :commands (auto-save-enable)
+  :init (setq auto-save-silent t
+              auto-save-idle 2)
+  :hook (after-init . auto-save-enable))
+
 ;; Displays the key bindings following your currently entered incomplete command
 (use-package which-key
   :ensure nil
@@ -157,7 +158,6 @@
 
 ;; Esup,Start time adjustment<Emacs Start Up Profiler>
 (use-package esup :ensure nil :commands esup)
-
 
 (provide 'init-basic)
 ;;; init-basic.el ends here

@@ -81,16 +81,14 @@ decrease this. If you experience stuttering, increase this.")
 
 ;; Let 'er rip!
 (require 'init-load-path (concat user-emacs-directory "lisp/init-load-path"))
+
+;; bechmark-init
+(require 'init-bechmark)
+;; Variable
 (require 'init-variable (concat user-emacs-directory "lisp/init-variable"))
+;; Use-package
 (require 'init-use-package
          (concat user-emacs-directory "lisp/init-use-package"))
-
-;; Test and optimize startup
-(when lye-enable-benchmark
-  (use-package benchmark-init
-    :commands bechmark-init/deactivate
-    :ensure nil
-    :hook (after-init . bechmark-init/deactivate)))
 
 ;; Import self-configuration of different systems
 (let ((system-file (format "%s/init-%s.el"
@@ -99,7 +97,9 @@ decrease this. If you experience stuttering, increase this.")
   (if (file-exists-p system-file)
       (load system-file)))
 
-(require 'init-font)                    ; font set
+(run-with-idle-timer 2 nil
+                     (lambda ()
+                       (require 'init-font)))                    ; font set
 (require 'init-ui)                      ; frame size set
 (require 'init-modeline)                ; modeline
 (require 'init-theme)                   ; load theme
@@ -131,8 +131,11 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-lsp)
   (require 'init-python)
   ;; Org mode
-  (require 'init-hugo)
-  (require 'init-org))
+  (run-with-idle-timer
+   3 nil
+   (lambda ()
+     (require 'init-hugo)
+     (require 'init-org))))
 
 ;; get emascs startup time
 (add-hook 'emacs-startup-hook

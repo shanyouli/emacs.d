@@ -36,7 +36,7 @@
   "Whether to use the column-enforce-mode package."
   :type 'boolean)
 
-(defvar lye-use-fci-mode t
+(defcustom lye-use-fci-mode t
   "Whether to use the FCI-MODE package."
   :type 'boolean)
 

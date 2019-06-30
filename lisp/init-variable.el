@@ -45,10 +45,6 @@
   "Enable yasnippet for company backends or not."
   :type  'boolean)
 
-(defcustom lye-enable-benchmark nil
-  "Enable the init benchmark or not."
-  :type 'boolean)
-
 ;;; Constants
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
