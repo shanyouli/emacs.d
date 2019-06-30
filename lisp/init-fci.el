@@ -59,7 +59,8 @@
   (when lye-use-fci-mode
     (use-package fill-column-indicator
       :ensure t
-      :hook (prog-mode . fci-mode)
+      :hook ((prog-mode . fci-mode)
+             (magit-mode . (lambda () (fci-mode -1))))
       :init
       (setq fci-rule-column 80)
       (setq fci-rule-width 1)
