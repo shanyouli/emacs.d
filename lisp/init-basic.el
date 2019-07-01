@@ -148,13 +148,5 @@
 ;; Esup,Start time adjustment<Emacs Start Up Profiler>
 (use-package esup :ensure nil :commands esup)
 
-;;read-only-mode us vi-navigate
-(use-package vi-navigate
-  :ensure nil
-  :commands vi-navigate-load-keys
-  :config
-  (push 'read-only-mode-hook vi-navigate-hook-list))
-
-
 (provide 'init-basic)
 ;;; init-basic.el ends here
