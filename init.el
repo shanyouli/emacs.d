@@ -102,9 +102,6 @@ decrease this. If you experience stuttering, increase this.")
   (if (file-exists-p system-file)
       (load system-file)))
 
-(run-with-idle-timer 2 nil
-                     (lambda ()
-                       (require 'init-font)))                    ; font set
 (require 'init-ui)                      ; frame size set
 (require 'init-modeline)                ; modeline
 (require 'init-theme)                   ; load theme
@@ -112,11 +109,14 @@ decrease this. If you experience stuttering, increase this.")
 (require 'init-funcs)                   ; some useful functions
 (require 'init-basic)
 
+(add-hook 'after-init-hook (lambda () (require 'init-font)))
+
 (with-temp-message ""                   ; Erase the output of the plugin startup
   (require 'init-package)               ; Package
   ;; Preferences
   (require 'init-edit)
   (require 'init-ivy)
+  (require 'init-search)
   (require 'init-window)
   (require 'init-company)
   (require 'init-chinese)
@@ -124,24 +124,20 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-magit)                 ; Git
   (require 'init-dired)                 ; Dired
   (require 'init-elfeed)                ; RSS Reader
-  (run-with-idle-timer
-   2 nil
-   (lambda ()
-     (require 'init-aweshell)              ; ESHELL
-     ;; Program language common tool
-     (require 'init-lang)
-     (require 'init-flycheck)
-     (require 'init-elisp)
-     (require 'init-scheme)
-     (require 'init-lua)
-     (require 'init-lsp)
-     (require 'init-python)))
+  (require 'init-aweshell)              ; ESHELL
+  (run-with-idle-timer 2 nil  (lambda ()
+                                ;; Program language common tool
+                                (require 'init-lang)
+                                (require 'init-flycheck)
+                                (require 'init-elisp)
+                                (require 'init-scheme)
+                                (require 'init-lua)
+                                (require 'init-lsp)
+                                (require 'init-python)))
   ;; Org mode
-  (run-with-idle-timer
-   3 nil
-   (lambda ()
-     (require 'init-hugo)
-     (require 'init-org))))
+  (run-with-idle-timer 3 nil (lambda ()
+                               (require 'init-hugo)
+                               (require 'init-org))))
 
 ;; get emascs startup time
 (add-hook 'emacs-startup-hook

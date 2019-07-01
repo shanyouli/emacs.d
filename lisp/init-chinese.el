@@ -165,7 +165,8 @@
   ;; Set 9 candidate words
   (setq pyim-page-length 9)
 
-  (setq-default pyim-punctuation-translate-p '(no yes auto))
+  ;;  (setq-default pyim-punctuation-translate-p '(no yes auto))
+    (setq-default pyim-punctuation-translate-p '(auto yes no ))
   (setq-default pyim-english-input-switch-functions
                 '(pyim-probe-isearch-mode)))
 

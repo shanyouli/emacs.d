@@ -67,3 +67,6 @@
 [submodule "aweshell"]
 	path = site-lisp/aweshell
 	url = https://github.com/manateelazycat/aweshell.git
+[submodule "vi-navigate"]
+	path = site-lisp/vi-navigate
+	url = https://github.com/manateelazycat/vi-navigate.git

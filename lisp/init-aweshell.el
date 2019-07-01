@@ -33,7 +33,8 @@
 (use-package aweshell
   :ensure nil
   :commands (aweshell-toggle aweshell-new aweshell-next aweshell-prev
-                             aweshell-sudo-toggle aweshell-switch-buffer))
+                             aweshell-sudo-toggle aweshell-switch-buffer)
+  :bind ("C-x s" . aweshell-toggle))
 
 (provide 'init-aweshell)
 

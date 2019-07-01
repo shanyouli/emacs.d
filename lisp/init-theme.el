@@ -43,7 +43,7 @@
   ;;Set bright and dark theme
   (setq lye-light-theme 'doom-solarized-light)
   (setq lye-dark-theme 'doom-one)
-  (add-hook 'after-init-hook
+  (add-hook 'emacs-startup-hook
             (lambda ()
               (run-with-timer 0 1800 'exchange-bright-and-dark-theme))))
 

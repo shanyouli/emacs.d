@@ -27,14 +27,11 @@
 (use-package counsel
   :ensure nil
   :diminish ivy-mode counsel-mode
-  :bind (("C-s s" . counsel-grep-or-swiper)
-         ("C-x f" . counsel-recentf)
+  :bind (("C-x f" . counsel-recentf)
          ("C-x C-b" . ivy-switch-buffer)
          :map ivy-minibuffer-map
          ([escape] . minibuffer-keyboard-quit)
-         ("<C-return>" . ivy-immediate-done)
-         :map swiper-map
-         ([escape] . minibuffer-keyboard-quit))
+         ("<C-return>" . ivy-immediate-done))
   :hook ((after-init . ivy-mode)
          (ivy-mode . counsel-mode))
   :config
@@ -55,9 +52,7 @@
      (cond
       ((executable-find "rg")
        "rg -i M 120 --no-beading --line-number --color never '%s' %s"))))
-    (setq counsel-grep-base-command command))
-
-  )
+    (setq counsel-grep-base-command command)))
 
 ;;Ivy is more intelligent
 (use-package amx

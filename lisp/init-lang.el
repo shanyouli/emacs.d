@@ -37,7 +37,7 @@
 
 ;;; yasnippet
 (use-package yasnippet
-  :hook (after-init . yas-global-mode)
+  :init (yas-global-mode 1)
   :config (use-package yasnippet-snippets))
 
 ;;; prettify-mode

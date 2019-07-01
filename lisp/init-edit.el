@@ -154,68 +154,12 @@
 ;; add color display
 (use-package rainbow-mode :hook (prog-mode . rainbow-mode))
 
-;;; Uninstall some global shortcuts that may cause conflicts
-(global-unset-key (kbd "C-s"))
-(global-unset-key (kbd "C-r"))
-;; (global-unset-key [^s])
-
-;; isearch or swiper
-(if (locate-library "swiper")
-    (use-package isearch
-      :ensure nil
-      :bind (("C-s s" . isearch-forward)
-             ("C-s r" . isearch-backward)
-             :map isearch-mode-map
-             ("C-n" . isearch-repeat-forward)
-             ("C-p" . isearch-repeat-backward))))
-
-;;; Highlight symbols
-;; Usage:
-;; When press M-s active lazy-search, it will mark current symbol or region.
-;; You can press below keys to jump in all matching symbols,
-;; or press `q' to quitlazy-search mode.
-(use-package lazy-search
-  :ensure nil
-  :commands (lazy-search)
-  :bind ("C-s l" . lazy-search)
-  :init
-  (advice-add #'lazy-search :after
-            #'(lambda () (rainbow-mode -1)))
-  (advice-add #'lazy-search-quit :after
-              #'(lambda () (rainbow-mode t))))
-
 ;; open line in browser
 ;; at see@https://github.com/noctuid/link-hint.el/
 (use-package link-hint
   :bind
   ("C-x p o" . link-hint-open-link)
   ("C-x p c" .  link-hint-copy-link))
-
-;; Search and refactoring tool based on ripgrep
-;; see @https://github.com/manateelazycat/color-rg
-(when  (executable-find "rg")
-  (use-package color-rg
-    :ensure nil
-;;    :preface (unbind-key "C-s")
-    :commands (color-rg-search-input
-               color-rg-search-symbol
-               color-rg-search-input-in-project
-               color-rg-search-symbol-in-project
-               color-rg-search-input-in-current-file
-               color-rg-search-symbol-in-current-file)
-    :bind (("C-s g" . color-rg-search-symbol)
-           ("C-s h" . color-rg-search-input)
-           ("C-s j" . color-rg-search-symbol-in-project)
-           ("C-s k" . color-rg-search-input-in-project)
-           ("C-s ," . color-rg-search-symbol-in-current-file)
-           ("C-s ." . color-rg-search-input-in-current-file))))
-
-;; Quickly search the copy history and paste it at the cursor
-;; @https://emacs-china.org/t/c-k/6775/9
-(use-package browse-kill-ring
-  :ensure t
-  :commands browse-kill-ring
-  :bind ("C-s p" . browse-kill-ring))
 
 (provide 'init-edit)
 ;;; init-edit.el ends here
