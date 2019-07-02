@@ -54,7 +54,10 @@
 ;; Prettify UI
 (use-package org-bullets
   :if (char-displayable-p ?◉)
-  :hook (org-mode . org-bullets-mode))
+  :hook (org-mode . org-bullets-mode)
+  :config
+  (setq org-bullets-bullet-list
+        '("◯" "◉" "◌" "⚈" "☉" "✥" "✡" "✤" "✣" "✴")))
 
 ;; 自动缩进，* or ** etc..
 (use-package org-indent
