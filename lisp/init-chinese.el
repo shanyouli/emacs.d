@@ -104,8 +104,9 @@
 ;;; pyim -- chinese input method
 (use-package pyim
   :demand t
-  :defer 0.5
+  :defer 0.3
   :ensure nil
+  :bind ("<f9>" . toggle-input-method)
   :preface
   (defun pyim-bigdict-enable ()
     "Add bigdict to pyim"

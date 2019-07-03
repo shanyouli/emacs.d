@@ -65,7 +65,7 @@
           (" *undo-tree*" :select t)
           ("*Paradox Report*" :size 0.382 :align 'below :autoclose t)
           ("*Youdao Dictionary*" :size 0.382 :align 'below :autoclose t)
-          ("^\\*.*Org Src.*\\*" :regexp t  :size 0.382 :align 'below :autoclose t)
+          ("*Flycheck errors*" :size 0.382 :align 'below :autoclose t)
           (Buffer-menu-mode :select t :size 20 :align 'below :autoclose t)
           (comint-mode :align 'below)
           (helpful-mode :select t :size 0.382 :align 'below :autoclose t)
