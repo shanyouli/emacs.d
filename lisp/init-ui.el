@@ -24,14 +24,17 @@
 
 ;;; Code:
 
-;;; Variable
-
-(defvar lye-frame-default-height nil
-  "The ratio of the default height to the screen height is 0.618.")
-(defvar lye-frame-default-width nil
-  "The default width is half of the screen, and the error is between 2px.")
-
 ;;; funtcion
+
+(defun lye/frame-default-height ()
+  "The ratio of the default height to the screen height is 0.618."
+  (/ (* 618 (x-display-pixel-height))
+     (* 1000 (frame-char-height))))
+
+(defun lye/frame-default-width ()
+  "The default width is half of the screen, and the error is between 2px."
+  (- (/ (x-display-pixel-width)
+        (* 2 (frame-char-width))) 2))
 
 (defun lye/restore-frame-size (&optional frame)
   "Frame default size configuration."
@@ -39,10 +42,10 @@
   (when frame (select-frame frame))
   (if ( and (boundp system/windows) system/windows)
       (progn
-        (set-frame-width (selected-frame) lye-frame-default-width)
-        (set-frame-height (selected-frame) lye-frame-default-height))
+        (set-frame-width (selected-frame) (lye/frame-default-width))
+        (set-frame-height (selected-frame) (lye/frame-default-height)))
     (set-frame-size (selected-frame)
-                    lye-frame-default-width lye-frame-default-height)))
+                    (lye/frame-default-width) (lye/frame-default-height))))
 
 (defun lye/init-default-frame-size ()
   "The frame default size setting at startup."
@@ -54,9 +57,9 @@
   (add-to-list 'default-frame-alist
                (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
   (add-to-list 'default-frame-alist
-               (cons 'height lye-frame-default-height))
+               (cons 'height (lye/frame-default-height)))
   (add-to-list 'default-frame-alist
-               (cons 'width lye-frame-default-width)))
+               (cons 'width (lye/frame-default-width))))
 
 ;;; Configuration
 
@@ -88,10 +91,6 @@
 
 ;; starup frame size at GUI
 (when (display-graphic-p)
-  (setq lye-frame-default-height (/ (* 618 (x-display-pixel-height))
-                                    (* 1000 (frame-char-height))))
-  (setq lye-frame-default-width (- (/ (x-display-pixel-width)
-                      (* 2 (frame-char-width))) 2))
   (lye/init-default-frame-size)  ; Frame Size after startup
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
   (add-hook 'after-make-frame-functions #'lye/restore-frame-size))
