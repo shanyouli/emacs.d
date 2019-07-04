@@ -102,14 +102,13 @@ decrease this. If you experience stuttering, increase this.")
   (if (file-exists-p system-file)
       (load system-file)))
 
+(require 'init-font)                    ; Init Font
 (require 'init-ui)                      ; frame size set
 (require 'init-modeline)                ; modeline
 (require 'init-theme)                   ; load theme
 (require 'init-scratch)                 ; scratch configure
 (require 'init-funcs)                   ; some useful functions
 (require 'init-basic)
-
-(add-hook 'after-init-hook (lambda () (require 'init-font)))
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
   (require 'init-package)               ; Package
