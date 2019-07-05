@@ -100,7 +100,7 @@ decrease this. If you experience stuttering, increase this.")
                            (expand-file-name "lisp" user-emacs-directory)
                            (symbol-name system-type))))
   (if (file-exists-p system-file)
-      (load system-file)))
+      (load system-file nil nil)))
 
 (require 'init-font)                    ; Init Font
 (require 'init-ui)                      ; frame size set
@@ -123,7 +123,8 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-magit)                 ; Git
   (require 'init-dired)                 ; Dired
   (require 'init-elfeed)                ; RSS Reader
-  (require 'init-aweshell)              ; ESHELL
+  (require 'init-aweshell)              ; Eshell, shell and powershell
+  (require 'init-reads)                 ; Reader tools
   (run-with-idle-timer 2 nil  (lambda ()
                                 ;; Program language common tool
                                 (require 'init-lang)

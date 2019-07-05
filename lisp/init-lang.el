@@ -117,8 +117,9 @@
 ;; Only suitable for Windows Languages-Packages major-mode
 (when (and (boundp system/windows) system/windows)
   ;; ahk-mode
-  (use-package ahk-mode :mode "\\.ahk\\'"  :defer t)
+  (use-package ahk-mode :mode "\\.ahk\\'"  :defer t))
 
+(when system/windows
   ;; powershell-mode
   (use-package powershell
     :mode ("\\.ps1\\'" . powershell-mode)
@@ -128,6 +129,7 @@
           "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe")
     ;; interactive, but no command prompt
     (setq explicit-powershell.exe-args '("-Command" "-"))))
+
 
 (provide 'init-lang)
 ;;; init-lang.el ends here

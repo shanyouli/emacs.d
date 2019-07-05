@@ -25,7 +25,7 @@
 ;;; Code:
 
 ;;; Variables
-(defvar lye-init-fullscreen-y-or-n nil
+(defvar lye-init-fullscreen-y-or-n t
   "Full screen or not when initializing.")
 
 ;;; funtcion
