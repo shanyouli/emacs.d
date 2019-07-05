@@ -69,7 +69,7 @@
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
 (use-package server
-  :if (not (eq system-type 'cygwin))
+  :if (not (or (eq system-type 'cygwin) system/windows))
   :ensure nil
   :commands (server-running-p)
   :hook (after-init . (lambda () (unless (server-running-p) (server-start))))

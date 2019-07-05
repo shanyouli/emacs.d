@@ -65,7 +65,7 @@
   "Is the cache directory this?")
 
 ;;; Load `custom-file'
-(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
 (when (file-exists-p custom-file) (load custom-file))
 
 ;; Set the temporal directory
