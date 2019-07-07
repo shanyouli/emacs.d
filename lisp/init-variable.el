@@ -39,7 +39,8 @@
                  (const :tag "Melpa-mirror" melpa-mirror)
                  (const :tag "Emacs-china" emacs-china)
                  (const :tag "Netease" netease)
-                 (const :tag "Tuna" tuna)))
+                 (const :tag "Tuna" tuna)
+                 (const :tag "Tencent" tencent)))
 
 (defcustom lye-company-enable-yas nil
   "Enable yasnippet for company backends or not."

@@ -122,8 +122,8 @@
   :ensure nil
   :commands global-undo-tree-mode
   :hook (after-init . global-undo-tree-mode))
- ;; (setq undo-tree-history-directory-alist
- ;;       `(("." . ,(concat lye-emacs-cache-dir "undo"))))
+;; (setq undo-tree-history-directory-alist
+;;       `(("." . ,(concat lye-emacs-cache-dir "undo"))))
 
 ;; Save Emacs buffers when they lose focus after 2s
 (use-package auto-save

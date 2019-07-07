@@ -47,7 +47,7 @@
   "Set specific package ARCHIVES repository."
   (interactive
    (list (intern (completing-read "Choose package archives: "
-                                  '(melpa melpa-mirror emacs-china netease tuna)))))
+                                  '(melpa melpa-mirror emacs-china netease tencent tuna)))))
 
   (setq package-archives
         (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
@@ -69,12 +69,15 @@
             ('tuna
              `(,(cons "gnu"   (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"))
                ,(cons "melpa" (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/"))))
+            ('tencent
+             `(,(cons "gnu" (concat proto "://mirrors.cloud.tencent.com/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.cloud.tencent.com/elpa/melpa/"))))
             (archives
              (error "Unknown archives: `%s'" archives)))))
 
   (message "Set package archives to `%s'." archives))
 
-;; Set package archives
+;; Set package archives, You can choose Repo with melpa, melpa-mirrors,emacs-china, netease, tuna, tencent
 (setq lye-package-archives 'tuna)
 (set-package-archives lye-package-archives)
 
