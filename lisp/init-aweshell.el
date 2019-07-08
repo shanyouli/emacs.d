@@ -30,11 +30,19 @@
 
 ;;; Code:
 
+(global-unset-key (kbd "C-x s"))
 (use-package aweshell
   :ensure nil
   :commands (aweshell-toggle aweshell-new aweshell-next aweshell-prev
                              aweshell-sudo-toggle aweshell-switch-buffer)
-  :bind ("C-x s" . aweshell-toggle))
+  :bind ("C-x s a" . aweshell-toggle))
+
+(unless (and system/windows (display-graphic-p))
+  (use-package multi-term
+    :ensure t
+    :commands (multi-term multi-term-dedicated-close multi-term-next
+                          multi-term-prev)
+    :bind (("C-x s m" . multi-term-dedicated-toggle))))
 
 (provide 'init-aweshell)
 
