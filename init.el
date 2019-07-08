@@ -125,7 +125,7 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-elfeed)                ; RSS Reader
   (require 'init-aweshell)              ; Eshell, shell and powershell
   (require 'init-reads)                 ; Reader tools
-  (run-with-idle-timer 2 nil  (lambda ()
+  (run-with-idle-timer 0.5 nil  (lambda ()
                                 ;; Program language common tool
                                 (require 'init-lang)
                                 (require 'init-flycheck)
@@ -135,7 +135,7 @@ decrease this. If you experience stuttering, increase this.")
                                 (require 'init-lsp)
                                 (require 'init-python)))
   ;; Org mode
-  (run-with-idle-timer 3 nil (lambda ()
+  (run-with-idle-timer 1 nil (lambda ()
                                (require 'init-hugo)
                                (require 'init-org))))
 

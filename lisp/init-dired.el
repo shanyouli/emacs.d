@@ -25,29 +25,6 @@
 ;;; Code:
 (use-package dired
   :ensure nil
-  :config
-  (setq dired-recursive-copies t) ; Recursive copying
-  (setq dired-recursive-deletes t) ; Recursive deletion
-
-  (put 'dired-find-alternate-file 'disabled nil)
-  ;; Use asynchronous file management
-  (use-package dired-async
-    :ensure async
-    :diminish dired-async-mode
-    :hook (dired-mode-hook . dired-async-mode))
-
-  (use-package dired-x
-    :ensure nil
-    :demand
-    :hook (dired-mode . dired-omit-mode)
-    :config
-    (setq dired-omit-verbose nil
-          dired-omit-files
-          (concat dired-omit-files "\\|^\\..+$\\|\\.pdf$\\|\\.tex$\\|\\*~$")))
-
-  (use-package all-the-icons-dired
-    :if (and (display-graphic-p) (not system/windows))
-    :hook (dired-mode . all-the-icons-dired-mode))
   :bind (:map dired-mode-map
               ("H" . dired-omit-mode)
               ("RET" . dired-find-alternate-file)
@@ -61,8 +38,36 @@
                        (lambda()
                          (interactive)
                          (message "!!! SUDO opening %s" (dired-file-name-at-point))
-                         (lye/sudo-find-file (dired-file-name-at-point)))))))
+                         (lye/sudo-find-file (dired-file-name-at-point))))))
+  :config
+  (setq dired-recursive-copies t) ; Recursive copying
+  (setq dired-recursive-deletes t) ; Recursive deletion
+  (setq dired-listing-switches "-aluh") ;参数，传递给 ls
+  (setq directory-free-space-args "-Pkh") ; 目录空间选项
+  (put 'dired-find-alternate-file 'disabled nil))
 
+;; Use asynchronous file management
+(use-package dired-async
+  :ensure async
+  :diminish dired-async-mode
+  :hook (dired-mode-hook . dired-async-mode))
+
+(use-package dired-x
+  :ensure nil
+  :demand
+  :hook (dired-mode . dired-omit-mode)
+  :config
+  (setq dired-omit-verbose nil
+        dired-omit-files
+        (concat dired-omit-files "\\|^\\..+$\\|\\.pdf$\\|\\.tex$\\|\\*~$")))
+
+(use-package all-the-icons-dired
+  :if (and (display-graphic-p) (not system/windows))
+  :hook (dired-mode . all-the-icons-dired-mode))
+
+(use-package diredfl
+  :ensure nil
+  :hook (dired-mode . diredfl-mode))
 
 (use-package image-dired
   :ensure nil
@@ -72,8 +77,6 @@
         image-dired-thumbnail-storage 'standard))
 
 (use-package image-mode :ensure nil)
-
-
 
 (provide 'init-dired)
 ;;; init-dired.el ends here

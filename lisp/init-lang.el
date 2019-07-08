@@ -96,7 +96,8 @@
   :ensure nil
   :mode (("\\.zsh\\'" . sh-mode)
          (".zshrc" . sh-mode))
-  :hook (sh-mode . (lambda () (sh-set-shell "bash"))))
+  ;;:hook (sh-mode . (lambda () (sh-set-shell "bash")))
+  )
 ;; vimrc-major mode
 (use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))
 
