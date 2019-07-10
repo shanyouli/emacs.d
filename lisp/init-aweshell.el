@@ -42,7 +42,13 @@
     :ensure t
     :commands (multi-term multi-term-dedicated-close multi-term-next
                           multi-term-prev)
-    :bind (("C-x s m" . multi-term-dedicated-toggle))))
+    :preface
+    (defun multi-term-dedicated-toggle+ ()
+      (interactive)
+      (multi-term-dedicated-toggle)
+      (other-window 1))
+    :bind (("C-x s t" . multi-term-dedicated-toggle+)
+           ("C-x s m" . multi-term))))
 
 (provide 'init-aweshell)
 

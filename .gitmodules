@@ -67,3 +67,6 @@
 [submodule "aweshell"]
 	path = site-lisp/aweshell
 	url = https://github.com/manateelazycat/aweshell.git
+[submodule "emacs-noflet"]
+	path = site-lisp/emacs-noflet
+	url = https://github.com/nicferrier/emacs-noflet.git

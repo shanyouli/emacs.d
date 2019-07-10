@@ -42,7 +42,7 @@
   :config
   (setq dired-recursive-copies t) ; Recursive copying
   (setq dired-recursive-deletes t) ; Recursive deletion
-  (setq dired-listing-switches "-aluh") ;参数，传递给 ls
+  (setq dired-listing-switches "-aluh --group-directories-first") ;参数，传递给 ls
   (setq directory-free-space-args "-Pkh") ; 目录空间选项
   (put 'dired-find-alternate-file 'disabled nil))
 
@@ -65,6 +65,7 @@
   :if (and (display-graphic-p) (not system/windows))
   :hook (dired-mode . all-the-icons-dired-mode))
 
+;; colorful dired
 (use-package diredfl
   :ensure nil
   :hook (dired-mode . diredfl-mode))

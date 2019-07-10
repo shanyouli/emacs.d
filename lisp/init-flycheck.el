@@ -45,9 +45,5 @@
     :after flycheck
     :hook (flycheck-mode . flycheck-posframe-mode)))
 
-(use-package flycheck-color-mode-line
-  :after flycheck
-  :hook (flycheck-mode . flycheck-color-mode-line-mode))
-
 (provide 'init-flycheck)
 ;;; init-flycheck.el ends here

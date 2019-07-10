@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: zsh script directory
+# key: zsd
+# --
+
+script_dir=$(cd "$(dirname "\$0")" && pwd)
