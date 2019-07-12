@@ -46,7 +46,9 @@
     (defun multi-term-dedicated-toggle+ ()
       (interactive)
       (multi-term-dedicated-toggle)
-      (other-window 1))
+      (unless (member "*MULTI-TERM-DEDICATED*"
+                      (mapcar (function buffer-name) (buffer-list)))
+        (other-window 1)))
     :bind (("C-x s t" . multi-term-dedicated-toggle+)
            ("C-x s m" . multi-term))))
 
