@@ -166,10 +166,20 @@
   ;; Set 9 candidate words
   (setq pyim-page-length 9)
 
-  ;;  (setq-default pyim-punctuation-translate-p '(no yes auto))
-    (setq-default pyim-punctuation-translate-p '(auto yes no ))
+  (setq-default pyim-punctuation-translate-p '(no yes auto))
+  ;;(setq-default pyim-punctuation-translate-p '(auto yes no ))
   (setq-default pyim-english-input-switch-functions
-                '(pyim-probe-isearch-mode)))
+                '(pyim-probe-isearch-mode))
+
+  ;; Half-width punctuation and full-width punctuation conversion
+  (defun lye/toggle-pyim-punctuation-translate()
+    (interactive)
+    (toggle-input-method)
+    (if (string= "no" (car pyim-punctuation-translate-p))
+        (setq-default pyim-punctuation-translate-p '(auto yes no))
+      (setq-default pyim-punctuation-translate-p '(no yes auto)))
+    (toggle-input-method))
+  (global-set-key (kbd "C-<f9>") #'lye/toggle-pyim-punctuation-translate))
 
 (provide 'init-chinese)
 ;;; init-chinese.el ends here
