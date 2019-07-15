@@ -139,6 +139,7 @@
 ;; starup frame size at GUI
 (when (display-graphic-p)
   ;; Frame Size after startup
+(setq lye-init-fullscreen-y-or-n nil)
   (if lye-init-fullscreen-y-or-n
       (lye/init-fullscreen)
     (lye/init-default-frame-size))
