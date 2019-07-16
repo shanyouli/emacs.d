@@ -125,6 +125,8 @@
                      :elpa t))
           (message "Pyim didn't pretend, pyim-bigdict failed to start.")))))
   :init
+  ;; Using pyim-dregcache. not use pyim-dhashcache
+  (setq pyim-dcache-backend 'pyim-dregcache)
   ;; Set pyim as the default input method
   (setq default-input-method "pyim")
 
@@ -138,12 +140,10 @@
           (funcall orig-fun))))
     (advice-add 'company-dabbrev--prefix
                 :around #'lye/company-dabbrev--prefix))
-
   :config
   (pyim-bigdict-enable)
-
   ;; Use Emacs async to dcache, Emacs thread is more stagnation than asynchronous
-  (setq pyim-dcache-prefer-emacs-thread nil)
+  (setq pyim-prefer-emacs-thread nil)
   (setq pyim-dcache-directory (concat lye-emacs-cache-dir "pyim/dcache"))
   ;; Use full spell
   (setq pyim-default-scheme 'quanpin)
