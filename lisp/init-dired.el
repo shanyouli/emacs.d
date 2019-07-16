@@ -52,15 +52,6 @@
   :diminish dired-async-mode
   :hook (dired-mode-hook . dired-async-mode))
 
-(use-package dired-x
-  :ensure nil
-  :demand
-  :hook (dired-mode . dired-omit-mode)
-  :config
-  (setq dired-omit-verbose nil
-        dired-omit-files
-        (concat dired-omit-files "\\|^\\..+$\\|\\.pdf$\\|\\.tex$\\|\\*~$")))
-
 (use-package all-the-icons-dired
   :if (and (display-graphic-p) (not system/windows))
   :hook (dired-mode . all-the-icons-dired-mode))
@@ -78,6 +69,40 @@
         image-dired-thumbnail-storage 'standard))
 
 (use-package image-mode :ensure nil)
+
+;; Extra Dired functionality
+(use-package dired-aux :ensure nil)
+(use-package dired-x
+  :ensure nil
+  :demand
+  :hook (dired-mode . dired-omit-mode)
+  :config
+  (setq dired-omit-verbose nil
+        dired-omit-files
+        (concat dired-omit-files "\\|^\\..+$\\|\\.pdf$\\|\\.tex$\\|\\*~$"))
+  (let ((cmd (cond
+              (system/windows "start")
+              (system/linux "xdg-open")
+              (system/mac "open"))))
+    (setq dired-guess-shell-alist-user
+          `(("\\.pdf\\'" ,cmd)
+            ("\\.docx\\'" ,cmd)
+            ("\\.\\(?:djvu\\|eps\\)\\'" ,cmd)
+            ("\\.\\(?:jpg\\|jpeg\\|png\\|gif\\|xpm\\)\\'" ,cmd)
+            ("\\.\\(?:xcf\\)\\'" ,cmd)
+            ("\\.csv\\'" ,cmd)
+            ("\\.tex\\'" ,cmd)
+            ("\\.\\(?:mp4\\|mkv\\|avi\\|flv\\|rm\\|rmvb\\|ogv\\)\\(?:\\.part\\)?\\'" ,cmd)
+            ("\\.\\(?:mp3\\|flac\\)\\'" ,cmd)
+            ("\\.html?\\'" ,cmd)
+            ("\\.md\\'" ,cmd)))))
+
+;; Music player(Need external commands `mpc' and `mpd')
+(when (and (executable-find "mpc") (executable-find "mpd"))
+  (use-package simple-mpc
+    :ensure t
+    :commands (simple-mpc simple-mpc-next simple-mpc-prev simple-mpc-toggle
+                        simple-mpc-delete simple-mpc-query )))
 
 (provide 'init-dired)
 ;;; init-dired.el ends here
