@@ -34,8 +34,10 @@
 (use-package aweshell
   :ensure nil
   :commands (aweshell-toggle aweshell-new aweshell-next aweshell-prev
-                             aweshell-sudo-toggle aweshell-switch-buffer)
-  :bind ("C-x s a" . aweshell-toggle))
+                             aweshell-sudo-toggle aweshell-switch-buffer
+                             aweshell-dedicated-toggle)
+  :bind (("C-x s a" . aweshell-toggle)
+         ("C-x s d" . aweshell-dedicated-toggle)))
 
 (unless (and system/windows (display-graphic-p))
   (use-package multi-term

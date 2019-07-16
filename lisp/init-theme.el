@@ -41,7 +41,7 @@
 
 (when (display-graphic-p)
   ;;Set bright and dark theme
-  (setq lye-light-theme 'doom-solarized-light)
+  (setq lye-light-theme 'doom-one-light)
   (setq lye-dark-theme 'doom-one)
   (add-hook 'emacs-startup-hook
             (lambda ()

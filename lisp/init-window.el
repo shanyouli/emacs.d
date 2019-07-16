@@ -66,6 +66,8 @@
           ("*Paradox Report*" :size 0.382 :align 'below :autoclose t)
           ("*Youdao Dictionary*" :size 0.382 :align 'below :autoclose t)
           ("*Flycheck errors*" :size 0.382 :align 'below :autoclose t)
+          ("*AWESHELL-DEDICATED*" :size 0.382 :align 'below :autoclose t)
+          ("*MULTI-TERM-DEDICATED*" :size 0.382 :align 'below :autoclose t)
           (Buffer-menu-mode :select t :size 20 :align 'below :autoclose t)
           (comint-mode :align 'below)
           (helpful-mode :select t :size 0.382 :align 'below :autoclose t)
