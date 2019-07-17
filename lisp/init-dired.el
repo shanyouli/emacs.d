@@ -58,7 +58,7 @@
 
 ;; colorful dired
 (use-package diredfl
-  :ensure nil
+  :ensure t
   :hook (dired-mode . diredfl-mode))
 
 (use-package image-dired

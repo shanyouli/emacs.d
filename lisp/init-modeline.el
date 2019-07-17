@@ -38,25 +38,26 @@
   (setq mode-line-format nil))
 
 (if (locate-library "doom-modeline")
-    (use-package doom-modeline
-      :ensure nil
-      :hook (after-init . doom-modeline-mode)
-      :init
-      (unless (display-graphic-p)
-        (setq doom-modeline-icon nil))
+     (use-package doom-modeline
+       :ensure nil
+       :hook (after-init . doom-modeline-mode)
+       :init
+       (unless (display-graphic-p)
+         (setq doom-modeline-icon nil))
 
-      (setq doom-modeline-major-mode-color-icon t
-            doom-modeline-minor-modes nil
-            doom-modeline-mu4e nil
-            doom-modeline-github t
-            doom-modeline-github-interval 300)
+       (setq doom-modeline-major-mode-color-icon t
+             doom-modeline-minor-modes nil
+             doom-modeline-mu4e nil
+             doom-modeline-github t
+             doom-modeline-github-interval 300)
 
-      (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
+       (setq doom-modeline-buffer-file-name-style 'truncate-upto-root))
 
-  (add-hook 'after-init-hook
-            (lambda ()
-              (setq mode-line-format default-modeline-format))))
-
+   (add-hook 'after-init-hook
+             (lambda ()
+               (setq mode-line-format default-modeline-format))))
+;; (load "~/.emacs.d/site-lisp/awesome-tray/awesome-tray.el")
+;; (awesome-tray-mode 1)
 ;;; Display line, column and time on mode-line
 
 ;; Line and column
