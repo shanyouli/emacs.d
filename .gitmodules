@@ -49,9 +49,6 @@
 [submodule "emacs-doom-themes"]
 	path = site-lisp/emacs-doom-themes
 	url = https://github.com/hlissner/emacs-doom-themes.git
-[submodule "exec-path-from-shell"]
-	path = site-lisp/exec-path-from-shell
-	url = https://github.com/purcell/exec-path-from-shell.git
 [submodule "undo-tree"]
 	path = site-lisp/undo-tree
 	url = https://github.com/emacsmirror/undo-tree.git
