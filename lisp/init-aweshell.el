@@ -53,6 +53,10 @@
         (other-window 1)))
     :bind (("C-x s t" . multi-term-dedicated-toggle+)
            ("C-x s m" . multi-term))))
+;; simple
+(use-package simple
+  :ensure nil
+  :bind ("C-x s c" . shell-command))
 
 (provide 'init-aweshell)
 

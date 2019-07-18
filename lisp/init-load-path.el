@@ -46,7 +46,6 @@
   "Custom configuration.")
 
 ;;; functions
-
 (defun lye/add-subdidrs-to-load-path (parent-dir)
   "Adds every non-hidden subdir of PARENT_DIR to `load-path'."
   (when (and parent-dir  (file-exists-p parent-dir))
@@ -63,7 +62,13 @@
   ;; add lye-emacs-user-load-path-dir to load-path
   (push lye-emacs-user-init-dir load-path)
   ;; add lye-emacs-site-lisp-dir to load-path
-  (lye/add-subdidrs-to-load-path lye-emacs-site-lisp-dir))
+  (lye/add-subdidrs-to-load-path lye-emacs-site-lisp-dir)
+  ;; add dash.el,major-mode-hydra.el and s.el to `load-path'
+  (push (concat lye-emacs-site-lisp-dir "/s.el") load-path)
+  (push (concat lye-emacs-site-lisp-dir "/dash.el") load-path)
+  (push (concat lye-emacs-site-lisp-dir "/major-mode-hydra.el") load-path)
+  (push (concat lye-emacs-site-lisp-dir "/all-the-icons.el") load-path)
+  )
 
 (advice-add #'package-initialize :after #'lye/update-load-path)
 

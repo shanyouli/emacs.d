@@ -94,6 +94,7 @@ decrease this. If you experience stuttering, increase this.")
 ;; Use-package
 (require 'init-use-package
          (concat user-emacs-directory "lisp/init-use-package"))
+(require 'init-hydras (concat user-emacs-directory "lisp/init-hydras"))
 
 ;; Import self-configuration of different systems
 (let ((system-file (format "%s/init-%s.el"
@@ -114,11 +115,13 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-package)               ; Package
   ;; Preferences
   (require 'init-edit)
+  (require 'init-thing-edit)
   (require 'init-ivy)
   (require 'init-search)
   (require 'init-window)
   (require 'init-company)
   (require 'init-chinese)
+  (require 'init-treemacs)
   ;; Tools
   (require 'init-magit)                 ; Git
   (require 'init-dired)                 ; Dired
