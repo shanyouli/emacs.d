@@ -86,7 +86,7 @@ decrease this. If you experience stuttering, increase this.")
              emacs-version)))
 
 ;; `load-path'
-(require 'init-load-path (concat user-emacs-directory "lisp/init-load-path"))
+(require 'core-path (concat user-emacs-directory "core/core-path.el"))
 ;; bechmark-init
 (require 'init-bechmark (concat user-emacs-directory "lisp/init-bechmark"))
 ;; Variable

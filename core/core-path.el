@@ -1,10 +1,10 @@
-;;; init-load-path.el --- load path Initialize -*- lexical-binding: t -*-
+;;; core-path.el --- Initialize Load Path -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v0.1
 ;; Package-Requires: (cl)
-;; Homepage: homepage
+;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: load-path
 
 
@@ -26,54 +26,45 @@
 
 ;;; Commentary:
 
-;; load-path
+;; Initialize Load-Path
 
 ;;; Code:
 
-;;; depends
+;; depends
 (eval-when-compile (require 'cl))
-
-;;; variable
-
 ;; constant
-(defconst lye-emacs-site-lisp-dir
-  (expand-file-name "site-lisp" user-emacs-directory)
+(defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp" user-emacs-directory)
   "The root directory of third packages.")
+(defconst lye-emacs-core-dir (expand-file-name "core" user-emacs-directory)
+  "Initialize some packages that are not installed using package.el.")
+(defconst lye-emacs-init-dir (expand-file-name "lisp" user-emacs-directory)
+  "Initialize some packages that are installed using package.el.")
 
-;; Variable variable
-(defconst lye-emacs-user-init-dir
-  (expand-file-name "lisp" user-emacs-directory)
-  "Custom configuration.")
-
-;;; functions
+;; functions
 (defun lye/add-subdidrs-to-load-path (parent-dir)
   "Adds every non-hidden subdir of PARENT_DIR to `load-path'."
-  (when (and parent-dir  (file-exists-p parent-dir))
+  (when (and parent-dir (file-directory-p parent-dir))
     (let* ((default-directory parent-dir))
       (setq load-path
             (append
              (loop for dir in (directory-files parent-dir)
-                   unless (string-match "\\." dir)
+                   unless (or (not (file-directory-p dir))
+                              (string= dir ".")
+                              (string= dir ".."))
                    collecting (expand-file-name dir))
              load-path)))))
 
 (defun lye/update-load-path (&rest _)
-  "Update `load'."
+  "Update `load-path'."
   ;; add lye-emacs-user-load-path-dir to load-path
-  (push lye-emacs-user-init-dir load-path)
+  (push lye-emacs-init-dir load-path)
   ;; add lye-emacs-site-lisp-dir to load-path
-  (lye/add-subdidrs-to-load-path lye-emacs-site-lisp-dir)
-  ;; add dash.el,major-mode-hydra.el and s.el to `load-path'
-  (push (concat lye-emacs-site-lisp-dir "/s.el") load-path)
-  (push (concat lye-emacs-site-lisp-dir "/dash.el") load-path)
-  (push (concat lye-emacs-site-lisp-dir "/major-mode-hydra.el") load-path)
-  (push (concat lye-emacs-site-lisp-dir "/all-the-icons.el") load-path)
-  )
+  (lye/add-subdidrs-to-load-path lye-emacs-site-lisp-dir))
 
 (advice-add #'package-initialize :after #'lye/update-load-path)
 
 (lye/update-load-path)
 
-(provide 'init-load-path)
+(provide 'core-path)
 
-;;; init-load-path.el ends here
+;;; core-path.el ends here
