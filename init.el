@@ -85,12 +85,16 @@ decrease this. If you experience stuttering, increase this.")
       (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
              emacs-version)))
 
+(defmacro lye/core-require (pkg)
+  "Load PKG."
+  `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory  "core") ,pkg)))
+
 ;; `load-path'
-(require 'core-path (concat user-emacs-directory "core/core-path.el"))
+(lye/core-require 'core-path)
 ;; bechmark-init
-(require 'init-bechmark (concat user-emacs-directory "lisp/init-bechmark"))
+(lye/core-require 'core-bechmark)
 ;; Variable
-(require 'init-variable (concat user-emacs-directory "lisp/init-variable"))
+(lye/core-require 'core-var)
 ;; Use-package
 (require 'init-use-package
          (concat user-emacs-directory "lisp/init-use-package"))
@@ -126,11 +130,11 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-magit)                 ; Git
   (require 'init-dired)                 ; Dired
   (require 'init-elfeed)                ; RSS Reader
-  (require 'init-aweshell)              ; Eshell, shell and powershell
   (require 'init-reads)                 ; Reader tools
+  (require 'init-lang)
+
   (run-with-idle-timer 0.5 nil  (lambda ()
                                 ;; Program language common tool
-                                (require 'init-lang)
                                 (require 'init-flycheck)
                                 (require 'init-elisp)
                                 (require 'init-scheme)

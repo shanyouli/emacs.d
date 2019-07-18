@@ -140,14 +140,6 @@
   :commands which-key-mode
   :hook (after-init . which-key-mode))
 
-;; restart emacs
-(use-package restart-emacs
-  :ensure nil
-  :commands (restart-emacs))
-
-;; Esup,Start time adjustment<Emacs Start Up Profiler>
-(use-package esup :ensure nil :commands esup)
-
 (require 'noflet)
 (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
   "Prevent annoying \"Active processes exist\" query when you quit Emacs."
@@ -156,7 +148,6 @@
 (setq kill-buffer-query-functions
       (remq 'process-kill-buffer-query-function
             kill-buffer-query-functions))
-
 
 (provide 'init-basic)
 ;;; init-basic.el ends here

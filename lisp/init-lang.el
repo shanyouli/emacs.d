@@ -33,7 +33,8 @@
     (setq exec-path-from-shell-check-startup-files nil)
     (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
     (setq exec-path-from-shell-arguments '("-l"))
-    (exec-path-from-shell-initialize)))
+    ;;(exec-path-from-shell-initialize)
+    ))
 
 ;;; yasnippet
 (use-package yasnippet
