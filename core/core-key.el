@@ -31,7 +31,7 @@
 ;;; Code:
 
 (require 'lazy-load)
-(require 'one-key)
+;;(require 'one-key)
 
 ;;Global uninstall button
 (lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s"))
@@ -65,7 +65,8 @@
 ;; Setup change size font, base on emacs-font-size  pair-list
 (when (display-graphic-p)
   (lazy-load-global-keys '(("C-z =" . increase-emacs-font-size)
-                           ("C-z -" . decrease-emacs-font-size))
+                           ("C-z -" . decrease-emacs-font-size)
+                           ("C-z 0" . default-emacs-font-size))
                          "core-font"))
 
 (provide 'core-key)

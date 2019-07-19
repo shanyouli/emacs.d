@@ -148,16 +148,16 @@ Corresponding English font size is 9pt, 10.5pt, 12pt, 15pt, 16pt, 18pt, 22pt,
                            emacs-cjk-font
                            emacs-font-size-pair)
 
-  ;; setup change size font, base on emacs-font-size pair-list
-  (setq lye-key-menu-thing-edit-alist
-        '(
-          (("=" . "Increase font size") . increase-emacs-font-size)
-          (("-" . "Decrease font size") . decrease-emacs-font-size)
-          (("0" . "Default font size")  . default-emacs-font-size)))
-  (defun lye/one-key-menu-font-size ()
-    "The `one-key' menu for Font-SIZE."
-    (interactive)
-    (one-key-menu "FONT-SIZE" lye-key-menu-thing-edit-alist t t))
+  ;; ;; setup change size font, base on emacs-font-size pair-list
+  ;; (setq lye-key-menu-thing-edit-alist
+  ;;       '(
+  ;;         (("=" . "Increase font size") . increase-emacs-font-size)
+  ;;         (("-" . "Decrease font size") . decrease-emacs-font-size)
+  ;;         (("0" . "Default font size")  . default-emacs-font-size)))
+  ;; (defun lye/one-key-menu-font-size ()
+  ;;   "The `one-key' menu for Font-SIZE."
+  ;;   (interactive)
+  ;;   (one-key-menu "FONT-SIZE" lye-key-menu-thing-edit-alist t t))
 
     ;; Specify font for all unicode characters
   (catch 'loop

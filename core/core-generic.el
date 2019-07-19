@@ -121,6 +121,10 @@
       make-backup-files nil ; not ~ file
       create-lockfiles nil) ; not .#*** file
 
+;; Don't display `symbolic link to Git-controlled source file....'
+;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links
+(setq vc-follow-symlinks nil)
+
 (provide 'core-generic)
 
 ;;; core-generic.el ends here

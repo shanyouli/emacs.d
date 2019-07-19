@@ -63,12 +63,12 @@
   (lazy-search-highlight-current
    ((t :foreground "black" :background "orange" :bold t)))
   (lazy-search-highlight-background
-   ((t :forground "grey80" :background "green" :bold t)))
+   ((t :forground "black" :background "green" :bold t)))
   :config
   (advice-add #'lazy-search :after
-              #'(lambda () (rainbow-mode -1)))
+              #'(lambda () (rainbow-turn-off)))
   (advice-add #'lazy-search-quit :after
-              #'(lambda () (rainbow-mode t))))
+              #'(lambda () (rainbow-turn-on))))
 
 ;; Search and refactoring tool based on ripgrep
 ;; see @https://github.com/manateelazycat/color-rg
