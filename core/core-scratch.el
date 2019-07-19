@@ -1,30 +1,34 @@
-;;; init-scratch.el ---Scratch Configurations        -*- lexical-binding: t; -*-
+;;; core-scratch.el --- Initialize scratch -*- lexical-binding: t -*-
 
-;; Copyright (C) 2019  lye li
-
-;; Author: lye li <shanyouli6@gmail.com>
+;; Author: shanyouli
+;; Maintainer: shanyouli
+;; Version: v0.1
+;; Package-Requires: (dependencies)
+;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: scratch
 
-;; This program is free software; you can redistribute it and/or modify
+
+;; This file is not part of GNU Emacs
+
+;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
 
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; For a full copy of the GNU General Public License
+;; see <http://www.gnu.org/licenses/>.
+
 
 ;;; Commentary:
 
-;; scratch
+;; Initialize SCRATCH
 
 ;;; Code:
-
-;;; Variables
 
 ;; see @https://emacs-china.org/t/topic/4714/2?u=twlz0ne
 (defvar lye-scratch-save-file (concat lye-emacs-cache-dir "scratch"))
@@ -70,8 +74,8 @@
 
 ;;; Configurations
 
-(setq-default initial-major-mode 'emacs-lisp-mode) ; Set scratch default major-mode
-(setq-default initial-scratch-message  ; The message of Scratch-Buffer
+(setq initial-major-mode 'emacs-lisp-mode) ; Set scratch default major-mode
+(setq initial-scratch-message  ; The message of Scratch-Buffer
               (concat ";; Happy hacking, "
                       user-login-name " - Emacs ♥ you!\n\n"))
 
@@ -79,5 +83,6 @@
 (add-hook 'after-init-hook #'lye/scratch-restore)
 (add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
 
-(provide 'init-scratch)
-;;; init-scratch.el ends here
+(provide 'core-scratch)
+
+;;; core-scratch.el ends here

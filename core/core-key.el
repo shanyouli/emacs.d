@@ -31,19 +31,16 @@
 ;;; Code:
 
 (require 'lazy-load)
+(require 'one-key)
 
 ;;Global uninstall button
 (lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s"))
 
 ;; esup
-(lazy-load-global-keys
- '(("C-z e" . esup))
- "esup")
+(lazy-load-global-keys '(("C-z e" . esup)) "esup")
 
 ;; restart-emacs
-(lazy-load-global-keys
- '(("C-z r" . restart-emacs))
- "restart-emacs")
+(lazy-load-global-keys '(("C-z r" . restart-emacs)) "restart-emacs")
 
 ;; aweshell
 (lazy-load-global-keys
@@ -64,6 +61,12 @@
 
 ;; I don't know why the shortcut key (M-!) in awesomewm can't be used.
 (lazy-load-global-keys '(("C-z c" . shell-command)) "simple")
+
+;; Setup change size font, base on emacs-font-size  pair-list
+(when (display-graphic-p)
+  (lazy-load-global-keys '(("C-z =" . increase-emacs-font-size)
+                           ("C-z -" . decrease-emacs-font-size))
+                         "core-font"))
 
 (provide 'core-key)
 

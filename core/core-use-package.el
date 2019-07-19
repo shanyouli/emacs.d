@@ -1,11 +1,11 @@
-;;; init-use-package.el --- Initialize use-package packages -*- lexical-binding: t -*-
+;;; core-use-package.el --- Initialize use-packakge -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v0.1
-;; Package-Requires: (use-package bind d)
-;; Homepage: homepage
-;; Keywords: package-manager
+;; Package-Requires: (use-package)
+;; Homepage: https://github.com/shanyouli/emacs.d
+;; Keywords: use-package
 
 
 ;; This file is not part of GNU Emacs
@@ -26,7 +26,7 @@
 
 ;;; Commentary:
 
-;; commentary
+;; Initialize use-package
 
 ;;; Code:
 
@@ -38,12 +38,11 @@
   (setq use-package-expand-minimally t)
   (setq use-package-enable-imenu-support t))
 
-
 (eval-when-compile (require 'use-package))
 ;; Extensions
 (use-package diminish :ensure nil)
 (use-package bind-key :ensure nil)
 
-(provide 'init-use-package)
+(provide 'core-use-package)
 
-;;; init-use-package.el ends here
+;;; core-use-package.el ends here

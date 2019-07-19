@@ -29,15 +29,11 @@
 ;; commentary
 
 ;;; Code:
-(eval-when-compile (require 'hydra))
+(require 'hydra)
 
 ;; Nice looking hydras
-(use-package pretty-hydra
-  :ensure nil
-  :demand
-  :bind ("<f6>" . toggles-hydra/body)
-  :config
-  (defun pretty-hydra-title (title &optional icon-type icon-name face)
+(require 'pretty-hydra )
+(defun pretty-hydra-title (title &optional icon-type icon-name face)
     "Pretty hydra title."
     (let ((title-face (or face 'all-the-icons-blue)))
       (concat
@@ -49,18 +45,48 @@
               " "))))
        (propertize title 'face title-face))))
 
-  ;; test and base
-  (pretty-hydra-define toggles-hydra
-    (:title (pretty-hydra-title "Toggles" 'faicon "toggle-on")
-     :color amaranth :quit-key "q")
-    ("Basic"
-     (("n" display-line-numbers-mode "Line number" :toggle t))
-     "Highlight"
-     (("l" hl-line-mode "Line" :toggle t))
-     "Coding"
-     (("S" prettify-symbols-mode "pretty symbol" :toggle t)
-      ("D" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
-      ("X" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit))))))
+;; test and base
+(pretty-hydra-define toggles-hydra
+  (:title (pretty-hydra-title "Toggles" 'faicon "toggle-on")
+   :color amaranth :quit-key "q")
+  ("Basic"
+   (("n" display-line-numbers-mode "Line number" :toggle t))
+   "Highlight"
+   (("l" hl-line-mode "Line" :toggle t))
+   "Coding"
+   (("S" prettify-symbols-mode "pretty symbol" :toggle t)
+    ("D" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
+    ("X" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit)))))
+
+;; (use-package pretty-hydra
+;;   :ensure nil
+;;   :demand
+;;   :bind ("<f6>" . toggles-hydra/body)
+;;   :config
+;;   (defun pretty-hydra-title (title &optional icon-type icon-name face)
+;;     "Pretty hydra title."
+;;     (let ((title-face (or face 'all-the-icons-blue)))
+;;       (concat
+;;        (when (and (display-graphic-p) icon-type icon-name)
+;;          (let ((f (intern (format "all-the-icons-%s" icon-type))))
+;;            (when (fboundp f)
+;;              (concat
+;;               (apply f (list icon-name :face title-face :v-adjust 0.0))
+;;               " "))))
+;;        (propertize title 'face title-face))))
+
+;;   ;; test and base
+;;   (pretty-hydra-define toggles-hydra
+;;     (:title (pretty-hydra-title "Toggles" 'faicon "toggle-on")
+;;      :color amaranth :quit-key "q")
+;;     ("Basic"
+;;      (("n" display-line-numbers-mode "Line number" :toggle t))
+;;      "Highlight"
+;;      (("l" hl-line-mode "Line" :toggle t))
+;;      "Coding"
+;;      (("S" prettify-symbols-mode "pretty symbol" :toggle t)
+;;       ("D" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
+;;       ("X" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit))))))
 
 (provide 'init-hydras)
 

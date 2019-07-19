@@ -23,36 +23,6 @@
 
 ;;; Code:
 
-;; Explicitly set the prefered coding systems to avoid annoying prompt
-;; from emacs (especially on Microsoft Windows)
-(when (fboundp 'set-charset-priority)
-  (set-charset-priority 'unicode))
-(prefer-coding-system 'utf-8)
-;; Optional
-;; (setq locale-coding-system 'utf-8)
-;; (unless system/windows
-;; (setq selection-coding-system 'utf-8))
-
-;; Miscs
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; Show path if name are same
-(setq adaptive-fill-regexp "[ t]+|[ t]*([0-9]+.|*+)[ t]*")
-(setq adaptive-fill-first-line-regexp "^* *$")
-(setq delete-by-moving-to-trash t) ; Deleting file go to OS'trash floder
-(setq set-mark-command-repeat-pop t) ; Repeating C-SPC after poping mark pops it again
-
-(setq-default major-mode 'text-mode)
-;; (add-hook 'text-mode-hook (lambda ()
-;;                             (turn-on-auto-fill)
-;;                             (diminish 'auto-fill-function)))
-(setq sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
-(setq sentence-end-double-space nil)
-
-;; Tab and Space
-;; Permanently indent with spaces, never with TABs
-(setq-default c-basic-offset 4
-              tab-width 4
-              indent-tabs-mode nil)
-
 ;; Do not use the mouse in the graphical interface
 (when (display-graphic-p)
   (use-package disable-mouse :hook  (after-init . global-disable-mouse-mode)))

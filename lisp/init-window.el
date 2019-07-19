@@ -46,7 +46,7 @@
 ;; @see https://github.com/seagle0128/.emacs.d/blob/f8a53fbc60414c98142e0fb9d33c8e6353db9347/lisp/init-window.el#L127
 (use-package shackle
   :commands shackle-display-mode
-  :hook (after-init . shackle-mode)
+;;  :hook (after-init . shackle-mode)
   :config
   (setq shackle-default-size 0.4
         shackle-default-alignment 'below
@@ -61,7 +61,7 @@
           ("\\*[Wo]*Man.*\\*" :regexp t :select t :align 'below :autoclose t)
           ("*color-rg*" :size 0.382 :align 'below :autoclose t)
           ("*Calendar*" :select t :size 0.382 :align 'below)
-          ("\\*ivy-occur .*\\*" :regexp t :size 0.4 :select t :align 'below)
+          ("\\*ivy-occur .*\\*" :regexp t :size 0.382 :select t :align 'below)
           (" *undo-tree*" :select t)
           ("*Paradox Report*" :size 0.382 :align 'below :autoclose t)
           ("*Youdao Dictionary*" :size 0.382 :align 'below :autoclose t)

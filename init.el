@@ -85,20 +85,25 @@ decrease this. If you experience stuttering, increase this.")
       (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
              emacs-version)))
 
+;; https://github.com/honmaple/dotfiles/blob/571d6f0dca10015886c56a1feab17f0d5a1bb1ab/emacs.d/init.el#L51
 (defmacro lye/core-require (pkg)
   "Load PKG."
   `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory  "core") ,pkg)))
 
-;; `load-path'
-(lye/core-require 'core-path)
-;; bechmark-init
-(lye/core-require 'core-bechmark)
-;; Variable
-(lye/core-require 'core-var)
-;; Use-package
-(require 'init-use-package
-         (concat user-emacs-directory "lisp/init-use-package"))
-(require 'init-hydras (concat user-emacs-directory "lisp/init-hydras"))
+(lye/core-require 'core-path)           ; `load-path'
+(lye/core-require 'core-bechmark)       ; bechmark-init
+(lye/core-require 'core-var)            ; Variable
+(lye/core-require 'core-scratch)        ; scratch
+(lye/core-require 'core-ui)             ; UI
+(lye/core-require 'core-font)           ; Font
+(lye/core-require 'core-generic)        ; generic
+(lye/core-require 'core-key)            ; Keybindings
+(lye/core-require 'core-elpa)           ; package management tool
+(lye/core-require 'core-use-package)    ; Initialize use-package
+(lye/core-require 'core-base-package)   ; Emacs built-in packages initialization
+(lye/core-require 'core-third-package)  ; Third packages initialization
+
+;;(require 'init-hydras (concat user-emacs-directory "lisp/init-hydras"))
 
 ;; Import self-configuration of different systems
 (let ((system-file (format "%s/init-%s.el"
@@ -107,19 +112,15 @@ decrease this. If you experience stuttering, increase this.")
   (if (file-exists-p system-file)
       (load system-file nil nil)))
 
-(require 'init-font)                    ; Init Font
-(require 'init-ui)                      ; frame size set
 (require 'init-modeline)                ; modeline
 (require 'init-theme)                   ; load theme
-(require 'init-scratch)                 ; scratch configure
 (require 'init-funcs)                   ; some useful functions
-(require 'init-basic)
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
   (require 'init-package)               ; Package
   ;; Preferences
   (require 'init-edit)
-  (require 'init-thing-edit)
+  ;;(require 'init-thing-edit)
   (require 'init-ivy)
   (require 'init-search)
   (require 'init-window)
@@ -131,11 +132,11 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-dired)                 ; Dired
   (require 'init-elfeed)                ; RSS Reader
   (require 'init-reads)                 ; Reader tools
-  (require 'init-lang)
 
   (run-with-idle-timer 0.5 nil  (lambda ()
                                 ;; Program language common tool
-                                (require 'init-flycheck)
+                                  (require 'init-lang)
+                                  (require 'init-flycheck)
                                 (require 'init-elisp)
                                 (require 'init-scheme)
                                 (require 'init-lua)
