@@ -95,6 +95,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-var)            ; Variable
 (lye/core-require 'core-scratch)        ; scratch
 (lye/core-require 'core-ui)             ; UI
+(lye/core-require 'core-theme)          ; Theme
 (lye/core-require 'core-font)           ; Font
 (lye/core-require 'core-generic)        ; generic
 (lye/core-require 'core-key)            ; Keybindings
@@ -113,7 +114,6 @@ decrease this. If you experience stuttering, increase this.")
       (load system-file nil nil)))
 
 (require 'init-modeline)                ; modeline
-(require 'init-theme)                   ; load theme
 (require 'init-funcs)                   ; some useful functions
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
@@ -137,11 +137,11 @@ decrease this. If you experience stuttering, increase this.")
                                 ;; Program language common tool
                                   (require 'init-lang)
                                   (require 'init-flycheck)
-                                (require 'init-elisp)
-                                (require 'init-scheme)
-                                (require 'init-lua)
-                                (require 'init-lsp)
-                                (require 'init-python)))
+                                  (require 'init-elisp)
+                                  (require 'init-scheme)
+                                  (require 'init-lua)
+                                  (require 'init-lsp)
+                                  (require 'init-python)))
   ;; Org mode
   (run-with-idle-timer 1 nil (lambda ()
                                (require 'init-hugo)
