@@ -97,6 +97,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-ui)             ; UI
 (lye/core-require 'core-theme)          ; Theme
 (lye/core-require 'core-font)           ; Font
+(lye/core-require 'core-modeline)       ; mode-line
 (lye/core-require 'core-generic)        ; generic
 (lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-elpa)           ; package management tool
@@ -113,7 +114,7 @@ decrease this. If you experience stuttering, increase this.")
   (if (file-exists-p system-file)
       (load system-file nil nil)))
 
-(require 'init-modeline)                ; modeline
+;;(require 'init-modeline)                ; modeline
 (require 'init-funcs)                   ; some useful functions
 
 (with-temp-message ""                   ; Erase the output of the plugin startup

@@ -99,11 +99,11 @@ EG: 11:12 == 11x60+12."
 
 
 (when (display-graphic-p)
-  (setq lye-dark-theme 'doom-one
-        lye-light-theme 'doom-one-light
-        lye-dark-time "14:05"
-        lye-light-time "13:26")
-  (lye/switch-light-or-dark-theme))
+  (setq lye-light-theme 'doom-one-light
+        lye-dark-theme 'doom-one
+        lye-light-time  "08:30"
+        lye-dark-time "19:30")
+  (add-hook 'emacs-startup-hook #'lye/switch-light-or-dark-theme))
 
 (provide 'core-theme)
 

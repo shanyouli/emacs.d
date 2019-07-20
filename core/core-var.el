@@ -68,7 +68,7 @@
 (defconst *root* (string-equal "root" (getenv "USER"))
   "Are you using ROOT user?")
 
-(defconst lye-emacs-cache-dir (concat user-emacs-directory "cache/")
+(defconst lye-emacs-cache-dir (concat user-emacs-directory ".cache/")
   "Is the cache directory this?")
 
 ;;; Load `custom-file'

@@ -91,3 +91,6 @@
 [submodule "shackle"]
 	path = site-lisp/shackle
 	url = https://github.com/wasamasa/shackle.git
+[submodule "awesome-tray"]
+	path = site-lisp/awesome-tray
+	url = https://github.com/shanyouli/awesome-tray.git
