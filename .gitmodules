@@ -31,18 +31,6 @@
 [submodule "color-rg"]
 	path = site-lisp/color-rg
 	url = https://github.com/manateelazycat/color-rg.git
-[submodule "all-the-icons.el"]
-	path = site-lisp/all-the-icons.el
-	url = https://github.com/domtronn/all-the-icons.el.git
-[submodule "shrink-path"]
-	path = site-lisp/shrink-path
-	url = https://github.com/emacsmirror/shrink-path.git
-[submodule "dash.el"]
-	path = site-lisp/dash.el
-	url = https://github.com/magnars/dash.el.git
-[submodule "doom-modeline"]
-	path = site-lisp/doom-modeline
-	url = https://github.com/seagle0128/doom-modeline.git
 [submodule "swiper"]
 	path = site-lisp/swiper
 	url = https://github.com/abo-abo/swiper.git
@@ -70,24 +58,12 @@
 [submodule "thing-edit"]
 	path = site-lisp/thing-edit
 	url = https://github.com/manateelazycat/thing-edit.git
-[submodule "major-mode-hydra.el"]
-	path = site-lisp/major-mode-hydra.el
-	url = https://github.com/jerrypnz/major-mode-hydra.el.git
-[submodule "hydra"]
-	path = site-lisp/hydra
-	url = https://github.com/abo-abo/hydra.git
-[submodule "s.el"]
-	path = site-lisp/s.el
-	url = https://github.com/magnars/s.el.git
 [submodule "lazy-load"]
 	path = site-lisp/lazy-load
 	url = https://github.com/manateelazycat/lazy-load.git
 [submodule "multi-term"]
 	path = site-lisp/multi-term
 	url = https://github.com/manateelazycat/multi-term.git
-[submodule "emacs-memoize"]
-	path = site-lisp/emacs-memoize
-	url = https://github.com/skeeto/emacs-memoize.git
 [submodule "shackle"]
 	path = site-lisp/shackle
 	url = https://github.com/wasamasa/shackle.git
