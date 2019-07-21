@@ -26,12 +26,12 @@
 
 ;;; Commentary:
 
-;; Init some packages
+;; Mainly the shortcut keys for local and third-party packages
 
 ;;; Code:
 
 (require 'lazy-load)
-;;(require 'one-key)
+(require 'one-key)
 
 ;;Global uninstall button
 (lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s"))
@@ -57,20 +57,17 @@
 ;; multi-term
 (lazy-load-global-keys
  '(
-   ("C-x s t" . multi-term-dedicated-toggle)
+   ("C-x s t" . multi-term-dedicated-toggle+)
    ("C-x s m" . multi-term)
    )
- "init-multi-term")
+ "lex-multi-term")
 
 ;; I don't know why the shortcut key (M-!) in awesomewm can't be used.
 (lazy-load-global-keys '(("C-z c" . shell-command)) "simple")
 
 ;; Setup change size font, base on emacs-font-size  pair-list
 (when (display-graphic-p)
-  (lazy-load-global-keys '(("C-z =" . increase-emacs-font-size)
-                           ("C-z -" . decrease-emacs-font-size)
-                           ("C-z 0" . default-emacs-font-size))
-                         "core-font"))
+  (lazy-load-global-keys '(("C-z f" . lye/one-key-menu-font-size)) "core-font"))
 
 ;; Chinese automatically translated as English
 (lazy-load-global-keys

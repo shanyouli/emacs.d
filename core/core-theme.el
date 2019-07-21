@@ -30,12 +30,20 @@
 
 ;;; Code:
 
-(require 'doom-themes)
 (require 'cl)
 
 ;; enable blod and italic
 (setq doom-themes-enable-bold t
       doom-themes-enable-italic t)
+
+
+;; Add a hook to load-theme
+(defvar after-load-theme-hook nil
+  "Hook run after a color theme is loaded using `load-theme'.")
+(defun run-after-load-theme-hook (&rest _)
+  "Run `after-load-theme-hook'."
+  (run-hooks 'after-load-theme-hook))
+(advice-add #'load-theme :after #'run-after-load-theme-hook)
 
 ;; @see https://github.com/guidoschmidt/circadian.el
 ;; @see https://emacs-china.org/t/emacs-theme/7781
@@ -61,7 +69,6 @@ EG: 11:12 == 11x60+12."
         (mapc 'disable-theme custom-enabled-themes)
         (load-theme new-theme t)
         (progress-reporter-done progress-reporter))))
-
 
 (defun lye/switch-light-or-dark-theme ()
   "Exchange topics on time."
@@ -99,11 +106,21 @@ EG: 11:12 == 11x60+12."
 
 
 (when (display-graphic-p)
-  (setq lye-light-theme 'doom-one-light
-        lye-dark-theme 'doom-one
-        lye-light-time  "08:30"
-        lye-dark-time "19:30")
-  (add-hook 'emacs-startup-hook #'lye/switch-light-or-dark-theme))
+  (add-hook 'emacs-startup-hook
+            (lambda ()
+              (require 'doom-themes)
+              (setq lye-light-theme 'doom-one-light
+                    lye-dark-theme 'doom-one
+                    lye-light-time  "08:30"
+                    lye-dark-time "19:30")
+              (lye/switch-light-or-dark-theme)
+              ))
+
+  ;;Fixed conflict with awesome-tray when switching emacs-doom-theme
+  (add-hook 'after-load-theme-hook
+            (lambda ()
+              (if (and (boundp 'awesome-tray-active-p) awesome-tray-active-p)
+                  (awesome-tray-enable)))))
 
 (provide 'core-theme)
 

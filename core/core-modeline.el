@@ -39,14 +39,16 @@
 
 
 (unless after-init-time
-  (setq-default mode-line-format nil))
+  (setq mode-line-format nil))
 (if (display-graphic-p)
     (progn
-      (setq awesome-tray-active-modules  '("pyim" "location"  "parent-dir"  "mode-name" "awesome-tab" "date"))
       (require 'awesome-tray)
+      (setq awesome-tray-active-modules  '("pyim" "location"  "parent-dir"  "mode-name" "awesome-tab" "date"))
+      (advice-add #'awesome-tray-enable :after
+                  (lambda ()
+                    (setq-default mode-line-buffer-identification nil)
+                    (setq-default mode-line-mule-info nil)))
       (run-with-idle-timer 0.1 nil (lambda ()
-                               (setq-default mode-line-buffer-identification nil)
-                               (setq-default mode-line-mule-info nil)
                                (awesome-tray-mode 1))))
 
   ;; use setq-default to set it for /all/ modes

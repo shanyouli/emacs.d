@@ -43,6 +43,10 @@
 (defconst lye-emacs-init-dir (expand-file-name "lisp" user-emacs-directory)
   "Initialize some packages that are installed using package.el.")
 
+(defconst lye-emacs-modules-dir (expand-file-name "modules/" user-emacs-directory)
+  "You don't need to load directly but use the extended key to load the package
+ configuration folder.")
+
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
 
@@ -111,10 +115,14 @@
 
 (defun lye/update-load-path (&rest _)
   "Update `load-path'."
-  ;; add lye-emacs-user-load-path-dir to load-path
+  ;; add `lye-emacs-init-dir' to load-path
   (push lye-emacs-init-dir load-path)
-  ;; add lye-emacs-site-lisp-dir to load-path
-  (lye/add-subdidrs-to-load-path lye-emacs-site-lisp-dir))
+
+  ;; add `lye-emacs-site-lisp-dir' to load-path
+  (lye/add-subdidrs-to-load-path lye-emacs-site-lisp-dir)
+
+  ;; add `lye-emacs-modules-dir' to load-path
+  (push lye-emacs-modules-dir load-path))
 
 (advice-add #'package-initialize :after #'lye/update-load-path)
 

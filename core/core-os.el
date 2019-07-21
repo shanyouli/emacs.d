@@ -38,21 +38,24 @@
   ;; (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
   (setq exec-path-from-shell-arguments '("-l")))
 
+(defun lye/exec-path-from-shell-init ()
+  "Avoid importing `exec-path-from-shell' on some operating systems."
+  (if (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
+
 (when system/windows
   ;;;Msys2 configuration
-  (defvar msys2-root nil
-    "The root directory of msys2.")
-  (defvar msys2-bin nil
-    "The executive of msys2.")
-  (defvar mingw64-bin nil
-    "The executive of mingw64.")
+  (defvar msys2-root  nil "The root directory of msys2.")
+
+  (defvar msys2-bin   nil "The executive of msys2.")
+
+  (defvar mingw64-bin nil "The executive of mingw64.")
 
   (catch 'loop
     (dolist (mpath '("C:\\msys64"
+                     "D:\\msys64"
                      "C:\\Applications\\msys64"
-                     "D:\\Applications\\msys64"
-                     "C:\\msys64"
-                     ))
+                     "D:\\Applications\\msys64"))
       (when (file-exists-p mpath)
         (setq msys2-root mpath)
         (throw 'loop t))))

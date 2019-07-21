@@ -1,4 +1,4 @@
-;;; init-multi-term.el --- Initialize ESHELL -*- lexical-binding: t -*-
+;;; lex-multi-term.el --- Initialize ESHELL -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
@@ -31,6 +31,8 @@
 ;;; Code:
 (require 'multi-term)
 
+(lye/exec-path-from-shell-init)
+
 (defun multi-term-dedicated-toggle+ ()
   (interactive)
   (multi-term-dedicated-toggle)
@@ -38,6 +40,6 @@
               (mapcar (function buffer-name) (buffer-list)))
       (other-window 1)))
 
-(provide 'init-multi-term)
+(provide 'lex-multi-term)
 
-;;; init-multi-term.el ends here
+;;; lex-multi-term.el ends here
