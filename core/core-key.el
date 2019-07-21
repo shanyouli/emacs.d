@@ -84,6 +84,17 @@
  '(("C-z i t" . toggle-company-english-helper))
  "company-english-helper")
 
+;; lex-one-key.el
+(lazy-load-global-keys
+ '(("C-z u" . one-key-menu-ui))
+ "lex-one-key")
+
+;;; Toolkit
+(lazy-load-set-keys
+ '(
+   ("M-h" . set-mark-command) ; Instead C-SPC for Chinese input method
+   ))
+
 (provide 'core-key)
 
 ;;; core-key.el ends here

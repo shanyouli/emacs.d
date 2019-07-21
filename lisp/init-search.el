@@ -89,13 +89,6 @@
            ("C-s ," . color-rg-search-symbol-in-current-file)
            ("C-s ." . color-rg-search-input-in-current-file))))
 
-;; Quickly search the copy history and paste it at the cursor
-;; @https://emacs-china.org/t/c-k/6775/9
-(use-package browse-kill-ring
-  :ensure t
-  :commands browse-kill-ring
-  :bind ("C-s p" . browse-kill-ring))
-
 
 (provide 'init-search)
 

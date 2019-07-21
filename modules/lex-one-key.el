@@ -1,0 +1,47 @@
+;;; lex-one-key.el --- one-keywords -*- lexical-binding: t -*-
+
+;; Author: shanyouli
+;; Maintainer: shanyouli
+;; Version: v0.1
+;; Package-Requires: (one-key )
+;; Homepage: https://github.com/shanyouli/emacs.d
+;; Keywords: key
+
+
+;; This file is not part of GNU Emacs
+
+;; This file is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; For a full copy of the GNU General Public License
+;; see <http://www.gnu.org/licenses/>.
+
+
+;;; Commentary:
+
+;; Quickly open some common folders and set shortcuts for some functions
+
+;;; Code:
+
+;; The hot key about tool-bar, menu-bar, scroll-bar
+(defvar one-key-menu-ui-alist nil
+  "The `one-key' menu alist for UI.")
+(setq one-key-menu-ui-alist
+      `((("t" . "Tool-Bar") . tool-bar-mode)
+        (("m" . "Menu-Bar") . menu-bar-mode)
+        (("s" . "Scroll-Bar") . scroll-bar-mode)))
+(defun one-key-menu-ui ()
+  "The `one-key' menu for UI."
+  (interactive)
+  (one-key-menu "UI" one-key-menu-ui-alist t))
+
+(provide 'lex-one-key)
+
+;;; lex-one-key.el ends here
