@@ -90,7 +90,7 @@ decrease this. If you experience stuttering, increase this.")
   "Load PKG."
   `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory  "core") ,pkg)))
 
-(lye/core-require 'core-path)           ; `load-path'
+(lye/core-require 'core-path)           ; `load-path', Variables, benchmark
 (lye/core-require 'core-font)           ; Font
 (lye/core-require 'core-scratch)        ; scratch
 (lye/core-require 'core-ui)             ; UI

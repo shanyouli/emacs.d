@@ -28,8 +28,20 @@
 
 ;;; Code:
 
-;; Use undo-tree
+;; Setup `use-package'
+;; Should set before loading `use-package'
+(eval-when-compile (require 'use-package))
+(eval-and-compile
+  (setq use-package-always-ensure t)
+  (setq use-package-always-defer t)
+  (setq use-package-expand-minimally t)
+  (setq use-package-enable-imenu-support t))
 
+;; Extensions
+(use-package diminish :ensure nil)
+(use-package bind-key :ensure nil)
+
+;; Use undo-tree
 (use-package undo-tree
   :ensure nil
   :commands global-undo-tree-mode
