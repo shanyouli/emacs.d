@@ -32,15 +32,70 @@
 
 ;; depends
 (eval-when-compile (require 'cl))
+
 ;; constant
 (defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp" user-emacs-directory)
   "The root directory of third packages.")
+
 (defconst lye-emacs-core-dir (expand-file-name "core" user-emacs-directory)
   "Initialize some packages that are not installed using package.el.")
+
 (defconst lye-emacs-init-dir (expand-file-name "lisp" user-emacs-directory)
   "Initialize some packages that are installed using package.el.")
 
-;; functions
+(defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
+  "The Github page of My Emacs Configurations.")
+
+(defconst system/windows (eq system-type 'windows-nt)
+  "Are we running on a Windows System?")
+
+(defconst system/mac (eq system-type 'darwin)
+  "Are we running on a Mac System?")
+
+(defconst system/linux (eq system-type 'gnu/linux)
+  "Are we running on a GNU/Linux System?")
+
+(defconst *root* (string-equal "root" (getenv "USER"))
+  "Are you using ROOT user?")
+
+(defconst lye-emacs-cache-dir (concat user-emacs-directory ".cache/")
+  "Is the cache directory this?")
+
+;;; customization
+(defcustom lye-full-name "shanyouli"
+  "Set user full name."
+  :type 'string)
+
+(defcustom lye-mail-address "shanyouli6@gmail.com"
+  "Set user mail address."
+  :type 'string)
+
+(defcustom lye-package-archives 'emacs-china
+  "Set package archives from which to fetch."
+  :type '(choice (const :tag "Melpa" melpa)
+                 (const :tag "Melpa-mirror" melpa-mirror)
+                 (const :tag "Emacs-china" emacs-china)
+                 (const :tag "Netease" netease)
+                 (const :tag "Tuna" tuna)
+                 (const :tag "Tencent" tencent)))
+
+(defcustom lye-company-enable-yas nil
+  "Enable yasnippet for company backends or not."
+  :type  'boolean)
+
+(defcustom lye-enable-benchmark-p nil
+  "Enable the init benchmark or not."
+  :type 'boolean)
+
+;;; Load `custom-file'
+(setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
+(when (file-exists-p custom-file) (load custom-file))
+
+;; Set the temporal directory
+(unless (file-exists-p lye-emacs-cache-dir)
+  (make-directory lye-emacs-cache-dir))
+
+;;; `Load-path'
 (defun lye/add-subdidrs-to-load-path (parent-dir)
   "Adds every non-hidden subdir of PARENT_DIR to `load-path'."
   (when (and parent-dir (file-directory-p parent-dir))
@@ -64,6 +119,12 @@
 (advice-add #'package-initialize :after #'lye/update-load-path)
 
 (lye/update-load-path)
+
+;;; bechmark-init
+(when lye-enable-benchmark-p
+  (require 'benchmark-init-modes)
+  (require 'benchmark-init)
+  (benchmark-init/activate))
 
 (provide 'core-path)
 

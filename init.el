@@ -91,30 +91,19 @@ decrease this. If you experience stuttering, increase this.")
   `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory  "core") ,pkg)))
 
 (lye/core-require 'core-path)           ; `load-path'
-(lye/core-require 'core-bechmark)       ; bechmark-init
-(lye/core-require 'core-var)            ; Variable
+(lye/core-require 'core-font)           ; Font
 (lye/core-require 'core-scratch)        ; scratch
 (lye/core-require 'core-ui)             ; UI
 (lye/core-require 'core-theme)          ; Theme
-(lye/core-require 'core-font)           ; Font
 (lye/core-require 'core-modeline)       ; mode-line
 (lye/core-require 'core-generic)        ; generic
+(lye/core-require 'core-os)             ; OS environmental variable
 (lye/core-require 'core-key)            ; Keybindings
-(lye/core-require 'core-elpa)           ; package management tool
 (lye/core-require 'core-use-package)    ; Initialize use-package
 (lye/core-require 'core-base-package)   ; Emacs built-in packages initialization
 (lye/core-require 'core-third-package)  ; Third packages initialization
+(lye/core-require 'core-elpa)           ; package management tool
 
-;;(require 'init-hydras (concat user-emacs-directory "lisp/init-hydras"))
-
-;; Import self-configuration of different systems
-(let ((system-file (format "%s/init-%s.el"
-                           (expand-file-name "lisp" user-emacs-directory)
-                           (symbol-name system-type))))
-  (if (file-exists-p system-file)
-      (load system-file nil nil)))
-
-;;(require 'init-modeline)                ; modeline
 (require 'init-funcs)                   ; some useful functions
 
 (with-temp-message ""                   ; Erase the output of the plugin startup

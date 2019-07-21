@@ -223,5 +223,6 @@ Lisp function does not specify a special indentation."
 (setq load-prefer-newer t)
 
 (add-hook 'emacs-lisp-mode-hook #'(lambda () (setq mode-name "EL")))
+
 (provide 'init-elisp)
 ;;; init-elisp.el ends here

@@ -25,16 +25,16 @@
 ;;; Code:
 
 ;; exec-path config
-(when (memq window-system '(mac ns x))
-  (use-package exec-path-from-shell
-    :ensure nil
-    :init
-    (require 'cache-path-from-shell)
-    (setq exec-path-from-shell-check-startup-files nil)
-    (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
-    (setq exec-path-from-shell-arguments '("-l"))
-    ;;(exec-path-from-shell-initialize)
-    ))
+;; (when (memq window-system '(mac ns x))
+;;   (use-package exec-path-from-shell
+;;     :ensure nil
+;;     :init
+;;     (require 'cache-path-from-shell)
+;;     (setq exec-path-from-shell-check-startup-files nil)
+;;     (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
+;;     (setq exec-path-from-shell-arguments '("-l"))
+;;     ;;(exec-path-from-shell-initialize)
+;;     ))
 
 ;;; yasnippet
 (use-package yasnippet

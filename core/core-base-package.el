@@ -32,12 +32,13 @@
 
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
-(use-package server
-  :if (not (or (eq system-type 'cygwin) system/windows))
-  :ensure nil
-  :commands (server-running-p)
-  :hook (after-init . (lambda () (unless (server-running-p) (server-start))))
-  :init (setq server-auth-dir (concat lye-emacs-cache-dir "server")))
+
+ (use-package server
+   :if (not (or (eq system-type 'cygwin) system/windows))
+   :ensure nil
+   :commands (server-running-p)
+   :hook (after-init . (lambda () (unless (server-running-p) (server-start))))
+   :init (setq server-auth-dir (concat lye-emacs-cache-dir "server")))
 
 ;; Save cursor position for everyfile you opened. So,  next time you open
 ;; the file, the cursor will be at the position you last opened it.

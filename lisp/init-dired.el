@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+
 (use-package dired
   :ensure nil
   :bind (:map dired-mode-map

@@ -30,17 +30,10 @@
 
 ;;; Code:
 
-
 ;; benchmark-init
-(defcustom lye-enable-benchmark-p nil
-  "Enable the init benchmark or not."
-  :type 'boolean)
 
 ;; Configurations
-(when lye-enable-benchmark-p
-  (require 'benchmark-init-modes)
-  (require 'benchmark-init)
-  (benchmark-init/activate))
+
 
 (provide 'core-bechmark)
 

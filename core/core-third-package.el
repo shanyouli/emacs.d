@@ -29,6 +29,7 @@
 ;;; Code:
 
 ;; Use undo-tree
+
 (use-package undo-tree
   :ensure nil
   :commands global-undo-tree-mode

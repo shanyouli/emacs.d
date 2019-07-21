@@ -23,18 +23,6 @@
 
 ;;; Code:
 
-;; ZH Automatically translated as EN
-(use-package insert-translated-name
-  :ensure nil
-  :commands (insert-translated-name-insert-original-translation)
-  :init (setq-default insert-translated-name-default-style "origin")
-  :bind ("C-c t" . insert-translated-name-insert-original-translation))
-
-;; Prompt English words when writing English
-(use-package company-english-helper
-  :ensure nil
-  :commands(toggle-company-english-helper))
-
 ;;translate Chinese to English, or translate English to Chinese
 (defun lye/use-sdcv ()
   "Installing sdcv and using sdcv package"
@@ -99,7 +87,6 @@
               (youdao-dictionary-search-at-point))))
         (bind-key "C-s y" #'lye/avy-youdao-dictionary)))
   (lye/use-sdcv))
-
 
 ;;; pyim -- chinese input method
 (use-package pyim

@@ -36,6 +36,9 @@
 ;;Global uninstall button
 (lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s"))
 
+;; suspend-frame
+(lazy-load-global-keys '(("C-z C-z" . suspend-frame)) "frame")
+
 ;; esup
 (lazy-load-global-keys '(("C-z e" . esup)) "esup")
 
@@ -68,6 +71,21 @@
                            ("C-z -" . decrease-emacs-font-size)
                            ("C-z 0" . default-emacs-font-size))
                          "core-font"))
+
+;; Chinese automatically translated as English
+(lazy-load-global-keys
+ '(
+   ("C-z i o" . insert-translated-name-insert-original-translation)
+   ("C-z i u" . insert-translated-name-insert-with-underline)
+   ("C-z i l" . insert-translated-name-insert-with-line)
+   ("C-z i c" . insert-translated-name-insert-with-camel)
+   )
+ "insert-translated-name")
+
+;; English word completion with Chinese comments
+(lazy-load-global-keys
+ '(("C-z i t" . toggle-company-english-helper))
+ "company-english-helper")
 
 (provide 'core-key)
 

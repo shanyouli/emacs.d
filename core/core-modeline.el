@@ -39,7 +39,7 @@
 
 
 (unless after-init-time
-  (setq mode-line-format nil))
+  (setq-default mode-line-format nil))
 (if (display-graphic-p)
     (progn
       (setq awesome-tray-active-modules  '("pyim" "location"  "parent-dir"  "mode-name" "awesome-tab" "date"))
@@ -48,8 +48,10 @@
                                (setq-default mode-line-buffer-identification nil)
                                (setq-default mode-line-mule-info nil)
                                (awesome-tray-mode 1))))
+
   ;; use setq-default to set it for /all/ modes
-  (setq mode-line-format
+  ;; http://emacs-fu.blogspot.com/2011/08/customizing-mode-line.html
+  (setq-default mode-line-format
         (list
          ;; the buffer name; the file name as a tool tip
          '(:eval (propertize "%b " 'face 'font-lock-keyword-face
