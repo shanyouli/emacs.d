@@ -1,4 +1,4 @@
-;;; core-path.el --- Initialize Load Path -*- lexical-binding: t -*-
+;;; core.el --- Initialize Load Path -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
@@ -134,6 +134,6 @@
   (require 'benchmark-init)
   (benchmark-init/activate))
 
-(provide 'core-path)
+(provide 'core)
 
-;;; core-path.el ends here
+;;; core.el ends here

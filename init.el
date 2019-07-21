@@ -90,7 +90,7 @@ decrease this. If you experience stuttering, increase this.")
   "Load PKG."
   `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory  "core") ,pkg)))
 
-(lye/core-require 'core-path)           ; `load-path', Variables, benchmark
+(lye/core-require 'core)                ; `load-path', Variables, benchmark
 (lye/core-require 'core-font)           ; Font
 (lye/core-require 'core-scratch)        ; scratch
 (lye/core-require 'core-theme)          ; Theme
@@ -99,8 +99,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-generic)        ; generic
 (lye/core-require 'core-os)             ; OS environmental variable
 (lye/core-require 'core-key)            ; Keybindings
-(lye/core-require 'core-third-package)  ; Third packages initialization
-(lye/core-require 'core-base-package)   ; Emacs built-in packages initialization
+(lye/core-require 'core-package)        ; packages initialization
 (lye/core-require 'core-elpa)           ; package management tool
 
 (require 'init-funcs)                   ; some useful functions

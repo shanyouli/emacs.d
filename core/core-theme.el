@@ -113,9 +113,9 @@ EG: 11:12 == 60*(11*60+12)."
             (lambda ()
               (require 'doom-themes)
               (setq lye-light-theme 'doom-one-light
-                    lye-dark-theme 'doom-one
+                    lye-dark-theme  'doom-one
                     lye-light-time  "08:30"
-                    lye-dark-time "19:30")
+                    lye-dark-time   "19:30")
               (lye/switch-light-or-dark-theme)
               ))
 

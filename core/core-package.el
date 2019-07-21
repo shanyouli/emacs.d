@@ -1,11 +1,11 @@
-;;; core-base-package.el --- Initialize base package -*- lexical-binding: t -*-
+;;; core-package.el --- Initialize third-packages -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v0.1
 ;; Package-Requires: (dependencies)
-;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: keywords
+;; Homepage: https://github.com/shanyouli
+;; Keywords:
 
 
 ;; This file is not part of GNU Emacs
@@ -26,13 +26,26 @@
 
 ;;; Commentary:
 
-;; base package
-
 ;;; Code:
+
+;; Setup `use-package'
+;; Should set before loading `use-package'
+(eval-when-compile
+  (progn
+    (require 'use-package)
+    (setq use-package-always-ensure t)
+    (setq use-package-always-defer t)
+    (setq use-package-expand-minimally t)
+    (setq use-package-enable-imenu-support t)))
+
+;; Extensions
+(use-package diminish :ensure nil)
+(use-package bind-key :ensure nil)
+
+;;; Exist package
 
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
-
  (use-package server
    :if (not (or (eq system-type 'cygwin) system/windows))
    :ensure nil
@@ -116,6 +129,32 @@
 ;; Automatically refresh files that have been changed elsewhere
 (add-hook 'after-init-hook (lambda () (global-auto-revert-mode t)))
 
-(provide 'core-base-package)
+;;; third-package
 
-;;; core-base-package.el ends here
+;; Use undo-tree
+(use-package undo-tree
+  :ensure nil
+  :commands global-undo-tree-mode
+  :hook (after-init . global-undo-tree-mode))
+;; (setq undo-tree-history-directory-alist
+;;       `(("." . ,(concat lye-emacs-cache-dir "undo"))))
+
+;; Save Emacs buffers when they lose focus after 1.5s
+(use-package auto-save
+  :ensure nil
+  :defines (auto-save-silent auto-save-idle)
+  :commands (auto-save-enable)
+  :init (setq auto-save-silent t
+              auto-save-idle 1.5)
+  :hook (after-init . auto-save-enable))
+
+;; Displays the key bindings following your currently entered incomplete command
+(use-package which-key
+  :ensure nil
+  :commands which-key-mode
+  :hook (after-init . which-key-mode)
+  :init (setq which-key-idle-delay 0.3))
+
+(provide 'core-package)
+
+;;; core-package.el ends here
