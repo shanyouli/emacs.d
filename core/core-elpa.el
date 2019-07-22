@@ -91,6 +91,19 @@
   (setq package-enable-at-startup nil) ;To prevent initializing twice
   (package-initialize))
 
+;; @see https://github.com/redguardtoo/emacs.d/blob/3c54e19d7793e8178b8a357502ae33c62b2db23a/lisp/init-elpa.el#L207
+;; On-demand installation of packages
+(defun require-package (package &optional min-version no-refresh)
+  "Ask elpa to install given PACKAGE."
+  (cond
+   ((package-installed-p package min-version)
+    t)
+   ((or (assoc package package-archive-contents) no-refresh)
+    (package-install package))
+   (t
+    (package-refresh-contents)
+    (require-package package min-version t))))
+
 (provide 'core-elpa)
 
 ;;; core-elpa.el ends here

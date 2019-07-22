@@ -34,7 +34,7 @@
 (require 'one-key)
 
 ;;Global uninstall button
-(lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s"))
+(lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s" "C-r"))
 
 ;; suspend-frame
 (lazy-load-global-keys '(("C-z C-z" . suspend-frame)) "frame")
@@ -62,9 +62,6 @@
    )
  "lex-multi-term")
 
-;; I don't know why the shortcut key (M-!) in awesomewm can't be used.
-(lazy-load-global-keys '(("C-z c" . shell-command)) "simple")
-
 ;; Setup change size font, base on emacs-font-size  pair-list
 (when (display-graphic-p)
   (lazy-load-global-keys '(("C-z f" . lye/one-key-menu-font-size)) "core-font"))
@@ -85,14 +82,19 @@
  "company-english-helper")
 
 ;; lex-one-key.el
-(lazy-load-global-keys
- '(("C-z u" . one-key-menu-ui))
- "lex-one-key")
+(lazy-load-global-keys '(("C-z u" . one-key-menu-ui)) "lex-one-key")
+
+;; lex-translate.el
+(lazy-load-global-keys '(("C-z y" . one-key-menu-translate)) "lex-translate")
+
+;; lex-search.el
+(lazy-load-global-keys '(("C-r" . one-key-menu-search)) "lex-search")
 
 ;;; Toolkit
 (lazy-load-set-keys
  '(
    ("M-h" . set-mark-command) ; Instead C-SPC for Chinese input method
+   ("C-z c" . shell-command)  ; I don't know why the `M-!' in awesomewm can't be used.
    ))
 
 (provide 'core-key)

@@ -91,6 +91,16 @@
   "Enable the init benchmark or not."
   :type 'boolean)
 
+(defcustom lye-enable-sdcv-or-youdao 'sdcv
+  "If it is sdcv, use `sdcv' as a translation tool.
+If it is youdao, use `youdao-dictionary' as a translation tool."
+  :type '(choice (const :tag "Sdcv" sdcv)
+                 (const :tag "Youdao" youdao)))
+
+(defcustom lye-sdcv-dictionary-data-dir (expand-file-name "~/.stardict/dic/")
+  "Sdcv dictionary storage directory."
+  :type 'string)
+
 ;;; Load `custom-file'
 (setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
 (when (file-exists-p custom-file) (load custom-file))

@@ -35,8 +35,9 @@
       user-mail-address lye-mail-address)
 
 ;; Restore emacs session.
-(setq initial-buffer-choice t)
-(run-with-timer 1 nil #'(lambda () (bury-buffer))) ;The start interface is `*Message*'
+;;(setq initial-buffer-choice t)
+;; Hide *scratch* buffer after entering the interface
+;; (run-with-timer 1 nil #'(lambda () (bury-buffer))) ;The start interface is `*Message*'
 
 (fset 'yes-or-no-p 'y-or-n-p)           ;以 y/n代表 yes/no
 (blink-cursor-mode -1)                  ;指针不闪动

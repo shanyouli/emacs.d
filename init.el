@@ -105,7 +105,8 @@ decrease this. If you experience stuttering, increase this.")
 (require 'init-funcs)                   ; some useful functions
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
-  (require 'init-package)               ; Package
+  (require 'init-key)                   ; Keybindings
+
   ;; Preferences
   (require 'init-edit)
   ;;(require 'init-thing-edit)
@@ -118,7 +119,6 @@ decrease this. If you experience stuttering, increase this.")
   ;; Tools
   (require 'init-magit)                 ; Git
   (require 'init-dired)                 ; Dired
-  (require 'init-elfeed)                ; RSS Reader
   (require 'init-reads)                 ; Reader tools
 
   (run-with-idle-timer 0.5 nil  (lambda ()

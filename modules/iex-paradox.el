@@ -1,11 +1,11 @@
-;;; init-search.el --- Initialize Search Configurations -*- lexical-binding: t -*-
+;;; iex-paradox.el --- Initialize Paradox -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (use-package lazy-search color-rg browse-kill-ring .etc)
+;; Version: v1
+;; Package-Requires: (paradox)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: search
+;; Keywords: package tools
 
 
 ;; This file is not part of GNU Emacs
@@ -26,27 +26,23 @@
 
 ;;; Commentary:
 
-;; Initialize Search
+;; Package management tools
 
 ;;; Code:
 
-;;; Configurations
 
-;; Uninstall some global shortcuts that may cause conflicts
 
-;; Isearch and swiper
-(if (locate-library "swiper")
-    (use-package swiper
-      :ensure nil
-      :bind (("C-s" . swiper-isearch)
-             :map swiper-map
-             ([escape] . minibuffer-keyboard-quit))
-      :config
-      (setq swiper-action-recenter t))
-  (use-package isearch
-    :ensure nil
-    :bind (("C-s" . isearch-forward))))
+(require-package 'paradox)
+(require 'paradox)
+(defun lye/list-package ()
+  (interactive)
+  (setq paradox-execute-asynchronously t)
+  (setq paradox-github-token t)
+  (setq paradox-display-star-count nil)
+  (paradox-enable)
+  (list-packages))
 
-(provide 'init-search)
 
-;;; init-search.el ends here
+(provide 'iex-paradox)
+
+;;; iex-paradox.el ends here

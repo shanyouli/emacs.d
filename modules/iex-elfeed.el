@@ -1,11 +1,11 @@
-;;; init-search.el --- Initialize Search Configurations -*- lexical-binding: t -*-
+;;; iex-elfeed.el --- A RSS feed reader. -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (use-package lazy-search color-rg browse-kill-ring .etc)
+;; Version: v1
+;; Package-Requires: (elfeed)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: search
+;; Keywords: elfeed
 
 
 ;; This file is not part of GNU Emacs
@@ -26,27 +26,22 @@
 
 ;;; Commentary:
 
-;; Initialize Search
+;; A RSS feed reader
 
 ;;; Code:
 
-;;; Configurations
+(require-package 'elfeed)
 
-;; Uninstall some global shortcuts that may cause conflicts
+(setq elfeed-db-directory (concat lye-emacs-cache-dir "elfeed"))
 
-;; Isearch and swiper
-(if (locate-library "swiper")
-    (use-package swiper
-      :ensure nil
-      :bind (("C-s" . swiper-isearch)
-             :map swiper-map
-             ([escape] . minibuffer-keyboard-quit))
-      :config
-      (setq swiper-action-recenter t))
-  (use-package isearch
-    :ensure nil
-    :bind (("C-s" . isearch-forward))))
+(setq elfeed-feeds
+        '("http://planet.emacsen.org/atom.xml"
+          "http://www.masteringemacs.org/feed/"
+          "https://oremacs.com/atom.xml"
+          "https://pinecast.com/feed/emacscast"
+          "https://emacs-china.github.io/rss.xml"
+          "https://manateelazycat.github.io/feed.xml"))
 
-(provide 'init-search)
+(provide 'iex-elfeed)
 
-;;; init-search.el ends here
+;;; iex-elfeed.el ends here

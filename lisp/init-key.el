@@ -1,11 +1,11 @@
-;;; init-search.el --- Initialize Search Configurations -*- lexical-binding: t -*-
+;;; init-key.el --- package.el keywords -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (use-package lazy-search color-rg browse-kill-ring .etc)
+;; Version: v1
+;; Package-Requires: (lazy-load )
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: search
+;; Keywords: key
 
 
 ;; This file is not part of GNU Emacs
@@ -26,27 +26,16 @@
 
 ;;; Commentary:
 
-;; Initialize Search
+;; Key
 
 ;;; Code:
 
-;;; Configurations
+;; iex-elfeed
+(lazy-load-global-keys '(("C-z w" . elfeed)) "iex-elfeed")
 
-;; Uninstall some global shortcuts that may cause conflicts
+;; iex-pardox
+(lazy-load-global-keys '(("C-z l" . lye/list-package)) "iex-paradox")
 
-;; Isearch and swiper
-(if (locate-library "swiper")
-    (use-package swiper
-      :ensure nil
-      :bind (("C-s" . swiper-isearch)
-             :map swiper-map
-             ([escape] . minibuffer-keyboard-quit))
-      :config
-      (setq swiper-action-recenter t))
-  (use-package isearch
-    :ensure nil
-    :bind (("C-s" . isearch-forward))))
+(provide 'init-key)
 
-(provide 'init-search)
-
-;;; init-search.el ends here
+;;; init-key.el ends here

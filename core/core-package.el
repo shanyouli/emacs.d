@@ -4,7 +4,7 @@
 ;; Maintainer: shanyouli
 ;; Version: v0.1
 ;; Package-Requires: (dependencies)
-;; Homepage: https://github.com/shanyouli
+;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords:
 
 
@@ -136,8 +136,6 @@
   :ensure nil
   :commands global-undo-tree-mode
   :hook (after-init . global-undo-tree-mode))
-;; (setq undo-tree-history-directory-alist
-;;       `(("." . ,(concat lye-emacs-cache-dir "undo"))))
 
 ;; Save Emacs buffers when they lose focus after 1.5s
 (use-package auto-save

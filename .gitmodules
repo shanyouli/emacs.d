@@ -67,3 +67,6 @@
 [submodule "awesome-tray"]
 	path = site-lisp/awesome-tray
 	url = https://github.com/shanyouli/awesome-tray.git
+[submodule "posframe"]
+	path = site-lisp/posframe
+	url = https://github.com/tumashu/posframe.git
