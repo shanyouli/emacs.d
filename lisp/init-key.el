@@ -36,6 +36,11 @@
 ;; iex-pardox
 (lazy-load-global-keys '(("C-z l" . lye/list-package)) "iex-paradox")
 
+;; iex-treemacs
+(lazy-load-global-keys '(("C-x t" . one-key-menu-treemacs)) "iex-treemacs")
+
+;; iex-git
+(lazy-load-global-keys '(("C-x g" . one-key-menu-magit)) "iex-git")
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
 (require-package 'link-hint)
@@ -46,6 +51,7 @@
 
 (require-package 'org-cliplink)
 (lazy-load-global-keys '(("C-x p i" . org-cliplink)) "org-cliplink")
+
 
 (provide 'init-key)
 

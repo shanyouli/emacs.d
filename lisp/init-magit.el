@@ -39,20 +39,7 @@ modifications to the currently deleted module. "
      (list (magit-read-module-path "Remove module"))
      "--force" nil))
 
-  ;; @https://github.com/manateelazycat/lazycat-emacs/blob/master/site-lisp/config/init-git.el#L154
-  (defun magit-submodule-add+ (url)
-    "It's more convenient to add third-party packages that don't use package
-management for Emacs."
-    (interactive "sURL: ")
-    (let ((parent-dir
-           (cadr
-            (split-string (expand-file-name
-                           (file-name-as-directory lye-emacs-site-lisp-dir))
-                          (expand-file-name (cdr (project-current)))))))
-      (magit-submodule-add
-       url
-       (concat parent-dir (file-name-base url))
-       (file-name-base url))))
+
 
   (defun magit-status+ ()
     (interactive)
@@ -60,17 +47,8 @@ management for Emacs."
     (other-window 1))
 
   :config
-  (setq transient-history-file
-        (concat lye-emacs-cache-dir "transient/history.el"))
-  (setq transient-values-file
-        (concat lye-emacs-cache-dir "transient/values.el"))
-  (setq transient-levels-file
-        (concat lye-emacs-cache-dir "transient/levels.el"))
 
-  ;; unset C-x g
-  ;; @see https://github.com/magit/magit/issues/3522#issuecomment-407640436
-  (with-eval-after-load "magit-files"
-    (define-key magit-file-mode-map (kbd "C-x g") nil))
+
 
   :bind (("C-x g s" . magit-status+)
          ("C-x g c" . magit-checkout)

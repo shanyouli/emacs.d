@@ -114,9 +114,9 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-window)
   (require 'init-company)
   (require 'init-chinese)
-  (require 'init-treemacs)
+
   ;; Tools
-  (require 'init-magit)                 ; Git
+;;  (require 'init-magit)                 ; Git
   (require 'init-dired)                 ; Dired
   (require 'init-reads)                 ; Reader tools
 

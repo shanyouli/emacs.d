@@ -87,6 +87,8 @@
 ;; lex-search.el
 (lazy-load-global-keys '(("C-r" . one-key-menu-search)) "lex-search")
 
+;; lex-thing-edit.el
+(lazy-load-global-keys '(("M-s" . one-key-menu-thing-edit)) "lex-thing-edit")
 ;; lex-pyim.el
 ;; (lazy-load-global-keys '(("<f9>" . toggle-input-method)) "lex-pyim")
 
