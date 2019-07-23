@@ -31,17 +31,28 @@
 ;;; Code:
 
 ;; lazy-search configuration ---------------------------------------------------
+
+
 (require 'lazy-search)
 (custom-set-faces
  '(lazy-search-highlight-current
    ((t :foreground "black" :background "orange" :bold t)))
-  '(lazy-search-highlight-background
-    ((t :foreground "black" :background "green" :bold t))))
+ '(lazy-search-highlight-background
+   ((t :foreground "gray" :background "black" :bold t))))
 
-;;(defadvice lazy-search)
-
-(advice-add #'lazy-search-quit :after #'rainbow-turn-on)
-(advice-add #'lazy-search :after  #'rainbow-turn-off)
+;; Fix lazy-search and rainbow-mode conflicts
+(defvar lye-rainbow-mode-active-p nil
+  "`rainbow-mode' is run or not.")
+(defun lye/rainbow-turn-off ()
+  (when (and (featurep 'rainbow-mode) rainbow-mode)
+    (setq lye-rainbow-mode-active-p t)
+    (rainbow-mode -1)))
+(defun lye/rainbow-turn-on ()
+  (when lye-rainbow-mode-active-p
+    (setq lye-rainbow-mode-active-p nil)
+    (rainbow-mode 1)))
+(advice-add #'lazy-search-quit :after #'lye/rainbow-turn-on)
+(advice-add #'lazy-search :after  #'lye/rainbow-turn-off)
 ;; -----------------------------------------------------------------------------
 
 ;; color-rg configuration ------------------------------------------------------

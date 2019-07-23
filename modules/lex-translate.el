@@ -87,7 +87,6 @@
     (interactive)
     (one-key-menu "TRANSLATATIONS" one-key-menu-translate-alist t))))
 
-
 ;; (when (locate-library "avy")
 ;;         (defun lye/avy-youdao-dictionary ()
 ;;           (interactive)

@@ -90,12 +90,15 @@
 ;; lex-search.el
 (lazy-load-global-keys '(("C-r" . one-key-menu-search)) "lex-search")
 
+;; lex-pyim.el
+;;(lazy-load-global-keys '(("<f9>" . toggle-input-method)) "lex-pyim")
 ;;; Toolkit
 (lazy-load-set-keys
  '(
    ("M-h" . set-mark-command) ; Instead C-SPC for Chinese input method
    ("C-z c" . shell-command)  ; I don't know why the `M-!' in awesomewm can't be used.
    ))
+
 
 (provide 'core-key)
 
