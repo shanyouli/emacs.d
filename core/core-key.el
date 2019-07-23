@@ -36,9 +36,6 @@
 ;;Global uninstall button
 (lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s" "C-r"))
 
-;; suspend-frame
-(lazy-load-global-keys '(("C-z C-z" . suspend-frame)) "frame")
-
 ;; esup
 (lazy-load-global-keys '(("C-z e" . esup)) "esup")
 
@@ -91,14 +88,15 @@
 (lazy-load-global-keys '(("C-r" . one-key-menu-search)) "lex-search")
 
 ;; lex-pyim.el
-;;(lazy-load-global-keys '(("<f9>" . toggle-input-method)) "lex-pyim")
+;; (lazy-load-global-keys '(("<f9>" . toggle-input-method)) "lex-pyim")
+
 ;;; Toolkit
 (lazy-load-set-keys
  '(
    ("M-h" . set-mark-command) ; Instead C-SPC for Chinese input method
    ("C-z c" . shell-command)  ; I don't know why the `M-!' in awesomewm can't be used.
+   ("C-z C-z" . suspend-frame); Suspend-frame
    ))
-
 
 (provide 'core-key)
 

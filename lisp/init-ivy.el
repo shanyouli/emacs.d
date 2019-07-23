@@ -62,5 +62,14 @@
   (setq amx-history-length 10)
   (amx-initialize))
 
+;; Swiper
+(use-package swiper
+  :ensure nil
+  :bind (("C-s" . swiper-isearch)
+         :map swiper-map
+         ([escape] . minibuffer-keyboard-quit))
+  :config
+  (setq swiper-action-recenter t))
+
 (provide 'init-ivy)
 ;;; init-ivy.el ends here
