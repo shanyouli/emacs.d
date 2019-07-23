@@ -1,5 +1,0 @@
-* 说明:
-1. 此目录下主要收录一些比较难以使用 git 或 package.el 管理的包
-* 包含的包和其网址
-**  [[https://github.com/manateelazycat/lazycat-emacs/blob/master/site-lisp/extensions/lazycat/one-key.el][懒猫的 one-key]]
--

@@ -36,6 +36,17 @@
 ;; iex-pardox
 (lazy-load-global-keys '(("C-z l" . lye/list-package)) "iex-paradox")
 
+;; open line in browser
+;; see @https://github.com/noctuid/link-hint.el/
+(require-package 'link-hint)
+(lazy-load-global-keys
+ '(("C-x p o" . link-hint-open-link)
+   ("C-x p c" . link-hint-copy-link))
+ "link-hint")
+
+(require-package 'org-cliplink)
+(lazy-load-global-keys '(("C-x p i" . org-cliplink)) "org-cliplink")
+
 (provide 'init-key)
 
 ;;; init-key.el ends here

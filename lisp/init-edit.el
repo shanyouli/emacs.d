@@ -89,12 +89,5 @@
 ;; add color display
 (use-package rainbow-mode :hook (prog-mode . rainbow-mode))
 
-;; open line in browser
-;; at see@https://github.com/noctuid/link-hint.el/
-(use-package link-hint
-  :bind
-  ("C-x p o" . link-hint-open-link)
-  ("C-x p c" .  link-hint-copy-link))
-
 (provide 'init-edit)
 ;;; init-edit.el ends here

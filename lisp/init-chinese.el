@@ -47,9 +47,9 @@
                      :elpa t))
           (message "Pyim didn't pretend, pyim-bigdict failed to start.")))))
   :init
-  ;; Using pyim-dregcache. not use pyim-dhashcache
+  ;; using pyim-dregcache. not use pyim-dhashcache
   (setq pyim-dcache-backend 'pyim-dregcache)
-  ;; Set pyim as the default input method
+  ;; set pyim as the default input method
   (setq default-input-method "pyim")
 
   ;; No Chinese company

@@ -123,8 +123,5 @@
     (setq plantuml-jar-path
           (concat user-emacs-directory "plantuml/plantuml.jar"))))
 
-(use-package org-cliplink
-  :bind ("C-x p i" . org-cliplink))
-
 (provide 'init-org)
 ;;; init-org.el ends here
