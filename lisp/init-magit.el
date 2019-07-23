@@ -39,8 +39,6 @@ modifications to the currently deleted module. "
      (list (magit-read-module-path "Remove module"))
      "--force" nil))
 
-
-
   (defun magit-status+ ()
     (interactive)
     (magit-status)

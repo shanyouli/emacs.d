@@ -198,20 +198,6 @@ Lisp function does not specify a special indentation."
 ;; Semantic code search for emacs lisp
 (use-package elisp-refs)
 
-;; A better *Help* buffer
-(use-package helpful
-  :defines ivy-initial-inputs-alist
-  :bind (("C-c C-d" . helpful-at-point))
-  :config
-  (with-eval-after-load 'ivy
-    (dolist (cmd '(helpful-callable
-           helpful-variable
-           helpful-function
-           helpful-macro
-           helpful-command))
-      (cl-pushnew `(,cmd . "^") ivy-initial-inputs-alist))))
-
-
 ;; Beautify line breaks
 (use-package page-break-lines
   :init
@@ -221,8 +207,6 @@ Lisp function does not specify a special indentation."
 
 ;; Load .el if newer than corresponding .elc
 (setq load-prefer-newer t)
-
-(add-hook 'emacs-lisp-mode-hook #'(lambda () (setq mode-name "EL")))
 
 (provide 'init-elisp)
 ;;; init-elisp.el ends here

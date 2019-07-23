@@ -52,6 +52,14 @@
 (require-package 'org-cliplink)
 (lazy-load-global-keys '(("C-x p i" . org-cliplink)) "org-cliplink")
 
+;; Better elisp help file format
+(require-package 'helpful)
+(lazy-load-global-keys
+ '(("C-h f" . helpful-function)
+   ("C-h v" . helpful-variable)
+   ("C-h k" . helpful-key)
+   ("C-h d" . helpful-at-point))
+ "helpful")
 
 (provide 'init-key)
 

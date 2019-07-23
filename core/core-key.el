@@ -92,7 +92,19 @@
 ;; lex-pyim.el
 ;; (lazy-load-global-keys '(("<f9>" . toggle-input-method)) "lex-pyim")
 
-;;; Toolkit
+;; lex-ivy.el
+(lazy-load-global-keys
+ '(("M-x"     . counsel-M-x)
+   ("C-x C-f" . counsel-find-file)
+   ("C-x f"   . counsel-recentf)
+   ("C-s"     . swiper-isearch)
+   ("C-z s t" . counsel-load-theme)
+   ("M-y"     . counsel-yank-pop)
+   ("C-x b"   . ivy-switch-buffer)
+   )
+ "iex-ivy")
+
+;;; toolkit
 (lazy-load-set-keys
  '(
    ("M-h" . set-mark-command) ; Instead C-SPC for Chinese input method

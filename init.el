@@ -109,17 +109,13 @@ decrease this. If you experience stuttering, increase this.")
 
   ;; Preferences
   (require 'init-edit)
-  ;;(require 'init-thing-edit)
-  (require 'init-ivy)
   (require 'init-window)
-  (require 'init-company)
   (require 'init-chinese)
 
   ;; Tools
-;;  (require 'init-magit)                 ; Git
   (require 'init-dired)                 ; Dired
   (require 'init-reads)                 ; Reader tools
-
+  (require 'init-company)
   (run-with-idle-timer 0.5 nil  (lambda ()
                                 ;; Program language common tool
                                   (require 'init-lang)
