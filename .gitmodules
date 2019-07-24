@@ -73,3 +73,9 @@
 [submodule "awesome-tab"]
 	path = site-lisp/awesome-tab
 	url = https://github.com/manateelazycat/awesome-tab.git
+[submodule "liberime"]
+	path = site-lisp/liberime
+	url = https://gitlab.com/liberime/liberime.git
+[submodule "emacs-async"]
+	path = site-lisp/emacs-async
+	url = https://github.com/jwiegley/emacs-async.git

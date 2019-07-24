@@ -71,7 +71,7 @@
    ("C-z i l" . insert-translated-name-insert-with-line)
    ("C-z i c" . insert-translated-name-insert-with-camel)
    )
- "insert-translated-name")
+ "lex-insert-translated-name")
 
 ;; English word completion with Chinese comments
 (lazy-load-global-keys
@@ -101,8 +101,15 @@
    ("C-z s t" . counsel-load-theme)
    ("M-y"     . counsel-yank-pop)
    ("C-x b"   . ivy-switch-buffer)
+   ("C-x d"   . counsel-dired)
    )
  "lex-ivy")
+
+;; lex-pyim.el
+(lazy-load-global-keys
+ '(("<f9>" . lye/toggle-pyim-input-method)
+   ("C-<f9>" . lye/toggle-pyim-punctuation-translate)
+   ("C-z s i" . lye/use-liberime)) "lex-pyim")
 
 ;;; toolkit
 (lazy-load-set-keys

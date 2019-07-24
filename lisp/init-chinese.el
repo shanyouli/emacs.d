@@ -26,7 +26,7 @@
 ;;; pyim -- chinese input method
 (use-package pyim
   :demand t
-  :defer 0.3
+;;  :defer 0.3
   :ensure nil
   :bind ("<f9>" . toggle-input-method)
   :preface
@@ -102,6 +102,15 @@
       (setq-default pyim-punctuation-translate-p '(no yes auto)))
     (toggle-input-method))
   (global-set-key (kbd "C-<f9>") #'lye/toggle-pyim-punctuation-translate))
+
+(defun lye/use-liberime ()
+  (interactive)
+  (when (locate-library "liberime-config")
+    (require 'liberime-config)
+    (liberime-select-schema "luna_pinyin_simp")
+    (setq pyim-default-scheme 'rime-quanpin)
+    (setq toggle-input-method "pyim")
+    (set-input-method "pyim")))
 
 (provide 'init-chinese)
 ;;; init-chinese.el ends here

@@ -33,7 +33,7 @@
 (defvar lye-gc-cons-threshold 16777216 ; 16mb
   "The default value to use for `gc-cons-threshold'. If you experience freezing,
 decrease this. If you experience stuttering, increase this.")
-(defvar lye-gc-cons-upper-linit 536870921 ; 512mb
+(defvar lye-gc-cons-upper-linit most-positive-fixnum        ;;536870921 ; 512mb
   "The temporary value for `gc-cons-threshold' to defer it.")
 
 (defvar lye--file-name-handler-alist file-name-handler-alist)
@@ -110,7 +110,6 @@ decrease this. If you experience stuttering, increase this.")
   ;; Preferences
   (require 'init-edit)
   (require 'init-shackle)
-  (require 'init-chinese)
 
   ;; Tools
   (require 'init-dired)                 ; Dired

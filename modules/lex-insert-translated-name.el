@@ -1,11 +1,11 @@
-;;; iex-elfeed.el --- A RSS feed reader. -*- lexical-binding: t -*-
+;;; lex-insert-translated-name.el --- Initialize Insert Translate Name -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v1
-;; Package-Requires: (elfeed)
+;; Version: v0.1
+;; Package-Requires: (pyim insert-translate-name)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: elfeed
+;; Keywords: translate
 
 
 ;; This file is not part of GNU Emacs
@@ -26,22 +26,16 @@
 
 ;;; Commentary:
 
-;; A RSS feed reader
+;;
 
 ;;; Code:
 
-(require-package 'elfeed)
-(require 'elfeed)
-(setq elfeed-db-directory (concat lye-emacs-cache-dir "elfeed"))
+(require 'lex-pyim)
+(when lye-enable-pyim-bigdict-p
+  (pyim-bigdict-enable)
+  (setq lye-enable-pyim-bigdict-p nil))
+(require 'insert-translated-name)
 
-(setq elfeed-feeds
-        '("http://planet.emacsen.org/atom.xml"
-          "http://www.masteringemacs.org/feed/"
-          "https://oremacs.com/atom.xml"
-          "https://pinecast.com/feed/emacscast"
-          "https://emacs-china.github.io/rss.xml"
-          "https://manateelazycat.github.io/feed.xml"))
+(provide 'lex-insert-translated-name)
 
-(provide 'iex-elfeed)
-
-;;; iex-elfeed.el ends here
+;;; lex-insert-translated-name.el ends here
