@@ -25,22 +25,15 @@
 
 ;; Do not use the mouse in the graphical interface
 (when (display-graphic-p)
-  (use-package disable-mouse :hook  (after-init . global-disable-mouse-mode)))
+  (use-package disable-mouse
+    :hook ((after-init after-change-major-mode) . disable-mouse-mode))
+  ;; (use-package disable-mouse :hook  (after-init . global-disable-mouse-mode))
+  )
 
 ;; Delete selection if you insert
 (use-package delsel
   :ensure nil
   :hook (after-init . delete-selection-mode))
-
-;; Jump to things in Emacs tree-style
-(use-package avy
-  :bind (("C-:" . avy-goto-char)
-         ("C-'" . avy-goto-char-2)
-         ("M-g f" . avy-goto-line)
-         ("M-g w" . avy-goto-word-1)
-         ("M-g e" . avy-goto-worf-0))
-  :hook (after-init . avy-setup-default)
-  :config (setq avy-background 1))
 
 ;; Pair Automatic completion
 (use-package autopair
@@ -88,6 +81,38 @@
 
 ;; add color display
 (use-package rainbow-mode :hook (prog-mode . rainbow-mode))
+
+;;Extra blank hint
+(use-package whitespace
+  :ensure nil
+  :hook ((prog-mode outline-mode conf-mode) . whitespace-mode)
+  :config
+  (setq whitespace-line-column fill-column) ;; limit line length
+  ;; automatically clean up bad whitespace
+  (setq whitespace-action '(auto-cleanup))
+  ;; only show bad whitespace
+  (setq whitespace-style '(face
+                           trailing space-before-tab
+                           indentation empty space-after-tab))
+
+  (with-eval-after-load 'popup
+    ;; advice for whitespace-mode conflict with popup
+    (defvar my-prev-whitespace-mode nil)
+    (make-local-variable 'my-prev-whitespace-mode)
+
+    (defadvice popup-draw (before my-turn-off-whitespace activate compile)
+      "Turn off whitespace mode before showing autocomplete box."
+      (if whitespace-mode
+          (progn
+            (setq my-prev-whitespace-mode t)
+            (whitespace-mode -1))
+        (setq my-prev-whitespace-mode nil)))
+
+    (defadvice popup-delete (after my-restore-whitespace activate compile)
+      "Restore previous whitespace mode when deleting autocomplete box."
+      (if my-prev-whitespace-mode
+          (whitespace-mode 1)))))
+
 
 (provide 'init-edit)
 ;;; init-edit.el ends here

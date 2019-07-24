@@ -1,4 +1,4 @@
-;;; init-windows.el ---Window Configurations.        -*- lexical-binding: t; -*-
+;;; init-shackle.el ---Window Configurations.        -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  lye li
 
@@ -24,29 +24,11 @@
 
 ;;; Code:
 
-;; Restore old window configurations
-(use-package winner
-  :ensure nil
-  :commands (winner-undo winner-redo)
-  :hook (after-init . winner-mode)
-  :bind (("C-x 4 u" . winner-undo)
-         ("C-x 4 r" . winner-redo)))
-
-;; Quickly switch windows
-(use-package ace-window
-  :bind ([remap other-window] . ace-window)
-  :hook (after-init . ace-window-display-mode)
-  :custom-face
-  (aw-leading-char-face
-   ((t (:inherit font-lock-keyword-face :bold t :height 3.0))))
-  (aw-mode-line-face ((t :inherit mode-line-emphasis :bold t))))
-
-
 ;; Enforce rules for popups
 ;; @see https://github.com/seagle0128/.emacs.d/blob/f8a53fbc60414c98142e0fb9d33c8e6353db9347/lisp/init-window.el#L127
 (use-package shackle
   :commands shackle-display-mode
-;;  :hook (after-init . shackle-mode)
+  :hook (after-init . shackle-mode)
   :config
   (setq shackle-default-size 0.4
         shackle-default-alignment 'below
@@ -57,10 +39,12 @@
           ("*Backtrace*" :select t :size 0.382 :align 'below)
           ("*Warnings*" :select t :size 0.382 :align 'below)
           ("*Messages*" :size 0.382 :align 'below :autoclose t)
+          (" *which-key*" :size 0.382 :align 'below :autoclose t)
           ("^\\*.*Shell Command.*\\*$" :regexp t :size 0.382 :align 'below :autoclose t)
           ("\\*[Wo]*Man.*\\*" :regexp t :select t :align 'below :autoclose t)
           ("*color-rg*" :size 0.382 :align 'below :autoclose t)
           ("*Calendar*" :select t :size 0.382 :align 'below)
+          ;; ("*One-Key*"  :size 0.382 :align 'below :autoclose t)
           ("\\*ivy-occur .*\\*" :regexp t :size 0.382 :select t :align 'below)
           (" *undo-tree*" :select t)
           ("*Paradox Report*" :size 0.382 :align 'below :autoclose t)
@@ -75,5 +59,5 @@
           (list-environment-mode :select t :size 0.382 :align 'below :autoclose t)
           (profiler-report-mode :select t :size 0.5 :align 'below))))
 
-(provide 'init-window)
-;;; init-windows.el ends here
+(provide 'init-shackle)
+;;; init-shackle.el ends here

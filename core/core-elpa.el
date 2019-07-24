@@ -40,7 +40,6 @@
     (add-hook 'after-init-hook #'package--save-selected-packages)))
 (advice-add 'package--save-selected-packages :override #'my-save-selected-packages)
 
-
 ;; Set the location where the elpa folder is stored
 (if (file-exists-p lye-emacs-cache-dir)
     (setq package-user-dir (expand-file-name
@@ -83,7 +82,6 @@
   (message "Set package archives to `%s'." archives))
 
 ;; Set package archives, You can choose Repo with melpa, melpa-mirrors,emacs-china, netease, tuna, tencent
-(setq lye-package-archives 'tuna)
 (set-package-archives lye-package-archives)
 
 ;; Initialize packages
@@ -103,6 +101,23 @@
    (t
     (package-refresh-contents)
     (require-package package min-version t))))
+
+;;; Setup `use-package'
+;; Should set before loading `use-package'
+(require-package 'use-package)
+
+(eval-and-compile
+    (setq use-package-always-ensure t)
+    (setq use-package-always-defer t)
+    (setq use-package-expand-minimally t)
+    (setq use-package-enable-imenu-support t))
+
+(eval-when-compile
+  (require 'use-package))
+
+;; Extensions
+(use-package diminish :ensure nil)
+(use-package bind-key :ensure nil)
 
 (provide 'core-elpa)
 

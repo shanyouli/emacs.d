@@ -41,6 +41,15 @@
 
 ;; iex-git
 (lazy-load-global-keys '(("C-x g" . one-key-menu-magit)) "iex-git")
+
+;; iex-window
+(lazy-load-global-keys '(([remap other-window] . ace-window)
+                         ("C-x 4 u" . winner-undo)
+                         ("C-x 4 r" . winner-redo)) "iex-window")
+
+;; iex-avy
+(lazy-load-global-keys '(("M-e" . one-key-menu-avy)) "iex-avy")
+
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
 (require-package 'link-hint)
@@ -55,9 +64,7 @@
 ;; Better elisp help file format
 (require-package 'helpful)
 (lazy-load-global-keys
- '(("C-h f" . helpful-function)
-   ("C-h v" . helpful-variable)
-   ("C-h k" . helpful-key)
+ '(("C-h k" . helpful-key)
    ("C-h d" . helpful-at-point))
  "helpful")
 

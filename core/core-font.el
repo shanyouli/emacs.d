@@ -29,8 +29,6 @@
 ;; Font
 
 ;;; Code:
-(require 'one-key)
-
 (defvar emacs-english-font nil
   "The font name of English.")
 (defvar emacs-cjk-font nil
@@ -64,8 +62,6 @@ Corresponding English font size is 9pt, 10.5pt, 12pt, 15pt, 16pt, 18pt, 22pt,
     (set-fontset-font (frame-parameter nil 'font) charset
                       (font-spec :family chinese :size (cdr size-pair)))))
 
-
-;; see @https://gist.github.com/Superbil/7113937#file-fix-font-org-mode-el-L31
 ;; see @https://gist.github.com/Superbil/7113937#file-fix-font-org-mode-el-L31
 (defun emacs-step-font-size (step)
   "Increase/Decrease emacs's font size."
@@ -144,7 +140,7 @@ Corresponding English font size is 9pt, 10.5pt, 12pt, 15pt, 16pt, 18pt, 22pt,
             (32 . 38) (35 . 42) (40 . 48) (48 . 56)
             )))
    )
-  ;;(setq emacs-english-font "Source Code Pro")
+
   (lye/set-monospaced-font emacs-english-font
                            emacs-cjk-font
                            emacs-font-size-pair)
@@ -152,17 +148,18 @@ Corresponding English font size is 9pt, 10.5pt, 12pt, 15pt, 16pt, 18pt, 22pt,
   ;; Key
   (defvar one-key-menu-font-size-alist nil
     "The `one-key' menu list for Font-SIZE.")
-  (setq one-key-menu-font-size-alist
-         '(
-           (("=" . "Increase font size") . increase-emacs-font-size)
-           (("-" . "Decrease font size") . decrease-emacs-font-size)
-           (("0" . "Default font size")  . default-emacs-font-size)))
-   (defun lye/one-key-menu-font-size ()
-     "The `one-key' menu for Font-SIZE."
-     (interactive)
-     (one-key-menu "FONT-SIZE" one-key-menu-font-size-alist nil t))
 
-    ;; Specify font for all unicode characters
+  (setq one-key-menu-font-size-alist
+        '((("=" . "Increase font size") . increase-emacs-font-size)
+          (("-" . "Decrease font size") . decrease-emacs-font-size)
+          (("0" . "Default font size")  . default-emacs-font-size)))
+
+  (defun lye/one-key-menu-font-size ()
+    "The `one-key' menu for Font-SIZE."
+    (interactive)
+    (one-key-menu "FONT-SIZE" one-key-menu-font-size-alist nil t))
+
+  ;; Specify font for all unicode characters
   (catch 'loop
     (dolist (font '("Symbola" "Apple Symbols" "Symbol"))
       (when (font-exist-p font)

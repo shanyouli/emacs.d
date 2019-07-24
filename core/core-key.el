@@ -102,7 +102,7 @@
    ("M-y"     . counsel-yank-pop)
    ("C-x b"   . ivy-switch-buffer)
    )
- "iex-ivy")
+ "lex-ivy")
 
 ;;; toolkit
 (lazy-load-set-keys

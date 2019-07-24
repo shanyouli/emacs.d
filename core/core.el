@@ -74,7 +74,7 @@
   "Set user mail address."
   :type 'string)
 
-(defcustom lye-package-archives 'emacs-china
+(defcustom lye-package-archives 'tuna
   "Set package archives from which to fetch."
   :type '(choice (const :tag "Melpa" melpa)
                  (const :tag "Melpa-mirror" melpa-mirror)

@@ -40,6 +40,7 @@
 
 (unless after-init-time
   (setq mode-line-format nil))
+
 (if (display-graphic-p)
     (progn
       (require 'awesome-tray)

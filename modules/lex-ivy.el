@@ -1,4 +1,4 @@
-;;; iex-ivy.el --- Initialize IVY configurations. -*- lexical-binding: t -*-
+;;; lex-ivy.el --- Initialize IVY configurations. -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
@@ -41,6 +41,7 @@
 (setq ivy-count-format "(%d/%d) ")
 (setq ivy-on-del-error-function nil)
 (setq ivy-display-style 'fancy)
+;; @https://github.com/abo-abo/swiper/issues/2130
 (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow)
 
 ;; (setq ivy-re-builders-alist
@@ -67,13 +68,13 @@
   (setq counsel-describe-variable-function #'helpful-variable))
 
 ;; load-locate-key
-(lazy-load-local-keys '(([escape] . minibuffer-keyboard-quit)) swiper-map "iex-ivy")
+(lazy-load-local-keys '(([escape] . minibuffer-keyboard-quit)) swiper-map "lex-ivy")
 (lazy-load-local-keys
  '(("<C-return>" . ivy-immediate-done)
    ([escape]     . minibuffer-keyboard-quit))
  ivy-minibuffer-map
- "iex-ivy")
+ "lex-ivy")
 
-(provide 'iex-ivy)
+(provide 'lex-ivy)
 
-;;; iex-ivy.el ends here
+;;; lex-ivy.el ends here

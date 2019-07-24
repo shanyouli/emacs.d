@@ -123,7 +123,14 @@ EG: 11:12 == 60*(11*60+12)."
   (add-hook 'after-load-theme-hook
             (lambda ()
               (if (and (boundp 'awesome-tray-active-p) awesome-tray-active-p)
-                  (awesome-tray-enable)))))
+                  (awesome-tray-enable))
+
+              (if (and (fboundp 'awesome-tab-mode-on-p) (awesome-tab-mode-on-p))
+                   (setq-default awesome-tab-background-color (face-background 'default)
+                                 awesome-tab-selected-background (face-background 'default)
+                                 awesome-tab-selected-foreground (face-background 'default)
+                                 awesome-tab-selected-color (face-background 'default)
+                                 awesome-tab-selected (face-background 'default))))))
 
 (provide 'core-theme)
 

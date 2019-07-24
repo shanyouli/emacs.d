@@ -91,6 +91,7 @@ decrease this. If you experience stuttering, increase this.")
   `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory  "core") ,pkg)))
 
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
+(lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-font)           ; Font
 (lye/core-require 'core-scratch)        ; scratch
 (lye/core-require 'core-theme)          ; Theme
@@ -98,7 +99,6 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-modeline)       ; mode-line
 (lye/core-require 'core-generic)        ; generic
 (lye/core-require 'core-os)             ; OS environmental variable
-(lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-package)        ; packages initialization
 (lye/core-require 'core-elpa)           ; package management tool
 
@@ -109,7 +109,7 @@ decrease this. If you experience stuttering, increase this.")
 
   ;; Preferences
   (require 'init-edit)
-  (require 'init-window)
+  (require 'init-shackle)
   (require 'init-chinese)
 
   ;; Tools
@@ -117,7 +117,8 @@ decrease this. If you experience stuttering, increase this.")
   (require 'init-reads)                 ; Reader tools
   (require 'init-company)
   (run-with-idle-timer 0.5 nil  (lambda ()
-                                ;; Program language common tool
+                                  ;; Program language common tool
+                                  (require 'init-awesome-tab)
                                   (require 'init-lang)
                                   (require 'init-flycheck)
                                   (require 'init-elisp)
