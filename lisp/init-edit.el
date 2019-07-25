@@ -42,12 +42,12 @@
 (use-package rainbow-delimiters
   :hook (autopair-mode . rainbow-delimiters-mode))
 
-;;Chinese input automatically adds spaces in Chinese
-;;(use-package pangu-spacing
-;;  :diminish pangu-spacing-mode
-;;  :hook (after-init . global-pangu-spacing-mode))
+;; Chinese input automatically adds spaces in Chinese
+;; (use-package pangu-spacing
+;;   :diminish pangu-spacing-mode
+;;   :hook (after-init . global-pangu-spacing-mode))
 
-;;Big blank delete
+;; Big blank delete
 (use-package hungry-delete
   :diminish hungry-delete-mode
   :hook (after-init . global-hungry-delete-mode))
@@ -70,7 +70,7 @@
       :config
       (setq linum-format "%4d "))))
 
-;;Set blank highlight when use display graphic
+;; Set blank highlight when use display graphic
 (if  (display-graphic-p)
     (use-package highlight-indent-guides
       :hook (prog-mode . highlight-indent-guides-mode)
@@ -78,11 +78,10 @@
       (setq highlight-indent-guides-method 'character)
       (setq highlight-indent-guides-responsive t)))
 
-
 ;; add color display
 (use-package rainbow-mode :hook (prog-mode . rainbow-mode))
 
-;;Extra blank hint
+;; Extra blank hint
 (use-package whitespace
   :ensure nil
   :hook ((prog-mode outline-mode conf-mode) . whitespace-mode)
@@ -112,7 +111,6 @@
       "Restore previous whitespace mode when deleting autocomplete box."
       (if my-prev-whitespace-mode
           (whitespace-mode 1)))))
-
 
 (provide 'init-edit)
 ;;; init-edit.el ends here

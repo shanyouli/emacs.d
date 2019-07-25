@@ -126,7 +126,7 @@
     (message "Limerime cannot be used on systems other than gnu/linux and Mac.")))
 
   ;; No Chinese company
-  (with-eval-after-load 'company
+;;  (with-eval-after-load 'company
     (defun lye/company-dabbrev--prefix (orig-fun)
       "取消中文补全"
       (let ((string (pyim-char-before-to-string 0)))
@@ -134,9 +134,9 @@
             nil
           (funcall orig-fun))))
     (advice-add 'company-dabbrev--prefix
-                :around #'lye/company-dabbrev--prefix))
+                :around #'lye/company-dabbrev--prefix)
+;;)
 
-
-  (provide 'lex-pyim)
+(provide 'lex-pyim)
 
 ;;; lex-pyim.el ends here

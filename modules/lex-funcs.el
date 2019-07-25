@@ -1,4 +1,4 @@
-;;; init-funcs.el --- Define functions.              -*- lexical-binding: t; -*-
+;;; lex-funcs.el --- Define functions.              -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  DESKTOP-RD96RHO
 
@@ -133,5 +133,27 @@ Return a string giving the duration of the Emacs initialization."
   (interactive)
   (lye/sudo-find-file (file-truename buffer-file-name)))
 
-(provide 'init-funcs)
-;;; init-funcs.el ends here
+(defvar one-key-menu-funcs-alist nil
+  "The `one-key' menu alist for FUNCTIONS.")
+
+(setq one-key-menu-funcs-alist
+      '((("d" . "Dos to unix") . dos2unix)
+        (("u" . "Unix to Dos") . unix2dos)
+        (("r" . "Revert current buffer.") revert-current-buffer)
+        (("s" . "Save as utf-8") . save-buffer-as-utf-8)
+        (("S" . "Save as GBK") . save-buffer-with-gbk)
+        (("g" . "revert buffer GBK") . revert-buffer-with-gbk)
+        (("U" . "Revert buffer with UTF-8") . revert-buffer-with-utf-8)
+        (("m" . "Recompile elpa") . recompile-elpa)
+        (("R" . "Rename this buffer") . rename-this-file-and-buffer)
+        (("b" . "Browse current file") . browse-current-file)
+        (("f" . "sudo find file") . lye/sudo-find-file)
+        (("F" . "SUDO find this file") . lye/sudo-this-file)))
+
+(defun one-key-menu-funcs ()
+  "The `one-key' menu for FUNCTIONS"
+  (interactive)
+  (one-key-menu "FUNCTIONS" one-key-menu-funcs-alist t))
+
+(provide 'lex-funcs)
+;;; lex-funcs.el ends here

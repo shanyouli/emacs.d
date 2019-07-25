@@ -107,6 +107,9 @@
    ("C-<f9>"  . lye/toggle-pyim-punctuation-translate)
    ("C-z s i" . lye/use-liberime)) "lex-pyim")
 
+;; lex-funcs
+(lazy-load-global-keys '(("C-z f" . one-key-menu-funcs)) "lex-funcs")
+
 ;; Setup change size font, base on emacs-font-size  pair-list
 (when (display-graphic-p)
   (lazy-load-global-keys '(("C-z s f" . lye/one-key-menu-font-size)) "core-font"))

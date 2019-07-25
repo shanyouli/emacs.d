@@ -30,16 +30,6 @@
               ("H" . dired-omit-mode)
               ("RET" . dired-find-alternate-file)
               ("C-c C-e" . wdired-change-to-wdired-mode))
-  ;; see @https://stackoverflow.com/questions/95631/open-a-file-with-su-sudo-inside-emacs
-  :hook (dired-mode .
-                    (lambda ()
-                      ;; open current file as sudo
-                      (local-set-key
-                       (kbd "C-x <M-S-return>")
-                       (lambda()
-                         (interactive)
-                         (message "!!! SUDO opening %s" (dired-file-name-at-point))
-                         (lye/sudo-find-file (dired-file-name-at-point))))))
   :config
   (setq dired-recursive-copies t) ; Recursive copying
   (setq dired-recursive-deletes t) ; Recursive deletion
@@ -51,6 +41,9 @@
 (use-package dired-async
   :ensure async
   :diminish dired-async-mode
+  :bind (:map dired-mode-map
+         ("C" . dired-async-do-copy)
+         ("R" . dired-async-do-rename))
   :hook (dired-mode-hook . dired-async-mode))
 
 (use-package all-the-icons-dired

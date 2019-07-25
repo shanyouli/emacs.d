@@ -92,7 +92,6 @@ decrease this. If you experience stuttering, increase this.")
 
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
 (lye/core-require 'core-key)            ; Keybindings
-(lye/core-require 'core-font)           ; Font
 (lye/core-require 'core-scratch)        ; scratch
 (lye/core-require 'core-theme)          ; Theme
 (lye/core-require 'core-ui)             ; UI
@@ -101,9 +100,6 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-os)             ; OS environmental variable
 (lye/core-require 'core-package)        ; packages initialization
 (lye/core-require 'core-elpa)           ; package management tool
-(lye/core-require 'core-mode)           ; File Mode Setup
-
-(require 'init-funcs)                   ; some useful functions
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
   (require 'init-key)                   ; Keybindings
@@ -114,7 +110,7 @@ decrease this. If you experience stuttering, increase this.")
 
   ;; Tools
   (require 'init-dired)                 ; Dired
-  ;;(require 'init-reads)                 ; Reader tools
+  (require 'init-reads)                 ; Reader tools
   (require 'init-company)
   (run-with-idle-timer 0.5 nil  (lambda ()
                                   ;; Program language common tool

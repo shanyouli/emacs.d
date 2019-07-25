@@ -128,10 +128,11 @@
                      (lambda ()
                        (toggle-frame-fullscreen)
                        ))
-      )
+        )
 
     ;; 非Mac平台直接全屏
     (fullscreen)))
+
 (when (display-graphic-p)
   ;; Frame Size after startup
   (if lye-init-fullscreen-p
@@ -151,6 +152,51 @@
 
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
   (add-hook 'after-make-frame-functions #'lye/restore-frame-size))
+
+;; font
+(when (display-graphic-p)
+  (require 'setup-font)
+
+  (setq setup-english-font "Fantasque Sans Mono")
+  (setq setup-cjk-font (cond
+                        (system/linux
+                         "WenQuanYi Micro Hei")
+                        (system/mac
+                         "Hiragio Sans GB")
+                        (system/windows
+                         "Microsoft Yahei")))
+
+  (setq setup-font-default-size 14)
+  (setup-font-initialize)
+
+  ;; Key
+  (defvar one-key-menu-font-size-alist nil
+    "The `one-key' menu list for Font-SIZE.")
+
+  (setq one-key-menu-font-size-alist
+        '((("=" . "Increase font size") . increase-emacs-font-size)
+          (("-" . "Decrease font size") . decrease-emacs-font-size)
+          (("0" . "Default font size")  . default-emacs-font-size)))
+
+  (defun lye/one-key-menu-font-size ()
+    "The `one-key' menu for Font-SIZE."
+    (interactive)
+    (one-key-menu "FONT-SIZE" one-key-menu-font-size-alist nil t))
+
+  ;; Specify font for all unicode characters
+  (catch 'loop
+    (dolist (font '("Symbola" "Apple Symbols" "Symbol"))
+      (when (font-exist-p font)
+        (set-fontset-font t 'unicode font nil 'prepend)
+        (throw 'loop t)))))
+
+;; {%org-mode%}
+;; here are 20 hanzi and 40 english chars, see if they are the same width
+;; 你你你你你你你你你你你你你你你你你你你你
+;; aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+;; /aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/
+;; {%/org-mode%}
+
 
 (provide 'core-ui)
 
