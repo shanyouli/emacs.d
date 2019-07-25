@@ -22,9 +22,7 @@
 
 ;; Define functions.
 
-;;; Code:
-
-
+;;; Code
 
 ;; Dos2Unix/Unix2Dos
 (defun dos2unix ()

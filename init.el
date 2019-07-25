@@ -101,6 +101,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-os)             ; OS environmental variable
 (lye/core-require 'core-package)        ; packages initialization
 (lye/core-require 'core-elpa)           ; package management tool
+(lye/core-require 'core-mode)           ; File Mode Setup
 
 (require 'init-funcs)                   ; some useful functions
 
@@ -113,7 +114,7 @@ decrease this. If you experience stuttering, increase this.")
 
   ;; Tools
   (require 'init-dired)                 ; Dired
-  (require 'init-reads)                 ; Reader tools
+  ;;(require 'init-reads)                 ; Reader tools
   (require 'init-company)
   (run-with-idle-timer 0.5 nil  (lambda ()
                                   ;; Program language common tool

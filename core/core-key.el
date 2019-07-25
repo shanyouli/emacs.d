@@ -59,10 +59,6 @@
    )
  "lex-multi-term")
 
-;; Setup change size font, base on emacs-font-size  pair-list
-(when (display-graphic-p)
-  (lazy-load-global-keys '(("C-z f" . lye/one-key-menu-font-size)) "core-font"))
-
 ;; Chinese automatically translated as English
 (lazy-load-global-keys
  '(
@@ -107,15 +103,19 @@
 
 ;; lex-pyim.el
 (lazy-load-global-keys
- '(("<f9>" . lye/toggle-pyim-input-method)
-   ("C-<f9>" . lye/toggle-pyim-punctuation-translate)
+ '(("<f9>"    . lye/toggle-pyim-input-method)
+   ("C-<f9>"  . lye/toggle-pyim-punctuation-translate)
    ("C-z s i" . lye/use-liberime)) "lex-pyim")
+
+;; Setup change size font, base on emacs-font-size  pair-list
+(when (display-graphic-p)
+  (lazy-load-global-keys '(("C-z s f" . lye/one-key-menu-font-size)) "core-font"))
 
 ;;; toolkit
 (lazy-load-set-keys
  '(
-   ("M-h" . set-mark-command) ; Instead C-SPC for Chinese input method
-   ("C-z c" . shell-command)  ; I don't know why the `M-!' in awesomewm can't be used.
+   ("C-x SPC"     . set-mark-command) ; Instead C-SPC for Chinese input method
+   ("C-z c"   . shell-command)  ; I don't know why the `M-!' in awesomewm can't be used.
    ("C-z C-z" . suspend-frame); Suspend-frame
    ))
 
