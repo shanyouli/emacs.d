@@ -71,17 +71,22 @@
         nil)
     t))
 
+;; No display `*scratch*'
+(defun remove-scratch-buffer ()
+  (if (get-buffer "*scratch*")
+      (kill-buffer "*scratch*")))
 
 ;;; Configurations
-
-(setq initial-major-mode 'emacs-lisp-mode) ; Set scratch default major-mode
-(setq initial-scratch-message  ; The message of Scratch-Buffer
-              (concat ";; Happy hacking, "
-                      user-login-name " - Emacs ♥ you!\n\n"))
-
-(add-hook 'kill-emacs-hook #'lye/scratch-save)
-(add-hook 'after-init-hook #'lye/scratch-restore)
-(add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer)
+(if lye-use-scratch-p
+    (progn
+      (setq initial-major-mode 'emacs-lisp-mode) ; Set scratch default major-mode
+      (setq initial-scratch-message  ; The message of Scratch-Buffer
+            (concat ";; Happy hacking, "
+                    user-login-name " - Emacs ♥ you!\n\n"))
+      (add-hook 'kill-emacs-hook #'lye/scratch-save)
+      (add-hook 'after-init-hook #'lye/scratch-restore)
+      (add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer))
+  (add-hook 'change-major-mode-hook #'remove-scratch-buffer))
 
 (provide 'core-scratch)
 

@@ -101,6 +101,14 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   "Sdcv dictionary storage directory."
   :type 'string)
 
+(defcustom lye-init-fullscreen-p nil
+  "Full SCREEN or not when initializing."
+  :type 'boolean)
+
+(defcustom lye-use-scratch-p nil
+  "Whether to use `*scratch*' buffer"
+  :type 'boolean)
+
 ;;; Load `custom-file'
 (setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
 (when (file-exists-p custom-file) (load custom-file))

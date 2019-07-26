@@ -29,6 +29,7 @@
 ;; Init awesome-tab
 
 ;;; Code:
+
 (when (display-graphic-p)
   (require 'awesome-tab)
 

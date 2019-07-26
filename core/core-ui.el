@@ -30,10 +30,6 @@
 
 ;;; Code:
 
-(defcustom lye-init-fullscreen-p nil
-  "Full SCREEN or not when initializing."
-  :type 'boolean)
-
 ;; (setq facy-splash-image logo) ; Logo
 
 ;; Title
@@ -145,16 +141,17 @@
                    (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
       (add-to-list 'default-frame-alist
                    (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
-      (add-to-list 'default-frame-alist
-                   (cons 'height (lye/frame-default-height)))
-      (add-to-list 'default-frame-alist
-                   (cons 'width (lye/frame-default-width)))))
+      ;; (add-to-list 'default-frame-alist
+                   ;; (cons 'height (lye/frame-default-height)))
+      ;; (add-to-list 'default-frame-alist
+      ;; (cons 'width (lye/frame-default-width)))
+      (add-hook 'after-init-hook #'lye/restore-frame-size)
+      ))
 
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-  (add-hook 'after-make-frame-functions #'lye/restore-frame-size))
+  (add-hook 'after-make-frame-functions #'lye/restore-frame-size)
 
 ;; font
-(when (display-graphic-p)
   (require 'setup-font)
 
   (setq setup-english-font "Fantasque Sans Mono")
@@ -174,9 +171,9 @@
     "The `one-key' menu list for Font-SIZE.")
 
   (setq one-key-menu-font-size-alist
-        '((("=" . "Increase font size") . increase-emacs-font-size)
-          (("-" . "Decrease font size") . decrease-emacs-font-size)
-          (("0" . "Default font size")  . default-emacs-font-size)))
+        '((("=" . "Increase font size") . increase-setup-font-size)
+          (("-" . "Decrease font size") . decrease-setup-font-size)
+          (("0" . "Default font size")  . default-setup-font-size)))
 
   (defun lye/one-key-menu-font-size ()
     "The `one-key' menu for Font-SIZE."
@@ -189,14 +186,6 @@
       (when (font-exist-p font)
         (set-fontset-font t 'unicode font nil 'prepend)
         (throw 'loop t)))))
-
-;; {%org-mode%}
-;; here are 20 hanzi and 40 english chars, see if they are the same width
-;; 你你你你你你你你你你你你你你你你你你你你
-;; aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-;; /aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/
-;; {%/org-mode%}
-
 
 (provide 'core-ui)
 

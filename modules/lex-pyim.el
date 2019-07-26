@@ -121,8 +121,8 @@
               (liberime-select-schema "luna_pinyin_simp")
               (setq pyim-default-scheme 'rime-quanpin)
               (setq lye-enable-pyim-bigdict-p nil)
-              (set-input-method "pyim")))
-        (message "Please compile liberime and use this function."))
+              (set-input-method "pyim"))
+          (message "Please compile liberime and use this function.")))
     (message "Limerime cannot be used on systems other than gnu/linux and Mac.")))
 
   ;; No Chinese company
