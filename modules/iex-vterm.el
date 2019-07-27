@@ -1,10 +1,10 @@
-;;; lex-multi-term.el --- Initialize ESHELL -*- lexical-binding: t -*-
+;;; iex-vterm.el --- initialize Vterm -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (multi-term)
-;; Homepage: homepage
+;; Version: v0.5
+;; Package-Requires: (vterm)
+;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: shell
 
 
@@ -26,20 +26,17 @@
 
 ;;; Commentary:
 
-;; commentary
+;; Use vterm instead of term
 
 ;;; Code:
-(require 'multi-term)
 
-(lye/exec-path-from-shell-init)
+;; @see https://github.com/akermu/emacs-libvterm#installation
+(when (and (executable-find "make")
+           (executable-find "libtool")
+           (executable-find "cmake"))
+  (require-package 'vterm)
+  (require 'vterm))
 
-(defun multi-term-dedicated-toggle+ ()
-  (interactive)
-  (multi-term-dedicated-toggle)
-  (if (member "*MULTI-TERM-DEDICATED*"
-              (mapcar (function buffer-name) (buffer-list)))
-      (other-window 1)))
+(provide 'iex-vterm)
 
-(provide 'lex-multi-term)
-
-;;; lex-multi-term.el ends here
+;;; iex-vterm.el ends here

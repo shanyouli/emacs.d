@@ -51,14 +51,6 @@
    )
  "aweshell")
 
-;; multi-term
-(lazy-load-global-keys
- '(
-   ("C-x s t" . multi-term-dedicated-toggle+)
-   ("C-x s m" . multi-term)
-   )
- "lex-multi-term")
-
 ;; Chinese automatically translated as English
 (lazy-load-global-keys
  '(

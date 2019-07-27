@@ -50,6 +50,9 @@
 ;; iex-avy
 (lazy-load-global-keys '(("M-e" . one-key-menu-avy)) "iex-avy")
 
+;; iex-vterm
+(lazy-load-global-keys '(("C-x s v" . vterm)) "iex-vterm")
+
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
 (require-package 'link-hint)

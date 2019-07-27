@@ -58,9 +58,6 @@
 [submodule "lazy-load"]
 	path = site-lisp/lazy-load
 	url = https://github.com/manateelazycat/lazy-load.git
-[submodule "multi-term"]
-	path = site-lisp/multi-term
-	url = https://github.com/manateelazycat/multi-term.git
 [submodule "awesome-tray"]
 	path = site-lisp/awesome-tray
 	url = https://github.com/shanyouli/awesome-tray.git
