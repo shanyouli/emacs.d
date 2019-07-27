@@ -15,4 +15,5 @@
 /nov-places
 /.pdf-view-restore
 /.cache
-
+/share/plantuml/
+/share/stardict/

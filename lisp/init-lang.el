@@ -102,11 +102,17 @@
 (use-package plantuml-mode
   :preface
   (defun plantuml-install ()
-    (let* ((plantuml-name ))))
+    (let* ((plantuml-name lye-emacs-plantuml-file)
+           (url "http://sourceforge.net/projects/plantuml/files/plantuml.jar/download"))
+      (unless (file-exists-p lye-emacs-plantuml-file)
+        (unless (file-exists-p (file-name-directory lye-emacs-plantuml-file))
+          (make-directory (file-name-directory lye-emacs-plantuml-file)))
+        (download-a-file url lye-emacs-plantuml-file))))
   :config
-  (when (file-exists-p (concat user-emacs-directory "plantuml/plantuml.jar"))
-    (setq plantuml-jar-path
-          (concat user-emacs-directory "plantuml/plantuml.jar"))))
+  (lye/core-require 'core-funcs)
+  (plantuml-install)
+  (setq plantuml-jar-path
+        (concat user-emacs-directory "plantuml/plantuml.jar")))
 
 ;; Only suitable for Windows Languages-Packages major-mode
 (when (and (boundp system/windows) system/windows)
@@ -123,7 +129,6 @@
           "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe")
     ;; interactive, but no command prompt
     (setq explicit-powershell.exe-args '("-Command" "-"))))
-
 
 (provide 'init-lang)
 ;;; init-lang.el ends here

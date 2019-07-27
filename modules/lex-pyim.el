@@ -31,6 +31,7 @@
 ;;; Code:
 (require 'pyim)
 (require 'async)
+(lye/core-require 'core-funcs)
 (when (and (>= emacs-major-version 26) (locate-library "posframe"))
   (require 'posframe))
 
@@ -38,15 +39,15 @@
 (defun pyim-bigdict-enable ()
   "Add bigdict to pyim"
   (interactive)
-  (let* ((file (concat
-                (file-name-as-directory user-emacs-directory)
-                (file-name-as-directory "pyim-dict")
-                "pyim-bigdict.pyim.gz")))
-    (when (file-exists-p file)
+  (let* ((file lye-emacs-pyim-big-file)
+         (newfile (concat lye-emacs-cache-dir "pyim/pyim-bigdict.pyim")))
+    (unless (file-exists-p newfile)
+      (gzip-a-file file newfile))
+    (when (file-exists-p newfile)
       (if (featurep 'pyim)
           (pyim-extra-dicts-add-dict
            `(:name "Bigdict-elpa"
-             :file ,file
+             :file ,newfile
              :coding utf-8-unix
              :dict-type pinyin-dict
              :elpa t))

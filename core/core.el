@@ -47,8 +47,19 @@
   "You don't need to load directly but use the extended key to load the package
  configuration folder.")
 
-(defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
-  "The Github page of My Emacs Configurations.")
+(defconst lye-emacs-cache-dir (concat user-emacs-directory ".cache/")
+  "Is the cache directory this?")
+
+(defconst lye-emacs-share-dir (expand-file-name "share/" user-emacs-directory)
+  "Store files in non-el format, such as `plantuml.jar', `pyim-bigdict.pyim.gz'.")
+
+(defconst lye-emacs-pyim-big-file
+  (expand-file-name "pyim-dict/pyim-bigdict.pyim.gz" lye-emacs-share-dir)
+  "Store the location of the pyim-dictionary.")
+
+(defconst lye-emacs-plantuml-file
+  (expand-file-name "plantuml/plantuml.jar" lye-emacs-share-dir)
+  "Store the location of the plantuml.jar.")
 
 (defconst system/windows (eq system-type 'windows-nt)
   "Are we running on a Windows System?")
@@ -62,9 +73,6 @@
 (defconst *root* (string-equal "root" (getenv "USER"))
   "Are you using ROOT user?")
 
-(defconst lye-emacs-cache-dir (concat user-emacs-directory ".cache/")
-  "Is the cache directory this?")
-
 ;;; customization
 (defcustom lye-full-name "shanyouli"
   "Set user full name."
@@ -73,6 +81,10 @@
 (defcustom lye-mail-address "shanyouli6@gmail.com"
   "Set user mail address."
   :type 'string)
+
+(defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
+  "The Github page of My Emacs Configurations.")
+
 
 (defcustom lye-package-archives 'tuna
   "Set package archives from which to fetch."
