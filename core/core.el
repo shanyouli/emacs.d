@@ -34,13 +34,13 @@
 (eval-when-compile (require 'cl))
 
 ;; constant
-(defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp" user-emacs-directory)
+(defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory)
   "The root directory of third packages.")
 
-(defconst lye-emacs-core-dir (expand-file-name "core" user-emacs-directory)
+(defconst lye-emacs-core-dir (expand-file-name "core/" user-emacs-directory)
   "Initialize some packages that are not installed using package.el.")
 
-(defconst lye-emacs-init-dir (expand-file-name "lisp" user-emacs-directory)
+(defconst lye-emacs-init-dir (expand-file-name "lisp/" user-emacs-directory)
   "Initialize some packages that are installed using package.el.")
 
 (defconst lye-emacs-modules-dir (expand-file-name "modules/" user-emacs-directory)
@@ -152,6 +152,15 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   (require 'benchmark-init)
   (benchmark-init/activate))
 
+;; modules
+(defmacro lye/modules-require (pkg)
+  "Import the *.el file in the lye-emacs-modules-dir folder."
+  `(require ,pkg (format "%s%s.el" ,lye-emacs-modules-dir ,pkg)))
+
+;; init Dired
+(defmacro lye/init-require (pkg)
+  "Import the `*.el' file in the lye-emacs-lisp-dir folder."
+  `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
 (provide 'core)
 
 ;;; core.el ends here
