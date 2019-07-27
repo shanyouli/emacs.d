@@ -29,12 +29,12 @@
   :preface
   (setq lye-company-enable-yas t)
 
-  (defvar company-enable-yas lye-company-enable-yas
-    "Enable yasnippet for all backends.")
+  ;; (defvar company-enable-yas lye-company-enable-yas
+  ;;   "Enable yasnippet for all backends.")
 
   (defun company-backend-with-yas (backend)
 
-    (if (or (not company-enable-yas)
+    (if (or (not lye-company-enable-yas)
             (and (listp backend) (member 'company-yasnippet backend)))
         backend
       (append (if (consp backend) backend (list backend))
@@ -77,12 +77,12 @@
   (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
 
 ;; Popup documentation for completion candidates
-(when (display-graphic-p)
-  (use-package company-quickhelp
-    :bind (:map company-active-map
-           ("M-h" . company-quickhelp-manual-begin))
-    :hook (global-company-mode . company-quickhelp-mode)
-    :config (setq company-quickhelp-delay 0.8)))
+;; (when (display-graphic-p)
+;;   (use-package company-quickhelp
+;;     :bind (:map company-active-map
+;;            ("M-h" . company-quickhelp-manual-begin))
+;;     :hook (global-company-mode . company-quickhelp-mode)
+;;     :config (setq company-quickhelp-delay 0.8)))
 
 ;; Use company-posframe
 (when (display-graphic-p)
