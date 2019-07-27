@@ -36,7 +36,7 @@
   (when (locate-library "all-the-icons") ; require all-the-icons
     (require 'all-the-icons))
 
-  (setq awesome-tab-style 'box) ; awesome-tab style
+  (setq awesome-tab-style 'slant) ; awesome-tab style
 
   (defun lye/awesome-tab-hide-tab (x)
     (let ((name (format "%s" x)))

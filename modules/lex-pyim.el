@@ -108,33 +108,43 @@
   (toggle-input-method))
 
 (defvar lye-liberime-share-dir "/usr/share/rime-data")
+
 (defvar lye-liberime-user-dir (expand-file-name "pyim/rime" lye-emacs-cache-dir))
+
+(defvar lye-use-liberime-p nil
+  "Whether liberime-module has been loaded.")
+
 (defun lye/use-liberime ()
+  "Use `liberime' module."
   (interactive)
-  (if  (memq system-type '(gnu/linux darwin))
+  (if (memq system-type '(gnu/linux darwin))
       (let* ((liberime--root (file-name-directory (locate-library "liberime-config")))
              (liberime--module (concat liberime--root "build/liberime" module-file-suffix)))
-        (if (and liberime--root (file-exists-p liberime--module))
-            (progn
-              (load liberime--module)
-              (liberime-start lye-liberime-share-dir lye-liberime-user-dir)
-              (liberime-select-schema "luna_pinyin_simp")
-              (setq pyim-default-scheme 'rime-quanpin)
-              (setq lye-enable-pyim-bigdict-p nil)
-              (set-input-method "pyim"))
-          (message "Please compile liberime and use this function.")))
+        (cond
+         (lye-use-liberime-p
+          (message "Liberime module has been loaded."))
+         ((and liberime--root (file-exists-p liberime--module))
+          (module-load liberime--module)
+          (liberime-start lye-liberime-share-dir lye-liberime-user-dir)
+          (liberime-select-schema "luna_pinyin_simp")
+          (setq pyim-default-scheme 'rime-quanpin)
+          (setq lye-enable-pyim-bigdict-p nil)
+          (set-input-method "pyim")
+          (setq lye-use-liberime-p t))
+         (t
+          (message "Please compile liberime and use this function."))))
     (message "Limerime cannot be used on systems other than gnu/linux and Mac.")))
 
   ;; No Chinese company
 ;;  (with-eval-after-load 'company
-    (defun lye/company-dabbrev--prefix (orig-fun)
-      "取消中文补全"
-      (let ((string (pyim-char-before-to-string 0)))
-        (if (pyim-string-match-p "\\cc" string)
-            nil
-          (funcall orig-fun))))
-    (advice-add 'company-dabbrev--prefix
-                :around #'lye/company-dabbrev--prefix)
+(defun lye/company-dabbrev--prefix (orig-fun)
+  "取消中文补全"
+  (let ((string (pyim-char-before-to-string 0)))
+    (if (pyim-string-match-p "\\cc" string)
+        nil
+      (funcall orig-fun))))
+(advice-add 'company-dabbrev--prefix
+            :around #'lye/company-dabbrev--prefix)
 ;;)
 
 (provide 'lex-pyim)

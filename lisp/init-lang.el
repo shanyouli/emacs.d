@@ -100,6 +100,9 @@
 
 ;; plantuml
 (use-package plantuml-mode
+  :preface
+  (defun plantuml-install ()
+    (let* ((plantuml-name ))))
   :config
   (when (file-exists-p (concat user-emacs-directory "plantuml/plantuml.jar"))
     (setq plantuml-jar-path

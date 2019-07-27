@@ -129,31 +129,26 @@
     ;; 非Mac平台直接全屏
     (fullscreen)))
 
+;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
+;; top, left ...
+;; Set the initial window size
+(add-to-list 'default-frame-alist
+             (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
+(add-to-list 'default-frame-alist
+             (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
+
 (when (display-graphic-p)
   ;; Frame Size after startup
   (if lye-init-fullscreen-p
       (lye/init-fullscreen)
-    (progn
-      ;; Set the initial window size
-      ;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
-      ;; top, left ...
-      (add-to-list 'default-frame-alist
-                   (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
-      (add-to-list 'default-frame-alist
-                   (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
-      ;; (add-to-list 'default-frame-alist
-                   ;; (cons 'height (lye/frame-default-height)))
-      ;; (add-to-list 'default-frame-alist
-      ;; (cons 'width (lye/frame-default-width)))
-      (add-hook 'after-init-hook #'lye/restore-frame-size)
-      ))
+    (add-hook 'after-init-hook
+              '(lambda ()
+                 (run-with-idle-timer 0.1 nil #'lye/restore-frame-size))))
 
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
   (add-hook 'after-make-frame-functions #'lye/restore-frame-size)
 
 ;; font
-  (require 'setup-font)
-
   (setq setup-english-font "Fantasque Sans Mono")
   (setq setup-cjk-font (cond
                         (system/linux
@@ -164,7 +159,10 @@
                          "Microsoft Yahei")))
 
   (setq setup-font-default-size 14)
-  (setup-font-initialize)
+  (add-hook 'after-init-hook
+            '(lambda ()
+                 (require 'setup-font)
+                 (setup-font-initialize)))
 
   ;; Key
   (defvar one-key-menu-font-size-alist nil
@@ -183,9 +181,29 @@
   ;; Specify font for all unicode characters
   (catch 'loop
     (dolist (font '("Symbola" "Apple Symbols" "Symbol"))
-      (when (font-exist-p font)
+      (when (member font (font-family-list))
         (set-fontset-font t 'unicode font nil 'prepend)
-        (throw 'loop t)))))
+        (throw 'loop t))))
+
+  ;; THEME
+  (setq theme-switch-light      'doom-one-light
+        theme-switch-dark       'doom-one
+        theme-switch-light-time "08:30"
+        theme-switch-dark-time  "19:30")
+  (add-hook 'after-init-hook (lambda ()
+                               (require 'theme-switch)
+                               (require 'doom-themes)
+                               (theme-switch-light-or-dark-theme)
+                               ))
+  (add-hook 'after-load-theme-hook
+            '(lambda ()
+               (when (and (boundp 'awesome-tray-active-p) awesome-tray-active-p)
+                 (awesome-tray-mode))
+
+               (when (and (fboundp 'awesome-tab-mode-on-p) (awesome-tab-mode-on-p))
+                 (awesome-tab-mode -1)
+                 (awesome-tab-mode 1))))
+  )
 
 (provide 'core-ui)
 

@@ -92,11 +92,10 @@ decrease this. If you experience stuttering, increase this.")
 
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
 (lye/core-require 'core-key)            ; Keybindings
+(lye/core-require 'core-generic)        ; generic
 (lye/core-require 'core-scratch)        ; scratch
-(lye/core-require 'core-theme)          ; Theme
 (lye/core-require 'core-ui)             ; UI
 (lye/core-require 'core-modeline)       ; mode-line
-(lye/core-require 'core-generic)        ; generic
 (lye/core-require 'core-os)             ; OS environmental variable
 (lye/core-require 'core-package)        ; packages initialization
 (lye/core-require 'core-elpa)           ; package management tool
@@ -106,12 +105,13 @@ decrease this. If you experience stuttering, increase this.")
 
   ;; Preferences
   (require 'init-edit)
-  (require 'init-shackle)
+  (require 'init-shackle)               ; Window rule
 
   ;; Tools
   (require 'init-dired)                 ; Dired
   (require 'init-reads)                 ; Reader tools
   (require 'init-company)
+
   (run-with-idle-timer 0.5 nil  (lambda ()
                                   ;; Program language common tool
                                   (require 'init-awesome-tab)

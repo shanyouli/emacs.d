@@ -86,7 +86,8 @@
       (add-hook 'kill-emacs-hook #'lye/scratch-save)
       (add-hook 'after-init-hook #'lye/scratch-restore)
       (add-hook 'kill-buffer-query-functions #'lye/unkillable-scratch-buffer))
-  (add-hook 'change-major-mode-hook #'remove-scratch-buffer))
+
+  (add-hook 'after-change-major-mode-hook #'remove-scratch-buffer))
 
 (provide 'core-scratch)
 
