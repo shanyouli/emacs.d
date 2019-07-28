@@ -38,20 +38,9 @@
 ;; PATH
 (lye/exec-path-from-shell-init)
 
-;; Forge configuration
-(setq-default forge-database-file (expand-file-name "forge-database.sqlite" lye-emacs-cache-dir))
-
 ;; Magit configuration.
 (setq magit-commit-ask-to-stage nil)   ; don't ask stage question
 (setq magit-display-buffer-noselect t) ; don't select magit buffer default
-
-;; transient file
-(setq-default transient-history-file
-        (concat lye-emacs-cache-dir "transient/history.el"))
-(setq-default transient-values-file
-      (concat lye-emacs-cache-dir "transient/values.el"))
-(setq-default transient-levels-file
-      (concat lye-emacs-cache-dir "transient/levels.el"))
 
 ;; Make path column have enough space to display.
 (setq magit-submodule-list-columns

@@ -40,6 +40,16 @@
 (lazy-load-global-keys '(("C-x t" . one-key-menu-treemacs)) "iex-treemacs")
 
 ;; iex-git
+;; transient file
+(setq-default transient-history-file
+        (concat lye-emacs-cache-dir "transient/history.el"))
+(setq transient-values-file
+      (concat lye-emacs-cache-dir "transient/values.el"))
+(setq transient-levels-file
+      (concat lye-emacs-cache-dir "transient/levels.el"))
+;; Forge configuration
+(setq forge-database-file
+      (expand-file-name "forge-database.sqlite" lye-emacs-cache-dir))
 (lazy-load-global-keys '(("C-x g" . one-key-menu-magit)) "iex-git")
 
 ;; iex-window
