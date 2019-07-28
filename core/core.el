@@ -34,6 +34,19 @@
 (eval-when-compile (require 'cl))
 
 ;; constant
+
+(defconst system/windows (eq system-type 'windows-nt)
+  "Are we running on a Windows System?")
+
+(defconst system/mac (eq system-type 'darwin)
+  "Are we running on a Mac System?")
+
+(defconst system/linux (eq system-type 'gnu/linux)
+  "Are we running on a GNU/Linux System?")
+
+(defconst *root* (string-equal "root" (getenv "USER"))
+  "Are you using ROOT user?")
+
 (defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory)
   "The root directory of third packages.")
 
@@ -65,17 +78,9 @@
   (expand-file-name "snippets" lye-emacs-share-dir)
   "Store the location of the `Yas-snippets'.")
 
-(defconst system/windows (eq system-type 'windows-nt)
-  "Are we running on a Windows System?")
-
-(defconst system/mac (eq system-type 'darwin)
-  "Are we running on a Mac System?")
-
-(defconst system/linux (eq system-type 'gnu/linux)
-  "Are we running on a GNU/Linux System?")
-
-(defconst *root* (string-equal "root" (getenv "USER"))
-  "Are you using ROOT user?")
+(defconst lye-emacs-custom-temp-file
+  (expand-file-name "custom-template.el" lye-emacs-share-dir)
+  "The custom template of `custom-file'.")
 
 ;;; customization
 (defcustom lye-full-name "shanyouli"
@@ -88,7 +93,6 @@
 
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
-
 
 (defcustom lye-package-archives 'tuna
   "Set package archives from which to fetch."
@@ -107,16 +111,6 @@
   "Enable the init benchmark or not."
   :type 'boolean)
 
-(defcustom lye-enable-sdcv-or-youdao 'sdcv
-  "If it is sdcv, use `sdcv' as a translation tool.
-If it is youdao, use `youdao-dictionary' as a translation tool."
-  :type '(choice (const :tag "Sdcv" sdcv)
-                 (const :tag "Youdao" youdao)))
-
-(defcustom lye-sdcv-dictionary-data-dir (expand-file-name "~/.stardict/dic/")
-  "Sdcv dictionary storage directory."
-  :type 'string)
-
 (defcustom lye-init-fullscreen-p nil
   "Full SCREEN or not when initializing."
   :type 'boolean)
@@ -125,9 +119,24 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   "Whether to use `*scratch*' buffer"
   :type 'boolean)
 
+(defcustom lye-enable-sdcv-or-youdao 'sdcv
+  "If it is sdcv, use `sdcv' as a translation tool.
+If it is youdao, use `youdao-dictionary' as a translation tool."
+  :type '(choice (const :tag "Sdcv" sdcv)
+                 (const :tag "Youdao" youdao)))
+
+(defcustom lye-sdcv-dictionary-data-dir (expand-file-name "stardict" lye-emacs-share-dir)
+  "Sdcv dictionary storage directory."
+  :type 'string)
+
 ;;; Load `custom-file'
 (setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
-(when (file-exists-p custom-file) (load custom-file))
+
+(if (and (file-exists-p lye-emacs-custom-temp-file)
+         (not (file-exists-p custom-file)))
+    (copy-file lye-emacs-custom-temp-file custom-file))
+
+(if (file-exists-p custom-file) (load custom-file))
 
 ;; Set the temporal directory
 (unless (file-exists-p lye-emacs-cache-dir)

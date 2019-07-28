@@ -33,6 +33,7 @@
 (defvar lye-gc-cons-threshold 16777216 ; 16mb
   "The default value to use for `gc-cons-threshold'. If you experience freezing,
 decrease this. If you experience stuttering, increase this.")
+
 (defvar lye-gc-cons-upper-linit most-positive-fixnum        ;;536870921 ; 512mb
   "The temporary value for `gc-cons-threshold' to defer it.")
 
@@ -101,7 +102,6 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-elpa)           ; package management tool
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
-
   (lye/init-require 'init-key)                   ; Keybindings
 
   ;; Preferences
@@ -113,7 +113,7 @@ decrease this. If you experience stuttering, increase this.")
   (lye/init-require 'init-reads)                 ; Reader tools
   (lye/init-require 'init-company)
 
-  (run-with-idle-timer 0.5 nil  (lambda ()
+  (run-with-idle-timer 0.3 nil  (lambda ()
                                   ;; Program language common tool
                                   (lye/init-require 'init-awesome-tab)
                                   (lye/init-require 'init-lang)

@@ -77,8 +77,12 @@
 
 ;; lex-thing-edit.el
 (lazy-load-global-keys '(("M-s" . one-key-menu-thing-edit)) "lex-thing-edit")
+
 ;; lex-pyim.el
-;; (lazy-load-global-keys '(("<f9>" . toggle-input-method)) "lex-pyim")
+(lazy-load-global-keys
+ '(("<f9>"    . lye/toggle-pyim-input-method)
+   ("C-<f9>"  . lye/toggle-pyim-punctuation-translate)
+   ("C-z s i" . lye/use-liberime)) "lex-pyim")
 
 ;; lex-ivy.el
 (lazy-load-global-keys
@@ -89,15 +93,8 @@
    ("C-z s t" . counsel-load-theme)
    ("M-y"     . counsel-yank-pop)
    ("C-x b"   . ivy-switch-buffer)
-   ("C-x d"   . counsel-dired)
-   )
+   ("C-x d"   . counsel-dired))
  "lex-ivy")
-
-;; lex-pyim.el
-(lazy-load-global-keys
- '(("<f9>"    . lye/toggle-pyim-input-method)
-   ("C-<f9>"  . lye/toggle-pyim-punctuation-translate)
-   ("C-z s i" . lye/use-liberime)) "lex-pyim")
 
 ;; lex-funcs
 (lazy-load-global-keys '(("C-z f" . one-key-menu-funcs)) "lex-funcs")

@@ -30,7 +30,9 @@
   (with-temp-message
       (with-current-buffer " *Minibuf-0*" (buffer-string))
     (setq-default yas-snippet-dirs (list lye-emacs-yas-snippets-dir))
-    (yas-global-mode 1))
+    (yas-global-mode 1)
+    (when (file-exists-p yas--default-user-snippets-dir)
+      (delete-directory yas--default-user-snippets-dir)))
   :config
   (use-package yasnippet-snippets))
 

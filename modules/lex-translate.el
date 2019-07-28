@@ -33,7 +33,7 @@
   "The `one-key' menu list for TRANSLATATIONS")
 
 (cond
- ((string= lye-enable-sdcv-or-youdao "sdcv")
+ ((eq lye-enable-sdcv-or-youdao 'sdcv)
   (require 'sdcv)
   (require 'posframe)
   ;; (setq sdcv-say-word-p t) ; say word after translation
@@ -68,7 +68,7 @@
     (interactive)
     (one-key-menu "TRANSLATATIONS" one-key-menu-translate-alist t)))
 
- ((string= lye-enable-sdcv-or-youdao "youdao")
+ ((eq lye-enable-sdcv-or-youdao 'youdao)
   ;; Cache documents
   (setq url-automatic-caching t)
   ;; Set file path for saving search history

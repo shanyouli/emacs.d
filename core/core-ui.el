@@ -178,13 +178,6 @@
     (interactive)
     (one-key-menu "FONT-SIZE" one-key-menu-font-size-alist nil t))
 
-  ;; Specify font for all unicode characters
-  (catch 'loop
-    (dolist (font '("Symbola" "Apple Symbols" "Symbol"))
-      (when (member font (font-family-list))
-        (set-fontset-font t 'unicode font nil 'prepend)
-        (throw 'loop t))))
-
   ;; THEME
   (setq theme-switch-light      'doom-one-light
         theme-switch-dark       'doom-one

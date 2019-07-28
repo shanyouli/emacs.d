@@ -29,9 +29,6 @@
   :preface
   (setq lye-company-enable-yas t)
 
-  ;; (defvar company-enable-yas lye-company-enable-yas
-  ;;   "Enable yasnippet for all backends.")
-
   (defun company-backend-with-yas (backend)
 
     (if (or (not lye-company-enable-yas)
