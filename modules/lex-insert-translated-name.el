@@ -30,10 +30,12 @@
 
 ;;; Code:
 
-(require 'lex-pyim)
+(lye/modules-require 'lex-pyim)
+
 (when lye-enable-pyim-bigdict-p
   (pyim-bigdict-enable)
   (setq lye-enable-pyim-bigdict-p nil))
+
 (require 'insert-translated-name)
 
 (provide 'lex-insert-translated-name)

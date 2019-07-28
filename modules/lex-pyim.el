@@ -135,7 +135,12 @@
           (message "Please compile liberime and use this function."))))
     (message "Limerime cannot be used on systems other than gnu/linux and Mac.")))
 
-  ;; No Chinese company
+;; Use the cursor format to determine whether to use pyim. When using pyim,
+;; the cursor is bar. When pyim is not applicable, the cursor is box.
+(add-hook 'input-method-activate-hook  (lambda () (setq cursor-type 'bar)))
+(add-hook 'input-method-deactivate-hook (lambda () (setq cursor-type t)))
+
+;; No Chinese company
 ;;  (with-eval-after-load 'company
 (defun lye/company-dabbrev--prefix (orig-fun)
   "取消中文补全"

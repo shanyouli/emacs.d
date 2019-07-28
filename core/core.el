@@ -61,6 +61,10 @@
   (expand-file-name "plantuml/plantuml.jar" lye-emacs-share-dir)
   "Store the location of the plantuml.jar.")
 
+(defconst lye-emacs-yas-snippets-dir
+  (expand-file-name "snippets" lye-emacs-share-dir)
+  "Store the location of the `Yas-snippets'.")
+
 (defconst system/windows (eq system-type 'windows-nt)
   "Are we running on a Windows System?")
 
@@ -173,6 +177,7 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 (defmacro lye/init-require (pkg)
   "Import the `*.el' file in the lye-emacs-lisp-dir folder."
   `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
+
 (provide 'core)
 
 ;;; core.el ends here

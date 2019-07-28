@@ -31,8 +31,8 @@
 ;;; Code:
 
 (require 'counsel)
-(if (and (locate-library "amx")  (locate-library "iex-amx"))
-    (require 'iex-amx))
+(if (locate-library "amx")
+    (lye/modules-require 'iex-amx))
 
 (setq enable-recursive-minibuffers t) ; Allow commands in minibuffers
 (setq ivy-use-selectable-prompt t)
@@ -41,6 +41,7 @@
 (setq ivy-count-format "(%d/%d) ")
 (setq ivy-on-del-error-function nil)
 (setq ivy-display-style 'fancy)
+
 ;; @https://github.com/abo-abo/swiper/issues/2130
 (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow)
 
@@ -69,6 +70,7 @@
 
 ;; load-locate-key
 (lazy-load-local-keys '(([escape] . minibuffer-keyboard-quit)) swiper-map "lex-ivy")
+
 (lazy-load-local-keys
  '(("<C-return>" . ivy-immediate-done)
    ([escape]     . minibuffer-keyboard-quit))

@@ -26,8 +26,13 @@
 
 ;;; yasnippet
 (use-package yasnippet
-  :init (yas-global-mode 1)
-  :config (use-package yasnippet-snippets))
+  :init
+  (with-temp-message
+      (with-current-buffer " *Minibuf-0*" (buffer-string))
+    (setq-default yas-snippet-dirs (list lye-emacs-yas-snippets-dir))
+    (yas-global-mode 1))
+  :config
+  (use-package yasnippet-snippets))
 
 ;;; prettify-mode
 (use-package prettify-symbols-mode
