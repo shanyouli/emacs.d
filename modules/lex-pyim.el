@@ -31,7 +31,6 @@
 ;;; Code:
 (require 'pyim)
 (require 'async)
-(lye/core-require 'core-funcs)
 (when (and (>= emacs-major-version 26) (locate-library "posframe"))
   (require 'posframe))
 
@@ -42,6 +41,7 @@
   (let* ((file lye-emacs-pyim-big-file)
          (newfile (concat lye-emacs-cache-dir "pyim/pyim-bigdict.pyim")))
     (unless (file-exists-p newfile)
+      (lye/core-require 'core-funcs)
       (gzip-a-file file newfile))
     (when (file-exists-p newfile)
       (if (featurep 'pyim)
@@ -77,8 +77,7 @@
         (setq pyim-posfram-min-width 0))
     (setq pyim-page-tooltip 'popup))
   ;; Set 9 candidate words
-  (setq pyim-page-length 9)
-  )
+  (setq pyim-page-length 9))
 
 (setq-default pyim-punctuation-translate-p '(no yes auto))
 ;;(setq-default pyim-punctuation-translate-p '(auto yes no ))

@@ -100,19 +100,10 @@
 
 ;; plantuml
 (use-package plantuml-mode
-  :preface
-  (defun plantuml-install ()
-    (let* ((plantuml-name lye-emacs-plantuml-file)
-           (url "http://sourceforge.net/projects/plantuml/files/plantuml.jar/download"))
-      (unless (file-exists-p lye-emacs-plantuml-file)
-        (unless (file-exists-p (file-name-directory lye-emacs-plantuml-file))
-          (make-directory (file-name-directory lye-emacs-plantuml-file)))
-        (download-a-file url lye-emacs-plantuml-file))))
   :config
-  (lye/core-require 'core-funcs)
-  (plantuml-install)
-  (setq plantuml-jar-path
-        (concat user-emacs-directory "plantuml/plantuml.jar")))
+  (setq plantuml-jar-path lye-emacs-plantuml-file)
+  (unless (file-exists-p plantuml-jar-path)
+    (plantuml-download-jar)))
 
 ;; Only suitable for Windows Languages-Packages major-mode
 (when (and (boundp system/windows) system/windows)

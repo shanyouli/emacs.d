@@ -47,13 +47,18 @@
             (message "Decompression is complete."))
         (message "%s is not a file compressed with gzip." old-file)))))
 
-(defun download-a-file (URL file-name)
+(defun download-a-file (URL file-name &optional cmd)
   (if  (string-match "\\/" file-name)
      (if (not (file-exists-p file-name))
          (let ((file (file-truename file-name)))
            (unless (file-exists-p (file-name-directory file))
              (make-directory file))
-           (url-copy-file URL file)
+           (if cmd
+               (cond ((and (executable-find cmd) (string= "axel" cmd))
+                      (async-shell-command
+                       (format "axel -n 20 %s -o %s" URL file))
+                      ))
+             (url-copy-file URL file))
            (message "%s download successful." file-name))
        (message "%s already exists, please re-determine the download file name."
                 file-name))
