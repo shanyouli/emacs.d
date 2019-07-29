@@ -126,14 +126,6 @@
 ;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links
 (setq vc-follow-symlinks nil)
 
-;; temp file
-(defun temp-file-scratch ()
-  "Create a temporary buffer to replace *scratch*."
-  (interactive)
-  (switch-to-buffer (find-file "~/.emacs.d/.cache/scratch"))
-  (emacs-lisp-mode)
-  (rename-buffer "*temp*"))
-
 (provide 'core-generic)
 
 ;;; core-generic.el ends here

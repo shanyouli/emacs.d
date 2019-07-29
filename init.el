@@ -140,3 +140,4 @@ decrease this. If you experience stuttering, increase this.")
 (provide 'init)
 
 ;;; init.el ends here
+(put 'erase-buffer 'disabled nil)

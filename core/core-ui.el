@@ -148,7 +148,7 @@
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
   (add-hook 'after-make-frame-functions #'lye/restore-frame-size)
 
-;; font
+  ;; font
   (setq setup-english-font "Fantasque Sans Mono")
   (setq setup-cjk-font (cond
                         (system/linux
@@ -192,13 +192,13 @@
                                ))
   (add-hook 'after-load-theme-hook
             '(lambda ()
+
                (when (and (boundp 'awesome-tray-active-p) awesome-tray-active-p)
                  (awesome-tray-mode))
 
                (when (and (fboundp 'awesome-tab-mode-on-p) (awesome-tab-mode-on-p))
                  (awesome-tab-mode -1)
-                 (awesome-tab-mode 1))))
-  )
+                 (awesome-tab-mode 1)))))
 
 (provide 'core-ui)
 

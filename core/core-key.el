@@ -103,6 +103,9 @@
 (when (display-graphic-p)
   (lazy-load-global-keys '(("C-z s f" . lye/one-key-menu-font-size)) "core-font"))
 
+;; lex-temp
+(lazy-load-global-keys '(("C-z b" . one-key-menu-scratch-buffer)) "lex-temp")
+
 ;;; toolkit
 (lazy-load-set-keys
  '(

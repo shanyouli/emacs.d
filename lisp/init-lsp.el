@@ -50,9 +50,8 @@
           lsp-ui-sideline-ignore-duplicate t))
   (use-package company-lsp :commands company-lsp))
 
-
-
 ;; (add-hook 'sh-mode-hook #'lsp)
 (add-hook 'python-mode-hook #'lsp)
+
 (provide 'init-lsp)
 ;;; init-lsp.el ends here
