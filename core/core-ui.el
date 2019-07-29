@@ -159,10 +159,12 @@
                          "Microsoft Yahei")))
 
   (setq setup-font-default-size 14)
-  (add-hook 'after-init-hook
-            '(lambda ()
-                 (require 'setup-font)
-                 (setup-font-initialize)))
+  (require 'setup-font)
+  (setup-font-initialize)
+  ;; (add-hook 'after-init-hook
+  ;;           '(lambda ()
+  ;;                (require 'setup-font)
+  ;;                (setup-font-initialize)))
 
   ;; Key
   (defvar one-key-menu-font-size-alist nil
