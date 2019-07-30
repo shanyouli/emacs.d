@@ -67,7 +67,10 @@
  "company-english-helper")
 
 ;; lex-one-key.el
-(lazy-load-global-keys '(("C-z u" . one-key-menu-ui)) "lex-one-key")
+(lazy-load-global-keys
+ '(("C-z u" . one-key-menu-ui)
+   ("C-z d" . one-key-menu-dir))
+ "lex-one-key")
 
 ;; lex-translate.el
 (lazy-load-global-keys '(("C-z y" . one-key-menu-translate)) "lex-translate")

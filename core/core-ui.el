@@ -129,15 +129,15 @@
     ;; 非Mac平台直接全屏
     (fullscreen)))
 
-;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
-;; top, left ...
-;; Set the initial window size
-(add-to-list 'default-frame-alist
-             (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
-(add-to-list 'default-frame-alist
-             (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
-
 (when (display-graphic-p)
+  ;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
+  ;; top, left ...
+  ;; Set the initial window size
+  (add-to-list 'default-frame-alist
+               (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
+  (add-to-list 'default-frame-alist
+               (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
+
   ;; Frame Size after startup
   (if lye-init-fullscreen-p
       (lye/init-fullscreen)

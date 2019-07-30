@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-;; install treemacs treemacs-projectile treemacs-magit -------------------------
+;; install treemacs ------------------------------------------------------------
 (require-package 'treemacs)
 (require-package 'treemacs-projectile)
 (require-package 'treemacs-magit)
@@ -84,6 +84,7 @@
 
 ;; Magit integration for treemacs
 (require 'treemacs-magit)
+
 (with-eval-after-load 'treemacs
   (with-eval-after-load 'magit
     (add-hook 'magit-post-commit-hook #'treemacs-magit--schedule-update)
@@ -95,7 +96,7 @@
 ;; treemacs icons
 (if (locate-library "doom-themes")
     (require 'doom-themes-ext-treemacs))
-;;(treemacs-load-theme 'centaur)
+
 ;; treemacs-key
 (defvar one-key-menu-treemacs-alist nil
   "The `one-key' menu alist for treemacs")

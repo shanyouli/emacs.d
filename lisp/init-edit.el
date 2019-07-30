@@ -112,5 +112,12 @@
       (if my-prev-whitespace-mode
           (whitespace-mode 1)))))
 
+;;------------------------------------------------------------------------------
+;; Page break lines
+;;------------------------------------------------------------------------------
+
+(require-package 'page-break-lines)
+(add-hook 'aftre-init-hook 'global-page-break-lines-mode)
+
 (provide 'init-edit)
 ;;; init-edit.el ends here

@@ -48,7 +48,7 @@
                         (push '("#+BEGIN_SRC" . "λ") prettify-symbols-alist)
                         (push '("#+END_SRC" . "λ") prettify-symbols-alist))
                       (prettify-symbols-mode)))
-  ;;  :config
+  :init (require 'doom-themes-ext-org)
   )
 
 ;; Prettify UI

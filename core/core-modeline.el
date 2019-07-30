@@ -37,24 +37,11 @@
 ;; (defconst default-modeline-mule-info mode-line-mule-info
 ;;   "Emacs default mode-line mule-info")
 
-
 (unless after-init-time
   (setq mode-line-format nil))
-
-(if (display-graphic-p)
-    (progn
-      (require 'awesome-tray)
-      (setq awesome-tray-active-modules  '("pyim" "location"  "parent-dir"  "mode-name" "awesome-tab" "date"))
-      (advice-add #'awesome-tray-enable :after
-                  (lambda ()
-                    (setq-default mode-line-buffer-identification nil)
-                    (setq-default mode-line-mule-info nil)))
-      (run-with-idle-timer 0.1 nil (lambda ()
-                               (awesome-tray-mode 1))))
-
   ;; use setq-default to set it for /all/ modes
   ;; http://emacs-fu.blogspot.com/2011/08/customizing-mode-line.html
-  (setq-default mode-line-format
+  (setq  default-mode-line-format
         (list
          ;; the buffer name; the file name as a tool tip
          '(:eval (propertize "%b " 'face 'font-lock-keyword-face
@@ -109,7 +96,25 @@
          ;; i don't want to see minor-modes; but if you want, uncomment this:
          ;; minor-mode-alist  ;; list of minor modes
          "%-" ;; fill with '-'
-         )))
+         ))
+
+(if (display-graphic-p)
+    (progn
+      (require 'awesome-tray)
+      (setq awesome-tray-active-modules
+            '("pyim" "location"  "parent-dir"  "mode-name" "awesome-tab" "date"))
+
+      (advice-add #'awesome-tray-enable :after
+                  (lambda ()
+                    (setq-default mode-line-format '(" "))))
+
+      (advice-add #'awesome-tray-disable :after
+                  (lambda () (setq-default mode-line-format default-mode-line-format)))
+
+      (run-with-idle-timer 0.1 nil (lambda ()
+                                     (awesome-tray-mode 1))))
+
+  (setq-default mode-line-format default-mode-line-format))
 
 (provide 'core-modeline)
 

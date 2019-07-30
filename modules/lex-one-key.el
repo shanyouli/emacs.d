@@ -53,6 +53,7 @@
       '((("d" . "Dotfiles") . (lambda () (interactive) (dired-x-find-file "~/.dotfiles")))
         (("e" . "Emacs.d")  . (lambda () (interactive) (dired-x-find-file user-emacs-directory)))
         (("g" . "Git Repo") . (lambda () (interactive) (dired-x-find-file "~/Git")))
+        (("r" . "DropBox")  . (lambda () (interactive) (dired-x-find-file "~/Dropbox")))
         ))
 
 (defun one-key-menu-dir ()
