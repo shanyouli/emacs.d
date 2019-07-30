@@ -33,14 +33,32 @@
 ;; The hot key about tool-bar, menu-bar, scroll-bar
 (defvar one-key-menu-ui-alist nil
   "The `one-key' menu alist for UI.")
+
 (setq one-key-menu-ui-alist
-      `((("t" . "Tool-Bar") . tool-bar-mode)
+      '((("t" . "Tool-Bar") . tool-bar-mode)
         (("m" . "Menu-Bar") . menu-bar-mode)
         (("s" . "Scroll-Bar") . scroll-bar-mode)))
+
 (defun one-key-menu-ui ()
   "The `one-key' menu for UI."
   (interactive)
   (one-key-menu "UI" one-key-menu-ui-alist t))
+
+
+;;Common file shortcuts
+(defvar one-key-menu-dir-alist nil
+  "The `one-key' menu alist for dir.")
+
+(setq one-key-menu-dir-alist
+      '((("d" . "Dotfiles") . (lambda () (interactive) (dired-x-find-file "~/.dotfiles")))
+        (("e" . "Emacs.d")  . (lambda () (interactive) (dired-x-find-file user-emacs-directory)))
+        (("g" . "Git Repo") . (lambda () (interactive) (dired-x-find-file "~/Git")))
+        ))
+
+(defun one-key-menu-dir ()
+  "The `one-key' menu alist for dir."
+  (interactive)
+  (one-key-menu "Open a Dir" one-key-menu-dir-alist))
 
 (provide 'lex-one-key)
 
