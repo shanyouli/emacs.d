@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-;; The hot key about tool-bar, menu-bar, scroll-bar
+;;; The hot key about tool-bar, menu-bar, scroll-bar
 (defvar one-key-menu-ui-alist nil
   "The `one-key' menu alist for UI.")
 
@@ -45,7 +45,7 @@
   (one-key-menu "UI" one-key-menu-ui-alist t))
 
 
-;;Common file shortcuts
+;;; Common file shortcuts
 (defvar one-key-menu-dir-alist nil
   "The `one-key' menu alist for dir.")
 
@@ -60,6 +60,22 @@
   "The `one-key' menu alist for dir."
   (interactive)
   (one-key-menu "Open a Dir" one-key-menu-dir-alist))
+
+;; Font size adjustment
+(defvar one-key-menu-font-size-alist nil
+  "The `one-key' menu list for Font-SIZE.")
+
+(setq one-key-menu-font-size-alist
+      '((("=" . "Increase font size") . increase-setup-font-size)
+        (("-" . "Decrease font size") . decrease-setup-font-size)
+        (("0" . "Default font size")  . default-setup-font-size)))
+
+(defun one-key-menu-font-size ()
+  "The `one-key' menu for Font-SIZE."
+  (interactive)
+  (if (and (fboundp 'increase-setup-font-size) (display-graphic-p))
+      (one-key-menu "FONT-SIZE" one-key-menu-font-size-alist nil t)
+    (message "Please run %s in the graphical interface." "one-key-menu-font-size")))
 
 (provide 'lex-one-key)
 

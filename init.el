@@ -103,15 +103,15 @@ decrease this. If you experience stuttering, increase this.")
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
   (lye/init-require 'init-hydras)
-  (lye/init-require 'init-key)                   ; Keybindings
+  (lye/init-require 'init-key)          ; Keybindings
 
   ;; Preferences
   (lye/init-require 'init-edit)
-  (lye/init-require 'init-shackle)               ; Window rule
+  (lye/init-require 'init-shackle)      ; Window rule
 
   ;; Tools
-  (lye/init-require 'init-dired)                 ; Dired
-  (lye/init-require 'init-reads)                 ; Reader tools
+  (lye/init-require 'init-dired)        ; Dired
+  (lye/init-require 'init-reads)        ; Reader tools
   (lye/init-require 'init-company)
 
   (run-with-idle-timer 0.3 nil  (lambda ()

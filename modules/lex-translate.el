@@ -57,45 +57,68 @@
           "quick_eng-zh_CN"
           "CDICT5英汉辞典"))
 
-  ;;Set shortcuts
-  (setq one-key-menu-translate-alist
-        '((("s" . "Search by translation") . sdcv-search-input+)
-          (("d" . "Search by translation, Displayed in other frame") . sdcv-search-input)
-          (("p" . "Point by translation") . sdcv-search-pointer+)
-          (("o" . "Search by translation, Displayed in another frame") . sdcv-search-pointer)))
-  (defun one-key-menu-translate ()
-    "The `one-key' menu for TRANSLATATIONS"
-    (interactive)
-    (one-key-menu "TRANSLATATIONS" one-key-menu-translate-alist t)))
+  ;; Set an alias for the function
+  (defalias 'default-translate-input 'sdcv-search-input
+    "Better create shortcut groups,`sdcv/youdao-dictionary'")
+
+  (defalias 'default-translate-point 'sdcv-search-pointer
+    "Better create shortcut groups,`sdcv/youdao-dictionary'")
+
+  (defalias 'default-translate-point+ 'sdcv-search-pointer+
+    "Better create shortcut groups,`sdcv/youdao-dictionary'")
+
+  (push '(("s" . "Search by input+") . sdcv-search-input+)
+        one-key-menu-translate-alist))
 
  ((eq lye-enable-sdcv-or-youdao 'youdao)
+
+  (require-package 'youdao-dictionary)
+  (require 'youdao-dictionary)
+
   ;; Cache documents
   (setq url-automatic-caching t)
+
   ;; Set file path for saving search history
   (setq youdao-dictionary-search-history-file
         (concat lye-emacs-cache-dir "youdaohs"))
+
   ;; Enable Chinese word segmentation support (支持中文分词)
   (setq youdao-dictionary-use-chinese-word-segmentation t)
 
-;;Set shortcuts
-  (setq one-key-menu-translate-alist
-        '((("s" . "Search by translation") . youdao-dictionary-search-from-input)
-          (("p" . "Point by translation") . youdao-dictionary-search-at-point-tooltip)
-          (("o" . "Search by translation, Displayed in another frame") . youdao-dictionary-search)))
-  (defun one-key-menu-translate ()
-    "The `one-key' menu for TRANSLATATIONS"
-    (interactive)
-    (one-key-menu "TRANSLATATIONS" one-key-menu-translate-alist t))))
+  ;; Set an alisas for the functions
+  (defalias 'default-translate-input 'youdao-dictionary-search-from-input
+    "Better create shortcut groups,`sdcv/youdao-dictionary'")
 
-;; (when (locate-library "avy")
-;;         (defun lye/avy-youdao-dictionary ()
-;;           (interactive)
-;;           (save-excursion
-;;             (call-interactively #'avy-goto-char)
-;;             (if (display-graphic-p)
-;;                 (youdao-dictionary-search-at-point-tooltip)
-;;               (youdao-dictionary-search-at-point))))
-;;         (bind-key "C-s y" #'lye/avy-youdao-dictionary))
+  (defalias 'default-translate-point 'youdao-dictionary-search-at-point
+    "Better create shortcut groups,`sdcv/youdao-dictionary'")
+
+  (defalias 'default-translate-point+ 'youdao-dictionary-search-at-point-tooltip
+    "Better create shortcut groups,`sdcv/youdao-dictionary'")))
+
+(when (locate-library "avy")
+  (defun default-translate-use-avy ()
+    (interactive)
+    (save-excursion
+      (call-interactively #'avy-goto-char)
+      (if (display-graphic-p)
+          (default-translate-point+)
+        (default-translate-point))))
+
+  (add-to-list 'one-key-menu-translate-alist
+               '(("SPC" . "Search by Goto a char") . default-translate-use-avy)))
+
+
+(add-to-list 'one-key-menu-translate-alist
+             '(("d" . "Search by input") . default-translate-input))
+(add-to-list 'one-key-menu-translate-alist
+             '(("t" . "Search by point+") . default-translate-point+))
+(add-to-list 'one-key-menu-translate-alist
+             '(("p" . "Search by point") . default-translate-point))
+
+(defun one-key-menu-translate ()
+  "The `one-key' menu for TRANSLATATIONS"
+  (interactive)
+  (one-key-menu "TRANSLATATIONS" one-key-menu-translate-alist t))
 
 (provide 'lex-translate)
 

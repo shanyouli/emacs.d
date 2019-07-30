@@ -43,7 +43,7 @@
           "https://manateelazycat.github.io/feed.xml"))
 
 (pretty-hydra-define toggle-hydra-elfeed
-  (:title (pretty-hydra-title "Elfeed" 'facion "rss-square")
+  (:title (pretty-hydra-title "Elfeed" 'faicon "rss-square")
    :color amaranth :quit-key "q")
   ("Search"
    (("g" elfeed-search-update--force "Refresh")

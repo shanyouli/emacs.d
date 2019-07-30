@@ -166,20 +166,6 @@
   ;;                (require 'setup-font)
   ;;                (setup-font-initialize)))
 
-  ;; Key
-  (defvar one-key-menu-font-size-alist nil
-    "The `one-key' menu list for Font-SIZE.")
-
-  (setq one-key-menu-font-size-alist
-        '((("=" . "Increase font size") . increase-setup-font-size)
-          (("-" . "Decrease font size") . decrease-setup-font-size)
-          (("0" . "Default font size")  . default-setup-font-size)))
-
-  (defun lye/one-key-menu-font-size ()
-    "The `one-key' menu for Font-SIZE."
-    (interactive)
-    (one-key-menu "FONT-SIZE" one-key-menu-font-size-alist nil t))
-
   ;; THEME
   (setq theme-switch-light      'doom-one-light
         theme-switch-dark       'doom-one

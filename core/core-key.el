@@ -68,8 +68,9 @@
 
 ;; lex-one-key.el
 (lazy-load-global-keys
- '(("C-z u" . one-key-menu-ui)
-   ("C-z d" . one-key-menu-dir))
+ '(("C-z u"   . one-key-menu-ui)
+   ("C-z d"   . one-key-menu-dir)
+   ("C-z s f" . one-key-menu-font-size))
  "lex-one-key")
 
 ;; lex-translate.el
@@ -101,10 +102,6 @@
 
 ;; lex-funcs
 (lazy-load-global-keys '(("C-z f" . one-key-menu-funcs)) "lex-funcs")
-
-;; Setup change size font, base on emacs-font-size  pair-list
-(when (display-graphic-p)
-  (lazy-load-global-keys '(("C-z s f" . lye/one-key-menu-font-size)) "core-font"))
 
 ;; lex-temp
 (lazy-load-global-keys '(("C-z b" . one-key-menu-scratch-buffer)) "lex-temp")
