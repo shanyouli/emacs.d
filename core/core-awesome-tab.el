@@ -1,4 +1,4 @@
-;;; init-awesome-tab.el --- Init Awesome-Tab -*- lexical-binding: t -*-
+;;; core-awesome-tab.el --- Init Awesome-Tab -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
@@ -59,9 +59,11 @@
             (not (file-name-extension name)))
        )))
   (setq awesome-tab-hide-tab-function 'lye/awesome-tab-hide-tab)
+  (add-hook 'after-init-hook
+            'awesome-tab-mode)
+  ;;(awesome-tab-mode t)
+  )
 
-  (awesome-tab-mode t))
+(provide 'core-awesome-tab)
 
-(provide 'init-awesome-tab)
-
-;;; init-awesome-tab.el ends here
+;;; core-awesome-tab.el ends here

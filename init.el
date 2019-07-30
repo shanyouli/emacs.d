@@ -99,6 +99,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-modeline)       ; mode-line
 (lye/core-require 'core-os)             ; OS environmental variable
 (lye/core-require 'core-package)        ; packages initialization
+(lye/core-require 'core-awesome-tab)    ; awesome-tab
 (lye/core-require 'core-elpa)           ; package management tool
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
@@ -116,7 +117,6 @@ decrease this. If you experience stuttering, increase this.")
 
   (run-with-idle-timer 0.3 nil  (lambda ()
                                   ;; Program language common tool
-                                  (lye/init-require 'init-awesome-tab)
                                   (lye/init-require 'init-lang)
                                   (lye/init-require 'init-flycheck)
                                   (lye/init-require 'init-elisp)

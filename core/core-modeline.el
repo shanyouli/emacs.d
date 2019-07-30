@@ -37,8 +37,8 @@
 ;; (defconst default-modeline-mule-info mode-line-mule-info
 ;;   "Emacs default mode-line mule-info")
 
-;; (unless after-init-time
-;;   (setq mode-line-format nil))
+(unless after-init-time
+  (setq-default mode-line-format nil))
 ;; use setq-default to set it for /all/ modes
 ;; http://emacs-fu.blogspot.com/2011/08/customizing-mode-line.html
 (setq  default-mode-line-format
@@ -111,7 +111,7 @@
       (advice-add #'awesome-tray-disable :after
                   (lambda () (setq-default mode-line-format default-mode-line-format)))
 
-      (run-with-idle-timer 0.1 nil (lambda ()
+      (run-with-idle-timer 0.5 nil (lambda ()
                                      (awesome-tray-mode 1))))
 
   (setq-default mode-line-format default-mode-line-format))
