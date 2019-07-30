@@ -91,37 +91,5 @@
   (setq org-src-fontify-natively t
         org-src-tab-acts-natively t))
 
-;; ob-python
-(use-package ob-python
-  :defer t
-  :ensure nil
-  :commands (org-babel-execute:python))
-
-;; ob-shell
-(use-package ob-shell
-  :defer t
-  :ensure nil
-  :commands
-  (org-babel-excute:sh
-   org-babel-expand-body:sh
-
-   org-babel-excute:bash
-   org-babel-expand-body:bash))
-
-;; ob-emacs-lisp
-(use-package ob-emacs-lisp
-  :ensure nil
-  :defer t
-  :commands (org-babel-execute:emacs-lisp))
-
-(use-package ob-plantuml
-  :ensure nil
-  :defer t
-  :commands (org-babel-execute:plantuml)
-  :config
-  (when (file-exists-p (concat user-emacs-directory "plantuml/plantuml.jar"))
-    (setq plantuml-jar-path
-          (concat user-emacs-directory "plantuml/plantuml.jar"))))
-
 (provide 'init-org)
 ;;; init-org.el ends here

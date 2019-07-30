@@ -95,7 +95,7 @@
 ;; treemacs icons
 (if (locate-library "doom-themes")
     (require 'doom-themes-ext-treemacs))
-
+;;(treemacs-load-theme 'centaur)
 ;; treemacs-key
 (defvar one-key-menu-treemacs-alist nil
   "The `one-key' menu alist for treemacs")
@@ -110,8 +110,6 @@
 (defun one-key-menu-treemacs ()
   "The `one-key' menu for TREEMACS."
   (interactive)
-  (pcase (treemacs-current-visibility)
-    ('none (treemacs--init)))
   (one-key-menu "TREEMACS" one-key-menu-treemacs-alist t))
 
 (provide 'iex-treemacs)

@@ -42,6 +42,32 @@
           "https://emacs-china.github.io/rss.xml"
           "https://manateelazycat.github.io/feed.xml"))
 
+(pretty-hydra-define toggle-hydra-elfeed
+  (:title (pretty-hydra-title "Elfeed" 'facion "rss-square")
+   :color amaranth :quit-key "q")
+  ("Search"
+   (("g" elfeed-search-update--force "Refresh")
+    ("G" elfeed-search-fetch "update")
+    ("y" elfeed-search-yank "Copy URL")
+    ("+" elfeed-search-tag-all "Tag all")
+    ("-" elfeed-search-untag-all "untag all"))
+   "Filter"
+   (("s" elfeed-search-live-filter "Live filter")
+    ("S" elfeed-search-set-filter "Set filter")
+    ("*" (elfeed-search-filter "@6-months-ago +star") "Starred")
+    ("A" (elfeed-search-set-filter "@6-moths-ago") "All")
+    ("T" (elfeed-search-set-filter "@1-day-ago") "today"))
+   "Article"
+   (("b" elfeed-search-browse-url "Browse")
+    ("n" next-line "Next")
+    ("p" previous-line "Previous")
+    ("u" elfeed-search-untag-all-unread "mark unread")
+    ("r" elfeed-search-untag-all-read "mark read")
+    ("RET" elfeed-search-show-entry "Show"))
+))
+
+(lazy-load-local-keys '(("?" . toggle-hydra-elfeed/body)) elfeed-search-mode-map "iex-elfeed")
+
 (provide 'iex-elfeed)
 
 ;;; iex-elfeed.el ends here

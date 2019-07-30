@@ -1,11 +1,11 @@
-;;; iex-window.el --- Window Configurations -*- lexical-binding: t -*-
+;;; iex-ivy-rich.el --- Ivy extensions -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v1.0
-;; Package-Requires: (ace-window winner)
+;; Version: v0.1
+;; Package-Requires: (ivy-rich ivy)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: windows
+;; Keywords: ivy
 
 
 ;; This file is not part of GNU Emacs
@@ -26,22 +26,16 @@
 
 ;;; Commentary:
 
-;; Window cpnfigurations
+;; Ivy extensions, More friendly interface for ivy
 
 ;;; Code:
 
-;; Quickly switc windows
-(custom-set-faces
- '(aw-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 3.0))))
- '(aw-mode-line-face ((t :inherit mode-line-emphasis :bold t))))
+(require-package 'ivy-rich)
+(require 'ivy-rich)
 
-(require 'winner)
-(require-package 'ace-window)
+(setq ivy-rich-path-style 'full)
+(ivy-rich-mode 1)
 
-;; run
-(winner-mode t)
-(ace-window-display-mode t)
+(provide 'iex-ivy-rich)
 
-(provide 'iex-window)
-
-;;; iex-window.el ends here
+;;; iex-ivy-rich.el ends here

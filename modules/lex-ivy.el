@@ -31,8 +31,12 @@
 ;;; Code:
 
 (require 'counsel)
+
 (if (locate-library "amx")
     (lye/modules-require 'iex-amx))
+
+(if (locate-library "ivy-rich")
+    (lye/modules-require 'iex-ivy-rich))
 
 (setq enable-recursive-minibuffers t) ; Allow commands in minibuffers
 (setq ivy-use-selectable-prompt t)

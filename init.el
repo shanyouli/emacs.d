@@ -102,6 +102,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-elpa)           ; package management tool
 
 (with-temp-message ""                   ; Erase the output of the plugin startup
+  (lye/init-require 'init-hydras)
   (lye/init-require 'init-key)                   ; Keybindings
 
   ;; Preferences

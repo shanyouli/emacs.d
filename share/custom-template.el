@@ -16,11 +16,14 @@
 ;;; Fonts set all unicode characters
 (when (display-graphic-p)
   ;; Specify font for all unicode characters
-  (catch 'loop
-    (dolist (font '("Symbola" "Apple Symbols" "Symbol"))
-      (when (member font (font-family-list))
-        (set-fontset-font t 'unicode font nil 'prepend)
-        (throw 'loop t)))))
+  (add-hook 'after-init-hook
+            (lambda ()
+
+              (catch 'loop
+                (dolist (font '("Symbola" "Apple Symbols" "Symbol"))
+                  (when (member font (font-family-list))
+                    (set-fontset-font t 'unicode font nil 'prepend)
+                    (throw 'loop t)))))))
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.

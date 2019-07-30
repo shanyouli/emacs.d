@@ -1,16 +1,15 @@
 #!/usr/bin/env zsh
 
 # update git-submodule package
+Dir=$PWD
 
-Dir=$(pwd) #current directory
-Scriptdir=$(cd "$(dirname "$0")" && pwd) # The directory where the script is located
-if [[ -d $Scriptdir/../site-lisp ]]; then
-    Workdir=$(cd $Scriptdir/../site-lisp && pwd)
+if [[ -n $1 ]] && [[ -d $1 ]]; then
+    Emacs_Home=$1
 else
-    print -P "%F{red}%B[ ER ] The git-Submodule-Dir don't exist."
-    exit 1
+    Emacs_Home=$HOME/.emacs.d
 fi
 
+Workdir=$Emacs_Home/site-lisp
 
 for i in "$Workdir"/* ; do
     [[ -d $i ]] && {
@@ -23,4 +22,4 @@ for i in "$Workdir"/* ; do
 done
 
 # Return to the directory where the work was performed
-cd "$Dir" || return 0
+cd "$Dir" || exit 0
