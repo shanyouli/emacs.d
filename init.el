@@ -115,7 +115,7 @@ decrease this. If you experience stuttering, increase this.")
   (lye/init-require 'init-reads)        ; Reader tools
   (lye/init-require 'init-company)
 
-  (run-with-idle-timer 0.3 nil  (lambda ()
+  (run-with-idle-timer 0.1 nil  (lambda ()
                                   ;; Program language common tool
                                   (lye/init-require 'init-lang)
                                   (lye/init-require 'init-flycheck)

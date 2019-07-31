@@ -68,6 +68,13 @@
                          (make-variable-buffer-local 'show-paren-mode)
                          (setq show-paren-mode nil)))))
 
+(add-hook 'org-mode-hook
+          (lambda ()
+            (when (featurep 'company)
+              (setq-local company-backends
+                          (remove-if (lambda (x) (eq 'company-tabnine (car x)))
+                                     company-backends)))))
+
 
 ;;; org-babel
 ;; (with-eval-after-load 'org

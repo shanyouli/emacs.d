@@ -93,8 +93,16 @@
   :ensure nil
   :mode (("\\.zsh\\'" . sh-mode)
          (".zshrc" . sh-mode))
-  ;;:hook (sh-mode . (lambda () (sh-set-shell "bash")))
-  )
+  :hook
+  (sh-mode .
+           (lambda ()
+             (if (remove-if 'null
+                            (mapcar (lambda (x) (string-match x (buffer-file-name)))
+                                    '("\\.zshrc$" "\\.zsh$" "\\.zshenv$"
+                                      "\\.zlogin$" "\\.zshfunc$")))
+                 (sh-set-shell "zsh")
+               (sh-set-shell "bash")))))
+
 ;; vimrc-major mode
 (use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))
 

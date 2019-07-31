@@ -69,6 +69,22 @@
         '(company-pseudo-tooltip-unless-just-one-frontend
           company-preview-if-just-one-frontend))
 
+  ;; Use company-tabnine
+  (use-package company-tabnine
+    :init
+    (setq company-tabnine-binaries-folder (expand-file-name "TabNine" lye-emacs-share-dir))
+    (add-to-list 'company-backends #'company-tabnine))
+
+  ;; The free version of TabNine is good enough,
+  ;; and below code is recommended that TabNine not always
+  ;; prompt me to purchase a paid version in a large project.
+  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
+    (let ((company-message-func (ad-get-arg 0)))
+      (when (and company-message-func
+                 (stringp (funcall company-message-func)))
+        (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+          ad-do-it))))
+
   ;; Support yas in commpany
   ;; Note: Must be the last to involve all backends
   (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
@@ -83,10 +99,10 @@
 
 ;; Use company-posframe
 (when (display-graphic-p)
-   (use-package company-posframe
-     :after company
-     :config
-     (company-posframe-mode 1)))
+  (use-package company-posframe
+    :after company
+    :config
+    (company-posframe-mode 1)))
 
 (provide 'init-company)
 ;;; init-company.el ends here
