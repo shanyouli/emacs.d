@@ -31,10 +31,7 @@
 ;;; Code:
 
 (when (display-graphic-p)
-  (require 'awesome-tab)
-
-  (when (locate-library "all-the-icons") ; require all-the-icons
-    (require 'all-the-icons))
+;;  (require 'awesome-tab)
 
   (setq awesome-tab-style 'slant) ; awesome-tab style
 
@@ -53,16 +50,22 @@
        (string-prefix-p "*scratch*" name)
        (string-prefix-p "*One-Key*" name)
        (string-prefix-p " *which-key*" name)
+       (string-prefix-p "*Flycheck" name)
+       (string-prefix-p "*flycheck-posframe-buffer*" name)
 
      ;; Is not magit buffer.
        (and (string-prefix-p "magit" name)
             (not (file-name-extension name)))
        )))
+
   (setq awesome-tab-hide-tab-function 'lye/awesome-tab-hide-tab)
+
   (add-hook 'after-init-hook
-            'awesome-tab-mode)
-  ;;(awesome-tab-mode t)
-  )
+            '(lambda ()
+               (require 'awesome-tab)
+               (when (locate-library "all-the-icons") ; require all-the-icons
+                 (require 'all-the-icons))
+               (awesome-tab-mode))))
 
 (provide 'core-awesome-tab)
 

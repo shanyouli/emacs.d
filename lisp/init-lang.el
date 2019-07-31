@@ -107,6 +107,7 @@
 
 ;; plantuml
 (use-package plantuml-mode
+  :init   (setq plantuml-default-exec-mode 'jar)
   :config
   (setq plantuml-jar-path lye-emacs-plantuml-file)
   (unless (file-exists-p plantuml-jar-path)

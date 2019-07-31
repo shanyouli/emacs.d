@@ -79,7 +79,8 @@
                                     "recentf"
                                     "url"
                                     "COMMIT_EDITMSG\\'"
-                                    "COMMIT_MSG"))
+                                    "COMMIT_MSG"
+                                    ))
             (recentf-mode)))
 
 ;; Automatically refresh files that have been changed elsewhere
