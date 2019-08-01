@@ -72,7 +72,9 @@
   ;; Use company-tabnine
   (use-package company-tabnine
     :init
-    (setq company-tabnine-binaries-folder (expand-file-name "TabNine" lye-emacs-share-dir))
+    (setq company-tabnine-binaries-folder
+          (expand-file-name "TabNine" lye-emacs-share-dir))
+
     (add-to-list 'company-backends #'company-tabnine))
 
   ;; The free version of TabNine is good enough,
@@ -82,7 +84,8 @@
     (let ((company-message-func (ad-get-arg 0)))
       (when (and company-message-func
                  (stringp (funcall company-message-func)))
-        (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+        (unless (string-match "The free version of TabNine only indexes up to"
+                              (funcall company-message-func))
           ad-do-it))))
 
   ;; Support yas in commpany

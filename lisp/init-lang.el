@@ -101,7 +101,14 @@
                                     '("\\.zshrc$" "\\.zsh$" "\\.zshenv$"
                                       "\\.zlogin$" "\\.zshfunc$")))
                  (sh-set-shell "zsh")
-               (sh-set-shell "bash")))))
+               (sh-set-shell "bash"))
+
+             (when (executable-find "bash-language-server")
+               (lye/modules-require 'iex-lsp)
+               (lsp)
+               (setq-local company-backends
+                           (mapcar #'company-backend-with-yas company-backends)))
+             )))
 
 ;; vimrc-major mode
 (use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))
