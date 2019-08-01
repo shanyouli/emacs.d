@@ -38,6 +38,10 @@
 (if (locate-library "ivy-rich")
     (lye/modules-require 'iex-ivy-rich))
 
+(if (and (locate-library "fuz-core")
+         (locate-library "ivy-fuz"))
+    (lye/modules-require 'lex-fuz))
+
 (setq enable-recursive-minibuffers t) ; Allow commands in minibuffers
 (setq ivy-use-selectable-prompt t)
 (setq ivy-use-virtual-buffers t) ; Enable bookmarks and recentf

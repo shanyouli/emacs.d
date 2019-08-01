@@ -86,7 +86,12 @@
 ;; markdown, md
 (use-package markdown-mode
   :mode (("\\.md\\'" . gfm-mode))
-  :defer t)
+  :defer t
+  :config
+  (lye/exec-path-from-shell-init)
+  (when (executable-find "markdownfmt")
+    (use-package markdownfmt
+      :hook (markdown-mode . markdownfmt-enable-on-save))))
 
 ;; sh-mode
 (use-package sh-script
@@ -96,19 +101,21 @@
   :hook
   (sh-mode .
            (lambda ()
-             (if (remove-if 'null
-                            (mapcar (lambda (x) (string-match x (buffer-file-name)))
-                                    '("\\.zshrc$" "\\.zsh$" "\\.zshenv$"
-                                      "\\.zlogin$" "\\.zshfunc$")))
-                 (sh-set-shell "zsh")
-               (sh-set-shell "bash"))
+             (let ((file-name (buffer-file-name)))
+               (if (and file-name (or (string-match "\\.zsh$" file-name)
+                                      (string-match "\\.zshrc$" file-name)
+                                      (string-match "\\.zshenv$" file-name)
+                                      (string-match "\\.zlogin$" file-name)
+                                      (string-match "\\.zshfunc$" file-name)))
+                   (sh-set-shell "zsh")
+                 (sh-set-shell "bash")))
 
              (when (executable-find "bash-language-server")
                (lye/modules-require 'iex-lsp)
                (lsp)
                (setq-local company-backends
-                           (mapcar #'company-backend-with-yas company-backends)))
-             )))
+                           (mapcar #'company-backend-with-yas company-backends))
+               ))))
 
 ;; vimrc-major mode
 (use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))
