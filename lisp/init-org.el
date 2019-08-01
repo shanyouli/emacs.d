@@ -23,6 +23,7 @@
 ;;
 
 ;;; Code:
+(require 'cl)
 
 (use-package org
   :commands org-mode
@@ -75,19 +76,6 @@
               (setq-local company-backends
                           (remove-if (lambda (x) (eq 'company-tabnine (car x)))
                                      company-backends)))))
-
-;;; org-babel
-;; (with-eval-after-load 'org
-;;     (org-babel-do-load-languages
-;;      'org-babel-load-languages
-;;      `((R . t)
-
-;;        (emacs-lisp . t)
-;;        (haskell . nil)
-
-;;        (,(if (locate-library "ob-sh") 'sh 'shell) . t)
-;;        (sql . t)
-;;        (sqlite . t))))
 
 (use-package org-babel
   :defer t

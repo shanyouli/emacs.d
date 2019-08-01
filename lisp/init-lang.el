@@ -57,9 +57,7 @@
                   ("<=<" . ?↢)
                   (">=>" . ?↣)
                   ("&&" . ?∧)
-                  ("||" . ?∨)
-                  ;;("not" . ?¬)
-                  ))
+                  ("||" . ?∨)))
   (setq prettify-symbols-unprettify-at-point 'right-edge))
 
 ;;; Program Languages

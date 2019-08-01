@@ -31,7 +31,6 @@
 ;;; Code:
 
 (when (display-graphic-p)
-;;  (require 'awesome-tab)
 
   (setq awesome-tab-style 'slant) ; awesome-tab style
 

@@ -38,16 +38,25 @@
 
   ;; Live Coding in Python
   (use-package live-py-mode)
-   ;; Format using YAPF
-  ;; Install: pip install yapf
+
   (use-package pyenv-mode)
   (use-package pyenv-mode-auto))
+
 ;; Format using YAPF
 ;; Install: pip install yapf
-(use-package yapfify :commands (yapf-mode))
-(add-hook 'python-mode-hook #'yapf-mode)
+(when (executable-find "yapf")
+  (use-package yapfify
+    :commands (yapf-mode)
+    :hook (python-mode . yapf-mode)))
 
-(add-hook 'python-mode-hook (lambda () (require 'pyenv-mode-auto)))
+(add-hook 'python-mode-hook
+          (lambda () (require 'pyenv-mode-auto)
+            (when (executable-find "pyls")
+               (lye/modules-require 'iex-lsp)
+               (lsp)
+               (setq-local company-backends
+                           (mapcar #'company-backend-with-yas company-backends))
+               )))
 
 (provide 'init-python)
 ;;; init-python.el ends here
