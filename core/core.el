@@ -119,6 +119,13 @@
   "Whether to use `*scratch*' buffer"
   :type 'boolean)
 
+(defcustom lye-use-amx-or-fuzzy 'fuzzy
+  "Because when using the `counsel-M-x', the amx and fuz packages conflict,
+only the fuz is used, not both. If it is 'fuzzy, Only use fuzzy match.
+If it is 'amx, Only use amx and not use fuzzy match."
+  :type '(choice (const :tag "fuzzy match" 'fuzzy)
+                 (const :tag "amx" 'amx)))
+
 (defcustom lye-enable-sdcv-or-youdao 'sdcv
   "If it is sdcv, use `sdcv' as a translation tool.
 If it is youdao, use `youdao-dictionary' as a translation tool."

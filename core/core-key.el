@@ -89,6 +89,7 @@
    ("C-z s i" . lye/use-liberime)) "lex-pyim")
 
 ;; lex-ivy.el
+(setq amx-save-file (concat lye-emacs-cache-dir "amx-items"))
 (lazy-load-global-keys
  '(("M-x"     . counsel-M-x)
    ("C-x C-f" . counsel-find-file)
@@ -105,6 +106,9 @@
 
 ;; lex-temp
 (lazy-load-global-keys '(("C-z b" . one-key-menu-scratch-buffer)) "lex-temp")
+
+;; awesome-tab.el
+(lazy-load-global-keys '(("C-z j" . awesome-tab-ace-jump)) "awesome-tab")
 
 ;;; toolkit
 (lazy-load-set-keys

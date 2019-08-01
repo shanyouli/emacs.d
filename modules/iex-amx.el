@@ -32,7 +32,6 @@
 
 (require-package 'amx)
 (require 'amx)
-(setq amx-save-file (concat lye-emacs-cache-dir "amx-items"))
 (setq amx-history-length 10)
 (with-eval-after-load 'counsel (amx-initialize))
 
