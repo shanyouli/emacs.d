@@ -32,22 +32,12 @@
   (setq lua-indent-level 4
         lua-indent-string-contents t))
 
-(use-package company-lua
-  :after (company))
+(use-package company-lua)
 
-(defun set-company-backends-for-lua ()
-    "Set lua company backend."
-  (setq-local company-backends '(
-                                (company-lsp
-                                 company-lua
-                                 company-keywords
-                                 company-gtags)
-                                company-capf
-                                company-dabbrev-code
-                                company-files
-                                )))
-
-(add-hook 'lua-mode-hook #'set-company-backends-for-lua)
+(add-hook 'lua-mode-hook
+          (lambda ()
+            (setq-local company-backends
+                        (cons '(company-tabnine company-lua company-yasnippet) company-backends))))
 
 (provide 'init-lua)
 ;;; init-lua.el ends here

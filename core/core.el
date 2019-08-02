@@ -118,8 +118,11 @@
 (defcustom lye-use-scratch-p nil
   "Whether to use `*scratch*' buffer"
   :type 'boolean)
+(defcustom lye-load-all-module-file-p nil
+  "Import all el files in lye-emacs-modules-dir on first run."
+  :type 'boolean)
 
-(defcustom lye-use-amx-or-fuzzy 'fuzzy
+(defcustom lye-use-amx-or-fuzzy 'amx
   "Because when using the `counsel-M-x', the amx and fuz packages conflict,
 only the fuz is used, not both. If it is 'fuzzy, Only use fuzzy match.
 If it is 'amx, Only use amx and not use fuzzy match."

@@ -121,6 +121,7 @@ decrease this. If you experience stuttering, increase this.")
                                   (lye/init-require 'init-flycheck)
                                   (lye/init-require 'init-elisp)
                                   (lye/init-require 'init-scheme)
+                                  (lye/init-require 'init-sh)
                                   (lye/init-require 'init-lua)
                                   (lye/init-require 'init-python)))
   ;; Org mode
@@ -137,7 +138,15 @@ decrease this. If you experience stuttering, increase this.")
 ;;                               (time-subtract after-init-time before-init-time)))
 ;;                      gcs-done)))
 
+;; load all el-file in lye-emacs-modules-dir, When fist run.
+(unless lye-load-all-module-file-p
+  (run-with-idle-timer 2 nil (lambda ()
+  (lye/core-require 'core-funcs)
+  (load-all-module-file)
+  (if (file-exists-p custom-file)
+      (append-to-file "\n (setq lye-load-all-module-file-p t)" nil custom-file)))))
+
+
 (provide 'init)
 
 ;;; init.el ends here
-(put 'erase-buffer 'disabled nil)

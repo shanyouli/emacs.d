@@ -63,6 +63,9 @@
 ;; iex-vterm
 (lazy-load-global-keys '(("C-x s v" . vterm)) "iex-vterm")
 
+;; iex-speed-type.el
+(lazy-load-global-keys '(("C-z g s" . speed-type-text)) "iex-speed-type")
+
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
 (require-package 'link-hint)

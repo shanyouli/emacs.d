@@ -27,12 +27,6 @@
 (use-package flycheck
   :diminish flycheck-mode
   :hook ((scheme-mode python-mode sh-mode) . flycheck-mode)
-  ;; :init (dolist (hook (list
-  ;; 'scheme-mode-hook
-  ;; 'python-mode-hook
-  ;; 'sh-mode-hook))
-  ;; (add-hook hook '(lambda ()
-  ;; (flycheck-mode 1))))
   :config
   (setq flycheck-indication-mode 'right-fringe)
   (setq flycheck-emacs-lisp-load-path 'inherit)

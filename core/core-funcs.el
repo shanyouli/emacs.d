@@ -64,6 +64,15 @@
                 file-name))
     (message "Please use an absolute path.")))
 
+;;
+(defun load-all-module-file ()
+  "Import all el files in lye-emacs-modules-dir."
+  (let* ((parent-dir lye-emacs-modules-dir)
+         (default-directory parent-dir))
+    (dolist (file (directory-files parent-dir))
+      (unless (string-match "^\\." file )
+        (load (expand-file-name file lye-emacs-modules-dir) )))))
+
 (provide 'core-funcs)
 
 ;;; core-funcs.el ends here
