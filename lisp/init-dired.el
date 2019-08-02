@@ -91,12 +91,5 @@
             ("\\.html?\\'" ,cmd)
             ("\\.md\\'" ,cmd)))))
 
-;; Music player(Need external commands `mpc' and `mpd')
-(when (and (executable-find "mpc") (executable-find "mpd"))
-  (use-package simple-mpc
-    :ensure t
-    :commands (simple-mpc simple-mpc-next simple-mpc-prev simple-mpc-toggle
-                        simple-mpc-delete simple-mpc-query )))
-
 (provide 'init-dired)
 ;;; init-dired.el ends here

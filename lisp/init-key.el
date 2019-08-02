@@ -66,6 +66,14 @@
 ;; iex-speed-type.el
 (lazy-load-global-keys '(("C-z g s" . speed-type-text)) "iex-speed-type")
 
+;; iex-pomidor.el
+(lazy-load-global-keys '(("C-z s c" . pomidor)) "iex-pomidor")
+
+;; iex-simple-mpc
+(when (and (executable-find "mpc") (executable-find "mpd"))
+  (lazy-load-global-keys '(("C-z m" . one-key-menu-simple-mpc))
+                         "iex-simple-mpc"))
+
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
 (require-package 'link-hint)
