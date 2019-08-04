@@ -65,10 +65,7 @@
     "Better create shortcut groups,`sdcv/youdao-dictionary'")
 
   (defalias 'default-translate-point+ 'sdcv-search-pointer+
-    "Better create shortcut groups,`sdcv/youdao-dictionary'")
-
-  (push '(("s" . "Search by input+") . sdcv-search-input+)
-        one-key-menu-translate-alist))
+    "Better create shortcut groups,`sdcv/youdao-dictionary'"))
 
  ((eq lye-enable-sdcv-or-youdao 'youdao)
 
@@ -102,23 +99,22 @@
       (call-interactively #'avy-goto-char)
       (if (display-graphic-p)
           (default-translate-point+)
-        (default-translate-point))))
-
-  (add-to-list 'one-key-menu-translate-alist
-               '(("SPC" . "Search by Goto a char") . default-translate-use-avy)))
+        (default-translate-point)))))
 
 
-(add-to-list 'one-key-menu-translate-alist
-             '(("d" . "Search by input") . default-translate-input))
-(add-to-list 'one-key-menu-translate-alist
-             '(("t" . "Search by point+") . default-translate-point+))
-(add-to-list 'one-key-menu-translate-alist
-             '(("p" . "Search by point") . default-translate-point))
-
-(defun one-key-menu-translate ()
-  "The `one-key' menu for TRANSLATATIONS"
-  (interactive)
-  (one-key-menu "TRANSLATATIONS" one-key-menu-translate-alist t))
+(defhydra hydra-translate-menu (:exit t)
+  "Translate Menu"
+  ("d"  default-translate-input "Search by Input")
+  ("t" default-translate-point+ "Search by Point+")
+  ("p" default-translate-point "Search by Point")
+  ("SPC" (lambda ()
+           (interactive)
+           (if (fboundp 'default-translate-use-avy) (default-translate-use-avy)))
+   "Search by Goto a char")
+  ("s" (lambda ()
+         (interactive)
+         (if (fboundp 'sdcv-search-input+) (sdcv-search-input+)))
+   "Search by Input+"))
 
 (provide 'lex-translate)
 

@@ -78,13 +78,6 @@
 ;;      "default"
 ;;      (("0" default-setup-font-size "Default font size")))))
 
-(defhydra hydra-font-size-menu ()
-  "Font size"
-  ("=" increase-setup-font-size "Inc font size")
-  ("-" decrease-setup-font-size "Dec font size")
-  ("0" default-setup-font-size "Default font size")
-  ("q" nil "quit"))
-
 (provide 'init-hydras)
 
 ;;; init-hydras.el ends here

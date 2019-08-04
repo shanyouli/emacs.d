@@ -68,13 +68,17 @@
 
 ;; lex-one-key.el
 (lazy-load-global-keys
- '(("C-z u"   . one-key-menu-ui)
-   ("C-z d"   . one-key-menu-dir)
-   ("C-z s f" . one-key-menu-font-size))
- "lex-one-key")
+ '(("C-z u"   . hydra-ui-menu/body)
+   ("C-z d"   . hydra-open-dir-menu/body))
+ "lex-hydra")
+
+;; lex-setup-font
+(when (and (display-graphic-p) (fboundp 'default-setup-font-size))
+  (lazy-load-global-keys '(("C-z s f" . hydra-font-size-menu/body))
+                         "lex-setup-font"))
 
 ;; lex-translate.el
-(lazy-load-global-keys '(("C-z y" . one-key-menu-translate)) "lex-translate")
+(lazy-load-global-keys '(("C-z y" . hydra-translate-menu/body)) "lex-translate")
 
 ;; lex-search.el
 (lazy-load-global-keys '(("C-r" . one-key-menu-search)) "lex-search")

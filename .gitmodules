@@ -79,3 +79,6 @@
 [submodule "fuz"]
 	path = site-lisp/fuz
 	url = https://github.com/cireu/fuz.el
+[submodule "hydra"]
+	path = site-lisp/hydra
+	url = https://github.com/abo-abo/hydra.git
