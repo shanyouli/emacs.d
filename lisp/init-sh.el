@@ -56,8 +56,8 @@
                                  company-backends))
                ;; (setq-local company-backends
                ;;             (mapcar #'company-backend-with-yas company-backends))
+               (lye/modules-require 'iex-flycheck)
                ))))
 
 (provide 'init-sh)
-
 ;;; init-sh.el ends here

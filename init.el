@@ -118,7 +118,6 @@ decrease this. If you experience stuttering, increase this.")
   (run-with-idle-timer 0.1 nil  (lambda ()
                                   ;; Program language common tool
                                   (lye/init-require 'init-lang)
-                                  (lye/init-require 'init-flycheck)
                                   (lye/init-require 'init-elisp)
                                   (lye/init-require 'init-scheme)
                                   (lye/init-require 'init-sh)
