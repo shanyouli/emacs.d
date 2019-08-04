@@ -95,6 +95,9 @@
    ("C-h d" . helpful-at-point))
  "helpful")
 
+;; better font size
+(lazy-load-set-keys '(("C-z s f" . font-size-menu/body)))
+
 (provide 'init-key)
 
 ;;; init-key.el ends here

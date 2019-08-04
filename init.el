@@ -106,14 +106,12 @@ decrease this. If you experience stuttering, increase this.")
   (lye/init-require 'init-hydras)
   (lye/init-require 'init-key)          ; Keybindings
 
-  ;; Preferences
-  (lye/init-require 'init-edit)
+  (lye/init-require 'init-edit)         ; better edit
   (lye/init-require 'init-shackle)      ; Window rule
 
-  ;; Tools
   (lye/init-require 'init-dired)        ; Dired
   (lye/init-require 'init-reads)        ; Reader tools
-  (lye/init-require 'init-company)
+  (lye/init-require 'init-company)      ; company
 
   (run-with-idle-timer 0.1 nil  (lambda ()
                                   ;; Program language common tool

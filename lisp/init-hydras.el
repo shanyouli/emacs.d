@@ -67,6 +67,24 @@
 ;;     ("D" toggle-debug-on-error "debug on error" :toggle (default-value 'debug-on-error))
 ;;     ("X" toggle-debug-on-quit "debug on quit" :toggle (default-value 'debug-on-quit)))))
 
+;; (when (locate-library "setup-font")
+;;   (pretty-hydra-define font-size-menu
+;;     (:title (pretty-hydra-title "Change font size" 'faicon "font")
+;;      :color amaranth :quit-key "q")
+;;     ("Inc"
+;;      (("=" increase-setup-font-size "Inc font size"))
+;;      "Dec"
+;;      (("-" decrease-setup-font-size "Dec font size"))
+;;      "default"
+;;      (("0" default-setup-font-size "Default font size")))))
+
+(defhydra hydra-font-size-menu ()
+  "Font size"
+  ("=" increase-setup-font-size "Inc font size")
+  ("-" decrease-setup-font-size "Dec font size")
+  ("0" default-setup-font-size "Default font size")
+  ("q" nil "quit"))
+
 (provide 'init-hydras)
 
 ;;; init-hydras.el ends here

@@ -59,7 +59,7 @@
   :ensure nil
   :commands (image-dired)
   :config
-  (setq image-dired-dir (concat maple-cache-directory "image-dired")
+  (setq image-dired-dir (concat lye-emacs-cache-dir "image-dired")
         image-dired-thumbnail-storage 'standard))
 
 (use-package image-mode :ensure nil)

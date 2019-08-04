@@ -42,7 +42,6 @@
   (paradox-enable)
   (list-packages))
 
-
 (provide 'iex-paradox)
 
 ;;; iex-paradox.el ends here
