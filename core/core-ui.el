@@ -161,10 +161,6 @@
   (setq setup-font-default-size 14)
   (require 'setup-font)
   (setup-font-initialize)
-  ;; (add-hook 'after-init-hook
-  ;;           '(lambda ()
-  ;;                (require 'setup-font)
-  ;;                (setup-font-initialize)))
 
   ;; THEME
   (setq theme-switch-light      'doom-one-light
@@ -178,7 +174,6 @@
                                ))
   (add-hook 'after-load-theme-hook
             '(lambda ()
-
                (when (and (boundp 'awesome-tray-active-p) awesome-tray-active-p)
                  (awesome-tray-mode))
 

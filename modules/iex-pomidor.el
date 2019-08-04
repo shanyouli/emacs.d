@@ -51,7 +51,7 @@
 (when (executable-find "mpv")
   (setq pomidor-play-sound-file
         (lambda (file)
-          (start-process "my-pomidor-play-sound" nil  "mplayer" file))))
+          (start-process "my-pomidor-play-sound" nil  "mpv" file))))
 
 ;; notifications
 (when (locate-library "alert")

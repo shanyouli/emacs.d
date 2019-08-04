@@ -52,7 +52,10 @@
                (lye/modules-require 'iex-lsp)
                (lsp)
                (setq-local company-backends
-                           (mapcar #'company-backend-with-yas company-backends))
+                           (cons '(company-tabnine company-lsp)
+                                 company-backends))
+               ;; (setq-local company-backends
+               ;;             (mapcar #'company-backend-with-yas company-backends))
                ))))
 
 (provide 'init-sh)
