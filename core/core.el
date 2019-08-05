@@ -115,9 +115,6 @@
   "Full SCREEN or not when initializing."
   :type 'boolean)
 
-(defcustom lye-use-scratch-p nil
-  "Whether to use `*scratch*' buffer"
-  :type 'boolean)
 (defcustom lye-load-all-module-file-p nil
   "Import all el files in lye-emacs-modules-dir on first run."
   :type 'boolean)

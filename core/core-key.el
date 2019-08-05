@@ -105,10 +105,10 @@
  "lex-ivy")
 
 ;; lex-funcs
-(lazy-load-global-keys '(("C-z f" . one-key-menu-funcs)) "lex-funcs")
+(lazy-load-global-keys '(("C-z f" . hydra-functions-menu/body)) "lex-funcs")
 
 ;; lex-temp
-(lazy-load-global-keys '(("C-z b" . one-key-menu-scratch-buffer)) "lex-temp")
+(lazy-load-global-keys '(("C-z b" . hydra-tmp-scratch-menu/body)) "lex-temp")
 
 ;; awesome-tab.el
 (lazy-load-global-keys '(("C-z j" . awesome-tab-ace-jump)) "awesome-tab")

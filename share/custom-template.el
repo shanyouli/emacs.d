@@ -10,7 +10,6 @@
 (setq lye-enable-benchmark-p nil)       ; Enable initialization benchmark or not: t or nil
 (setq lye-enable-sdcv-or-youdao 'sdcv)  ; Use sdcv or youdao dictionary
 (setq lye-package-archives 'tuna)       ; Package repo: melpa, melpa-mirror, emacs-china, netease, tencent or tuna
-(setq lye-use-scratch-p nil)            ; Use scratch-buffer or not
 (setq lye-init-fullscreen-p nil)        ; Use fullscreen or not
 
 ;;; Fonts set all unicode characters

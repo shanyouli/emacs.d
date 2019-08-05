@@ -126,6 +126,13 @@
 ;; @see https://stackoverflow.com/questions/15390178/emacs-and-symbolic-links
 (setq vc-follow-symlinks nil)
 
+;; No display `*scratch*'
+(defun remove-scratch-buffer ()
+  (if (get-buffer "*scratch*")
+      (kill-buffer "*scratch*")))
+
+(add-hook 'after-change-major-mode-hook #'remove-scratch-buffer)
+
 (provide 'core-generic)
 
 ;;; core-generic.el ends here

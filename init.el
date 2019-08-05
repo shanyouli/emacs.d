@@ -93,8 +93,7 @@ decrease this. If you experience stuttering, increase this.")
 
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
 (lye/core-require 'core-key)            ; Keybindings
-(lye/core-require 'core-generic)        ; generic
-(lye/core-require 'core-scratch)        ; scratch
+(lye/core-require 'core-generic)        ; generic and delete *scratch*
 (lye/core-require 'core-ui)             ; UI
 (lye/core-require 'core-modeline)       ; mode-line
 (lye/core-require 'core-os)             ; OS environmental variable

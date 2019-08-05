@@ -77,20 +77,12 @@
   (temp-scratch-init temp-scratch-el-file))
 
 ;; key
-(when (locate-library "one-key")
 
-  (defvar one-key-menu-scratch-alist nil
-    "The one-key menu of `temp-file-scratch'")
-
-  (setq one-key-menu-scratch-alist
-        '((("SPC" . "Original TBuffer") . temp-scratch-init)
-          (("e" . "ELisp TBuffer") . temp-scratch-init-el)
-          (("s" . "Shell TBuffer") . temp-scratch-init-sh)))
-  (defun one-key-menu-scratch-buffer ()
-    "The one-key Menu of `Temp-file-scratch'"
-    (interactive)
-    (one-key-menu "Temp Buffer" one-key-menu-scratch-alist))
-  )
+(defhydra hydra-tmp-scratch-menu (:exit t)
+  "Temp file scratch"
+  ("SPC" temp-scratch-init "Original")
+  ("e" temp-scratch-init-el "Emacs-lisp")
+  ("s" temp-scratch-init-sh "Shell Script"))
 
 (provide 'lex-temp)
 

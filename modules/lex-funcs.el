@@ -99,22 +99,9 @@
         (error "Cannot open tramp file")
       (browse-url (concat "file://" file-name)))))
 
-;; add emacs startup time, copy from emacs-git(2018.02.22)
-(defun lye/emacs-init-time ()
-  "Copy `emacs-git'
-Return a string giving the duration of the Emacs initialization."
-  (interactive)
-  (let ((str
-         (format "%s seconds"
-                 (float-time
-                  (time-subtract after-init-time before-init-time)))))
-    (if (called-interactively-p 'interactive)
-        (message "%s" str)
-      str)))
-
 ;;Edit files with root privileges
 ;; see @https://github.com/hlissner/doom-emacs/blob/develop/core/autoload/files.el
-(defun lye/sudo-find-file (file)
+(defun sudo-find-file (file)
   "Open FILE as root."
   (interactive
    (list (read-file-name "Open as root: ")))
@@ -128,32 +115,29 @@ Return a string giving the duration of the Emacs initialization."
                          (file-remote-p file 'localname))
                (concat "/sudo:root@localhost:" file))))
 
-(defun lye/sudo-this-file ()
+(defun sudo-this-file ()
   "Open the current file as root."
   (interactive)
-  (lye/sudo-find-file (file-truename buffer-file-name)))
+  (sudo-find-file (file-truename buffer-file-name)))
 
-(defvar one-key-menu-funcs-alist nil
-  "The `one-key' menu alist for FUNCTIONS.")
+;; hydra key
+(defhydra hydra-functions-menu (:exit t)
+  "Functions Menu"
+  ("d" dos2unix "Dos2Unix")
+  ("u" unix2dos "Unix2dos")
+  ("r" revert-current-buffer "Revert current buffer")
+  ("s" save-buffer-as-utf-8 "Save as utf-8")
+  ("g" save-buffer-with-gbk "Save as GBK")
+  ("c" revert-buffer-with-gbk "Revert Buffer with GBK")
+  ("i" revert-buffer-with-utf-8 "Revert Buffer with utf8")
+  ("m" recompile-elpa "Recompile elpa")
+  ("n" rename-this-file-and-buffer "Rename File")
+  ("b" browse-current-file "Browse current File")
+  ("f" sudo-find-file "find file as Root")
+  ("u" sudo-this-file "Open file as root")
+  ("q" nil "quit")
+  )
 
-(setq one-key-menu-funcs-alist
-      '((("d" . "Dos to unix") . dos2unix)
-        (("u" . "Unix to Dos") . unix2dos)
-        (("r" . "Revert current buffer.") revert-current-buffer)
-        (("s" . "Save as utf-8") . save-buffer-as-utf-8)
-        (("S" . "Save as GBK") . save-buffer-with-gbk)
-        (("g" . "revert buffer GBK") . revert-buffer-with-gbk)
-        (("U" . "Revert buffer with UTF-8") . revert-buffer-with-utf-8)
-        (("m" . "Recompile elpa") . recompile-elpa)
-        (("R" . "Rename this buffer") . rename-this-file-and-buffer)
-        (("b" . "Browse current file") . browse-current-file)
-        (("f" . "sudo find file") . lye/sudo-find-file)
-        (("F" . "SUDO find this file") . lye/sudo-this-file)))
-
-(defun one-key-menu-funcs ()
-  "The `one-key' menu for FUNCTIONS"
-  (interactive)
-  (one-key-menu "FUNCTIONS" one-key-menu-funcs-alist t))
 
 (provide 'lex-funcs)
 ;;; lex-funcs.el ends here
