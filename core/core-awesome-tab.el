@@ -61,11 +61,10 @@
 
   (add-hook 'after-init-hook
             '(lambda ()
-               (when  (locate-library "projectile")
                  (require 'awesome-tab)
                  (when (locate-library "all-the-icons") ; require all-the-icons
                    (require 'all-the-icons))
-                 (awesome-tab-mode)))))
+                 (awesome-tab-mode))))
 
 (provide 'core-awesome-tab)
 

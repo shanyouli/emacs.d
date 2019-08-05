@@ -33,6 +33,9 @@
 (require-package 'flycheck)
 (require 'flycheck)
 
+;;Need to get a better PATH
+(lye/exec-path-from-shell-init)
+
 ;; flycheck-configurations
 (setq flycheck-indication-mode 'right-fringe)
 (setq flycheck-emacs-lisp-load-path 'inherit)

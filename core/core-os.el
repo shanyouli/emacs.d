@@ -31,17 +31,15 @@
 ;;; Code:
 
 ;; Mac, X, GNU-step
-(when (memq window-system '(mac ns x))
-  (require 'exec-path-from-shell)
-  (require 'cache-path-from-shell)
-  (setq exec-path-from-shell-check-startup-files nil)
-  ;; (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
-  (setq exec-path-from-shell-arguments '("-l")))
-
 (defun lye/exec-path-from-shell-init ()
   "Avoid importing `exec-path-from-shell' on some operating systems."
-  (if (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize)))
+  (when (memq window-system '(mac ns x))
+    (require 'exec-path-from-shell)
+    (require 'cache-path-from-shell)
+    (setq exec-path-from-shell-check-startup-files nil)
+    ;; (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
+    (setq exec-path-from-shell-arguments '("-l"))
+    (exec-path-from-shell-initialize)))
 
 (when system/windows
   ;;;Msys2 configuration
