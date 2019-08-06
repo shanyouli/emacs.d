@@ -37,8 +37,7 @@
       (append (if (consp backend) backend (list backend))
               '(:with company-yasnippet))))
 
-  :bind (
-         :map company-active-map
+  :bind (:map company-active-map
          ("C-p" . company-select-previous)
          ("C-n" . company-select-next)
          :map company-search-map
@@ -58,6 +57,7 @@
         company-dabbrev-downcase nil
         company-dabbrev-code-other-buffers t
         company-show-numbers t)
+
   ;; Avoid entering code blocks quickly in org-mode because the prompts don't respond
   (setq company-minimum-prefix-length 2)
 

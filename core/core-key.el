@@ -47,8 +47,7 @@
  '(
    ("C-x s n" . aweshell-new)
    ("C-x s a" . aweshell-toggle)
-   ("C-x s d" . aweshell-dedicated-toggle)
-   )
+   ("C-x s d" . aweshell-dedicated-toggle))
  "aweshell")
 
 ;; Chinese automatically translated as English
@@ -57,8 +56,7 @@
    ("C-z i o" . insert-translated-name-insert-original-translation)
    ("C-z i u" . insert-translated-name-insert-with-underline)
    ("C-z i l" . insert-translated-name-insert-with-line)
-   ("C-z i c" . insert-translated-name-insert-with-camel)
-   )
+   ("C-z i c" . insert-translated-name-insert-with-camel))
  "lex-insert-translated-name")
 
 ;; English word completion with Chinese comments

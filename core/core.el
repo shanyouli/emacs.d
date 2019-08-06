@@ -165,6 +165,7 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 
 (defun lye/update-load-path (&rest _)
   "Update `load-path'."
+
   ;; add `lye-emacs-init-dir' to load-path
   (push lye-emacs-init-dir load-path)
 

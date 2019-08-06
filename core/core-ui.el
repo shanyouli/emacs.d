@@ -68,18 +68,17 @@
 ;; Frame Size
 (defun lye/frame-default-height ()
   "The ratio of the default height to the screen height is 0.618."
-  (/ (* 618 (x-display-pixel-height))
-     (* 1000 (frame-char-height))))
+  (/ (* 618 (x-display-pixel-height)) (* 1000 (frame-char-height))))
 
 (defun lye/frame-default-width ()
   "The default width is half of the screen, and the error is between 2px."
-  (- (/ (x-display-pixel-width)
-        (* 2 (frame-char-width))) 2))
+  (- (/ (x-display-pixel-width) (* 2 (frame-char-width))) 2))
 
-(defun lye/restore-frame-size (&optional frame)
+(defun lye/restore-frame-size ()
   "Frame default size configuration."
   (interactive)
-  (when frame (select-frame frame))
+  ;;&optional frame)
+  ;;  (when frame (select-frame frame))
   (if ( and (boundp system/windows) system/windows)
       (progn
         (set-frame-width (selected-frame) (lye/frame-default-width))

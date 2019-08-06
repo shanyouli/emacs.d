@@ -25,10 +25,7 @@
 
 ;; Do not use the mouse in the graphical interface
 (when (display-graphic-p)
-  (use-package disable-mouse
-    :hook ((after-init after-change-major-mode) . disable-mouse-mode))
-  ;; (use-package disable-mouse :hook  (after-init . global-disable-mouse-mode))
-  )
+  (use-package disable-mouse :hook  (after-init . global-disable-mouse-mode)))
 
 ;; Delete selection if you insert
 (use-package delsel
@@ -117,7 +114,7 @@
 ;;------------------------------------------------------------------------------
 
 (require-package 'page-break-lines)
-(add-hook 'after-init-hook 'global-page-break-lines-mode)
+(add-hook 'after-init-hook #'global-page-break-lines-mode)
 
 (provide 'init-edit)
 ;;; init-edit.el ends here

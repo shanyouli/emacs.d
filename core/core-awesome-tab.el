@@ -54,8 +54,7 @@
 
      ;; Is not magit buffer.
        (and (string-prefix-p "magit" name)
-            (not (file-name-extension name)))
-       )))
+            (not (file-name-extension name))))))
 
   (setq awesome-tab-hide-tab-function 'lye/awesome-tab-hide-tab)
 

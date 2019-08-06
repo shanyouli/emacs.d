@@ -35,7 +35,7 @@
       user-mail-address lye-mail-address)
 
 ;; Restore emacs session.
-;;(setq initial-buffer-choice t)
+(setq initial-buffer-choice t)
 ;; Hide *scratch* buffer after entering the interface
 (run-with-timer 1 nil #'(lambda () (bury-buffer))) ;The start interface is `*Message*'
 
@@ -45,7 +45,7 @@
 (global-subword-mode 1)                 ;Word移动支持 FooBar 的格式
 (setq use-dialog-box nil)               ;never pop dialog
 (setq inhibit-startup-screen t)         ;inhibit start screen
-;;(setq initial-scratch-message "") ;关闭启动空白buffer, 这个buffer会干扰session恢复
+(setq initial-scratch-message "")       ;关闭启动空白buffer, 这个buffer会干扰session恢复
 (setq-default comment-style 'indent)    ;设定自动缩进的注释风格
 (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
 (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
@@ -103,7 +103,7 @@
 ;; Store all temporal files in a temporal directory instead of being
 ;; disseminated in the $HOME directory
 (setq-default
-  ;; Tramp history
+ ;; Tramp history
  tramp-persistency-file-name (concat lye-emacs-cache-dir "tramp")
  ;; Bookmark-default-file
  bookmark-default-file (concat lye-emacs-cache-dir "bookmarks")
@@ -113,7 +113,7 @@
  url-configuration-directory (concat lye-emacs-cache-dir "url")
  ;; eshell files
  eshell-directory-name (concat lye-emacs-cache-dir "eshell")
-;; Game score
+ ;; Game score
  gamegrid-user-score-file-directory (concat lye-emacs-cache-dir "games"))
 
 ;; @see https://emacs-china.org/t/spacemacs/9000

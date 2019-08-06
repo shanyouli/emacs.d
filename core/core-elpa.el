@@ -42,17 +42,15 @@
 
 ;; Set the location where the elpa folder is stored
 (if (file-exists-p lye-emacs-cache-dir)
-    (setq package-user-dir (expand-file-name
-                            "elpa"
-                            ;;(format "elpa-%s" emacs-major-version)
-                            lye-emacs-cache-dir)))
+    (setq package-user-dir (expand-file-name "elpa" lye-emacs-cache-dir)))
 
 ;; ELPA: refer to https://melpa.org and https://elpa.emacs-china.org
 (defun set-package-archives (archives)
   "Set specific package ARCHIVES repository."
   (interactive
    (list (intern (completing-read "Choose package archives: "
-                                  '(melpa melpa-mirror emacs-china netease tencent tuna)))))
+                                  '(melpa melpa-mirror emacs-china
+                                          netease tencent tuna)))))
 
   (setq package-archives
         (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
@@ -107,14 +105,12 @@
 ;; Should set before loading `use-package'
 (require-package 'use-package)
 
-(eval-when-compile
-  (require 'use-package))
+(eval-when-compile (require 'use-package))
 
-(eval-and-compile
-    (setq use-package-always-ensure t)
-    (setq use-package-always-defer t)
-    (setq use-package-expand-minimally t)
-    (setq use-package-enable-imenu-support t))
+(eval-and-compile (setq use-package-always-ensure t)
+                  (setq use-package-always-defer t)
+                  (setq use-package-expand-minimally t)
+                  (setq use-package-enable-imenu-support t))
 
 ;; Extensions
 (use-package diminish :ensure nil)
