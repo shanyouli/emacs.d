@@ -31,7 +31,6 @@
 ;;; Code:
 
 (require 'lazy-load)
-(require 'one-key)
 
 ;;Global uninstall button
 (lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s" "C-r"))

@@ -68,7 +68,9 @@
 (use-package dired-aux :ensure nil)
 (use-package dired-x
   :ensure nil
-  :demand
+  :commands (dired-omit-mode)
+;;  :demand
+  :defer 0.1
   :hook (dired-mode . dired-omit-mode)
   :config
   (setq dired-omit-verbose nil

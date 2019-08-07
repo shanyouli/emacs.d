@@ -74,11 +74,10 @@
   "The default width is half of the screen, and the error is between 2px."
   (- (/ (x-display-pixel-width) (* 2 (frame-char-width))) 2))
 
-(defun lye/restore-frame-size ()
+(defun lye/restore-frame-size (&optional frame)
   "Frame default size configuration."
   (interactive)
-  ;;&optional frame)
-  ;;  (when frame (select-frame frame))
+  (when frame (select-frame frame))
   (if ( and (boundp system/windows) system/windows)
       (progn
         (set-frame-width (selected-frame) (lye/frame-default-width))
@@ -158,7 +157,7 @@
                          "Microsoft Yahei")))
 
   (setq setup-font-default-size 14)
-  (require 'setup-font)
+;;  (require 'setup-font)
   (setup-font-initialize)
 
   ;; THEME
@@ -167,7 +166,7 @@
         theme-switch-light-time "08:30"
         theme-switch-dark-time  "19:30")
   (add-hook 'after-init-hook (lambda ()
-                               (require 'theme-switch)
+                               ;;(require 'theme-switch)
                                (require 'doom-themes)
                                (theme-switch-light-or-dark-theme)
                                ))

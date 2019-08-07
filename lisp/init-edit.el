@@ -24,8 +24,8 @@
 ;;; Code:
 
 ;; Do not use the mouse in the graphical interface
-(when (display-graphic-p)
-  (use-package disable-mouse :hook  (after-init . global-disable-mouse-mode)))
+;; (when (display-graphic-p)
+;;   (use-package disable-mouse :hook  (after-init . global-disable-mouse-mode)))
 
 ;; Delete selection if you insert
 (use-package delsel

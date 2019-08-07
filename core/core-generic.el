@@ -62,6 +62,7 @@
                    (5 right)))))
 
 ;; Don't ask me when close emacs with process is running
+
 (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
   "Prevent annoying \"Active processes exist\" query when you quit Emacs."
   (require 'noflet)

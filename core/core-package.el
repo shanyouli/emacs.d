@@ -87,21 +87,24 @@
 (add-hook 'after-init-hook (lambda () (global-auto-revert-mode t)))
 
 (add-hook 'after-init-hook
- (lambda ()
-   ;; Use undo-tree
-   (require 'undo-tree)
-   (global-undo-tree-mode)
+          (lambda ()
+            ;; Use undo-tree
+            ;; (require 'undo-tree)
+            (global-undo-tree-mode)
 
-   ;; Save Emacs buffers when they lose focus after 1.5s
-   (require 'auto-save)
-   (setq auto-save-idle 1.5)
-   (setq auto-save-silent t)
-   (auto-save-enable)
+            ;; Save Emacs buffers when they lose focus after 1.5s
+            ;; (require 'auto-save)
+            (setq auto-save-idle 1.5)
+            (setq auto-save-silent t)
+            (auto-save-enable)
 
-   ;; Displays the key bindings following your currently entered incomplete command
-   (require 'which-key)
-   (setq which-key-idle-delay 0.5)
-   (which-key-mode t)))
+            ;; Displays the key bindings following your currently entered incomplete command
+            ;; (require 'which-key)
+            (setq which-key-idle-delay 0.5)
+            (which-key-mode t)
+
+          ;; not use mouse
+          (if (display-graphic-p) (global-disable-mouse-mode))))
 
 (provide 'core-package)
 

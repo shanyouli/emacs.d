@@ -30,12 +30,12 @@
 
 ;;; Code:
 
-(use-package hydra
-  :commands (hydra-default-pre
-             hydra-keyboard-quit
-             hydra-call-interacctively-remap-maybe
-             hydra-show-hint
-             hydra-set-transient-map))
+;; (use-package hydra
+;;   :commands (hydra-default-pre
+;;              hydra-keyboard-quit
+;;              hydra-call-interacctively-remap-maybe
+;;              hydra-show-hint
+;;              hydra-set-transient-map))
 
 (use-package pretty-hydra
   :init

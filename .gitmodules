@@ -82,3 +82,6 @@
 [submodule "hydra"]
 	path = site-lisp/hydra
 	url = https://github.com/abo-abo/hydra.git
+[submodule "disable-mouse"]
+	path = site-lisp/disable-mouse
+	url = https://github.com/purcell/disable-mouse.git

@@ -92,8 +92,9 @@ decrease this. If you experience stuttering, increase this.")
   `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory  "core") ,pkg)))
 
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
-(lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
+(lye/core-require 'core-autoload)       ; Generate autoload file
+(lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-ui)             ; UI
 (lye/core-require 'core-modeline)       ; mode-line
 (lye/core-require 'core-os)             ; OS environmental variable
@@ -146,3 +147,4 @@ decrease this. If you experience stuttering, increase this.")
 (provide 'init)
 
 ;;; init.el ends here
+(put 'erase-buffer 'disabled nil)
