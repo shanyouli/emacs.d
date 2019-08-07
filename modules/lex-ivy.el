@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-(require 'counsel)
+;; (require 'counsel)
 
 (pcase lye-use-amx-or-fuzzy
   ('fuzzy
@@ -69,9 +69,6 @@
 ;; swiper
 (setq swiper-action-recenter t)
 
-(ivy-mode 1)
-(counsel-mode 1)
-
 ;; helpful
 (when (locate-library "helpful")
   (setq counsel-describe-function-function #'helpful-callable)
@@ -85,6 +82,9 @@
    ([escape]     . minibuffer-keyboard-quit))
  ivy-minibuffer-map
  "lex-ivy")
+
+(ivy-mode 1)
+(counsel-mode 1)
 
 (provide 'lex-ivy)
 

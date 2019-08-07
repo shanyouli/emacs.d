@@ -156,10 +156,10 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
     (let* ((default-directory parent-dir))
       (setq load-path
             (append
-             (loop for dir in (directory-files parent-dir)
-                   unless (or (not (file-directory-p dir))
-                              (string= dir ".")
-                              (string= dir ".."))
+             (loop for dir in (remove-if
+                               (lambda (f) (string-prefix-p "." f) )
+                               (directory-files parent-dir))
+                   unless (not (file-directory-p dir))
                    collecting (expand-file-name dir))
              load-path)))))
 

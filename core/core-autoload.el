@@ -34,9 +34,9 @@
 
 ;; Automatically generate autoload contained in third-party packages
 ;; https://emacs-china.org/t/autoloads/8775/10?u=shanyouli
+
 (defun cm/find-subdir-recursively (dir)
   "Find all subdirectories in DIR.
-
 Dot-directories and directories contain `.nosearch' will be skipped."
   (eval-when-compile (require 'subr-x)
                      (require 'cl))
@@ -78,10 +78,14 @@ Dot-directories and directories contain `.nosearch' will be skipped."
                                       (file-name-nondirectory target)))
                            "\n")))))
 
-(unless (file-exists-p lye-emacs-autoload-file)
-  (generate-autoload-and-refresh))
-(load lye-emacs-autoload-file :no-error :no-message)
-;; (add-hook 'kill-emacs-hook #'generate-autoload-and-refresh)
+(defun lye/load-autoload-file  ()
+  "If lye-emacs-autoload-file does not exist, create it. Then load it,
+otherwise just load it."
+  (unless (file-exists-p lye-emacs-autoload-file)
+    (generate-autoload-and-refresh))
+  (load lye-emacs-autoload-file :no-error :no-message))
+
+(lye/load-autoload-file)
 
 (provide 'core-autoload)
 

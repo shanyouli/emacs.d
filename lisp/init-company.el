@@ -27,10 +27,8 @@
   :diminish company-mode
   :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
   :preface
-  (setq lye-company-enable-yas t)
-
   (defun company-backend-with-yas (backend)
-
+    "Use `company-yasnippet' as the complement backend for `company'."
     (if (or (not lye-company-enable-yas)
             (and (listp backend) (member 'company-yasnippet backend)))
         backend
