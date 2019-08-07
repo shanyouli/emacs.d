@@ -23,7 +23,7 @@
 ;;
 
 ;;; Code:
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 (use-package org
   :commands org-mode
