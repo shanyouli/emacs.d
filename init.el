@@ -143,7 +143,6 @@ decrease this. If you experience stuttering, increase this.")
   (if (file-exists-p custom-file)
       (append-to-file "\n (setq lye-load-all-module-file-p t)" nil custom-file)))))
 
-
 (provide 'init)
 
 ;;; init.el ends here

@@ -89,18 +89,6 @@
    ("C-<f9>"  . lye/toggle-pyim-punctuation-translate)
    ("C-z s i" . lye/use-liberime)) "lex-pyim")
 
-;; lex-ivy.el
-(lazy-load-global-keys
- '(("M-x"     . counsel-M-x)
-   ("C-x C-f" . counsel-find-file)
-   ("C-x f"   . counsel-recentf)
-   ("C-s"     . swiper-isearch)
-   ("C-z s t" . counsel-load-theme)
-   ("M-y"     . counsel-yank-pop)
-   ("C-x b"   . ivy-switch-buffer)
-   ("C-x d"   . counsel-dired))
- "lex-ivy")
-
 ;; lex-funcs
 (lazy-load-global-keys '(("C-z f" . hydra-functions-menu/body)) "lex-funcs")
 
@@ -110,6 +98,17 @@
 ;; awesome-tab.el
 (lazy-load-global-keys '(("C-z j" . awesome-tab-ace-jump)) "awesome-tab")
 
+;; lex-ivy.el
+(lazy-load-set-keys
+ '(("M-x"     . counsel-M-x)
+   ("C-x C-f" . counsel-find-file)
+   ("C-x f"   . counsel-recentf)
+   ("C-s"     . swiper-isearch)
+   ("C-z s t" . counsel-load-theme)
+   ("M-y"     . counsel-yank-pop)
+   ("C-x b"   . ivy-switch-buffer)
+   ("C-x d"   . counsel-dired)))
+
 ;;; toolkit
 (lazy-load-set-keys
  '(
@@ -118,6 +117,7 @@
    ("C-z c"   . shell-command)       ; I don't know why the `M-!' in awesomewm can't be used.
    ("C-z C-z" . suspend-frame)       ; Suspend-frame
    ))
+
 
 (provide 'core-key)
 

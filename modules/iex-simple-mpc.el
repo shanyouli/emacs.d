@@ -50,6 +50,12 @@
     "The `One-key' menu for simple-mpc."
     (interactive)
     (one-key-menu "SIMPLE-MPC" one-key-menu-simple-mpc-alist t t))
+
+
+  ;; hydra key
+  (defhydra hydra-simple-mpc-menu (:exit nil)
+    ""
+    )
   )
 
 (provide 'iex-simple-mpc)

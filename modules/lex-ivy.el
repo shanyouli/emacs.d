@@ -75,13 +75,12 @@
   (setq counsel-describe-variable-function #'helpful-variable))
 
 ;; load-locate-key
-(lazy-load-local-keys '(([escape] . minibuffer-keyboard-quit)) swiper-map "lex-ivy")
+(lazy-load-set-keys '(([escape] . minibuffer-keyboard-quit)) swiper-map)
 
-(lazy-load-local-keys
+(lazy-load-set-keys
  '(("<C-return>" . ivy-immediate-done)
    ([escape]     . minibuffer-keyboard-quit))
- ivy-minibuffer-map
- "lex-ivy")
+ ivy-minibuffer-map)
 
 (ivy-mode 1)
 (counsel-mode 1)

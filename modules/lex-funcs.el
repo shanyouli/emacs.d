@@ -73,7 +73,9 @@
 (defun recompile-elpa ()
   "Recompile packages in elpa directory.  Useful if you switch Emacs versions."
   (interactive)
-  (byte-recompile-directory package-user-dir nil t))
+  (if (fboundp 'async-byte-recompile-directory)
+      (async-byte-recompile-directory package-user-dir nil)
+    (byte-recompile-directory package-user-dir nil t)))
 
 ;; Rename the current file
 (defun rename-this-file-and-buffer (new-name)
@@ -135,8 +137,7 @@
   ("b" browse-current-file "Browse current File")
   ("f" sudo-find-file "find file as Root")
   ("u" sudo-this-file "Open file as root")
-  ("q" nil "quit")
-  )
+  ("q" nil "quit"))
 
 
 (provide 'lex-funcs)

@@ -114,5 +114,7 @@
   (org-babel-do-load-languages 'org-babel-load-languages
                                load-language-list))
 
+(use-package htmlize)
+
 (provide 'init-org)
 ;;; init-org.el ends here

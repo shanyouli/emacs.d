@@ -51,7 +51,7 @@
          (interactive)
          (dired-x-find-file (expand-file-name "~/Git"))) "Git Repo")
   ("r" (lambda ()
-         (interacitve)
+         (interactive)
          (dired-x-find-file (expand-file-name "~/Dropbox"))) "Dropbox")
   ("q" nil "quit"))
 
