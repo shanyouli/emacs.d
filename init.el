@@ -137,13 +137,14 @@ decrease this. If you experience stuttering, increase this.")
 
 ;; load all el-file in lye-emacs-modules-dir, When fist run.
 (unless lye-load-all-module-file-p
-  (run-with-idle-timer 2 nil (lambda ()
-  (lye/core-require 'core-funcs)
-  (load-all-module-file)
-  (if (file-exists-p custom-file)
-      (append-to-file "\n (setq lye-load-all-module-file-p t)" nil custom-file)))))
+  (run-with-idle-timer
+   2 nil
+   (lambda ()
+     (lye/core-require 'core-funcs)
+     (load-all-module-file)
+     (if (file-exists-p custom-file)
+         (append-to-file "\n (setq lye-load-all-module-file-p t)" nil custom-file)))))
 
 (provide 'init)
 
 ;;; init.el ends here
-(put 'erase-buffer 'disabled nil)

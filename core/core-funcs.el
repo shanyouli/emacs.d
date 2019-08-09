@@ -67,11 +67,8 @@
 ;;
 (defun load-all-module-file ()
   "Import all el files in lye-emacs-modules-dir."
-  (let* ((parent-dir lye-emacs-modules-dir)
-         (default-directory parent-dir))
-    (dolist (file (directory-files parent-dir))
-      (unless (string-match "^\\." file )
-        (load (expand-file-name file lye-emacs-modules-dir) )))))
+  (dolist (f (directory-files lye-emacs-modules-dir t "\\.el\\'"))
+    (load f :no-error :no-message)))
 
 (provide 'core-funcs)
 
