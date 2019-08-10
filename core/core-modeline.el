@@ -111,8 +111,13 @@
       (advice-add #'awesome-tray-disable :after
                   (lambda () (setq-default mode-line-format default-mode-line-format)))
 
-      (run-with-idle-timer 0.5 nil (lambda ()
-                                     (awesome-tray-mode 1))))
+      (run-with-idle-timer 1 nil (lambda ()
+                                     (awesome-tray-mode 1)))
+      (when (boundp 'after-load-theme-hook)
+        (add-hook 'after-load-theme-hook
+                  '(lambda ()
+                     (when  awesome-tray-active-p
+                       (awesome-tray-mode))))))
 
   (setq-default mode-line-format default-mode-line-format))
 

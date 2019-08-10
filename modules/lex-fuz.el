@@ -2,7 +2,7 @@
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1 
+;; Version: v0.1
 ;; Package-Requires: (fuz)
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: fuzzy
@@ -30,10 +30,11 @@
 
 ;;; Code:
 
+(setq ivy-sort-matches-functions-alist '((t . ivy-fuz-sort-fn)))
+(setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy)))
+
 (with-eval-after-load 'ivy
   (require 'ivy-fuz)
-  (setq ivy-sort-matches-functions-alist '((t . ivy-fuz-sort-fn)))
-  (setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy)))
 
   (add-to-list 'ivy-highlight-functions-alist
                '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn)))

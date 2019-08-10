@@ -30,8 +30,6 @@
 
 ;;; Code:
 
-(defvar lye-emacs-autoload-file (expand-file-name "loadfs.el" lye-emacs-cache-dir))
-
 ;; Automatically generate autoload contained in third-party packages
 ;; https://emacs-china.org/t/autoloads/8775/10?u=shanyouli
 

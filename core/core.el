@@ -136,6 +136,11 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   "Sdcv dictionary storage directory."
   :type 'string)
 
+(defcustom lye-emacs-autoload-file (expand-file-name "loadfs.el" lye-emacs-cache-dir)
+  "Extract the autoload magic annotation file from the third party package."
+  :type '(choice (string :tag "Fire Name")
+                 (const :tag "Error" nil)))
+
 ;;; Load `custom-file'
 (setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
 

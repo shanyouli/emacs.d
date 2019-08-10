@@ -127,7 +127,6 @@ management for Emacs."
   (when (y-or-n-p (format "Delete remote branch (%s): " (magit-get-current-branch)))
     (magit-run-git-async "push" "origin" (format ":%s" (magit-get-current-branch)))))
 
-
 (provide 'iex-git)
 
 ;;; iex-git.el ends here

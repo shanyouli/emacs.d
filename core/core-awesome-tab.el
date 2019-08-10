@@ -32,6 +32,7 @@
 
 (when (display-graphic-p)
 
+;;  (require 'awesome-tab)
   (setq awesome-tab-style 'slant) ; awesome-tab style
 
   (defun lye/awesome-tab-hide-tab (x)
@@ -62,7 +63,14 @@
             '(lambda ()
                  (when (locate-library "all-the-icons") ; require all-the-icons
                    (require 'all-the-icons))
-                 (awesome-tab-mode))))
+                 (awesome-tab-mode)
+
+                 (when (boundp 'after-load-theme-hook)
+                   (add-hook 'after-load-theme-hook
+                             (lambda ()
+                               (when (awesome-tab-mode-on-p)
+                                 (awesome-tab-mode -1)
+                                 (awesome-tab-mode 1))))))))
 
 (provide 'core-awesome-tab)
 

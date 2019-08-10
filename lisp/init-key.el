@@ -23,7 +23,6 @@
 ;; For a full copy of the GNU General Public License
 ;; see <http://www.gnu.org/licenses/>.
 
-
 ;;; Commentary:
 
 ;; Key
@@ -94,9 +93,6 @@
  '(("C-h k" . helpful-key)
    ("C-h d" . helpful-at-point))
  "helpful")
-
-;; better font size
-;;(lazy-load-set-keys '(("C-z s f" . font-size-menu/body)))
 
 (provide 'init-key)
 

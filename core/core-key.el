@@ -98,6 +98,11 @@
 ;; awesome-tab.el
 (lazy-load-global-keys '(("C-z j" . awesome-tab-ace-jump)) "awesome-tab")
 
+;; lex-snails
+(when (display-graphic-p)
+  (lazy-load-unset-keys '("C-x C-b"))
+  (lazy-load-global-keys '(("C-x C-b" . snails)) "lex-snails"))
+
 ;; lex-ivy.el
 (lazy-load-set-keys
  '(("M-x"     . counsel-M-x)

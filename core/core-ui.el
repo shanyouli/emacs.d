@@ -97,8 +97,8 @@
   (set-frame-parameter
    nil 'fullscreen
    (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
-;; @see https://github.com/manateelazycat/lazycat-emacs/blob/master/site-lisp/config/init-startup.el#L95
 
+;; @see https://github.com/manateelazycat/lazycat-emacs/blob/master/site-lisp/config/init-startup.el#L95
 (defun lye/init-fullscreen ()
   "Init fullscreen "
   (if (featurep 'cocoa)
@@ -121,8 +121,7 @@
         (run-at-time "2sec" nil
                      (lambda ()
                        (toggle-frame-fullscreen)
-                       ))
-        )
+                       )))
 
     ;; 非Mac平台直接全屏
     (fullscreen)))
@@ -166,18 +165,8 @@
         theme-switch-light-time "08:30"
         theme-switch-dark-time  "19:30")
   (add-hook 'after-init-hook (lambda ()
-                               ;;(require 'theme-switch)
                                (require 'doom-themes)
-                               (theme-switch-light-or-dark-theme)
-                               ))
-  (add-hook 'after-load-theme-hook
-            '(lambda ()
-               (when (and (boundp 'awesome-tray-active-p) awesome-tray-active-p)
-                 (awesome-tray-mode))
-
-               (when (and (fboundp 'awesome-tab-mode-on-p) (awesome-tab-mode-on-p))
-                 (awesome-tab-mode -1)
-                 (awesome-tab-mode 1)))))
+                               (theme-switch-light-or-dark-theme))))
 
 (provide 'core-ui)
 

@@ -64,7 +64,6 @@
                 file-name))
     (message "Please use an absolute path.")))
 
-;;
 (defun load-all-module-file ()
   "Import all el files in lye-emacs-modules-dir."
   (dolist (f (directory-files lye-emacs-modules-dir t "\\.el\\'"))

@@ -139,6 +139,5 @@
   ("u" sudo-this-file "Open file as root")
   ("q" nil "quit"))
 
-
 (provide 'lex-funcs)
 ;;; lex-funcs.el ends here

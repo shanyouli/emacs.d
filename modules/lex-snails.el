@@ -1,11 +1,11 @@
-;;; iex-ivy-rich.el --- Ivy extensions -*- lexical-binding: t -*-
+;;; lex-snails.el --- Multiple backend search tools -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v0.1
-;; Package-Requires: (ivy-rich ivy)
+;; Package-Requires: (snails)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: ivy
+;; Keywords: search
 
 
 ;; This file is not part of GNU Emacs
@@ -26,16 +26,18 @@
 
 ;;; Commentary:
 
-;; Ivy extensions, More friendly interface for ivy
+;; snails
 
 ;;; Code:
 
-(require-package 'ivy-rich)
-(require 'ivy-rich)
+(require 'fuz)
+(require 'snails)
+(setq snails-fuz-library-load-status "load")
 
-(setq ivy-rich-path-style 'full)
-(ivy-rich-mode 1)
+;; Make the theme of the snails window change as the theme of the change changes
+(when (boundp 'after-load-theme-hook)
+  (add-hook 'after-load-theme-hook #'snails-init-face-with-theme))
 
-(provide 'iex-ivy-rich)
+(provide 'lex-snails)
 
-;;; iex-ivy-rich.el ends here
+;;; lex-snails.el ends here
