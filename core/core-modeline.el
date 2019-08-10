@@ -110,7 +110,7 @@
 
       (advice-add #'awesome-tray-disable :after
                   (lambda () (setq-default mode-line-format default-mode-line-format)))
-;;      (awesome-tray-mode)
+
       (advice-add #'theme-switch-light-or-dark-theme :after #'awesome-tray-mode)
 ;;      (run-with-idle-timer 1 nil #'awesome-tray-mode)
 
@@ -118,8 +118,7 @@
         (add-hook 'after-load-theme-hook
                   '(lambda ()
                      (when awesome-tray-active-p
-                       (awesome-tray-disabele)
-                       (awesome-tray-enable))))))
+                       (awesome-tray-mode))))))
 
   (setq-default mode-line-format default-mode-line-format))
 

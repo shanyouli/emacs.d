@@ -166,7 +166,46 @@
         theme-switch-dark-time  "19:30")
   (add-hook 'after-init-hook (lambda ()
                                (require 'doom-themes)
-                               (theme-switch-light-or-dark-theme))))
+                               (theme-switch-light-or-dark-theme)))
+
+;;; awesome-tab
+    (setq awesome-tab-style 'slant) ; awesome-tab style
+
+  (defun lye/awesome-tab-hide-tab (x)
+    (let ((name (format "%s" x)))
+      (or
+       ;; Current window is not dedicated windows.
+       (window-dedicated-p (selected-window))
+
+       ;; Buffer name not match below dedicated window.
+       (string-prefix-p "*esup" name)
+       (string-prefix-p "*epc" name)
+       (string-prefix-p "*helm" name)
+       (string-prefix-p "*Compile-Log*" name)
+       (string-prefix-p "*lsp" name)
+       (string-prefix-p "*scratch*" name)
+       (string-prefix-p "*One-Key*" name)
+       (string-prefix-p " *which-key*" name)
+       (string-prefix-p "*Flycheck" name)
+       (string-prefix-p "*flycheck-posframe-buffer*" name)
+
+     ;; Is not magit buffer.
+       (and (string-prefix-p "magit" name)
+            (not (file-name-extension name))))))
+
+  (setq awesome-tab-hide-tab-function 'lye/awesome-tab-hide-tab)
+
+  (add-hook 'after-init-hook
+            '(lambda ()
+                 (when (locate-library "all-the-icons") ; require all-the-icons
+                   (require 'all-the-icons))
+                 (awesome-tab-mode)
+
+                 (when (boundp 'after-load-theme-hook)
+                   (add-hook 'after-load-theme-hook
+                             (lambda ()
+                               (when (awesome-tab-mode-on-p)
+                                 (awesome-tab-mode 1))))))))
 
 (provide 'core-ui)
 
