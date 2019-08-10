@@ -30,7 +30,7 @@
 
 ;;; Code:
 (require 'pyim)
-(require 'async)
+
 (when (and (>= emacs-major-version 26) (locate-library "posframe"))
   (require 'posframe))
 
@@ -62,10 +62,6 @@
 (with-eval-after-load 'pyim
   ;; Loading dictionary
   ;;  (pyim-bigdict-enable)
-  ;; set pyim as the default input method
-  (setq default-input-method "pyim")
-  ;; Use full spell
-  (setq pyim-default-scheme 'quanpin)
   ;; Fuzzy pinyin
   (setq pyim-fuzzy-pinyin-alist
         '(("en" "eng") ("in" "ing") ("l" "n") ("z" "zh") ("c" "ch")
@@ -84,17 +80,54 @@
 (setq-default pyim-english-input-switch-functions
               '(pyim-probe-isearch-mode))
 
-(defvar lye-enable-pyim-bigdict-p t)
+;; No Chinese company
+(defun lye/company-dabbrev--prefix (orig-fun)
+  "取消中文补全"
+  (let ((string (pyim-char-before-to-string 0)))
+    (if (pyim-string-match-p "\\cc" string)
+        nil
+      (funcall orig-fun))))
+(if (featurep 'company)
+    (advice-add 'company-dabbrev--prefix
+                :around #'lye/company-dabbrev--prefix))
 
-(defun lye/toggle-pyim-input-method ()
+;; Use the cursor format to determine whether to use pyim. When using pyim,
+;; the cursor is bar. When pyim is not applicable, the cursor is box.
+(add-hook 'input-method-activate-hook  (lambda () (setq cursor-type 'bar)))
+(add-hook 'input-method-deactivate-hook (lambda () (setq cursor-type t)))
+
+;; use-pyim-bigdict-enable
+(defun pyim-load-bigdict ()
+  "Use pyim-bigdict as a full-fledged dictionary."
+  (pyim-bigdict-enable) ; load dictionary
+  ;; Use full spell
+  (setq pyim-default-scheme 'quanpin))
+
+(defun pyim-load-liberime-or-pyim-bigdict ()
+  "If you can use liberime, use liberime.
+If you can't use liberime, use pyim-bigdict."
+
+  ;; set pyim as the default input method
+  (setq default-input-method "pyim")
+
+  (unless (featurep 'liberime)
+    (lye/modules-require 'lex-liberime)
+    (setq liberime-user-dir (expand-file-name "pyim/rime" lye-emacs-cache-dir))
+    (liberime-initialize))
+
+  (unless (featurep 'liberime)
+    (pyim-load-bigdict)))
+
+;;; Start pyim function
+(defvar pyim-load-liberime-or-pyim-bigdict-p t)
+
+(defun toggle-default-pyim-input-method ()
   "Use pyim as the default output."
   (interactive)
-  (when lye-enable-pyim-bigdict-p
-    (pyim-bigdict-enable)
-    (setq lye-enable-pyim-bigdict-p nil))
-  (if toggle-input-method-active
+  (if pyim-load-liberime-or-pyim-bigdict-p
       (progn
-        (setq default-input-method "pyim")
+        (pyim-load-liberime-or-pyim-bigdict)
+        (setq pyim-load-liberime-or-pyim-bigdict-p nil)
         (set-input-method "pyim"))
     (toggle-input-method)))
 
@@ -106,51 +139,6 @@
       (setq-default pyim-punctuation-translate-p '(auto yes no))
     (setq-default pyim-punctuation-translate-p '(no yes auto)))
   (toggle-input-method))
-
-(defvar lye-liberime-share-dir "/usr/share/rime-data")
-
-(defvar lye-liberime-user-dir (expand-file-name "pyim/rime" lye-emacs-cache-dir))
-
-(defvar lye-use-liberime-p nil
-  "Whether liberime-module has been loaded.")
-
-(defun lye/use-liberime ()
-  "Use `liberime' module."
-  (interactive)
-  (if (memq system-type '(gnu/linux darwin))
-      (let* ((liberime--root (file-name-directory (locate-library "liberime-config")))
-             (liberime--module (concat liberime--root "build/liberime" module-file-suffix)))
-        (cond
-         (lye-use-liberime-p
-          (message "Liberime module has been loaded."))
-         ((and liberime--root (file-exists-p liberime--module))
-          (module-load liberime--module)
-          (liberime-start lye-liberime-share-dir lye-liberime-user-dir)
-          (liberime-select-schema "luna_pinyin_simp")
-          (setq pyim-default-scheme 'rime-quanpin)
-          (setq lye-enable-pyim-bigdict-p nil)
-          (set-input-method "pyim")
-          (setq lye-use-liberime-p t))
-         (t
-          (message "Please compile liberime and use this function."))))
-    (message "Limerime cannot be used on systems other than gnu/linux and Mac.")))
-
-;; Use the cursor format to determine whether to use pyim. When using pyim,
-;; the cursor is bar. When pyim is not applicable, the cursor is box.
-(add-hook 'input-method-activate-hook  (lambda () (setq cursor-type 'bar)))
-(add-hook 'input-method-deactivate-hook (lambda () (setq cursor-type t)))
-
-;; No Chinese company
-;;  (with-eval-after-load 'company
-(defun lye/company-dabbrev--prefix (orig-fun)
-  "取消中文补全"
-  (let ((string (pyim-char-before-to-string 0)))
-    (if (pyim-string-match-p "\\cc" string)
-        nil
-      (funcall orig-fun))))
-(advice-add 'company-dabbrev--prefix
-            :around #'lye/company-dabbrev--prefix)
-;;)
 
 (provide 'lex-pyim)
 

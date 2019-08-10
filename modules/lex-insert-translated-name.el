@@ -32,9 +32,9 @@
 
 (lye/modules-require 'lex-pyim)
 
-(when lye-enable-pyim-bigdict-p
-  (pyim-bigdict-enable)
-  (setq lye-enable-pyim-bigdict-p nil))
+(when pyim-load-liberime-or-pyim-bigdict-p
+  (pyim-load-liberime-or-pyim-bigdict)
+  (setq pyim-load-liberime-or-pyim-bigdict-p nil))
 
 (require 'insert-translated-name)
 

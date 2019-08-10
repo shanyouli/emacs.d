@@ -85,9 +85,9 @@
 
 ;; lex-pyim.el
 (lazy-load-global-keys
- '(("<f9>"    . lye/toggle-pyim-input-method)
-   ("C-<f9>"  . lye/toggle-pyim-punctuation-translate)
-   ("C-z s i" . lye/use-liberime)) "lex-pyim")
+ '(("<f9>"    . toggle-default-pyim-input-method)
+   ("C-<f9>"  . lye/toggle-pyim-punctuation-translate))
+ "lex-pyim")
 
 ;; lex-funcs
 (lazy-load-global-keys '(("C-z f" . hydra-functions-menu/body)) "lex-funcs")
