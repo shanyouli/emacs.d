@@ -154,6 +154,16 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 (unless (file-exists-p lye-emacs-cache-dir)
   (make-directory lye-emacs-cache-dir))
 
+;; modules
+(defmacro lye/modules-require (pkg)
+  "Import the *.el file in the lye-emacs-modules-dir folder."
+  `(require ,pkg (format "%s%s.el" ,lye-emacs-modules-dir ,pkg)))
+
+;; init Dired
+(defmacro lye/init-require (pkg)
+  "Import the `*.el' file in the lye-emacs-lisp-dir folder."
+  `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
+
 ;;; `Load-path'
 (defun lye/add-subdidrs-to-load-path (parent-dir)
   "Adds every non-hidden subdir of PARENT_DIR to `load-path'."
@@ -162,7 +172,7 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
       (setq load-path
             (append
              (loop for dir in (remove-if
-                               (lambda (f) (string-prefix-p "." f) )
+                               (lambda (f) (string-prefix-p "." f))
                                (directory-files parent-dir))
                    unless (not (file-directory-p dir))
                    collecting (expand-file-name dir))
@@ -189,16 +199,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   (require 'benchmark-init-modes)
   (require 'benchmark-init)
   (benchmark-init/activate))
-
-;; modules
-(defmacro lye/modules-require (pkg)
-  "Import the *.el file in the lye-emacs-modules-dir folder."
-  `(require ,pkg (format "%s%s.el" ,lye-emacs-modules-dir ,pkg)))
-
-;; init Dired
-(defmacro lye/init-require (pkg)
-  "Import the `*.el' file in the lye-emacs-lisp-dir folder."
-  `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
 
 (provide 'core)
 
