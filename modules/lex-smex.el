@@ -1,11 +1,11 @@
-;;; iex-amx.el --- Initialize AMX configurations -*- lexical-binding: t -*-
+;;; lex-smex.el --- Initialize smex -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v1
-;; Package-Requires: (amx)
+;; Version: v0.1
+;; Package-Requires: (smex)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: search
+;; Keywords: M-x
 
 
 ;; This file is not part of GNU Emacs
@@ -26,20 +26,19 @@
 
 ;;; Commentary:
 
-;; AMX
+;; Smex configuration
 
 ;;; Code:
 
-(require-package 'amx)
-(require 'amx)
-(let ((smex-file (expand-file-name "smex-items" lye-emacs-cache-dir)))
-  (if (file-exists-p smex-file)
-      (setq amx-save-file smex-file)
-    (setq amx-save-file (concat lye-emacs-cache-dir "amx-items"))))
+(require 'smex)
+(let ((amx-file (expand-file-name "amx-items" lye-emacs-cache-dir)))
+  (if (file-exists-p amx-file)
+      (setq smex-save-file amx-file)
+    (setq smex-save-file (expand-file-name "smex-items" lye-emacs-cache-dir))))
+(setq smex-history-length 10)
 
-(setq amx-history-length 10)
-(with-eval-after-load 'counsel (amx-initialize))
+(smex-initialize)
 
-(provide 'iex-amx)
+(provide 'lex-smex)
 
-;;; iex-amx.el ends here
+;;; lex-smex.el ends here

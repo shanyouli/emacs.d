@@ -1,4 +1,4 @@
-;;; lex-ivy.el --- Initialize IVY configurations. -*- lexical-binding: t -*-
+;;; iex-ivy.el --- Initialize IVY configurations. -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
@@ -29,7 +29,8 @@
 ;; IVY SWIPER, counsel
 
 ;;; Code:
-
+(require-package 'ivy)
+(require-package 'counsel)
 (require 'counsel)
 
 (pcase lye-use-amx-or-fuzzy
@@ -82,6 +83,6 @@
 (ivy-mode 1)
 (counsel-mode 1)
 
-(provide 'lex-ivy)
+(provide 'iex-ivy)
 
-;;; lex-ivy.el ends here
+;;; iex-ivy.el ends here

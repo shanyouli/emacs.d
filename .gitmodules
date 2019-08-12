@@ -28,9 +28,6 @@
 [submodule "color-rg"]
 	path = site-lisp/color-rg
 	url = https://github.com/manateelazycat/color-rg.git
-[submodule "swiper"]
-	path = site-lisp/swiper
-	url = https://github.com/abo-abo/swiper.git
 [submodule "emacs-doom-themes"]
 	path = site-lisp/emacs-doom-themes
 	url = https://github.com/hlissner/emacs-doom-themes.git
@@ -88,3 +85,6 @@
 [submodule "snails"]
 	path = site-lisp/snails
 	url = https://github.com/manateelazycat/snails.git
+[submodule "smex"]
+	path = site-lisp/smex
+	url = https://github.com/nonsequitur/smex.git

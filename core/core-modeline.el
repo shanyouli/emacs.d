@@ -30,13 +30,6 @@
 
 ;;; Code:
 
-;; (defconst default-modelinhfqe-format mode-line-format
-;;   "Emacs default mode-line format.")
-;; (defconst default-modeline-identification mode-line-buffer-identification
-;;   "Emacs default mode-line identification")
-;; (defconst default-modeline-mule-info mode-line-mule-info
-;;   "Emacs default mode-line mule-info")
-
 (unless after-init-time
   (setq-default mode-line-format nil))
 ;; use setq-default to set it for /all/ modes

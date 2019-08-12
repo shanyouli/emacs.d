@@ -29,6 +29,18 @@
 
 ;;; Code:
 
+;; iex-ivy.el
+(lazy-load-global-keys
+ '(("M-x"     . counsel-M-x)
+   ("C-x C-f" . counsel-find-file)
+   ("C-x f"   . counsel-recentf)
+   ("C-s"     . swiper-isearch)
+   ("C-z s t" . counsel-load-theme)
+   ("M-y"     . counsel-yank-pop)
+   ("C-x b"   . ivy-switch-buffer)
+   ("C-x d"   . counsel-dired))
+ "iex-ivy")
+
 ;; iex-elfeed
 (lazy-load-global-keys '(("C-z w" . elfeed)) "iex-elfeed")
 
@@ -57,7 +69,7 @@
                          ("C-x 4 r" . winner-redo)) "iex-window")
 
 ;; iex-avy
-(lazy-load-global-keys '(("M-e" . one-key-menu-avy)) "iex-avy")
+(lazy-load-global-keys '(("M-s" . one-key-menu-avy)) "iex-avy")
 
 ;; iex-vterm
 (lazy-load-global-keys '(("C-x s v" . vterm)) "iex-vterm")

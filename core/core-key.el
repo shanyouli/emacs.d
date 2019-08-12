@@ -70,7 +70,7 @@
  "lex-hydra")
 
 ;; lex-setup-font
-(when (and (display-graphic-p) (fboundp 'default-setup-font-size))
+(when (and (display-graphic-p) (fboundp 'setup-font-initialize))
   (lazy-load-global-keys '(("C-z s f" . hydra-font-size-menu/body))
                          "lex-setup-font"))
 
@@ -81,7 +81,7 @@
 (lazy-load-global-keys '(("C-r" . one-key-menu-search)) "lex-search")
 
 ;; lex-thing-edit.el
-(lazy-load-global-keys '(("M-s" . one-key-menu-thing-edit)) "lex-thing-edit")
+(lazy-load-global-keys '(("M-e" . one-key-menu-thing-edit)) "lex-thing-edit")
 
 ;; lex-pyim.el
 (lazy-load-global-keys
@@ -103,16 +103,10 @@
   (lazy-load-unset-keys '("C-x C-b"))
   (lazy-load-global-keys '(("C-x C-b" . snails)) "lex-snails"))
 
-;; lex-ivy.el
-(lazy-load-set-keys
- '(("M-x"     . counsel-M-x)
-   ("C-x C-f" . counsel-find-file)
-   ("C-x f"   . counsel-recentf)
-   ("C-s"     . swiper-isearch)
-   ("C-z s t" . counsel-load-theme)
-   ("M-y"     . counsel-yank-pop)
-   ("C-x b"   . ivy-switch-buffer)
-   ("C-x d"   . counsel-dired)))
+;; lex-smex
+(lazy-load-global-keys
+ '(("M-x" . smex)
+   ("C-x M-x" . smex-major-mode-commands)) "lex-smex")
 
 ;;; toolkit
 (lazy-load-set-keys

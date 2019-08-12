@@ -106,8 +106,6 @@
           ;; not use mouse
             (if (display-graphic-p) (global-disable-mouse-mode))))
 
-(run-with-idle-timer 1 nil (lambda () (lye/modules-require 'lex-ivy)))
-
 (provide 'core-package)
 
 ;;; core-package.el ends here
