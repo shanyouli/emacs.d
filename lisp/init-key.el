@@ -44,9 +44,6 @@
 ;; iex-elfeed
 (lazy-load-global-keys '(("C-z w" . elfeed)) "iex-elfeed")
 
-;; iex-pardox
-(lazy-load-global-keys '(("C-z l" . lye/list-package)) "iex-paradox")
-
 ;; iex-treemacs
 (lazy-load-global-keys '(("C-x t" . one-key-menu-treemacs)) "iex-treemacs")
 
