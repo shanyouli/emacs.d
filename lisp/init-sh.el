@@ -47,6 +47,7 @@
                    (sh-set-shell "zsh")
                  (sh-set-shell "bash")))
 
+             ;; run lsp
              (when (and (string= sh-shell "bash")
                         (executable-find "bash-language-server"))
                (lye/modules-require 'iex-lsp)
@@ -56,8 +57,10 @@
                                  company-backends))
                ;; (setq-local company-backends
                ;;             (mapcar #'company-backend-with-yas company-backends))
-               (lye/modules-require 'iex-flycheck)
-               ))))
+               (add-hook 'lsp--managed-mode-hook (lambda () (eldoc-mode -1))))
+
+             ;; run flycheck
+             (lye/modules-require 'iex-flycheck))))
 
 (provide 'init-sh)
 ;;; init-sh.el ends here

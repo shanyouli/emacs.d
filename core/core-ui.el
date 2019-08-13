@@ -205,6 +205,7 @@
                    (add-hook 'after-load-theme-hook
                              (lambda ()
                                (when (awesome-tab-mode-on-p)
+                                 (awesome-tab-mode -1)
                                  (awesome-tab-mode 1))))))))
 
 (provide 'core-ui)
