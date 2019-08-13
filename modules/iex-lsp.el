@@ -58,12 +58,11 @@
       lsp-ui-sideline-ignore-duplicate t)
 
 ;; shotcut key
-(lazy-load-local-keys
+(lazy-load-set-keys
  '(([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
    ([remap xref-find-references]  . lsp-ui-peek-find-references)
    ("C-c u" . lsp-ui-imenu))
- lsp-ui-mode-map
- "iex-lsp")
+ lsp-ui-mode-map)
 
 (provide 'iex-lsp)
 

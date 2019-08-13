@@ -94,7 +94,7 @@
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
 
-(defcustom lye-package-archives 'tuna
+(defcustom lye-package-archives 'melpa
   "Set package archives from which to fetch."
   :type '(choice (const :tag "Melpa" melpa)
                  (const :tag "Melpa-mirror" melpa-mirror)

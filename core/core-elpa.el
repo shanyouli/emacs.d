@@ -116,6 +116,9 @@
 (use-package diminish :ensure nil)
 (use-package bind-key :ensure nil)
 
+;; pardox
+(run-with-idle-timer 5 nil (lambda () (lye/modules-require 'iex-paradox)))
+
 (provide 'core-elpa)
 
 ;;; core-elpa.el ends here

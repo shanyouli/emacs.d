@@ -34,13 +34,29 @@
 
 (require-package 'paradox)
 (require 'paradox)
-(defun lye/list-package ()
-  (interactive)
-  (setq paradox-execute-asynchronously t)
-  (setq paradox-github-token t)
-  (setq paradox-display-star-count nil)
-  (paradox-enable)
-  (list-packages))
+;; (defun lye/list-package ()
+;;   (interactive)
+;;   (setq paradox-execute-asynchronously t)
+;;   (setq paradox-github-token t)
+;;   (setq paradox-display-star-count nil)
+;;   (paradox-enable)
+;;   (list-packages))
+
+;; Replace default `list-packages'
+;; (defadvice list-packages (before my-list-packages activate)
+  ;; (require 'paradox)
+  ;; (setq paradox-execute-asynchronously t)
+  ;; (setq paradox-github-token t)
+  ;; (setq paradox-display-star-count nil)
+  ;; (paradox-enable))
+
+(advice-add #'list-packages :before
+            (lambda (&rest _)
+              (require 'paradox)
+              (setq paradox-execute-asynchronously t)
+              (setq paradox-github-token t)
+              (setq paradox-display-star-count nil)
+              (paradox-enable)))
 
 (provide 'iex-paradox)
 
