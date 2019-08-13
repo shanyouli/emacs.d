@@ -99,11 +99,17 @@
 ;;     :config (setq company-quickhelp-delay 0.8)))
 
 ;; Use company-posframe
-(when (display-graphic-p)
-  (use-package company-posframe
-    :after company
-    :config
-    (company-posframe-mode 1)))
+(require-package 'company-posframe)
+(add-hook 'company-mode
+          (lambda ()
+            (when (display-graphic-p)
+              (require 'company-posframe)
+              (company-posframe-mode))))
+;; (when (display-graphic-p)
+;;   (use-package company-posframe
+;;     :after company
+;;     :config
+;;     (company-posframe-mode 1)))
 
 (provide 'init-company)
 ;;; init-company.el ends here

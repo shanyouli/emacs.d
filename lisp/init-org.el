@@ -50,8 +50,10 @@
                       (push '("#+BEGIN_SRC" . "λ") prettify-symbols-alist)
                       (push '("#+END_SRC" . "λ") prettify-symbols-alist))
                     (prettify-symbols-mode)))
-  :init (require 'doom-themes-ext-org)
-  )
+  :init
+  (require 'doom-themes-ext-org)
+  :config
+  (define-key org-mode-map (kbd "M-e") nil))
 
 ;; Prettify UI
 (use-package org-bullets

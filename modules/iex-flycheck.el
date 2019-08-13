@@ -46,7 +46,7 @@
 (when (display-graphic-p)
   (require-package 'flycheck-posframe)
   (require 'flycheck-posframe)
-  (add-hook 'after-init-hook 'flycheck-posframe-mode))
+  (add-hook 'flycheck-mode-hook 'flycheck-posframe-mode))
 
 (flycheck-mode t)
 

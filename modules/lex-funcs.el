@@ -122,6 +122,10 @@
   (interactive)
   (sudo-find-file (file-truename buffer-file-name)))
 
+(defun erase-all-buffer ()
+  (interactive)
+  (delete-region (point-min) (point-max)))
+
 ;; hydra key
 (defhydra hydra-functions-menu (:exit t)
   "Functions Menu"
@@ -137,6 +141,7 @@
   ("b" browse-current-file "Browse current File")
   ("f" sudo-find-file "find file as Root")
   ("u" sudo-this-file "Open file as root")
+  ("C" erase-all-buffer "Clear the entire buffer")
   ("q" nil "quit"))
 
 (provide 'lex-funcs)
