@@ -1,11 +1,11 @@
-;;; iex-flycheck.el --- Initialize flycheck -*- lexical-binding: t -*-
+;;; lex-vi-key.el --- vim keybindings -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v0.1
-;; Package-Requires: (flycheck flycke-posframe)
+;; Package-Requires: (hydra)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: flychek
+;; Keywords: key
 
 
 ;; This file is not part of GNU Emacs
@@ -26,28 +26,21 @@
 
 ;;; Commentary:
 
-;; commentary
+;; vim key
 
 ;;; Code:
 
-(require-package 'flycheck)
-(require 'flycheck)
+;; vi keybindings
+(lye/modules-require 'lex-translate)
+(defhydra hydra-vim-menu (:exit nil)
+  "vim keybindings"
+  ("h" backward-char "Left")
+  ("j" next-line "Down Line")
+  ("k" previous-line "Up Line")
+  ("l" forward-char "Right")
+  ("t" default-translate-point+ "Translate")
+  ("q" nil))
 
-;;Need to get a better PATH
-(lye/exec-path-from-shell-init)
+(provide 'lex-vi-key)
 
-;; flycheck-configurations
-(setq flycheck-indication-mode 'right-fringe)
-(setq flycheck-emacs-lisp-load-path 'inherit)
-
-;; Only check while saving and opening files
-(setq flycheck-check-syntax-automatically '(save mode-enabled))
-
-(when (display-graphic-p)
-  (require-package 'flycheck-posframe)
-  (require 'flycheck-posframe)
-  (add-hook 'flycheck-mode-hook 'flycheck-posframe-mode))
-
-(provide 'iex-flycheck)
-
-;;; iex-flycheck.el ends here
+;;; lex-vi-key.el ends here

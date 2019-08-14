@@ -156,7 +156,7 @@
                          "Microsoft Yahei")))
 
   (setq setup-font-default-size 14)
-;;  (require 'setup-font)
+  ;;  (require 'setup-font)
   (setup-font-initialize)
 
   ;; THEME
@@ -169,7 +169,7 @@
                                (theme-switch-light-or-dark-theme)))
 
 ;;; awesome-tab
-    (setq awesome-tab-style 'slant) ; awesome-tab style
+  (setq awesome-tab-style 'slant) ; awesome-tab style
 
   (defun lye/awesome-tab-hide-tab (x)
     (let ((name (format "%s" x)))
@@ -185,28 +185,30 @@
        (string-prefix-p "*lsp" name)
        (string-prefix-p "*scratch*" name)
        (string-prefix-p "*One-Key*" name)
-       (string-prefix-p " *which-key*" name)
+       (string-match "^\\ \\*" name)
        (string-prefix-p "*Flycheck" name)
        (string-prefix-p "*flycheck-posframe-buffer*" name)
 
-     ;; Is not magit buffer.
+       ;; Is not magit buffer.
        (and (string-prefix-p "magit" name)
             (not (file-name-extension name))))))
 
   (setq awesome-tab-hide-tab-function 'lye/awesome-tab-hide-tab)
 
-  (add-hook 'after-init-hook
-            '(lambda ()
-                 (when (locate-library "all-the-icons") ; require all-the-icons
-                   (require 'all-the-icons))
-                 (awesome-tab-mode)
+  (setq awesome-tab-face-height 110)  ;;Set the height of awesome-tab-face-hieght to 110
 
-                 (when (boundp 'after-load-theme-hook)
-                   (add-hook 'after-load-theme-hook
-                             (lambda ()
-                               (when (awesome-tab-mode-on-p)
-                                 (awesome-tab-mode -1)
-                                 (awesome-tab-mode 1))))))))
+  (add-hook 'after-init-hook
+            (lambda ()
+              (when (locate-library "all-the-icons") ; require all-the-icons
+                (require 'all-the-icons))
+              (awesome-tab-mode)
+
+              (when (boundp 'after-load-theme-hook)
+                (add-hook 'after-load-theme-hook
+                          (lambda ()
+                            (when (awesome-tab-mode-on-p)
+                              (awesome-tab-mode -1)
+                              (awesome-tab-mode 1))))))))
 
 (provide 'core-ui)
 

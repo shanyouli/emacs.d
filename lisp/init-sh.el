@@ -38,18 +38,18 @@
   :hook
   (sh-mode .
            (lambda ()
-             (let ((file-name (buffer-file-name)))
-               (if (and file-name (or (string-match "\\.zsh$" file-name)
-                                      (string-match "\\.zshrc$" file-name)
-                                      (string-match "\\.zshenv$" file-name)
-                                      (string-match "\\.zlogin$" file-name)
-                                      (string-match "\\.zshfunc$" file-name)))
+             ;; Determine if the shell using the running script is zsh or bash
+             (let ((f (buffer-file-name)))
+               (if (and f (or (setq f (file-name-base f))
+                              (string-match "^\\.zsh\\(\\rc\\|\\env\\|func\\)$" f)
+                              (string-match "\\.zsh$" f)
+                              (string-match "^\\.zlogin$" f)))
                    (sh-set-shell "zsh")
                  (sh-set-shell "bash")))
 
              ;; run flycheck
              (lye/modules-require 'iex-flycheck)
-
+             (flycheck-mode +1)
              ;; run lsp
              (when (and (string= sh-shell "bash")
                         (executable-find "bash-language-server"))

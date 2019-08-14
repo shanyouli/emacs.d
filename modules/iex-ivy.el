@@ -52,8 +52,11 @@
 ;; @https://github.com/abo-abo/swiper/issues/2130
 (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow)
 
-;; (setq ivy-re-builders-alist
-;;       '((t . ivy--regex-fuzzy))) ; Fuzzy search
+;; Fuzzy search
+;; (if (locate-library "flx")
+;;     (setq ivy-re-builders-alist
+;;           '((t . ivy--regex-fuzzy))))
+
 (when (locate-library "magit")
   (setq magit-completing-read-function 'ivy-completing-read))
 
