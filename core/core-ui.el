@@ -199,8 +199,9 @@
 
   (add-hook 'after-init-hook
             (lambda ()
-              (when (locate-library "all-the-icons") ; require all-the-icons
-                (require 'all-the-icons))
+              (lye/modules-require 'iex-all-the-icons)
+              ;; (when (locate-library "all-the-icons") ; require all-the-icons
+              ;;   (require 'all-the-icons))
               (awesome-tab-mode)
 
               (when (boundp 'after-load-theme-hook)

@@ -67,7 +67,7 @@
         '(company-pseudo-tooltip-unless-just-one-frontend
           company-preview-if-just-one-frontend))
 
-  ;; Use company-tabnine
+   ;; Use company-tabnine
   (use-package company-tabnine
     :init
     (setq company-tabnine-binaries-folder
