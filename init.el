@@ -144,6 +144,11 @@ decrease this. If you experience stuttering, increase this.")
      (if (file-exists-p custom-file)
          (append-to-file "\n (setq lye-load-all-module-file-p t)" nil custom-file)))))
 
+;; Function that highlights global variables
+(when (locate-library "elispfl")
+  (require 'elispfl)
+  (add-hook 'emacs-lisp-mode-hook #'elispfl-mode))
+
 (provide 'init)
 
 ;;; init.el ends here

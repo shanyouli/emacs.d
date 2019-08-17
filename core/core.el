@@ -200,6 +200,9 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   (require 'benchmark-init)
   (benchmark-init/activate))
 
+;; Load .el if newer than corresponding .elc
+(setq load-prefer-newer t)
+
 (provide 'core)
 
 ;;; core.el ends here

@@ -31,7 +31,18 @@
 ;;; Code:
 (require 'pyim)
 
-(when (and (>= emacs-major-version 26) (locate-library "posframe"))
+;;; Start pyim function
+(defvar pyim-load-liberime-or-pyim-bigdict-p t
+  "If pyim-load-liberime-or-pyim-bigdict-p is t and the liberime package exists,
+use liberime as the back end of the pyim input method.
+Conversely use pyim-bigdict as the lexical backend for the pyim input method.")
+
+(defvar previous-themes-is nil
+  "A variable determines if the Theme changes.")
+
+(when (and (>= emacs-major-version 26)
+           (locate-library "posframe")
+           (not (featurep 'posframe)))
   (require 'posframe))
 
 ;; pyim-bigdict
@@ -67,11 +78,11 @@
         '(("en" "eng") ("in" "ing") ("l" "n") ("z" "zh") ("c" "ch")
           ("s" "sh") ("an" "ang")))
 
-  (if (featurep 'posframe)
+  (if (and (display-graphic-p) (featurep 'posframe))
       (progn
         (setq pyim-page-tooltip 'posframe)
         (setq pyim-posfram-min-width 0))
-    (setq pyim-page-tooltip 'popup))
+    (setq pyim-page-tooltip 'minibuffer))
   ;; Set 9 candidate words
   (setq pyim-page-length 9))
 
@@ -107,8 +118,7 @@
   "If you can use liberime, use liberime.
 If you can't use liberime, use pyim-bigdict."
 
-  ;; set pyim as the default input method
-  (setq default-input-method "pyim")
+  (setq default-input-method "pyim") ;set pyim as the default input method
 
   (unless (featurep 'liberime)
     (lye/modules-require 'lex-liberime)
@@ -118,12 +128,22 @@ If you can't use liberime, use pyim-bigdict."
   (unless (featurep 'liberime)
     (pyim-load-bigdict)))
 
-;;; Start pyim function
-(defvar pyim-load-liberime-or-pyim-bigdict-p t)
+(defun changes-pyim-page-color-from-theme ()
+  "Set different color schemes for `pyim-page' according to different topics."
+  (let ((current-themes (car custom-enabled-themes)))
+    (unless (and previous-themes-is
+                 (string= previous-themes-is current-themes))
+      (set-face-attribute 'pyim-page nil
+                          :background (face-foreground 'default)
+                          :foreground (face-background 'default))
+      (setq previous-themes-is current-themes))))
 
 (defun toggle-default-pyim-input-method ()
   "Use pyim as the default output."
   (interactive)
+  ;; Set the color of pyim-bage
+  (changes-pyim-page-color-from-theme)
+
   (if pyim-load-liberime-or-pyim-bigdict-p
       (progn
         (pyim-load-liberime-or-pyim-bigdict)
@@ -131,8 +151,8 @@ If you can't use liberime, use pyim-bigdict."
         (set-input-method "pyim"))
     (toggle-input-method)))
 
-;; Half-width punctuation and full-width punctuation conversion
 (defun lye/toggle-pyim-punctuation-translate()
+  "Half-width punctuation and full-width punctuation conversion."
   (interactive)
   (toggle-input-method)
   (if (string= "no" (car pyim-punctuation-translate-p))

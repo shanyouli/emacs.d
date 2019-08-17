@@ -198,8 +198,5 @@ Lisp function does not specify a special indentation."
 ;; Semantic code search for emacs lisp
 (use-package elisp-refs)
 
-;; Load .el if newer than corresponding .elc
-(setq load-prefer-newer t)
-
 (provide 'init-elisp)
 ;;; init-elisp.el ends here

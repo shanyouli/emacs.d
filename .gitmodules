@@ -88,3 +88,6 @@
 [submodule "smex"]
 	path = site-lisp/smex
 	url = https://github.com/nonsequitur/smex.git
+[submodule "elispfl"]
+	path = site-lisp/elispfl
+	url = https://github.com/cireu/elispfl.git
