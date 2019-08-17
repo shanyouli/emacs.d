@@ -47,6 +47,11 @@
 ;; iex-treemacs
 (lazy-load-global-keys '(("C-x t" . one-key-menu-treemacs)) "iex-treemacs")
 
+;; iex-youdao-dictionary
+(if (eq lye-enable-sdcv-or-youdao 'youdao)
+    (lazy-load-global-keys '(("C-z y" . youdao-dictionary-search-at-point++))
+                           "iex-youdao-dictionary"))
+
 ;; iex-git
 ;; transient file
 (setq-default transient-history-file
@@ -97,11 +102,11 @@
 (lazy-load-global-keys '(("C-x p i" . org-cliplink)) "org-cliplink")
 
 ;; Better elisp help file format
-(require-package 'helpful)
-(lazy-load-global-keys
- '(("C-h k" . helpful-key)
-   ("C-h d" . helpful-at-point))
- "helpful")
+;; (require-package 'helpful)
+;; (lazy-load-global-keys
+;;  '(("C-h k" . helpful-key)
+;;    ("C-h d" . helpful-at-point))
+;;  "helpful")
 
 (provide 'init-key)
 

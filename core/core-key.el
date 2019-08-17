@@ -74,8 +74,10 @@
   (lazy-load-global-keys '(("C-z s f" . hydra-font-size-menu/body))
                          "lex-setup-font"))
 
-;; lex-translate.el
-(lazy-load-global-keys '(("C-z y" . hydra-translate-menu/body)) "lex-translate")
+;; lex-sdcv
+(if (eq lye-enable-sdcv-or-youdao 'sdcv)
+    (lazy-load-global-keys '(("C-z y" . sdcv-search-at-point++))
+                           "lex-sdcv"))
 
 ;; lex-search.el
 (lazy-load-global-keys '(("C-r" . one-key-menu-search)) "lex-search")

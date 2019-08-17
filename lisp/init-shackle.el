@@ -45,6 +45,7 @@
           ("*color-rg*" :size 0.382 :align 'below :autoclose t)
           ("*Calendar*" :select t :size 0.382 :align 'below)
           ;; ("*One-Key*"  :size 0.382 :align 'below :autoclose t)
+          ("*SDCV*" :size 0.382 :align 'below :autoclose t)
           ("\\*ivy-occur .*\\*" :regexp t :size 0.382 :select t :align 'below)
           (" *undo-tree*" :select t)
           ("*Paradox Report*" :size 0.382 :align 'below :autoclose t)
