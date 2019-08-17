@@ -31,12 +31,22 @@
 ;;; Code:
 
 ;; Quickly switc windows
-(custom-set-faces
- '(aw-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 3.0))))
- '(aw-mode-line-face ((t :inherit mode-line-emphasis :bold t))))
+;; (custom-set-faces
+;;  '(aw-leading-char-face ((t (:inherit font-lock-keyword-face :bold t :height 3.0))))
+;;  '(aw-mode-line-face ((t :inherit mode-line-emphasis :bold t))))
 
 (require 'winner)
 (require-package 'ace-window)
+(require 'ace-window)
+
+(set-face-attribute 'aw-leading-char-face nil
+                    :inherit font-lock-keyword-face
+                    :bold t
+                    :height 3.0)
+
+;; (set-face-attribute 'aw-mode-line-face t
+;;                     :inherit mode-line-emphasis
+;;   :bold t)
 
 ;; run
 (winner-mode t)
