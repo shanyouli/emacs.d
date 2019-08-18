@@ -164,6 +164,14 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   "Import the `*.el' file in the lye-emacs-lisp-dir folder."
   `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
 
+;;Test added third party packages
+(defmacro lye/test-package (pkg-dir &optional pkg-file path)
+  "Add the folder of the trial package to the load-path table and import it."
+  `(let ((pkg-file (or ,pkg-file ,pkg-dir))
+         (path (or ,path lye-emacs-site-lisp-dir)))
+     (push (expand-file-name (format "%s" ,pkg-dir) path) load-path)
+     (require pkg-file)))
+
 ;;; `Load-path'
 (defun lye/add-subdidrs-to-load-path (parent-dir)
   "Adds every non-hidden subdir of PARENT_DIR to `load-path'."
