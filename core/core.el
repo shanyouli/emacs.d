@@ -119,12 +119,13 @@
   "Import all el files in lye-emacs-modules-dir on first run."
   :type 'boolean)
 
-(defcustom lye-use-amx-or-fuzzy 'amx
-  "Because when using the `counsel-M-x', the amx and fuz packages conflict,
-only the fuz is used, not both. If it is 'fuzzy, Only use fuzzy match.
-If it is 'amx, Only use amx and not use fuzzy match."
-  :type '(choice (const :tag "fuzzy match" 'fuzzy)
-                 (const :tag "amx" 'amx)))
+(defcustom lye-use-fuz-or-flx-in-ivy nil
+  "If it is `flx', use fuzzy match with `flx' package.
+If it is `fuz', use fuzzy match with `fuz' package.
+If it is `nil', Not use fuzzy match."
+  :type '(choice (const :tag "fuzzy match" 'flx)
+                 (const :tag "fuzzy" 'fuz)
+                 (const :tag "Null" nil)))
 
 (defcustom lye-enable-sdcv-or-youdao 'sdcv
   "If it is sdcv, use `sdcv' as a translation tool.

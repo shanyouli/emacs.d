@@ -28,18 +28,30 @@
 
 ;; IVY SWIPER, counsel
 
+(pcase lye-use-fuz-or-flx-in-ivy
+  ('fuz
+   (require-package 'fuz)
+   (require 'fuz)
+   (unless (require 'fuz-core nil t)
+     (fuz-build-and-load-dymod))
+   (setq ivy-sort-matches-functions-alist '((t . ivy-fuz-sort-fn)))
+   (setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy)))
+
+   (with-eval-after-load 'ivy
+     (require 'ivy-fuz)
+     (add-to-list 'ivy-highlight-functions-alist '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn))))
+
+  ('flx
+   (require-package 'flx)
+   (require 'flx)
+   (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))))
+
+(lye/modules-require 'iex-amx)
+
 ;;; Code:
 (require-package 'ivy)
 (require-package 'counsel)
 (require 'counsel)
-
-(pcase lye-use-amx-or-fuzzy
-  ('fuzzy
-   (if (and (locate-library "fuz-core") (locate-library "ivy-fuz"))
-       (lye/modules-require 'lex-fuz)))
-  ('amx
-   (if (locate-library "amx")
-       (lye/modules-require 'iex-amx))))
 
 (setq enable-recursive-minibuffers t) ; Allow commands in minibuffers
 (setq ivy-use-selectable-prompt t)
@@ -53,9 +65,7 @@
 (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow)
 
 ;; Fuzzy search
-;; (if (locate-library "flx")
-;;     (setq ivy-re-builders-alist
-;;           '((t . ivy--regex-fuzzy))))
+;; (if (locate-library "flx"))
 
 (when (locate-library "magit")
   (setq magit-completing-read-function 'ivy-completing-read))
