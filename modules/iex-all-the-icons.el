@@ -42,6 +42,10 @@
 (push '("\\.mkv$" all-the-icons-faicon "film" :face all-the-icons-blue)
       all-the-icons-icon-alist)
 
+(when (locate-library "vterm")
+  (push '(vterm-mode all-the-icons-faicon "terminal" :face all-the-icons-yellow)
+        all-the-icons-mode-icon-alist))
+
 (provide 'iex-all-the-icons)
 
 ;;; iex-all-the-icons.el ends here
