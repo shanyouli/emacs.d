@@ -1,4 +1,4 @@
-;;; iex-vterm.el --- initialize Vterm -*- lexical-binding: t -*-
+;;; iex-term.el --- initialize Vterm -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
@@ -31,12 +31,17 @@
 ;;; Code:
 
 ;; @see https://github.com/akermu/emacs-libvterm#installation
-(when (and (executable-find "make")
+(if (and (executable-find "make")
            (executable-find "libtool")
            (executable-find "cmake"))
-  (require-package 'vterm)
-  (require 'vterm))
+    (progn
+      (require-package 'vterm)
+      (require 'vterm)
+      (require-package 'vterm-toggle)
+      (defalias 'term-toggle  'vterm-toggle))
+  (require-package 'multi-term)
+  (defalias 'term-toggle  'multi-term))
 
-(provide 'iex-vterm)
+(provide 'iex-term)
 
-;;; iex-vterm.el ends here
+;;; iex-term.el ends here

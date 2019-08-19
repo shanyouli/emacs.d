@@ -74,7 +74,7 @@
 (lazy-load-global-keys '(("M-s" . one-key-menu-avy)) "iex-avy")
 
 ;; iex-vterm
-(lazy-load-global-keys '(("C-x s v" . vterm)) "iex-vterm")
+(lazy-load-global-keys '(("C-x s v" . term-toggle)) "iex-term")
 
 ;; iex-speed-type.el
 (lazy-load-global-keys '(("C-z g s" . speed-type-text)) "iex-speed-type")

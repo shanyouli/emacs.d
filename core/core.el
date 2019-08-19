@@ -168,10 +168,10 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 ;;Test added third party packages
 (defmacro lye/test-package (pkg-dir &optional pkg-file path)
   "Add the folder of the trial package to the load-path table and import it."
-  `(let ((pkg-file (or ,pkg-file ,pkg-dir))
+  `(let ((pkg (or ,pkg-file ,pkg-dir))
          (path (or ,path lye-emacs-site-lisp-dir)))
      (push (expand-file-name (format "%s" ,pkg-dir) path) load-path)
-     (require pkg-file)))
+     (load-library (format "%s" pkg))))
 
 ;;; `Load-path'
 (defun lye/add-subdidrs-to-load-path (parent-dir)

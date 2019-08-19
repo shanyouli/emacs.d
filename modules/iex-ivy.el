@@ -27,6 +27,7 @@
 ;;; Commentary:
 
 ;; IVY SWIPER, counsel
+;;(setq lye-use-fuz-or-flx-in-ivy 'fuz)
 
 (pcase lye-use-fuz-or-flx-in-ivy
   ('fuz
@@ -38,8 +39,13 @@
    (setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy)))
 
    (with-eval-after-load 'ivy
-     (require 'ivy-fuz)
-     (add-to-list 'ivy-highlight-functions-alist '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn))))
+     (let ((ivy-fuz-file (expand-file-name "ivy-fuz.el" lye-emacs-cache-dir)))
+     (unless (file-exists-p ivy-fuz-file)
+       (unless (featurep 'core-funcs)
+         (lye/core-require 'core-funcs))
+       (download-a-file "https://github.com/cireu/fuz.el/raw/master/ivy-fuz.el" ivy-fuz-file))
+     (load ivy-fuz-file :no-error :no-message)
+     (add-to-list 'ivy-highlight-functions-alist '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn)))))
 
   ('flx
    (require-package 'flx)
