@@ -29,10 +29,10 @@
 ;; snails
 
 ;;; Code:
-
-(require 'fuz)
 (require 'snails)
-(setq snails-fuz-library-load-status "load")
+(when (locate-library "fuz-core")
+  (require 'fuz)
+  (setq snails-fuz-library-load-status "load"))
 
 ;; Make the theme of the snails window change as the theme of the change changes
 (when (boundp 'after-load-theme-hook)

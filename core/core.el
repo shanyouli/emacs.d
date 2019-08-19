@@ -142,6 +142,10 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   :type '(choice (string :tag "Fire Name")
                  (const :tag "Error" nil)))
 
+;; Set the temporal directory
+(unless (file-exists-p lye-emacs-cache-dir)
+  (make-directory lye-emacs-cache-dir))
+
 ;;; Load `custom-file'
 (setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
 
@@ -150,10 +154,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
     (copy-file lye-emacs-custom-temp-file custom-file))
 
 (if (file-exists-p custom-file) (load custom-file))
-
-;; Set the temporal directory
-(unless (file-exists-p lye-emacs-cache-dir)
-  (make-directory lye-emacs-cache-dir))
 
 ;; modules
 (defmacro lye/modules-require (pkg)
