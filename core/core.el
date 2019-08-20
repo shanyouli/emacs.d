@@ -206,6 +206,14 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 
 (lye/update-load-path)
 
+(add-hook 'after-init-hook
+          (lambda ()
+            (run-with-idle-timer
+             5 nil
+             (lambda ()
+               (lye/core-require 'core-funcs)
+               (setq load-path (delete-same-element-in-list load-path))))))
+
 ;;; bechmark-init
 (when lye-enable-benchmark-p
   (require 'benchmark-init-modes)

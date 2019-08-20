@@ -69,6 +69,15 @@
   (dolist (f (directory-files lye-emacs-modules-dir t "\\.el\\'"))
     (load f :no-error :no-message)))
 
+(defun delete-same-element-in-list (list)
+  "Delete the same element in a list."
+  (let ((new-list nil))
+    (while list
+      (when (and (car list) (not (member (car list) new-list)))
+        (setq new-list (cons (car list) new-list)))
+      (setq list (cdr list)))
+    (nreverse new-list)))
+
 (provide 'core-funcs)
 
 ;;; core-funcs.el ends here
