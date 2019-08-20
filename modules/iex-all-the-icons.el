@@ -29,8 +29,7 @@
 ;; Add some icons of files that are not collected by all-the-icons-icon-alist
 
 ;;; Code:
-(unless (featurep 'package)
-  (lye/core-require 'core-elpa))
+(lye/core-require 'core-elpa)
 
 (require-package 'all-the-icons)
 (require 'all-the-icons)

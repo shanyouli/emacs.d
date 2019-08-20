@@ -47,7 +47,7 @@
   (interactive)
   (if (locate-library "posframe")
       (progn
-        (or (featurep 'posframe) (require 'posframe))
+         (require 'posframe)
         (let ((word (youdao-dictionary--region-or-word)))
           (if word
               (progn

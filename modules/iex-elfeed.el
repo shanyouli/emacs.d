@@ -43,6 +43,7 @@
           "https://manateelazycat.github.io/feed.xml"
           "https://planet.emacslife.com/atom.xml"))
 
+(lye/modules-require 'iex-pretty-hydra)
 (pretty-hydra-define toggle-hydra-elfeed
   (:title (pretty-hydra-title "Elfeed" 'faicon "rss-square")
    :color amaranth :quit-key "q")

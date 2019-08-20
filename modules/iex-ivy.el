@@ -41,8 +41,7 @@
    (with-eval-after-load 'ivy
      (let ((ivy-fuz-file (expand-file-name "ivy-fuz.el" lye-emacs-cache-dir)))
      (unless (file-exists-p ivy-fuz-file)
-       (unless (featurep 'core-funcs)
-         (lye/core-require 'core-funcs))
+       (lye/core-require 'core-funcs)
        (download-a-file "https://github.com/cireu/fuz.el/raw/master/ivy-fuz.el" ivy-fuz-file))
      (load ivy-fuz-file :no-error :no-message)
      (add-to-list 'ivy-highlight-functions-alist '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn)))))

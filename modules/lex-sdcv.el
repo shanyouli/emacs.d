@@ -31,7 +31,7 @@
 ;;; Code:
 
 (if (locate-library "posframe")
-    (or (featurep 'posframe) (require 'posframe))
+    (require 'posframe)
   (require-package 'posframe)
   (require 'posframe))
 
@@ -66,7 +66,7 @@
   (interactive)
   (let ((word (sdcv-search-with-dictionary world sdcv-dictionary-simple-list)))
     (when word
-      (or (featurep 'pos-tip) (require 'pos-tip))
+      (require 'pos-tip)
       (pos-tip-show word nil nil nil 0))))
 
 (defun sdcv-search-at-point++ ()
