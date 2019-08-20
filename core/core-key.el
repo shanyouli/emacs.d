@@ -42,12 +42,12 @@
 (lazy-load-global-keys '(("C-z r" . restart-emacs)) "restart-emacs")
 
 ;; aweshell
-(lazy-load-global-keys
- '(
-   ("C-x s n" . aweshell-new)
-   ("C-x s a" . aweshell-toggle)
-   ("C-x s d" . aweshell-dedicated-toggle))
- "aweshell")
+;; (lazy-load-global-keys
+;;  '(
+;;    ("C-x s n" . aweshell-new)
+;;    ("C-x s a" . aweshell-toggle)
+;;    ("C-x s d" . aweshell-dedicated-toggle))
+;;  "aweshell")
 
 ;; Chinese automatically translated as English
 (lazy-load-global-keys

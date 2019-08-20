@@ -198,5 +198,10 @@ Lisp function does not specify a special indentation."
 ;; Semantic code search for emacs lisp
 (use-package elisp-refs)
 
+;; Function that highlights global variables
+(when (locate-library "elispfl")
+  (require 'elispfl)
+  (add-hook 'emacs-lisp-mode-hook #'elispfl-mode))
+
 (provide 'init-elisp)
 ;;; init-elisp.el ends here

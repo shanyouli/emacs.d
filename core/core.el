@@ -166,12 +166,15 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
 
 ;;Test added third party packages
-(defmacro lye/test-package (pkg-dir &optional pkg-file path)
+(defmacro lye/test-package (pkg-base-dir &optional pkg-file path-dir)
   "Add the folder of the trial package to the load-path table and import it."
-  `(let ((pkg (or ,pkg-file ,pkg-dir))
-         (path (or ,path lye-emacs-site-lisp-dir)))
-     (push (expand-file-name (format "%s" ,pkg-dir) path) load-path)
-     (load-library (format "%s" pkg))))
+  `(let* ((pkg (or ,pkg-file ,pkg-base-dir))
+          (path (or ,path-dir ,lye-emacs-site-lisp-dir))
+          (apath (expand-file-name (format "%s" ,pkg-base-dir) path)))
+     (if (file-directory-p apath)
+         (or (member apath load-path)
+             (put apath load-path)))
+     (require pkg)))
 
 ;;; `Load-path'
 (defun lye/add-subdidrs-to-load-path (parent-dir)
@@ -208,9 +211,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   (require 'benchmark-init-modes)
   (require 'benchmark-init)
   (benchmark-init/activate))
-
-;; Load .el if newer than corresponding .elc
-(setq load-prefer-newer t)
 
 (provide 'core)
 

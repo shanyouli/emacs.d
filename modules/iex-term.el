@@ -37,8 +37,13 @@
     (progn
       (require-package 'vterm)
       (require 'vterm)
-      (require-package 'vterm-toggle)
-      (defalias 'term-toggle  'vterm-toggle))
+      (defun term-toggle ()
+        (interactive)
+        (if (member "vterm" (mapcar #'buffer-name (buffer-list)))
+            (if (string= "vterm" (buffer-name (current-buffer)))
+                (kill-buffer "vterm")
+              (switch-to-buffer "vterm"))
+          (vterm))))
   (require-package 'multi-term)
   (defalias 'term-toggle  'multi-term))
 

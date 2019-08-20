@@ -34,6 +34,8 @@
 (defun lye/exec-path-from-shell-init ()
   "Avoid importing `exec-path-from-shell' on some operating systems."
   (when (memq window-system '(mac ns x))
+    (or (locate-library "exec-path-from-shell")
+        (require-package 'exec-path-from-shell))
     (require 'exec-path-from-shell)
     (require 'cache-path-from-shell)
     (setq exec-path-from-shell-check-startup-files nil)

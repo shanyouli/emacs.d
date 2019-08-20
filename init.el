@@ -79,6 +79,8 @@ decrease this. If you experience stuttering, increase this.")
 ;; prevent stable, byte-compiled code from running. However, if you're getting
 ;; recursive load errors, it may help to set this to nil.
 (setq load-prefer-newer noninteractive)
+;; Load .el if newer than corresponding .elc
+;; (setq load-prefer-newer t)
 
 ;; Let 'er rip!
 (eval-when-compile
@@ -101,12 +103,9 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-package)        ; packages initialization
 (lye/core-require 'core-elpa)           ; package management tool
 
-
 (lye/init-require 'init-key)          ; Keybindings
-
 (lye/init-require 'init-edit)         ; better edit
 (lye/init-require 'init-shackle)      ; Window rule
-
 (lye/init-require 'init-dired)        ; Dired
 (lye/init-require 'init-reads)        ; Reader tools
 (lye/init-require 'init-company)      ; company
@@ -142,11 +141,6 @@ decrease this. If you experience stuttering, increase this.")
      (load-all-module-file)
      (if (file-exists-p custom-file)
          (append-to-file "\n (setq lye-load-all-module-file-p t)" nil custom-file)))))
-
-;; Function that highlights global variables
-(when (locate-library "elispfl")
-  (require 'elispfl)
-  (add-hook 'emacs-lisp-mode-hook #'elispfl-mode))
 
 (provide 'init)
 

@@ -43,9 +43,6 @@
 [submodule "esup"]
 	path = site-lisp/esup
 	url = https://github.com/jschaf/esup.git
-[submodule "aweshell"]
-	path = site-lisp/aweshell
-	url = https://github.com/manateelazycat/aweshell.git
 [submodule "emacs-noflet"]
 	path = site-lisp/emacs-noflet
 	url = https://github.com/nicferrier/emacs-noflet.git
@@ -88,3 +85,6 @@
 [submodule "elispfl"]
 	path = site-lisp/elispfl
 	url = https://github.com/cireu/elispfl.git
+[submodule "exec-path-from-shell"]
+	path = site-lisp/exec-path-from-shell
+	url = https://github.com/purcell/exec-path-from-shell.git
