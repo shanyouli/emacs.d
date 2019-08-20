@@ -42,6 +42,9 @@
 (defvar liberime-user-dir (expand-file-name "pyim/rime" user-emacs-directory)
   "Rime data save location.")
 
+(defvar liberime-default-custom-file
+  (expand-file-name "rime/default.custom.yaml" lye-emacs-share-dir))
+
 (defvar use-liberime-p nil
   "Whether Liberime-module has been loaded.")
 
@@ -57,12 +60,17 @@
                   (file-name-directory (locate-library "liberime-config"))))
              (liberime--module
               (concat liberime--root "build/liberime" module-file-suffix)))
-        (unless (featurep 'pyim)
-          (lye/modules-require 'lex-pyim))
+
+        (lye/modules-require 'lex-pyim)
 
         (unless (and liberime--module (featurep 'liberime))
           (load liberime--module :no-error :no-message))
 
+        (unless (file-directory-p liberime-user-dir)
+          (make-directory liberime-user-dir))
+        (let ((cf (expand-file-name "default.custom.yaml" liberime-user-dir)))
+          (unless (file-exists-p cf)
+            (copy-file liberime-default-custom-file cf)))
         t)
     nil))
 

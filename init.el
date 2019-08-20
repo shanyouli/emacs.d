@@ -101,29 +101,28 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-package)        ; packages initialization
 (lye/core-require 'core-elpa)           ; package management tool
 
-(with-temp-message ""                   ; Erase the output of the plugin startup
-  (lye/init-require 'init-hydras)
-  (lye/init-require 'init-key)          ; Keybindings
 
-  (lye/init-require 'init-edit)         ; better edit
-  (lye/init-require 'init-shackle)      ; Window rule
+(lye/init-require 'init-key)          ; Keybindings
 
-  (lye/init-require 'init-dired)        ; Dired
-  (lye/init-require 'init-reads)        ; Reader tools
-  (lye/init-require 'init-company)      ; company
+(lye/init-require 'init-edit)         ; better edit
+(lye/init-require 'init-shackle)      ; Window rule
 
-  (run-with-idle-timer 0.1 nil  (lambda ()
-                                  ;; Program language common tool
-                                  (lye/init-require 'init-lang)
-                                  (lye/init-require 'init-elisp)
-                                  (lye/init-require 'init-scheme)
-                                  (lye/init-require 'init-sh)
-                                  (lye/init-require 'init-lua)
-                                  (lye/init-require 'init-python)))
-  ;; Org mode
-  (run-with-idle-timer 1 nil (lambda ()
-                               (lye/init-require 'init-hugo)
-                               (lye/init-require 'init-org))))
+(lye/init-require 'init-dired)        ; Dired
+(lye/init-require 'init-reads)        ; Reader tools
+(lye/init-require 'init-company)      ; company
+
+(run-with-idle-timer 0.1 nil  (lambda ()
+                                ;; Program language common tool
+                                (lye/init-require 'init-lang)
+                                (lye/init-require 'init-elisp)
+                                (lye/init-require 'init-scheme)
+                                (lye/init-require 'init-sh)
+                                (lye/init-require 'init-lua)
+                                (lye/init-require 'init-python)))
+;; Org mode
+(run-with-idle-timer 1 nil (lambda ()
+                             (lye/init-require 'init-hugo)
+                             (lye/init-require 'init-org)))
 
 ;; get emascs startup time
 ;; (add-hook 'emacs-startup-hook

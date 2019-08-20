@@ -35,7 +35,7 @@
 (require 'all-the-icons)
 
 (push '("\\.lua\\(\\.template\\|\\)$" all-the-icons-fileicon  "lua"
-        :height 1.0 :face all-the-icons-purple)
+        :height 1.0 :face all-the-icons-blue)
       all-the-icons-icon-alist)
 
 (push '("\\.mkv$" all-the-icons-faicon "film" :face all-the-icons-blue)
