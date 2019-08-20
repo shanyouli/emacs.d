@@ -35,8 +35,8 @@
   (setq snails-fuz-library-load-status "load"))
 
 ;; Make the theme of the snails window change as the theme of the change changes
-(when (boundp 'after-load-theme-hook)
-  (add-hook 'after-load-theme-hook #'snails-init-face-with-theme))
+;; (when (boundp 'after-load-theme-hook)
+;;   (add-hook 'after-load-theme-hook #'snails-init-face-with-theme))
 
 (provide 'lex-snails)
 
