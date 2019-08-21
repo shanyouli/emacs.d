@@ -39,9 +39,9 @@
   (sh-mode .
            (lambda ()
              ;; Determine if the shell using the running script is zsh or bash
-             (let ((f (buffer-file-name)))
-               (if (and f (or (setq f (file-name-base f))
-                              (string-match "^\\.zsh\\(\\rc\\|\\env\\|func\\)$" f)
+             (let*  ((f (buffer-file-name))
+                     (f (if f (file-name-nondirectory f) nil)))
+               (if (and f (or (string-match "^\\.zsh\\(\\rc\\|\\env\\|func\\)$" f)
                               (string-match "\\.zsh$" f)
                               (string-match "^\\.zlogin$" f)))
                    (sh-set-shell "zsh")

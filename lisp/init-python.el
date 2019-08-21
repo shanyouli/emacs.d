@@ -62,6 +62,7 @@
                   (require-package 'lsp-python-ms)
                   (require 'lsp-python-ms)
                   (setq lsp-python-ms-executable "/usr/bin/mspyls"))
+                (setq lsp-session-file (concat lye-emacs-cache-dir "lsp-session" ))
                 (lsp)
                 (setq-local company-backends
                             (mapcar #'company-backend-with-yas company-backends))))))
