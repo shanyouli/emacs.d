@@ -36,8 +36,13 @@
 
 (add-hook 'lua-mode-hook
           (lambda ()
+            (lye/exec-path-from-shell-init)
+            (when (executable-find "luacheck")
+              (lye/modules-require 'iex-flycheck)
+              (flycheck-mode +1))
             (setq-local company-backends
-                        (cons '(company-tabnine company-lua company-yasnippet) company-backends))))
+                        (cons '(company-lua company-tabnine company-yasnippet)
+                              company-backends))))
 
 (provide 'init-lua)
 ;;; init-lua.el ends here

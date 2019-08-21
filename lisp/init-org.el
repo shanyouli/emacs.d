@@ -25,6 +25,8 @@
 ;;; Code:
 (eval-when-compile (require 'cl))
 
+(and (featurep 'doom-themes) (require 'doom-themes-ext-org))
+
 (use-package org
   :commands org-mode
   :bind (("C-c a" . org-agenda)
@@ -50,8 +52,6 @@
                       (push '("#+BEGIN_SRC" . "λ") prettify-symbols-alist)
                       (push '("#+END_SRC" . "λ") prettify-symbols-alist))
                     (prettify-symbols-mode)))
-  :init
-  (require 'doom-themes-ext-org)
   :config
   (define-key org-mode-map (kbd "M-e") nil))
 
