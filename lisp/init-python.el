@@ -51,12 +51,20 @@
 
 (add-hook 'python-mode-hook
           (lambda () (require 'pyenv-mode-auto)
-            (when (executable-find "pyls")
-               (lye/modules-require 'iex-lsp)
-               (lsp)
-               (setq-local company-backends
-                           (mapcar #'company-backend-with-yas company-backends))
-               )))
+            (let* ((pylsp (cond
+                           ((executable-find "mspyls")
+                            'mspyls)
+                           ((executable-find "pyls")
+                            'pyls)
+                           (t nil))))
+              (when pylsp
+                (when (eq pylsp 'mspyls)
+                  (require-package 'lsp-python-ms)
+                  (require 'lsp-python-ms)
+                  (setq lsp-python-ms-executable "/usr/bin/mspyls"))
+                (lsp)
+                (setq-local company-backends
+                            (mapcar #'company-backend-with-yas company-backends))))))
 
 (provide 'init-python)
 ;;; init-python.el ends here
