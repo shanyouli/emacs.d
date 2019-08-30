@@ -88,3 +88,6 @@
 [submodule "xr"]
 	path = site-lisp/xr
 	url = https://github.com/mattiase/xr.git
+[submodule "awesome-tray"]
+	path = site-lisp/awesome-tray
+	url = git@github.com:shanyouli/awesome-tray.git

@@ -193,7 +193,7 @@
 
   (setq awesome-tab-hide-tab-function 'lye/awesome-tab-hide-tab)
 
-  ;;  (setq awesome-tab-face-height 130)
+   (setq awesome-tab-face-height 130)
 
   (add-hook 'after-init-hook
             (lambda ()

@@ -98,7 +98,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-autoload)       ; Generate autoload file
 (lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-ui)             ; UI
-;;(lye/core-require 'core-modeline)       ; mode-line
+(lye/core-require 'core-modeline)       ; mode-line
 (lye/core-require 'core-os)             ; OS environmental variable
 (lye/core-require 'core-package)        ; packages initialization
 (lye/core-require 'core-elpa)           ; package management tool
