@@ -25,18 +25,21 @@
 ;;; Code:
 
 ;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold (* 2 1024 1024))
-;; (setq gc-cons-percentage 0.1)
+
+;; (setq package-enable-at-startup nil)
+
+;; Defer garbage collection further back in the startup process
+(setq gc-cons-threshold 268435456)
+
+;; Package initialize occurs automatically, before `user-init-file' is
+;; loaded, but after `early-init-file'. Doom handles package
+;; initialization, so we must prevent Emacs from doing it early!
 (setq package-enable-at-startup nil)
 
-(unless (and (display-graphic-p) (eq system-type 'darwin))
-  ;;(setq menu-bar-mode nil)
-  (menu-bar-mode -1))
+;; Prevent the glimpse of un-styled Emacs by setting these early.
+(add-to-list 'default-frame-alist '(tool-bar-lines . 0))
+(add-to-list 'default-frame-alist '(menu-bar-lines . 0))
+(add-to-list 'default-frame-alist '(vertical-scroll-bars))
 
-(setq tool-bar-mode nil)
-(setq scroll-bar-mode nil)
-
-(modify-all-frames-parameters '((vertical-scroll-bars)))
-
-(provide 'early-init)
-;;; early-init.el ends here
+;; One less file to load at startup
+(setq site-run-file nil)

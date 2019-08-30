@@ -154,9 +154,7 @@
                          "Hiragio Sans GB")
                         (system/windows
                          "Microsoft Yahei")))
-
   (setq setup-font-default-size 14)
-  ;;  (require 'setup-font)
   (setup-font-initialize)
 
   ;; THEME
@@ -168,7 +166,7 @@
                                (require 'doom-themes)
                                (theme-switch-light-or-dark-theme)))
 
-;;; awesome-tab
+  ;; awesome-tab
   (setq awesome-tab-style 'slant) ; awesome-tab style
 
   (defun lye/awesome-tab-hide-tab (x)
@@ -195,13 +193,11 @@
 
   (setq awesome-tab-hide-tab-function 'lye/awesome-tab-hide-tab)
 
-  (setq awesome-tab-face-height 110)  ;;Set the height of awesome-tab-face-hieght to 110
+  ;;  (setq awesome-tab-face-height 130)
 
   (add-hook 'after-init-hook
             (lambda ()
               (lye/modules-require 'iex-all-the-icons)
-              ;; (when (locate-library "all-the-icons") ; require all-the-icons
-              ;;   (require 'all-the-icons))
               (awesome-tab-mode)
 
               (when (boundp 'after-load-theme-hook)

@@ -23,8 +23,8 @@
 ;;
 
 ;;; Code:
-(eval-when-compile (require 'cl))
-
+(require 'cl-seq)
+(require 'cl-lib)
 (and (featurep 'doom-themes) (require 'doom-themes-ext-org))
 
 (use-package org
@@ -37,6 +37,8 @@
   :ensure nil
   :hook (org-mode .
                   (lambda ()
+                    (and (string-match "doom-*" (symbol-name (car custom-enabled-themes)))
+                         (require 'doom-themes-ext-org))
                     ;; (auto-fill-mode nil) ; 不自动换行
                     (setq truncate-lines nil) ; 不自动换行
 
@@ -76,7 +78,7 @@
           (lambda ()
             (when (featurep 'company)
               (setq-local company-backends
-                          (remove-if (lambda (x) (eq 'company-tabnine (car x)))
+                          (cl-remove-if (lambda (x) (eq 'company-tabnine (car x)))
                                      company-backends)))))
 
 (use-package org-babel

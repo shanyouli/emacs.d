@@ -37,7 +37,7 @@
   "Find all subdirectories in DIR.
 Dot-directories and directories contain `.nosearch' will be skipped."
   (eval-when-compile (require 'subr-x)
-                     (require 'cl))
+                     (require 'cl-seq))
 
   (thread-last (directory-files dir nil)
     (cl-remove-if (lambda (f)

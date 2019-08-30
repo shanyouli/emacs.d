@@ -31,8 +31,8 @@
 ;;; Code:
 
 ;; depends
-(eval-when-compile (require 'cl))
-
+(require 'cl-macs)
+(require 'cl-seq)
 ;; constant
 
 (defconst system/windows (eq system-type 'windows-nt)
@@ -166,15 +166,15 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
 
 ;;Test added third party packages
-(defmacro lye/test-package (pkg-base-dir &optional pkg-file path-dir)
-  "Add the folder of the trial package to the load-path table and import it."
-  `(let* ((pkg (or ,pkg-file ,pkg-base-dir))
-          (path (or ,path-dir ,lye-emacs-site-lisp-dir))
-          (apath (expand-file-name (format "%s" ,pkg-base-dir) path)))
-     (if (file-directory-p apath)
-         (or (member apath load-path)
-             (put apath load-path)))
-     (require pkg)))
+;; (defmacro lye/test-package (pkg-base-dir &optional pkg-file path-dir)
+;;   "Add the folder of the trial package to the load-path table and import it."
+;;   `(let* ((pkg (or ,pkg-file ,pkg-base-dir))
+;;           (path (or ,path-dir ,lye-emacs-site-lisp-dir))
+;;           (apath (expand-file-name (format "%s" ,pkg-base-dir) path)))
+;;      (if (file-directory-p apath)
+;;          (or (member apath load-path)
+;;              (put apath load-path)))
+;;      (require pkg)))
 
 ;;; `Load-path'
 (defun lye/add-subdidrs-to-load-path (parent-dir)
@@ -183,7 +183,7 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
     (let* ((default-directory parent-dir))
       (setq load-path
             (append
-             (loop for dir in (remove-if
+             (cl-loop for dir in (cl-remove-if
                                (lambda (f) (string-prefix-p "." f))
                                (directory-files parent-dir))
                    unless (not (file-directory-p dir))

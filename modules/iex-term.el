@@ -37,6 +37,7 @@
     (progn
       (require-package 'vterm)
       (require 'vterm)
+      (define-key vterm-mode-map (kbd "C-z") nil)
       (defun term-toggle ()
         (interactive)
         (if (member "vterm" (mapcar #'buffer-name (buffer-list)))

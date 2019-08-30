@@ -89,7 +89,8 @@
   (lye/exec-path-from-shell-init)
   (when (executable-find "markdownfmt")
     (use-package markdownfmt
-      :hook (markdown-mode . markdownfmt-enable-on-save))))
+      :bind (:map markdown-mode-map
+             ("C-c f" . markdownfmt-format-buffer)))))
 
 ;; vimrc-major mode
 (use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))

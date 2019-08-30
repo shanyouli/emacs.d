@@ -32,7 +32,7 @@
 
 (require-package 'pretty-hydra)
 (require 'pretty-hydra)
-
+(require 'cl-macs)
 (cl-defun pretty-hydra-title (title &optional icon-type icon-name
                                       &key face height v-adjust)
     "Add an icon in the hydra title."
