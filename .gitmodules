@@ -52,9 +52,6 @@
 [submodule "lazy-load"]
 	path = site-lisp/lazy-load
 	url = https://github.com/manateelazycat/lazy-load.git
-[submodule "awesome-tray"]
-	path = site-lisp/awesome-tray
-	url = https://github.com/shanyouli/awesome-tray.git
 [submodule "posframe"]
 	path = site-lisp/posframe
 	url = https://github.com/tumashu/posframe.git
