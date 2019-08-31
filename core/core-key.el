@@ -75,9 +75,10 @@
                          "lex-setup-font"))
 
 ;; lex-sdcv
-(if (eq lye-enable-sdcv-or-youdao 'sdcv)
+(if (and (executable-find "sdcv") (eq lye-enable-sdcv-or-youdao 'sdcv))
     (lazy-load-global-keys '(("C-z y" . sdcv-search-at-point++))
-                           "lex-sdcv"))
+                           "lex-sdcv")
+  (setq lye-enable-sdcv-or-youdao 'youdao))
 
 ;; lex-search.el
 (lazy-load-global-keys '(("C-r" . one-key-menu-search)) "lex-search")
