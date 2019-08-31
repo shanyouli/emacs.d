@@ -27,27 +27,21 @@
 ;;; Commentary:
 
 ;; IVY SWIPER, counsel
-;;(setq lye-use-fuz-or-flx-in-ivy 'fuz)
+;; (setq lye-use-fuz-or-flx-in-ivy 'fuz)
 
 (pcase lye-use-fuz-or-flx-in-ivy
   ('fuz
-   (require-package 'fuz)
-   (require 'fuz)
-   (unless (require 'fuz-core nil t)
-     (fuz-build-and-load-dymod))
+   (lye/modules-require 'iex-fuz)
    (setq ivy-sort-matches-functions-alist '((t . ivy-fuz-sort-fn)))
    (setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy)))
 
    (with-eval-after-load 'ivy
-     (let ((ivy-fuz-file (expand-file-name "ivy-fuz.el" lye-emacs-cache-dir)))
-     (unless (file-exists-p ivy-fuz-file)
-       (lye/core-require 'core-funcs)
-       (download-a-file "https://github.com/cireu/fuz.el/raw/master/ivy-fuz.el"
-                        ivy-fuz-file))
-
-     (load ivy-fuz-file :no-error :no-message)
+     (straight-use-package '(ivy-fuz :host github
+                                     :repo "cireu/fuz.el"
+                                     :files ("ivy-fuz.el")))
+     (require 'ivy-fuz)
      (add-to-list 'ivy-highlight-functions-alist
-                  '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn)))))
+                  '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn))))
 
   ('flx
    (require-package 'flx)
@@ -71,9 +65,6 @@
 
 ;; @https://github.com/abo-abo/swiper/issues/2130
 (setcdr (assq t ivy-format-functions-alist) #'ivy-format-function-arrow)
-
-;; Fuzzy search
-;; (if (locate-library "flx"))
 
 (when (locate-library "magit")
   (setq magit-completing-read-function 'ivy-completing-read))

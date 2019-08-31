@@ -30,7 +30,8 @@
 
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
-(when (not (or (eq system-type 'cygwin) system/windows))
+(when (and (display-graphic-p)
+       (not (or system/cygwin system/windows)))
   (add-hook 'after-init-hook
             (lambda ()
               (require 'server)

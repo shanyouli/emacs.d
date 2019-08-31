@@ -102,6 +102,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-os)             ; OS environmental variable
 (lye/core-require 'core-package)        ; packages initialization
 (lye/core-require 'core-elpa)           ; package management tool
+(lye/core-require 'core-straight)       ; staraight
 
 (lye/init-require 'init-key)          ; Keybindings
 (lye/init-require 'init-edit)         ; better edit

@@ -37,13 +37,13 @@
 ;; Restore emacs session.
 (setq initial-buffer-choice t)
 ;; Hide *scratch* buffer after entering the interface
-(run-with-timer 1 nil #'(lambda () (bury-buffer))) ;The start interface is `*Message*'
+(run-with-timer 1 nil #'(lambda () (bury-buffer)))
 
-(fset 'yes-or-no-p 'y-or-n-p)           ;以 y/n代表 yes/no
-(blink-cursor-mode -1)                  ;指针不闪动
-(transient-mark-mode 1)                 ;标记高亮
-(global-subword-mode 1)                 ;Word移动支持 FooBar 的格式
-(setq use-dialog-box nil)               ;never pop dialog
+(fset 'yes-or-no-p 'y-or-n-p)           ; 以 y/n代表 yes/no
+(blink-cursor-mode -1)                  ; 指针不闪动
+(transient-mark-mode 1)                 ; 标记高亮
+(global-subword-mode 1)                 ; Word移动支持 FooBar 的格式
+(setq use-dialog-box nil)               ; never pop dialog
 (setq inhibit-startup-screen t)         ;inhibit start screen
 (setq initial-scratch-message "")       ;关闭启动空白buffer, 这个buffer会干扰session恢复
 (setq-default comment-style 'indent)    ;设定自动缩进的注释风格
@@ -53,7 +53,7 @@
 (setq x-select-enable-clipboard t)      ;支持emacs和外部程序的粘贴
 (setq split-width-threshold nil)        ;分屏的时候使用上下分屏
 (setq inhibit-compacting-font-caches t) ;使用字体缓存，避免卡顿
-(setq profiler-report-cpu-line-format ;让 profiler-report 第一列宽一点
+(setq profiler-report-cpu-line-format   ;让 profiler-report 第一列宽一点
       '((100 left)
         (24 right ((19 right)
                    (5 right)))))
@@ -63,7 +63,6 @@
                    (5 right)))))
 
 ;; Don't ask me when close emacs with process is running
-
 (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
   "Prevent annoying \"Active processes exist\" query when you quit Emacs."
   (require 'noflet)
@@ -131,6 +130,8 @@
       (kill-buffer "*scratch*")))
 
 (add-hook 'after-change-major-mode-hook #'remove-scratch-buffer)
+;; Avoid emacsclient opening *scratch* buffer and getting an error
+(setq initial-buffer-choice '(lambda () (switch-to-next-buffer)))
 
 (provide 'core-generic)
 

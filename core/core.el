@@ -44,6 +44,9 @@
 (defconst system/linux (eq system-type 'gnu/linux)
   "Are we running on a GNU/Linux System?")
 
+(defconst system/cygwin (eq system-type 'cygwin)
+  "Are we running on a cygwin system?")
+
 (defconst *root* (string-equal "root" (getenv "USER"))
   "Are you using ROOT user?")
 

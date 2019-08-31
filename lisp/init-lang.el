@@ -37,28 +37,25 @@
   (use-package yasnippet-snippets))
 
 ;;; prettify-mode
-(use-package prettify-symbols-mode
-  :ensure nil
-  :init
-  (setq-default prettify-symbols-alist
-                '(
-                  ("<-" . "←")
-                  ("->" . ?→)
-                  ("->>" . ?↠)
-                  ("=>" . ?⇒)
-                  ("map" . ?↦)
-                  ("/=" . ?≠)
-                  ("!=" . ?≠)
-                  ("==" . ?≡)
-                  ("<=" . ?≤)
-                  (">=" . ?≥)
-                  ("=<<" . (?= (Br . Bl) ?≪))
-                  (">>=" . (?≫ (Br . Bl) ?=))
-                  ("<=<" . ?↢)
-                  (">=>" . ?↣)
-                  ("&&" . ?∧)
-                  ("||" . ?∨)))
-  (setq prettify-symbols-unprettify-at-point 'right-edge))
+(setq-default prettify-symbols-alist
+              '(
+                ("<-" . "←")
+                ("->" . ?→)
+                ("->>" . ?↠)
+                ("=>" . ?⇒)
+                ("map" . ?↦)
+                ("/=" . ?≠)
+                ("!=" . ?≠)
+                ("==" . ?≡)
+                ("<=" . ?≤)
+                (">=" . ?≥)
+                ("=<<" . (?= (Br . Bl) ?≪))
+                (">>=" . (?≫ (Br . Bl) ?=))
+                ("<=<" . ?↢)
+                (">=>" . ?↣)
+                ("&&" . ?∧)
+                ("||" . ?∨)))
+(setq prettify-symbols-unprettify-at-point 'right-edge)
 
 ;;; Program Languages
 

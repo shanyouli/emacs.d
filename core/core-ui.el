@@ -77,13 +77,14 @@
 (defun lye/restore-frame-size (&optional frame)
   "Frame default size configuration."
   (interactive)
-  (when frame (select-frame frame))
-  (if ( and (boundp system/windows) system/windows)
-      (progn
-        (set-frame-width (selected-frame) (lye/frame-default-width))
-        (set-frame-height (selected-frame) (lye/frame-default-height)))
-    (set-frame-size (selected-frame)
-                    (lye/frame-default-width) (lye/frame-default-height))))
+  (when (display-graphic-p)
+    (when frame (select-frame frame))
+    (if ( and (boundp system/windows) system/windows)
+        (progn
+          (set-frame-width (selected-frame) (lye/frame-default-width))
+          (set-frame-height (selected-frame) (lye/frame-default-height)))
+      (set-frame-size (selected-frame)
+                      (lye/frame-default-width) (lye/frame-default-height)))))
 
 ;; @see https://github.com/manateelazycat/lazycat-emacs/blob/master/site-lisp/extensions/lazycat/fullscreen.el
 (defun fullscreen ()
@@ -126,6 +127,15 @@
     ;; 非Mac平台直接全屏
     (fullscreen)))
 
+;; THEME
+(setq theme-switch-light      'doom-one-light
+      theme-switch-dark       'doom-one
+      theme-switch-light-time "08:30"
+      theme-switch-dark-time  "19:30")
+(add-hook 'after-init-hook (lambda ()
+                             (require 'doom-themes)
+                             (theme-switch-light-or-dark-theme)))
+
 (when (display-graphic-p)
   ;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
   ;; top, left ...
@@ -156,15 +166,6 @@
                          "Microsoft Yahei")))
   (setq setup-font-default-size 14)
   (setup-font-initialize)
-
-  ;; THEME
-  (setq theme-switch-light      'doom-one-light
-        theme-switch-dark       'doom-one
-        theme-switch-light-time "08:30"
-        theme-switch-dark-time  "19:30")
-  (add-hook 'after-init-hook (lambda ()
-                               (require 'doom-themes)
-                               (theme-switch-light-or-dark-theme)))
 
   ;; awesome-tab
   (setq awesome-tab-style 'slant) ; awesome-tab style
