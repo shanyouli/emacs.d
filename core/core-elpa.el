@@ -101,21 +101,6 @@
     (package-refresh-contents)
     (require-package package min-version t))))
 
-;;; Setup `use-package'
-;; Should set before loading `use-package'
-;; (require-package 'use-package)
-
-;; (eval-when-compile (require 'use-package))
-
-;; (eval-and-compile (setq use-package-always-ensure t)
-;;                   (setq use-package-always-defer t)
-;;                   (setq use-package-expand-minimally t)
-;;                   (setq use-package-enable-imenu-support t))
-
-;; Extensions
-;; (use-package diminish)
-;; (use-package bind-key)
-
 ;; pardox
 (run-with-idle-timer 5 nil (lambda () (lye/modules-require 'iex-paradox)))
 

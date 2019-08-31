@@ -68,12 +68,7 @@
   (message "Initializing straight")
   (doom-ensure-straight)
   (require 'straight)
-  (mapc #'straight-use-recipes straight-core-package-sources)
-  (straight-register-package
-   `(straight :type git :host github
-              :repo ,(format "%s/straight.el" straight-repository-user)
-              :files ("straight*.el")
-              :branch ,straight-repository-branch)))
+  (mapc #'straight-use-recipes straight-core-package-sources))
 
 (defun package! (pkg-name &optional loadp use-straight-p)
   "Install a package"
@@ -81,8 +76,11 @@
           (consp pkg-name))
       (straight-use-package pkg-name)
     (require-package pkg-name))
+
   (when loadp
-    (let ((package-name (if (consp pkg-name) (car pkg-name) pkg-name)))
+    (let ((package-name (if (consp pkg-name)
+                            (car pkg-name)
+                          pkg-name)))
       (require package-name))))
 
 (straight-initialize-packages)
@@ -92,6 +90,10 @@
 
 (use-package bind-key
   :straight t)
+
+
+;; some useful library
+(package! 's nil t)
 
 (provide 'core-straight)
 

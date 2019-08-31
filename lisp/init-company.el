@@ -90,14 +90,6 @@
   ;; Note: Must be the last to involve all backends
   (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
 
-;; Popup documentation for completion candidates
-;; (when (display-graphic-p)
-;;   (use-package company-quickhelp
-;;     :bind (:map company-active-map
-;;            ("M-h" . company-quickhelp-manual-begin))
-;;     :hook (global-company-mode . company-quickhelp-mode)
-;;     :config (setq company-quickhelp-delay 0.8)))
-
 ;; Use company-posframe
 (add-hook 'company-mode
           (lambda ()

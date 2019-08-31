@@ -1,4 +1,4 @@
-;;; lex-snails.el --- Multiple backend search tools -*- lexical-binding: t -*-
+;;; iex-snails.el --- Multiple backend search tools -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
@@ -37,6 +37,6 @@
 (lye/modules-require 'iex-fuz)
 (setq snails-fuz-library-load-status "load")
 
-(provide 'lex-snails)
+(provide 'iex-snails)
 
-;;; lex-snails.el ends here
+;;; iex-snails.el ends here
