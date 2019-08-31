@@ -37,6 +37,9 @@
 (push '("\\(\\.\\|\\)conf\\(ig\\|\\)" all-the-icons-fileicon "config" :height 1.0 :face all-the-icons-blue)
       all-the-icons-icon-alist)
 
+;;------------------------------------------------------------------------------
+;; icons
+;;------------------------------------------------------------------------------
 (push '("\\.lua\\(\\.template\\|\\)$" all-the-icons-fileicon  "lua"
         :height 1.0 :face all-the-icons-blue)
       all-the-icons-icon-alist)
@@ -44,6 +47,9 @@
 (push '("\\.mkv$" all-the-icons-faicon "film" :face all-the-icons-blue)
       all-the-icons-icon-alist)
 
+;;------------------------------------------------------------------------------
+;; mode icons
+;;------------------------------------------------------------------------------
 (push '(vterm-mode all-the-icons-faicon "terminal" :face all-the-icons-yellow)
       all-the-icons-mode-icon-alist)
 
@@ -52,6 +58,12 @@
 
 (push '(conf-unix-mode all-the-icons-fileicon "config" :face all-the-icons-yellow)
       all-the-icons-mode-icon-alist)
+
+;;------------------------------------------------------------------------------
+;; dir-icons
+;;------------------------------------------------------------------------------
+(push '("Videos?" all-the-icons-faicon "film")
+      all-the-icons-dir-icon-alist)
 
 (provide 'iex-all-the-icons)
 

@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-(require-package 'amx)
+(straight-use-package 'amx)
 (require 'amx)
 (let ((smex-file (expand-file-name "smex-items" lye-emacs-cache-dir)))
   (if (file-exists-p smex-file)

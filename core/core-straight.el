@@ -49,26 +49,6 @@
       straight-recipes-emacsmirror-use-mirror t
       straight-process-buffer " *straight-process*")
 
-;; (defun doom-ensure-straight ()
-;;   "Ensure `straight' is installed and was compiled with this version of Emacs."
-;;   (defvar bootstrap-version)
-;;   (let* (;; Force straight to install into ~/.emacs.d/.local/straight instead of
-;;          ;; ~/.emacs.d/straight by pretending `doom-local-dir' is our .emacs.d.
-;;          (user-emacs-directory straight-base-dir)
-;;          (bootstrap-file (concat straight-base-dir "straight/repos/straight.el/straight.el"))
-;;          (bootstrap-version 5))
-;;     (make-directory (concat straight-base-dir "straight/build") 'parents)
-;;     (unless (featurep 'straight)
-;;       (unless (or (require 'straight nil t)
-;;                   (file-readable-p bootstrap-file))
-;;         (with-current-buffer
-;;             (url-retrieve-synchronously
-;;              "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-;;              'silent 'inhibit-cookies)
-;;           (goto-char (point-max))
-;;           (eval-print-last-sexp)))
-;;       (load bootstrap-file nil t))))
-
 (defun doom-ensure-straight ()
   (defvar bootstrap-version)
   (let ((bootstrap-file
@@ -95,12 +75,20 @@
               :files ("straight*.el")
               :branch ,straight-repository-branch)))
 
+(defun package! (pkg-name &optional loadp use-straight-p)
+  "Install a package"
+  (if (or use-straight-p
+          (consp pkg-name))
+      (straight-use-package pkg-name)
+    (require-package pkg-name))
+  (when loadp
+    (let ((package-name (if (consp pkg-name) (car pkg-name) pkg-name)))
+      (require package-name))))
+
 (straight-initialize-packages)
 
 ;; use package
-(straight-use-package 'use-package)
-(require 'use-package)
-;;(setq straight-use-package-by-default t)
+(package! 'use-package t t)
 
 (use-package bind-key
   :straight t)
