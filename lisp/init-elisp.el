@@ -190,13 +190,14 @@ Lisp function does not specify a special indentation."
 
 ;; Interacitve macro expander
 (use-package macrostep
+  :ensure t
   :bind (:map emacs-lisp-mode-map
           ("C-c e" . macrostep-expand)
           :map lisp-interaction-mode-map
           ("C-c e" . macrostep-expand)))
 
 ;; Semantic code search for emacs lisp
-(use-package elisp-refs)
+(use-package elisp-refs :ensure t)
 
 ;; Function that highlights global variables
 (when (locate-library "elispfl")

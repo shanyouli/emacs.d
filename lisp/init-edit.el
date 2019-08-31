@@ -34,9 +34,11 @@
 
 ;; Pair Automatic completion
 (use-package autopair
+  :ensure t
   :diminish autopair-mode
   :hook (after-init . autopair-global-mode))
 (use-package rainbow-delimiters
+  :ensure t
   :hook (autopair-mode . rainbow-delimiters-mode))
 
 ;; Chinese input automatically adds spaces in Chinese
@@ -46,6 +48,7 @@
 
 ;; Big blank delete
 (use-package hungry-delete
+  :ensure t
   :diminish hungry-delete-mode
   :hook (after-init . global-hungry-delete-mode))
 
@@ -61,7 +64,6 @@
         (setq line-number-display-limit large-file-warning-threshold)
         (setq line-number-display-limit-width 1000))
     (use-package linum-off
-      :demand
       :defines linum-format
       :hook (after-init . global-linum-mode)
       :config
@@ -70,13 +72,14 @@
 ;; Set blank highlight when use display graphic
 (if  (display-graphic-p)
     (use-package highlight-indent-guides
+      :ensure t
       :hook (prog-mode . highlight-indent-guides-mode)
       :config
       (setq highlight-indent-guides-method 'character)
       (setq highlight-indent-guides-responsive t)))
 
 ;; add color display
-(use-package rainbow-mode :hook (prog-mode . rainbow-mode))
+(use-package rainbow-mode :ensure t :hook (prog-mode . rainbow-mode))
 
 ;; Extra blank hint
 (use-package whitespace
@@ -121,6 +124,7 @@
 ;;------------------------------------------------------------------------------
 ;; An alternative for `use-package' users:
 (use-package solaire-mode
+  :ensure t
   :hook
   ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
   (minibuffer-setup . solaire-mode-in-minibuffer)

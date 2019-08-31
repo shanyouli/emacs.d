@@ -30,6 +30,7 @@
 
 ;;; Code:
 
+;;;###autoload
 (defun gzip-a-file (old-file new-file)
   (if (file-exists-p new-file)
       (message "%s already exists. If you want to extract to %s again, please rename %s"
@@ -47,6 +48,7 @@
             (message "Decompression is complete."))
         (message "%s is not a file compressed with gzip." old-file)))))
 
+;;;###autoload
 (defun download-a-file (URL file-name &optional cmd)
   (if  (string-match "\\/" file-name)
      (if (not (file-exists-p file-name))
@@ -64,11 +66,13 @@
                 file-name))
     (message "Please use an absolute path.")))
 
+;;;###autoload
 (defun load-all-module-file ()
   "Import all el files in lye-emacs-modules-dir."
   (dolist (f (directory-files lye-emacs-modules-dir t "\\.el\\'"))
     (load f :no-error :no-message)))
 
+;;;###autoload
 (defun delete-same-element-in-list (list)
   "Delete the same element in a list."
   (let ((new-list nil))

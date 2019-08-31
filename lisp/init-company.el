@@ -24,6 +24,7 @@
 ;;; Code:
 
 (use-package company
+  :ensure t
   :diminish company-mode
   :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
   :preface
@@ -69,6 +70,7 @@
 
    ;; Use company-tabnine
   (use-package company-tabnine
+    :ensure t
     :init
     (setq company-tabnine-binaries-folder
           (expand-file-name "TabNine" lye-emacs-share-dir))
@@ -91,12 +93,10 @@
   (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
 
 ;; Use company-posframe
-(add-hook 'company-mode
-          (lambda ()
-            (when (display-graphic-p)
-              (require-package 'company-posframe)
-              (require 'company-posframe)
-              (company-posframe-mode +1))))
+(with-eval-after-load 'company
+  (when (display-graphic-p)
+    (package! 'company-posframe t)
+    (company-posframe-mode +1)))
 
 (provide 'init-company)
 ;;; init-company.el ends here

@@ -32,13 +32,13 @@
 
 ;; HACK: DO NOT save the variable "package-selected-packages" in init/custom file
 ;; @see https://github.com/jwiegley/use-package/issues/383#issuecomment-247801751
-(defun my-save-selected-packages (&optional value)
-  "Set and (don't!) save 'package-selected-packages' to VALUE"
-  (when value
-    (setq package-selected-packages value))
-  (unless after-init-time
-    (add-hook 'after-init-hook #'package--save-selected-packages)))
-(advice-add 'package--save-selected-packages :override #'my-save-selected-packages)
+;; (defun my-save-selected-packages (&optional value)
+;;   "Set and (don't!) save 'package-selected-packages' to VALUE"
+;;   (when value
+;;     (setq package-selected-packages value))
+;;   (unless after-init-time
+;;     (add-hook 'after-init-hook #'package--save-selected-packages)))
+;; (advice-add 'package--save-selected-packages :override #'my-save-selected-packages)
 
 ;; Set the location where the elpa folder is stored
 (if (file-exists-p lye-emacs-cache-dir)

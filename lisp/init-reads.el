@@ -33,6 +33,7 @@
 (when (display-graphic-p)
   ;; PDF View
   (use-package pdf-tools
+    :ensure t
     :diminish (pdf-view-midnight-minor-mode pdf-view-printer-minor-mode)
     :defines pdf-annot-activate-created-annotations
     :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
@@ -59,6 +60,7 @@
 
   ;; Epub reader
   (use-package nov
+    :ensure t
     :mode ("\\.[eE][pP][uU][bB]" . nov-mode)
     :preface
     ;; (defun my-nov-setup ()

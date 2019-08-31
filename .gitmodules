@@ -64,9 +64,6 @@
 [submodule "liberime"]
 	path = site-lisp/liberime
 	url = https://gitlab.com/liberime/liberime.git
-[submodule "emacs-async"]
-	path = site-lisp/emacs-async
-	url = https://github.com/jwiegley/emacs-async.git
 [submodule "hydra"]
 	path = site-lisp/hydra
 	url = https://github.com/abo-abo/hydra.git

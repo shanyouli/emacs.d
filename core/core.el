@@ -168,17 +168,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   "Import the `*.el' file in the lye-emacs-lisp-dir folder."
   `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
 
-;;Test added third party packages
-;; (defmacro lye/test-package (pkg-base-dir &optional pkg-file path-dir)
-;;   "Add the folder of the trial package to the load-path table and import it."
-;;   `(let* ((pkg (or ,pkg-file ,pkg-base-dir))
-;;           (path (or ,path-dir ,lye-emacs-site-lisp-dir))
-;;           (apath (expand-file-name (format "%s" ,pkg-base-dir) path)))
-;;      (if (file-directory-p apath)
-;;          (or (member apath load-path)
-;;              (put apath load-path)))
-;;      (require pkg)))
-
 ;;; `Load-path'
 (defun lye/add-subdidrs-to-load-path (parent-dir)
   "Adds every non-hidden subdir of PARENT_DIR to `load-path'."
@@ -222,6 +211,16 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   (require 'benchmark-init-modes)
   (require 'benchmark-init)
   (benchmark-init/activate))
+
+;;; Add after-load-theme-hook
+(defvar after-load-theme-hook nil
+  "Hook run after a color theme is loaded using `load-theme'.")
+
+(defun run-after-load-theme-hook (&rest _)
+  "Run `after-load-theme-hook'."
+  (run-hooks 'after-load-theme-hook))
+
+(advice-add #'load-theme :after #'run-after-load-theme-hook)
 
 (provide 'core)
 

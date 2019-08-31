@@ -31,8 +31,7 @@
 ;;; Code:
 (lye/core-require 'core-elpa)
 
-(require-package 'all-the-icons)
-(require 'all-the-icons)
+(package! 'all-the-icons t t)
 
 (push '("\\(\\.\\|\\)conf\\(ig\\|\\)" all-the-icons-fileicon "config" :height 1.0 :face all-the-icons-blue)
       all-the-icons-icon-alist)

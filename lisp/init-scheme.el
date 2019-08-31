@@ -25,6 +25,7 @@
 ;;; Code:
 
 (use-package cmuscheme
+  :ensure t
   :config
   (setq scheme-program-name "scheme")
 
@@ -75,6 +76,7 @@
     (define-key scheme-mode-map (kbd "<f6>") 'scheme-send-definition-split-window)))
 )
 (use-package paredit
+  :ensure t
   :config
   (autoload 'paredit-mode "paredit"
   "Minor mode for pseudo-structurally editing Lisp code."

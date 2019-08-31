@@ -37,15 +37,16 @@
               (process-query-on-exit-flag (get-process "Python"))))
 
   ;; Live Coding in Python
-  (use-package live-py-mode)
+  (use-package live-py-mode :ensure t)
 
-  (use-package pyenv-mode)
-  (use-package pyenv-mode-auto))
+  (use-package pyenv-mode :ensure t)
+  (use-package pyenv-mode-auto :ensure t))
 
 ;; Format using YAPF
 ;; Install: pip install yapf
 (when (executable-find "yapf")
   (use-package yapfify
+    :ensure t
     :commands (yapf-mode)
     :hook (python-mode . yapf-mode)))
 

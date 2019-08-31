@@ -26,6 +26,7 @@
 
 ;;; yasnippet
 (use-package yasnippet
+  :ensure t
   :init
   (with-temp-message
       (with-current-buffer " *Minibuf-0*" (buffer-string))
@@ -34,7 +35,7 @@
     (when (file-exists-p yas--default-user-snippets-dir)
       (delete-directory yas--default-user-snippets-dir)))
   :config
-  (use-package yasnippet-snippets))
+  (use-package yasnippet-snippets :ensure t))
 
 ;;; prettify-mode
 (setq-default prettify-symbols-alist
@@ -60,10 +61,11 @@
 ;;; Program Languages
 
 ;; json
-(use-package json-mode :mode "\\.json\\'"   :defer t)
+(use-package json-mode  :ensure t :mode "\\.json\\'"   :defer t)
 
 ;; xml
 (use-package web-mode
+  :ensure t
   :mode (("\\.xml\\'" . web-mode)
          ("\\fonts.conf\\'" . web-mode)
          ("\\.html\\'" . web-mode))
@@ -71,6 +73,7 @@
 
 ;; yaml
 (use-package yaml-mode
+  :ensure t
   ;; :init
   ;; (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
   ;; (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode))
@@ -80,6 +83,7 @@
 
 ;; markdown, md
 (use-package markdown-mode
+  :ensure t
   :mode (("\\.md\\'" . gfm-mode))
   :defer t
   :config
@@ -90,7 +94,7 @@
              ("C-c f" . markdownfmt-format-buffer)))))
 
 ;; vimrc-major mode
-(use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))
+(use-package vimrc-mode :ensure t :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))
 
 ;; PKGBUILD-mode
 (use-package pkgbuild-mode
@@ -101,6 +105,7 @@
 
 ;; plantuml
 (use-package plantuml-mode
+  :ensure t
   :init   (setq plantuml-default-exec-mode 'jar)
   :config
   (setq plantuml-jar-path lye-emacs-plantuml-file)
@@ -110,11 +115,12 @@
 ;; Only suitable for Windows Languages-Packages major-mode
 (when (and (boundp system/windows) system/windows)
   ;; ahk-mode
-  (use-package ahk-mode :mode "\\.ahk\\'"  :defer t))
+  (use-package ahk-mode :ensure t :mode "\\.ahk\\'"  :defer t))
 
 (when system/windows
   ;; powershell-mode
   (use-package powershell
+    :ensure t
     :mode ("\\.ps1\\'" . powershell-mode)
     :defer t
     :init

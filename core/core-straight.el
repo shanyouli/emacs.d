@@ -88,12 +88,11 @@
 ;; use package
 (package! 'use-package t t)
 
-(use-package bind-key
-  :straight t)
-
+(use-package bind-key :straight t)
 
 ;; some useful library
 (package! 's nil t)
+(package! 'async nil t)
 
 (provide 'core-straight)
 

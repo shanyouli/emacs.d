@@ -36,7 +36,7 @@
   (require 'ox-hugo)
   (setq org-hugo-section "post"))
 
-(use-package easy-hugo)
+(use-package easy-hugo :ensure t)
 
 
 (provide 'init-hugo)

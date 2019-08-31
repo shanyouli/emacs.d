@@ -25,14 +25,14 @@
 ;;; Code:
 
 (use-package lua-mode
+  :ensure t
   :defer t
   :mode ("\\.lua\\'" . lua-mode)
- ;; :interpreter (.lua . lua-mode)
   :config
   (setq lua-indent-level 4
         lua-indent-string-contents t))
 
-(use-package company-lua)
+(use-package company-lua :ensure t)
 
 (add-hook 'lua-mode-hook
           (lambda ()
