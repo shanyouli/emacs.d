@@ -2,8 +2,8 @@
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (snails)
+;; Version: v0.2
+;; Package-Requires: (snails fuz)
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: search
 
@@ -29,14 +29,13 @@
 ;; snails
 
 ;;; Code:
+(straight-use-package '(snails :type git
+                               :host github
+                               :repo "manateelazycat/snails"))
 (require 'snails)
-(when (locate-library "fuz-core")
-  (require 'fuz)
-  (setq snails-fuz-library-load-status "load"))
 
-;; Make the theme of the snails window change as the theme of the change changes
-;; (when (boundp 'after-load-theme-hook)
-;;   (add-hook 'after-load-theme-hook #'snails-init-face-with-theme))
+(lye/modules-require 'iex-fuz)
+(setq snails-fuz-library-load-status "load")
 
 (provide 'lex-snails)
 

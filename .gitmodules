@@ -73,9 +73,6 @@
 [submodule "disable-mouse"]
 	path = site-lisp/disable-mouse
 	url = https://github.com/purcell/disable-mouse.git
-[submodule "snails"]
-	path = site-lisp/snails
-	url = https://github.com/manateelazycat/snails.git
 [submodule "smex"]
 	path = site-lisp/smex
 	url = https://github.com/nonsequitur/smex.git
