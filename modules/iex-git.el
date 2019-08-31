@@ -30,10 +30,7 @@
 
 ;;; Code:
 
-(require-package 'magit)
-(require-package 'forge)
-(require 'magit)
-(require 'forge)
+(package! 'magit t)
 
 ;; PATH
 (lye/exec-path-from-shell-init)

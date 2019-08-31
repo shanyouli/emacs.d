@@ -2,7 +2,7 @@
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v1
+;; Version: v2.0
 ;; Package-Requires: (paradox)
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: package tools
@@ -29,26 +29,7 @@
 ;; Package management tools
 
 ;;; Code:
-
-
-
-(require-package 'paradox)
-(require 'paradox)
-;; (defun lye/list-package ()
-;;   (interactive)
-;;   (setq paradox-execute-asynchronously t)
-;;   (setq paradox-github-token t)
-;;   (setq paradox-display-star-count nil)
-;;   (paradox-enable)
-;;   (list-packages))
-
-;; Replace default `list-packages'
-;; (defadvice list-packages (before my-list-packages activate)
-  ;; (require 'paradox)
-  ;; (setq paradox-execute-asynchronously t)
-  ;; (setq paradox-github-token t)
-  ;; (setq paradox-display-star-count nil)
-  ;; (paradox-enable))
+(package! 'paradox t)
 
 (advice-add #'list-packages :before
             (lambda (&rest _)

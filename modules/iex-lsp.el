@@ -31,14 +31,10 @@
 ;;; Code:
 
 ;; Installed packages
-(require-package 'lsp-mode)
-(require-package 'lsp-ui)
-(require-package 'company-lsp)
+(package! 'lsp-mode t)
+(package! 'lsp-ui t)
+(package! 'company-lsp t)
 
-;; require
-(require 'lsp-mode)
-(require 'lsp-ui)
-(require 'company-lsp)
 
 ;; lsp-mode Configurations
 (setq lsp-auto-guess-root nil) ; Detect project root

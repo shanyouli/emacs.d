@@ -30,11 +30,8 @@
 
 ;;; Code:
 
-(require-package 'avy)
-(require-package 'ace-pinyin)
-
-(require 'avy)
-(require 'ace-pinyin)
+(package! 'avy t t)
+(package! 'ace-pinyin t t)
 
 ;;; configurations
 (setq avy-background 1)

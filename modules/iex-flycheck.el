@@ -29,9 +29,7 @@
 ;; commentary
 
 ;;; Code:
-
-(require-package 'flycheck)
-(require 'flycheck)
+(package! 'flycheck t t)
 
 ;;Need to get a better PATH
 (lye/exec-path-from-shell-init)
@@ -43,10 +41,10 @@
 ;; Only check while saving and opening files
 (setq flycheck-check-syntax-automatically '(save mode-enabled))
 
-(when (display-graphic-p)
-  (require-package 'flycheck-posframe)
-  (require 'flycheck-posframe)
-  (add-hook 'flycheck-mode-hook 'flycheck-posframe-mode))
+(with-eval-after-load 'flycheck
+  (when (display-graphic-p)
+    (package! 'flycheck-posframe t t)
+    (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)))
 
 (provide 'iex-flycheck)
 

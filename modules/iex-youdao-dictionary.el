@@ -29,8 +29,7 @@
 
 ;;; Code:
 
-(require-package 'youdao-dictionary)
-(require 'youdao-dictionary)
+(package! 'youdao-dictionary t)
 
 ;; Cache documents
 (setq url-automatic-caching t)

@@ -29,9 +29,8 @@
 ;; A RSS feed reader
 
 ;;; Code:
+(package! 'elfeed t t)
 
-(require-package 'elfeed)
-(require 'elfeed)
 (setq elfeed-db-directory (concat lye-emacs-cache-dir "elfeed"))
 
 (setq elfeed-feeds

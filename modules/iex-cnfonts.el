@@ -30,9 +30,7 @@
 
 ;;; Code:
 
-(require-package 'cnfonts)
-
-(require 'cnfonts)
+(package! 'cnfonts  t)
 
 (setq cnfonts-profiles-directory (expand-file-name "cnfonts" lye-emacs-cache-dir))
 

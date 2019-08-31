@@ -30,9 +30,9 @@
 
 ;;; Code:
 
-(straight-use-package '(fuz :host github :repo "cireu/fuz.el"
-                         :files ("fuz*.el"  "src" "Cargo*")))
-(require 'fuz)
+(package! '(fuz :host github :repo "cireu/fuz.el"
+                :files ("fuz*.el" "src" "Cargo*")) t)
+
 (unless (require 'fuz-core nil t)
   (fuz-build-and-load-dymod))
 

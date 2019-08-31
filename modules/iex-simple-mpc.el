@@ -31,8 +31,7 @@
 ;;; Code:
 
 (when (and (executable-find "mpc") (executable-find "mpd"))
-  (require-package 'simple-mpc)
-  (require 'simple-mpc)
+  (package! 'simple-mpc t t)
 
   (defvar one-key-menu-simple-mpc-alist nil
           "The `one-key' menu alist for SIMPLE-MPC.")

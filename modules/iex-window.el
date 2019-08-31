@@ -36,8 +36,7 @@
 ;;  '(aw-mode-line-face ((t :inherit mode-line-emphasis :bold t))))
 
 (require 'winner)
-(require-package 'ace-window)
-(require 'ace-window)
+(package! 'ace-window t)
 
 (set-face-attribute 'aw-leading-char-face nil
                     :inherit font-lock-keyword-face
