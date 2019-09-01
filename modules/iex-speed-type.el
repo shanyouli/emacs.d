@@ -29,9 +29,8 @@
 ;; Speed Test
 
 ;;; Code:
-(package! 'speed-type t t)
 (setq speed-type-gb-dir (concat lye-emacs-cache-dir "speed-type"))
-
+(package! 'speed-type t t)
 
 (provide 'iex-speed-type)
 

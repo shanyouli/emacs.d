@@ -47,7 +47,7 @@
   :hook (dired-mode-hook . dired-async-mode))
 
 (use-package all-the-icons-dired
-             :ensure t
+  :straight t
   :if (and (display-graphic-p) (not system/windows))
   :hook (dired-mode . all-the-icons-dired-mode))
 

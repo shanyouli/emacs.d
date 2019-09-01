@@ -106,6 +106,20 @@
                  (const :tag "Tuna" tuna)
                  (const :tag "Tencent" tencent)))
 
+(defcustom lye-use-fuz-or-flx-in-ivy nil
+  "If it is `flx', use fuzzy match with `flx' package.
+If it is `fuz', use fuzzy match with `fuz' package.
+If it is `nil', Not use fuzzy match."
+  :type '(choice (const :tag "fuzzy match" 'flx)
+                 (const :tag "fuzzy" 'fuz)
+                 (const :tag "Null" nil)))
+
+(defcustom lye-enable-sdcv-or-youdao 'sdcv
+  "If it is sdcv, use `sdcv' as a translation tool.
+If it is youdao, use `youdao-dictionary' as a translation tool."
+  :type '(choice (const :tag "Sdcv" sdcv)
+                 (const :tag "Youdao" youdao)))
+
 (defcustom lye-company-enable-yas nil
   "Enable yasnippet for company backends or not."
   :type  'boolean)
@@ -121,20 +135,6 @@
 (defcustom lye-load-all-module-file-p nil
   "Import all el files in lye-emacs-modules-dir on first run."
   :type 'boolean)
-
-(defcustom lye-use-fuz-or-flx-in-ivy nil
-  "If it is `flx', use fuzzy match with `flx' package.
-If it is `fuz', use fuzzy match with `fuz' package.
-If it is `nil', Not use fuzzy match."
-  :type '(choice (const :tag "fuzzy match" 'flx)
-                 (const :tag "fuzzy" 'fuz)
-                 (const :tag "Null" nil)))
-
-(defcustom lye-enable-sdcv-or-youdao 'sdcv
-  "If it is sdcv, use `sdcv' as a translation tool.
-If it is youdao, use `youdao-dictionary' as a translation tool."
-  :type '(choice (const :tag "Sdcv" sdcv)
-                 (const :tag "Youdao" youdao)))
 
 (defcustom lye-sdcv-dictionary-data-dir (expand-file-name "stardict" lye-emacs-share-dir)
   "Sdcv dictionary storage directory."
@@ -198,14 +198,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 
 (lye/update-load-path)
 
-(add-hook 'after-init-hook
-          (lambda ()
-            (run-with-idle-timer
-             5 nil
-             (lambda ()
-               (lye/core-require 'core-funcs)
-               (setq load-path (delete-same-element-in-list load-path))))))
-
 ;;; bechmark-init
 (when lye-enable-benchmark-p
   (require 'benchmark-init-modes)
@@ -213,6 +205,7 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   (benchmark-init/activate))
 
 ;;; Add after-load-theme-hook
+
 (defvar after-load-theme-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
 
