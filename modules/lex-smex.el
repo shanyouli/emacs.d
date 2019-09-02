@@ -29,8 +29,7 @@
 ;; Smex configuration
 
 ;;; Code:
-
-(require 'smex)
+(package! 'smex t)
 (let ((amx-file (expand-file-name "amx-items" lye-emacs-cache-dir)))
   (if (file-exists-p amx-file)
       (setq smex-save-file amx-file)

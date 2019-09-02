@@ -29,6 +29,84 @@
 ;; Next package Management
 
 ;;; Code:
+
+;;; package management
+
+;; HACK: DO NOT save the variable "package-selected-packages" in init/custom file
+;; @see https://github.com/jwiegley/use-package/issues/383#issuecomment-247801751
+(defun my-save-selected-packages (&optional value)
+  "Set and (don't!) save 'package-selected-packages' to VALUE"
+  (when value
+    (setq package-selected-packages value))
+  (unless after-init-time
+    (add-hook 'after-init-hook #'package--save-selected-packages)))
+(advice-add 'package--save-selected-packages :override #'my-save-selected-packages)
+
+;; Set the location where the elpa folder is stored
+(if (file-exists-p lye-emacs-cache-dir)
+    (setq package-user-dir (expand-file-name "elpa" lye-emacs-cache-dir)))
+
+;; ELPA: refer to https://melpa.org and https://elpa.emacs-china.org
+(defun set-package-archives (archives)
+  "Set specific package ARCHIVES repository."
+  (interactive
+   (list (intern (completing-read "Choose package archives: "
+                                  '(melpa melpa-mirror emacs-china
+                                          netease tencent tuna)))))
+
+  (setq package-archives
+        (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                            (not (gnutls-available-p))))
+               (proto (if no-ssl "http" "https")))
+          (pcase archives
+            ('melpa
+             `(,(cons "gnu"   (concat proto "://elpa.gnu.org/packages/"))
+               ,(cons "melpa" (concat proto "://melpa.org/packages/"))))
+            ('melpa-mirror
+             `(,(cons "gnu"   (concat proto "://elpa.gnu.org/packages/"))
+               ,(cons "melpa" (concat proto "://www.mirrorservice.org/sites/melpa.org/packages/"))))
+            ('emacs-china
+             `(,(cons "gnu"   (concat proto "://elpa.emacs-china.org/gnu/"))
+               ,(cons "melpa" (concat proto "://elpa.emacs-china.org/melpa/"))))
+            ('netease
+             `(,(cons "gnu"   (concat proto "://mirrors.163.com/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.163.com/elpa/melpa/"))))
+            ('tuna
+             `(,(cons "gnu"   (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/"))))
+            ('tencent
+             `(,(cons "gnu" (concat proto "://mirrors.cloud.tencent.com/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.cloud.tencent.com/elpa/melpa/"))))
+            (archives
+             (error "Unknown archives: `%s'" archives)))))
+
+  (message "Set package archives to `%s'." archives))
+
+;; Set package archives, You can choose Repo with melpa, melpa-mirrors,emacs-china, netease, tuna, tencent
+(set-package-archives lye-package-archives)
+
+;; Initialize packages
+(unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
+  (setq package-enable-at-startup nil) ;To prevent initializing twice
+  (package-initialize))
+
+;; @see https://github.com/redguardtoo/emacs.d/blob/3c54e19d7793e8178b8a357502ae33c62b2db23a/lisp/init-elpa.el#L207
+;; On-demand installation of packages
+(defun require-package (package &optional min-version no-refresh)
+  "Ask elpa to install given PACKAGE."
+  (cond
+   ((package-installed-p package min-version)
+    t)
+   ((or (assoc package package-archive-contents) no-refresh)
+    (package-install package))
+   (t
+    (package-refresh-contents)
+    (require-package package min-version t))))
+
+;; pardox
+(run-with-idle-timer 5 nil (lambda () (lye/modules-require 'iex-paradox)))
+
+;;; straight.el
 (defvar straight-core-package-sources
   '((org-elpa :local-repo nil)
     (melpa :type git
@@ -47,7 +125,8 @@
       ;;      straight-cache-autoloads nil
       straight-vc-git-default-clone-depth 1
       straight-recipes-emacsmirror-use-mirror t
-      straight-process-buffer " *straight-process*")
+      straight-process-buffer " *straight-process*"
+      straight-check-for-modifications nil)
 
 (defun doom-ensure-straight ()
   (defvar bootstrap-version)

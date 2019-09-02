@@ -157,6 +157,7 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
     (copy-file lye-emacs-custom-temp-file custom-file))
 
 (if (file-exists-p custom-file) (load custom-file))
+;; -----------------------------------------------------------------------------
 
 ;; modules
 (defmacro lye/modules-require (pkg)
@@ -205,7 +206,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   (benchmark-init/activate))
 
 ;;; Add after-load-theme-hook
-
 (defvar after-load-theme-hook nil
   "Hook run after a color theme is loaded using `load-theme'.")
 

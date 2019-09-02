@@ -2,7 +2,7 @@
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.2
+;; Version: v0.3
 ;; Package-Requires: (snails fuz)
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: search
@@ -29,10 +29,11 @@
 ;; snails
 
 ;;; Code:
-(straight-use-package '(snails :type git
-                               :host github
-                               :repo "manateelazycat/snails"))
-(require 'snails)
+(package! '(snails :type git
+                   :host github
+                   :repo "manateelazycat/snails"
+                   :no-byte-compile t)
+          t)
 
 (lye/modules-require 'iex-fuz)
 (setq snails-fuz-library-load-status "load")

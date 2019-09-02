@@ -37,6 +37,8 @@
 (setq package-enable-at-startup nil)
 
 ;; Prevent the glimpse of un-styled Emacs by setting these early.
+(unless (and (display-graphic-p) (eq system-type 'darwin))
+  (push '(menu-bar-lines . 0) default-frame-alist))
 (add-to-list 'default-frame-alist '(tool-bar-lines . 0))
 (add-to-list 'default-frame-alist '(menu-bar-lines . 0))
 (add-to-list 'default-frame-alist '(vertical-scroll-bars))

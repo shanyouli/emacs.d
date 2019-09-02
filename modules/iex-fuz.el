@@ -30,8 +30,13 @@
 
 ;;; Code:
 
-(package! '(fuz :host github :repo "cireu/fuz.el"
-                :files ("fuz*.el" "src" "Cargo*")) t)
+;; TODO: Use strap.el instead of package.el
+;; (package! '(fuz :host github :repo "cireu/fuz.el"
+;;                 :files ("fuz*.el" "src" "Cargo*")) t)
+
+;; Because straight.el does not support dynamic modules, every time the emacs
+;; version changes, it will require recompilation.
+(package! 'fuz t)
 
 (unless (require 'fuz-core nil t)
   (fuz-build-and-load-dymod))

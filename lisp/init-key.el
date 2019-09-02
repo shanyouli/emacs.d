@@ -104,7 +104,7 @@
 ;; lex-snails
 (when (display-graphic-p)
   (lazy-load-unset-keys '("C-x C-b"))
-  (lazy-load-global-keys '(("C-x C-b" . snails)) "lex-snails"))
+  (lazy-load-global-keys '(("C-x C-b" . snails)) "iex-snails"))
 
 ;; Better elisp help file format
 ;; (require-package 'helpful)

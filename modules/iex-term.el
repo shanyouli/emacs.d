@@ -35,7 +35,7 @@
            (executable-find "libtool")
            (executable-find "cmake"))
     (progn
-      (package! 'vterm t t)
+      (package! 'vterm t)
       (define-key vterm-mode-map (kbd "C-z") nil)
       (defun term-toggle ()
         (interactive)
