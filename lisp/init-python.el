@@ -24,23 +24,10 @@
 
 ;;; Code:
 
-(use-package python
-  :ensure nil
-  :defines gud-pdb-command-name pdb-path
-  :config
-    ;; Disable readline based native completion
-  (setq python-shell-completion-native-enable nil)
 
-  (add-hook 'inferior-python-mode-hook
-            (lambda ()
-              ;; (bind-key "C-c C-z" #'kill-buffer-and-window inferior-python-mode-map)
-              (process-query-on-exit-flag (get-process "Python"))))
-
-  ;; Live Coding in Python
-  (use-package live-py-mode :ensure t)
-
-  (use-package pyenv-mode :ensure t)
-  (use-package pyenv-mode-auto :ensure t))
+(package! 'live-py-mode)
+(package! 'pyenv-mode)
+(package! 'pyenv-mode-auto)
 
 ;; Format using YAPF
 ;; Install: pip install yapf
@@ -51,7 +38,8 @@
     :hook (python-mode . yapf-mode)))
 
 (add-hook 'python-mode-hook
-          (lambda () (require 'pyenv-mode-auto)
+          (lambda ()
+            (require 'pyenv-mode-auto)
             (let* ((pylsp (cond
                            ((executable-find "mspyls")
                             'mspyls)

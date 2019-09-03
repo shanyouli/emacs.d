@@ -31,7 +31,7 @@
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
 (when (and (display-graphic-p) (not system/windows))
-  (add-hook 'after-init-hook
+  (add-hook 'lye-init-hook
             (lambda ()
               (require 'server)
               (setq server-auth-dir (concat lye-emacs-cache-dir "server"))
@@ -40,13 +40,13 @@
 
 ;; Save cursor position for everyfile you opened. So,  next time you open
 ;; the file, the cursor will be at the position you last opened it.
-(add-hook 'after-init-hook
+(add-hook 'lye-init-hook
           (lambda ()
             (require 'saveplace)
             (save-place-mode +1)))
 
 ;; Miantain a history of past actions and a resonable number of lists
-(add-hook 'after-init-hook
+(add-hook 'lye-init-hook
           (lambda ()
             (require 'savehist)
             (setq-default history-length 1000)
@@ -61,7 +61,7 @@
             (savehist-mode +1)))
 
 ;; Save recentf file and open them
-(add-hook 'after-init-hook
+(add-hook 'lye-init-hook
           (lambda ()
             (require 'recentf)
 
@@ -80,9 +80,9 @@
             (recentf-mode)))
 
 ;; Automatically refresh files that have been changed elsewhere
-(add-hook 'after-init-hook (lambda () (global-auto-revert-mode t)))
+(add-hook 'lye-init-hook (lambda () (global-auto-revert-mode +1)))
 
-(add-hook 'after-init-hook
+(add-hook 'lye-init-hook
           (lambda ()
             ;; Use undo-tree
             (global-undo-tree-mode +1)

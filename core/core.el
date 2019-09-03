@@ -211,6 +211,18 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   (run-hooks 'after-load-theme-hook))
 
 (advice-add #'load-theme :after #'run-after-load-theme-hook)
+;; -----------------------------------------------------------------------------
+
+;;; Add lye-init-hook
+(defvar lye-init-hook nil
+  "HOOK runs after after-start-hook.")
+
+(defun run-lye-init-hook (&rest _)
+  "Run `lye-init-hook'."
+  (run-at-time 0.1 nil (lambda () (run-hooks 'lye-init-hook))))
+
+(add-hook 'after-init-hook #'run-lye-init-hook)
+;; -----------------------------------------------------------------------------
 
 (provide 'core)
 

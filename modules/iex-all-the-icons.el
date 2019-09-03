@@ -31,7 +31,8 @@
 ;;; Code:
 (package! 'all-the-icons t t)
 
-(push '("\\(\\.\\|\\)conf\\(ig\\|\\)" all-the-icons-fileicon "config" :height 1.0 :face all-the-icons-blue)
+(push '("\\(\\.\\|\\)conf\\(ig\\|\\)" all-the-icons-fileicon "config"
+        :height 1.0 :face all-the-icons-blue)
       all-the-icons-icon-alist)
 
 ;;------------------------------------------------------------------------------
@@ -59,8 +60,7 @@
 ;;------------------------------------------------------------------------------
 ;; dir-icons
 ;;------------------------------------------------------------------------------
-(push '("Videos?" all-the-icons-faicon "film")
-      all-the-icons-dir-icon-alist)
+(push '("Videos?" all-the-icons-faicon "film") all-the-icons-dir-icon-alist)
 
 (provide 'iex-all-the-icons)
 
