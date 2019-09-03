@@ -28,13 +28,13 @@
 (and (featurep 'doom-themes) (require 'doom-themes-ext-org))
 
 (use-package org
+  :ensure nil
   :commands org-mode
   :bind (("C-c a" . org-agenda)
          ("C-c l" . org-store-link)
          ("C-c c" . org-capture)
          ("C-c b" . org-switchb))
   :mode ("\\.org$\\'" . org-mode)
-  :ensure nil
   :hook (org-mode .
                   (lambda ()
                     (and (string-match "doom-*" (symbol-name (car custom-enabled-themes)))

@@ -30,6 +30,11 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (if (version< emacs-version "25.3")
+      (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
+             emacs-version)))
+
 (defvar lye-gc-cons-threshold 16777216 ; 16mb
   "The default value to use for `gc-cons-threshold'. If you experience freezing,
 decrease this. If you experience stuttering, increase this.")
@@ -79,14 +84,8 @@ decrease this. If you experience stuttering, increase this.")
 ;; prevent stable, byte-compiled code from running. However, if you're getting
 ;; recursive load errors, it may help to set this to nil.
 (setq load-prefer-newer noninteractive)
-;; Load .el if newer than corresponding .elc
-;; (setq load-prefer-newer t)
 
 ;; Let 'er rip!
-(eval-when-compile
-  (if (version< emacs-version "25.3")
-      (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
-             emacs-version)))
 
 ;; https://github.com/honmaple/dotfiles/blob/571d6f0dca10015886c56a1feab17f0d5a1bb1ab/emacs.d/init.el#L51
 (defmacro lye/core-require (pkg)
@@ -96,7 +95,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
 (lye/core-require 'core-autoload)       ; Generate autoload file
-(lye/core-require 'core-straight)       ; staraight
+(lye/core-require 'core-straight)       ; staraight, package
 (lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-ui)             ; UI
 (lye/core-require 'core-modeline)       ; mode-line
@@ -122,6 +121,9 @@ decrease this. If you experience stuttering, increase this.")
 (run-with-idle-timer 1 nil (lambda ()
                              (lye/init-require 'init-hugo)
                              (lye/init-require 'init-org)))
+
+;;(require 'dashboard)
+;;(dashboard-setup-startup-hook)
 
 ;; get emascs startup time
 ;; (add-hook 'emacs-startup-hook

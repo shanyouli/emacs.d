@@ -40,7 +40,6 @@
 ;; Use asynchronous file management
 (use-package dired-async
   :ensure async
-  :diminish dired-async-mode
   :bind (:map dired-mode-map
          ("C" . dired-async-do-copy)
          ("R" . dired-async-do-rename))
@@ -70,7 +69,6 @@
 (use-package dired-x
   :ensure nil
   :commands (dired-omit-mode)
-;;  :demand
   :defer 0.1
   :hook (dired-mode . dired-omit-mode)
   :config

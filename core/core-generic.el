@@ -2,7 +2,7 @@
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
+;; Version: v0.2
 ;; Package-Requires: (dependencies)
 ;; Homepage: https://github.com/shanyouli
 ;; Keywords: keywords
@@ -26,7 +26,8 @@
 
 ;;; Commentary:
 
-;; commentary
+;;; remove global-subword-mode
+;; time: 2019.09.02 16:48
 
 ;;; Code:
 
@@ -41,8 +42,7 @@
 
 (fset 'yes-or-no-p 'y-or-n-p)           ; 以 y/n代表 yes/no
 (blink-cursor-mode -1)                  ; 指针不闪动
-(transient-mark-mode 1)                 ; 标记高亮
-(global-subword-mode 1)                 ; Word移动支持 FooBar 的格式
+(transient-mark-mode +1)                 ; 标记高亮
 (setq use-dialog-box nil)               ; never pop dialog
 (setq inhibit-startup-screen t)         ;inhibit start screen
 (setq initial-scratch-message "")       ;关闭启动空白buffer, 这个buffer会干扰session恢复
@@ -52,7 +52,8 @@
 (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
 (setq x-select-enable-clipboard t)      ;支持emacs和外部程序的粘贴
 (setq split-width-threshold nil)        ;分屏的时候使用上下分屏
-(setq inhibit-compacting-font-caches t) ;使用字体缓存，避免卡顿
+(when system/windows
+  (setq inhibit-compacting-font-caches t)) ;使用字体缓存，避免卡顿
 (setq profiler-report-cpu-line-format   ;让 profiler-report 第一列宽一点
       '((100 left)
         (24 right ((19 right)
@@ -83,14 +84,20 @@
 (unless system/windows
   (setq selection-coding-system 'utf-8))
 
-;; Miscs
-(setq uniquify-buffer-name-style 'post-forward-angle-brackets) ; Show path if name are same
+;;; Miscs
+
+;; Show path if name are same
+(setq uniquify-buffer-name-style 'post-forward-angle-brackets)
+
 (setq adaptive-fill-regexp "[ t]+|[ t]*([0-9]+.|*+)[ t]*")
 (setq adaptive-fill-first-line-regexp "^* *$")
 (setq delete-by-moving-to-trash t) ; Deleting file go to OS'trash floder
 (setq set-mark-command-repeat-pop t) ; Repeating C-SPC after poping mark pops it again
 (setq sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
 (setq sentence-end-double-space nil)
+
+;; Avoid emacsclient opening *scratch* buffer and getting an error
+(setq initial-buffer-choice '(lambda () (switch-to-next-buffer)))
 
 ;; Tab and Space
 ;; Permanently indent with spaces, never with TABs
@@ -112,7 +119,13 @@
  ;; eshell files
  eshell-directory-name (concat lye-emacs-cache-dir "eshell")
  ;; Game score
- gamegrid-user-score-file-directory (concat lye-emacs-cache-dir "games"))
+ gamegrid-user-score-file-directory (concat lye-emacs-cache-dir "games")
+ ;; Saveplace
+ save-place-file (concat lye-emacs-cache-dir "saveplace")
+ ;; save-history
+ savehist-file (concat lye-emacs-cache-dir "history")
+ ;; Recentf-file
+ recentf-save-file (concat lye-emacs-cache-dir "recentf"))
 
 ;; @see https://emacs-china.org/t/spacemacs/9000
 (setq auto-save-list-file-prefix nil ;not.# and #.# file
@@ -130,8 +143,6 @@
       (kill-buffer "*scratch*")))
 
 (add-hook 'after-change-major-mode-hook #'remove-scratch-buffer)
-;; Avoid emacsclient opening *scratch* buffer and getting an error
-(setq initial-buffer-choice '(lambda () (switch-to-next-buffer)))
 
 (provide 'core-generic)
 

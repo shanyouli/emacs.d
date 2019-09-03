@@ -1,9 +1,8 @@
-;;; lex-smex.el --- Initialize smex -*- lexical-binding: t -*-
+;;; lex-ido.el --- Initialize smex -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (smex)
+;; Version: v0.2
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: M-x
 
@@ -26,18 +25,41 @@
 
 ;;; Commentary:
 
-;; Smex configuration
+;; Ido mode--Does not contain other uses of packages that need to be installed
 
 ;;; Code:
-(package! 'smex t)
+(require 'ido)
+(require 'ido-completing-read+)
+(package! 'smex t t)
+(package! 'flx-ido t t)
+(package! 'ido-sort-mtime t t)
+
+(setq ido-enable-flex-matching  t
+      ido-everywhere            nil
+      ido-use-filename-at-point 'guess
+      ido-create-new-buffer     'always
+      ido-max-prospects         10
+      ido-save-directory-list-file (expand-file-name "ido.hist" lye-emacs-cache-dir)
+      ido-default-file-method 'selected-window
+      ido-auto-merge-work-directories-length -1)
+
+(ido-mode +1)
+(ido-ubiquitous-mode +1)
+
+;;; smarter fuzzy matching for ido
+(flx-ido-mode +1)
+
+;; smex, remember recently and most frequently ised commands
 (let ((amx-file (expand-file-name "amx-items" lye-emacs-cache-dir)))
   (if (file-exists-p amx-file)
       (setq smex-save-file amx-file)
     (setq smex-save-file (expand-file-name "smex-items" lye-emacs-cache-dir))))
 (setq smex-history-length 10)
-
 (smex-initialize)
 
-(provide 'lex-smex)
+;;; ido-sort-mtime
+(ido-sort-mtime-mode +1)
 
-;;; lex-smex.el ends here
+(provide 'lex-ido)
+
+;;; lex-ido.el ends here

@@ -32,8 +32,8 @@
 
 ;; lazy-search configuration ---------------------------------------------------
 
-
 (require 'lazy-search)
+
 (custom-set-faces
  '(lazy-search-highlight-current
    ((t :foreground "black" :background "orange" :bold t)))

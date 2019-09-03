@@ -35,7 +35,7 @@
 (require 'cl-seq)
 ;; constant
 
-(defconst system/windows (eq system-type 'windows-nt)
+(defconst system/windows (memq system-type '(windows-nt ms-dos cygwin))
   "Are we running on a Windows System?")
 
 (defconst system/mac (eq system-type 'darwin)
@@ -43,9 +43,6 @@
 
 (defconst system/linux (eq system-type 'gnu/linux)
   "Are we running on a GNU/Linux System?")
-
-(defconst system/cygwin (eq system-type 'cygwin)
-  "Are we running on a cygwin system?")
 
 (defconst *root* (string-equal "root" (getenv "USER"))
   "Are you using ROOT user?")

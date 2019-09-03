@@ -166,12 +166,13 @@
 
 ;; use package
 (package! 'use-package t t)
-
-(use-package bind-key :straight t)
+(package! 'bind-key t t)
 
 ;; some useful library
 (package! 's nil t)
 (package! 'async nil t)
+(package! 'f nil t)
+(package! 'dash nil t)
 
 (provide 'core-straight)
 

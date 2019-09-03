@@ -54,10 +54,9 @@
   (interactive)
   (one-key-menu "AVY" one-key-menu-avy-alist t))
 
-
 ;; run
 (avy-setup-default)
-(ace-pinyin-global-mode t)
+(ace-pinyin-global-mode +1)
 
 (provide 'iex-avy)
 

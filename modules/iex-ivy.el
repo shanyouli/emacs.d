@@ -26,9 +26,30 @@
 
 ;;; Commentary:
 
-;; IVY SWIPER, counsel
-;; (setq lye-use-fuz-or-flx-in-ivy 'fuz)
+;;; v0.5
+;; Formatted file structure
+;; Time 2019.09.02 21:23
 
+;;; Code:
+
+;;; Must package
+(package! 'amx t t)
+(package! 'ivy t)
+(package! 'counsel t)
+(package! 'swiper t)
+;; -----------------------------------------------------------------------------
+
+;;; AMX
+(let ((smex-file (expand-file-name "smex-items" lye-emacs-cache-dir)))
+  (if (file-exists-p smex-file)
+      (setq amx-save-file smex-file)
+    (setq amx-save-file (concat lye-emacs-cache-dir "amx-items"))))
+
+(setq amx-history-length 10)
+(with-eval-after-load 'counsel (amx-initialize))
+;; -----------------------------------------------------------------------------
+
+;;; Fuzzy-Match
 (pcase lye-use-fuz-or-flx-in-ivy
   ('fuz
    (lye/modules-require 'iex-fuz)
@@ -36,25 +57,16 @@
    (setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy)))
 
    (with-eval-after-load 'ivy
-     (straight-use-package '(ivy-fuz :host github
-                                     :repo "cireu/fuz.el"
-                                     :files ("ivy-fuz.el")))
-     (require 'ivy-fuz)
+     (package! '(ivy-fuz :host github :repo "cireu/fuz.el" :files ("ivy-fuz.el")) t)
      (add-to-list 'ivy-highlight-functions-alist
                   '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn))))
 
   ('flx
-   (require-package 'flx)
-   (require 'flx)
+   (package! 'flx t t)
    (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))))
+;; -----------------------------------------------------------------------------
 
-(lye/modules-require 'iex-amx)
-
-;;; Code:
-(require-package 'ivy)
-(require-package 'counsel)
-(require 'counsel)
-
+;;; counsel, swiper and ivy
 (setq enable-recursive-minibuffers t) ; Allow commands in minibuffers
 (setq ivy-use-selectable-prompt t)
 (setq ivy-use-virtual-buffers t)      ; Enable bookmarks and recentf
@@ -92,8 +104,8 @@
    ([escape]     . minibuffer-keyboard-quit))
  ivy-minibuffer-map)
 
-(ivy-mode 1)
-(counsel-mode 1)
+(ivy-mode +1)
+(counsel-mode +1)
 
 (provide 'iex-ivy)
 

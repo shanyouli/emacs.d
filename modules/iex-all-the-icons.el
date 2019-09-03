@@ -29,8 +29,6 @@
 ;; Add some icons of files that are not collected by all-the-icons-icon-alist
 
 ;;; Code:
-(lye/core-require 'core-elpa)
-
 (package! 'all-the-icons t t)
 
 (push '("\\(\\.\\|\\)conf\\(ig\\|\\)" all-the-icons-fileicon "config" :height 1.0 :face all-the-icons-blue)

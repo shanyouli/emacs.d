@@ -41,14 +41,6 @@
 ;; restart-emacs
 (lazy-load-global-keys '(("C-z r" . restart-emacs)) "restart-emacs")
 
-;; aweshell
-;; (lazy-load-global-keys
-;;  '(
-;;    ("C-x s n" . aweshell-new)
-;;    ("C-x s a" . aweshell-toggle)
-;;    ("C-x s d" . aweshell-dedicated-toggle))
-;;  "aweshell")
-
 ;; Chinese automatically translated as English
 (lazy-load-global-keys
  '(
@@ -104,7 +96,7 @@
 ;; lex-smex
 (lazy-load-global-keys
  '(("M-x" . smex)
-   ("C-x M-x" . smex-major-mode-commands)) "lex-smex")
+   ("C-x M-x" . smex-major-mode-commands)) "lex-ido")
 
 ;;; toolkit
 (lazy-load-set-keys

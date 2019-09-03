@@ -6,11 +6,11 @@
 
 ;; (setq lye-full-name "user name")     ; User full name
 ;; (setq lye-mail-address "user@email.com") ; Email address
+(setq lye-use-fuz-or-flx-in-ivy 'flx)
 (setq lye-company-enable-yas t)         ; Whether to use the company to complete yas-snippet
 (setq lye-enable-benchmark-p nil)       ; Enable initialization benchmark or not: t or nil
 (setq lye-enable-sdcv-or-youdao 'sdcv)  ; Use sdcv or youdao dictionary
 (setq lye-package-archives 'tuna)       ; Package repo: melpa, melpa-mirror, emacs-china, netease, tencent or tuna
-(setq lye-init-fullscreen-p nil)        ; Use fullscreen or not
 
 ;;; Fonts set all unicode characters
 (when (display-graphic-p)

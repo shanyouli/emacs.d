@@ -82,3 +82,6 @@
 [submodule "awesome-tray"]
 	path = site-lisp/awesome-tray
 	url = git@github.com:shanyouli/awesome-tray.git
+[submodule "ido-completing-read-plus"]
+	path = site-lisp/ido-completing-read-plus
+	url = https://github.com/DarwinAwardWinner/ido-completing-read-plus.git

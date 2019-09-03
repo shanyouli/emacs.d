@@ -30,8 +30,7 @@
 
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
-(when (and (display-graphic-p)
-       (not (or system/cygwin system/windows)))
+(when (and (display-graphic-p) (not system/windows))
   (add-hook 'after-init-hook
             (lambda ()
               (require 'server)
@@ -44,17 +43,14 @@
 (add-hook 'after-init-hook
           (lambda ()
             (require 'saveplace)
-            (setq save-place-file (concat lye-emacs-cache-dir "saveplace"))
-            (save-place-mode)))
-
+            (save-place-mode +1)))
 
 ;; Miantain a history of past actions and a resonable number of lists
 (add-hook 'after-init-hook
           (lambda ()
             (require 'savehist)
             (setq-default history-length 1000)
-            (setq savehist-file (concat lye-emacs-cache-dir "history")
-                  enable-recursive-minibuffers t
+            (setq enable-recursive-minibuffers t
                   history-delete-duplicates t
                   savehist-additional-variables '(mark-ring
                                                   global-mark-ring
@@ -62,7 +58,7 @@
                                                   regexp-search-ring
                                                   extended-command-history)
                   savehist-autosave-interval 60)
-            (savehist-mode)))
+            (savehist-mode +1)))
 
 ;; Save recentf file and open them
 (add-hook 'after-init-hook
@@ -70,9 +66,8 @@
             (require 'recentf)
 
             (setq recentf-max-saved-items 200
-                  recentf-save-file (concat lye-emacs-cache-dir "recentf"))
-            ;;Do not add these files to the recently opened text
-            (setq recentf-exclude '((expand-file-name package-user-dir)
+                  ;;Do not add these files to the recently opened text
+                  recentf-exclude '((expand-file-name package-user-dir)
                                     ".cache"
                                     ".cask"
                                     "bookmarks"
@@ -97,7 +92,8 @@
             (setq auto-save-silent t)
             (auto-save-enable)
 
-            ;; Displays the key bindings following your currently entered incomplete command
+            ;; Displays the key bindings following your currently entered
+            ;; incomplete command
             (setq which-key-idle-delay 0.5)
             (which-key-mode +1)
 
