@@ -100,8 +100,7 @@
 
 ;;; toolkit
 (lazy-load-set-keys
- '(
-   ("C-x SPC" . set-mark-command)    ; Instead C-SPC for Chinese input method
+ '(("C-x SPC" . set-mark-command)    ; Instead C-SPC for Chinese input method
    ("C-x C-h" . rectangle-mark-mode) ; rectangle-mark-mode
    ("C-z c"   . shell-command)       ; I don't know why the `M-!' in awesomewm can't be used.
    ("C-z C-z" . suspend-frame)       ; Suspend-frame

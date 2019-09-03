@@ -2,8 +2,8 @@
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (ivy)
+;; Version: v0.5
+;; Package-Requires: (amx ivy counsel swiper ivy-yasnippet :optional fuz flx)
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: search
 
@@ -106,6 +106,13 @@
 
 (ivy-mode +1)
 (counsel-mode +1)
+;; -----------------------------------------------------------------------------
+
+;;; Linkage between ivy and yasnippet
+(when (locate-library "yasnippet")
+  (package! 'ivy-yasnippet t)
+  (lazy-load-set-keys '(("C-c y" . ivy-yasnippet))))
+;; -----------------------------------------------------------------------------
 
 (provide 'iex-ivy)
 
