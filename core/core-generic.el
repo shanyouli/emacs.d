@@ -125,7 +125,9 @@
  ;; save-history
  savehist-file (concat lye-emacs-cache-dir "history")
  ;; Recentf-file
- recentf-save-file (concat lye-emacs-cache-dir "recentf"))
+ recentf-save-file (concat lye-emacs-cache-dir "recentf")
+ ;; server auth dir
+ server-auth-dir (concat lye-emacs-cache-dir "server"))
 
 ;; @see https://emacs-china.org/t/spacemacs/9000
 (setq auto-save-list-file-prefix nil ;not.# and #.# file

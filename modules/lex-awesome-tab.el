@@ -29,6 +29,7 @@
 ;; awesome-tab
 
 ;;; Code:
+(lye/modules-require 'iex-all-the-icons)
 
 (setq awesome-tab-style 'slant) ; awesome-tab style
 
@@ -57,6 +58,12 @@
 (setq awesome-tab-hide-tab-function 'lye/awesome-tab-hide-tab)
 
 ;; (setq awesome-tab-face-height 130)
+
+(defun lye/refresh-awesome-tab-mode ()
+  "Refresh `awesome-tab-mode', especially after replacing themes."
+  (when (awesome-tab-mode-on-p)
+    (awesome-tab-mode -1)
+    (awesome-tab-mode +1)))
 
 (provide 'lex-awesome-tab)
 

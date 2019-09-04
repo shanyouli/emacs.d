@@ -125,7 +125,7 @@
       ;;      straight-cache-autoloads nil
       straight-vc-git-default-clone-depth 1
       straight-recipes-emacsmirror-use-mirror t
-      straight-process-buffer " *straight-process*"
+      straight-process-buffer " *straight-process*" ; hide *straight-process*
       straight-check-for-modifications nil)
 
 (defun doom-ensure-straight ()

@@ -27,7 +27,7 @@
 ;;; yasnippet
 (use-package yasnippet
   :ensure t
-  :hook ((progn-mode org-mode) . yas-minor-mode)
+  :hook ((prog-mode org-mode) . yas-minor-mode)
   :init
   (setq yas-snippet-dirs (list lye-emacs-yas-snippets-dir))
   :config

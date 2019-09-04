@@ -78,7 +78,6 @@
       (set-frame-size (selected-frame)
                       (lye/frame-default-width) (lye/frame-default-height)))))
 
-
 ;; THEME
 (setq theme-switch-light      'doom-one-light
       theme-switch-dark       'doom-one
@@ -118,16 +117,11 @@
   ;; awesome-tab
   (add-hook 'after-init-hook
             (lambda ()
-              (lye/modules-require 'iex-all-the-icons)
               (lye/modules-require 'lex-awesome-tab)
               (awesome-tab-mode +1)
+              (add-hook 'after-load-theme-hook #'lye/refresh-awesome-tab-mode))))
 
-              (when (boundp 'after-load-theme-hook)
-                (add-hook 'after-load-theme-hook
-                          (lambda ()
-                            (when (awesome-tab-mode-on-p)
-                              (awesome-tab-mode -1)
-                              (awesome-tab-mode +1))))))))
+(lye/modules-require 'iex-solair)
 
 (provide 'core-ui)
 

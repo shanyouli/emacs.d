@@ -28,13 +28,14 @@
 
 ;;; Code:
 
+
+
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
 (when (and (display-graphic-p) (not system/windows))
   (add-hook 'lye-init-hook
             (lambda ()
               (require 'server)
-              (setq server-auth-dir (concat lye-emacs-cache-dir "server"))
               (unless (server-running-p)
                 (server-start)))))
 
@@ -99,6 +100,17 @@
 
           ;; not use mouse
             (if (display-graphic-p) (global-disable-mouse-mode))))
+
+;;; Backup-file
+(add-hook 'lye-init-hook
+          (lambda ()
+            (require 'diff-mode)
+            (package! '(backup-file :type git :host github
+                                    :repo "Andersbakken/emacs-backup-file") t)
+            (setq backup-file-location (expand-file-name "backup"
+                                                         lye-emacs-cache-dir))
+            (add-hook 'after-save-hook #'backup-file)
+            (lazy-load-set-keys '(("C-z s b" . backup-file-log)))))
 
 (provide 'core-package)
 

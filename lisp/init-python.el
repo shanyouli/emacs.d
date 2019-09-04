@@ -24,7 +24,6 @@
 
 ;;; Code:
 
-
 (package! 'live-py-mode)
 (package! 'pyenv-mode)
 (package! 'pyenv-mode-auto)

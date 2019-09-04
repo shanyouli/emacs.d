@@ -113,6 +113,9 @@
 ;;    ("C-h d" . helpful-at-point))
 ;;  "helpful")
 
+;; iex-tldr
+(lazy-load-global-keys '(("C-z s h" . tldr)) "iex-tldr")
+
 (provide 'init-key)
 
 ;;; init-key.el ends here

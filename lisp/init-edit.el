@@ -23,10 +23,6 @@
 
 ;;; Code:
 
-;; Do not use the mouse in the graphical interface
-;; (when (display-graphic-p)
-;;   (use-package disable-mouse :hook  (after-init . global-disable-mouse-mode)))
-
 ;; Delete selection if you insert
 (use-package delsel
   :ensure nil
@@ -118,19 +114,6 @@
 
 (require-package 'page-break-lines)
 (add-hook 'after-init-hook #'global-page-break-lines-mode)
-
-;;------------------------------------------------------------------------------
-;; solaire-mode use
-;;------------------------------------------------------------------------------
-;; An alternative for `use-package' users:
-(use-package solaire-mode
-  :ensure t
-  :hook
-  ((change-major-mode after-revert ediff-prepare-buffer) . turn-on-solaire-mode)
-  (minibuffer-setup . solaire-mode-in-minibuffer)
-  :config
-  (solaire-global-mode +1)
-  (solaire-mode-swap-bg))
 
 (provide 'init-edit)
 ;;; init-edit.el ends here
