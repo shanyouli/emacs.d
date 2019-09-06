@@ -34,8 +34,7 @@
 (setq elfeed-db-directory (concat lye-emacs-cache-dir "elfeed"))
 
 (setq elfeed-feeds
-        '("http://planet.emacsen.org/atom.xml"
-          "http://www.masteringemacs.org/feed/"
+        '("http://www.masteringemacs.org/feed/"
           "https://oremacs.com/atom.xml"
           "https://pinecast.com/feed/emacscast"
           "https://emacs-china.github.io/rss.xml"
@@ -68,6 +67,7 @@
 ))
 
 (lazy-load-local-keys '(("?" . toggle-hydra-elfeed/body)) elfeed-search-mode-map "iex-elfeed")
+
 
 (provide 'iex-elfeed)
 

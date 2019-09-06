@@ -30,19 +30,17 @@
 
 ;;; Code:
 
+(package! 'doom-modeline t t)
+(package! 'all-the-icons nil t)
+(package! 'shrink-path nil t)
+(package! 'dash nil t)
 
-(defun install-doom-modeline ()
-  (package! 'doom-modeline t t)
-  (package! 'all-the-icons nil t)
-  (package! 'shrink-path nil t)
-  (package! 'dash nil t))
+(setq doom-modeline-buffer-file-name-style 'truncate-upto-root)
 
 ;;;###autoload
 (defun enable-doom-modeline ()
   "Enable `doom-modeline'"
   (interactive)
-  (install-doom-modeline)
-  (setq doom-modeline-buffer-file-name-style 'truncate-upto-root)
   (doom-modeline-mode +1))
 
 ;;;###autoload

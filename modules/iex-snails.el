@@ -29,14 +29,34 @@
 ;; snails
 
 ;;; Code:
+
 (package! '(snails :type git
                    :host github
                    :repo "manateelazycat/snails"
                    :no-byte-compile t)
           t)
 
+(package! '(snails-backend-themes :type git
+                                  :host github
+                                  :repo "shanyouli/snails-backend"
+                                  :no-bype-compile t)
+          t)
+
 (lye/modules-require 'iex-fuz)
 (setq snails-fuz-library-load-status "load")
+
+(dolist (buf (list
+              " *which-key*"
+              " *straight-process*"
+              "*straight-process*"
+              "*One-Key*"
+              "*Flycheck**"
+              "*flycheck-posframe-buffer*"
+              " *flycheck-posframe-buffer*"
+              " *company-posframe-buffer*"
+              "*company"
+              "*esup"))
+  (push buf snails-backend-buffer-blacklist))
 
 (provide 'iex-snails)
 

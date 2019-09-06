@@ -34,7 +34,7 @@
  '(("M-x"     . counsel-M-x)
    ("C-x C-f" . counsel-find-file)
    ("C-x f"   . counsel-recentf)
-   ("C-s"     . swiper-isearch)
+   ("C-s"     . swiper-isearch-thing-at-point)
    ("C-z s t" . counsel-load-theme)
    ("M-y"     . counsel-yank-pop)
    ("C-x b"   . ivy-switch-buffer)
@@ -104,7 +104,8 @@
 ;; lex-snails
 (when (display-graphic-p)
   (lazy-load-unset-keys '("C-x C-b"))
-  (lazy-load-global-keys '(("C-x C-b" . snails)) "iex-snails"))
+  (lazy-load-global-keys '(("C-x C-b" . snails)
+                           ("C-z C-s" . snails-load-themes)) "iex-snails"))
 
 ;; Better elisp help file format
 ;; (require-package 'helpful)

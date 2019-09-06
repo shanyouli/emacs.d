@@ -62,10 +62,10 @@
   (setq image-dired-dir (concat lye-emacs-cache-dir "image-dired")
         image-dired-thumbnail-storage 'standard))
 
-(use-package image-mode :ensure nil)
+;; (use-package image-mode :ensure nil)
 
 ;; Extra Dired functionality
-(use-package dired-aux :ensure nil)
+;; (use-package dired-aux :ensure nil)
 (use-package dired-x
   :ensure nil
   :commands (dired-omit-mode)

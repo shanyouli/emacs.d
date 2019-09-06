@@ -28,8 +28,6 @@
 
 ;;; Code:
 
-
-
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
 (when (and (display-graphic-p) (not system/windows))

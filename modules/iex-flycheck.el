@@ -44,6 +44,7 @@
 (with-eval-after-load 'flycheck
   (when (display-graphic-p)
     (package! 'flycheck-posframe t t)
+    (setq flycheck-posframe-buffer " *flycheck-posframe-buffer*")
     (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)))
 
 (provide 'iex-flycheck)
