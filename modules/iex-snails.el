@@ -28,8 +28,7 @@
 
 ;; snails
 
-;;; Code:
-
+;;; require
 (package! '(snails :type git
                    :host github
                    :repo "manateelazycat/snails"
@@ -42,9 +41,14 @@
                                   :no-bype-compile t)
           t)
 
+;;; Code:
+
+;;; Use fuzzy search from `fuz'
 (lye/modules-require 'iex-fuz)
 (setq snails-fuz-library-load-status "load")
+;; -----------------------------------------------------------------------------
 
+;;; snails-backend-buffer-blacklist
 (dolist (buf (list
               " *which-key*"
               " *straight-process*"
