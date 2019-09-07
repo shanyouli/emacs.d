@@ -70,9 +70,6 @@
 [submodule "disable-mouse"]
 	path = site-lisp/disable-mouse
 	url = https://github.com/purcell/disable-mouse.git
-[submodule "elispfl"]
-	path = site-lisp/elispfl
-	url = https://github.com/cireu/elispfl.git
 [submodule "exec-path-from-shell"]
 	path = site-lisp/exec-path-from-shell
 	url = https://github.com/purcell/exec-path-from-shell.git

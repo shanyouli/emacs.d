@@ -184,10 +184,6 @@ Lisp function does not specify a special indentation."
 ;; Show function arglist or variable docstring
 ;; `global-edloc-mode' is enabled by default.
 
-(use-package eldoc
-  :ensure nil
-  :diminish eldoc-mode)
-
 ;; Interacitve macro expander
 (use-package macrostep
   :ensure t
@@ -200,9 +196,9 @@ Lisp function does not specify a special indentation."
 (use-package elisp-refs :ensure t)
 
 ;; Function that highlights global variables
-(when (locate-library "elispfl")
-  (require 'elispfl)
-  (add-hook 'emacs-lisp-mode-hook #'elispfl-mode))
+(package! '(elispfl :type git :host github
+                    :repo "cireu/elispfl") t t)
+(elispfl-mode +1)
 
 (provide 'init-elisp)
 ;;; init-elisp.el ends here

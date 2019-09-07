@@ -30,16 +30,17 @@
   :hook ((prog-mode org-mode) . yas-minor-mode)
   :init
   (setq yas-snippet-dirs (list lye-emacs-yas-snippets-dir))
-  (use-package yasnippet-snippets :ensure t)
   :config
   (yas-reload-all)
+
   (when (file-exists-p yas--default-user-snippets-dir)
-    (delete-directory yas--default-user-snippets-dir)))
+    (delete-directory yas--default-user-snippets-dir))
+
+  (use-package yasnippet-snippets :ensure t))
 
 ;;; prettify-mode
 (setq-default prettify-symbols-alist
-              '(
-                ("<-" . "←")
+              '(("<-" . "←")
                 ("->" . ?→)
                 ("->>" . ?↠)
                 ("=>" . ?⇒)
@@ -55,6 +56,7 @@
                 (">=>" . ?↣)
                 ("&&" . ?∧)
                 ("||" . ?∨)))
+
 (setq prettify-symbols-unprettify-at-point 'right-edge)
 
 ;;; Program Languages
@@ -87,6 +89,7 @@
   :defer t
   :config
   (lye/exec-path-from-shell-init)
+
   (when (executable-find "markdownfmt")
     (use-package markdownfmt
       :bind (:map markdown-mode-map
@@ -105,18 +108,17 @@
 ;; plantuml
 (use-package plantuml-mode
   :ensure t
-  :init   (setq plantuml-default-exec-mode 'jar)
+  :init (setq plantuml-default-exec-mode 'jar)
   :config
   (setq plantuml-jar-path lye-emacs-plantuml-file)
   (unless (file-exists-p plantuml-jar-path)
     (plantuml-download-jar)))
 
 ;; Only suitable for Windows Languages-Packages major-mode
-(when (and (boundp system/windows) system/windows)
+(when  system/windows
   ;; ahk-mode
-  (use-package ahk-mode :ensure t :mode "\\.ahk\\'"  :defer t))
+  (use-package ahk-mode :ensure t :mode "\\.ahk\\'"  :defer t)
 
-(when system/windows
   ;; powershell-mode
   (use-package powershell
     :ensure t
