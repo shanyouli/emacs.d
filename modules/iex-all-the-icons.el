@@ -44,6 +44,8 @@
 
 (push '("\\.mkv$" all-the-icons-faicon "film" :face all-the-icons-blue)
       all-the-icons-icon-alist)
+(push '("\\.rasi" all-the-icons-alltheicon "css3" :face all-the-icons-blue)
+      all-the-icons-icon-alist)
 
 ;;------------------------------------------------------------------------------
 ;; mode icons

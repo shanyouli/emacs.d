@@ -82,6 +82,12 @@
          ("\\.yaml\\'" . yaml-mode))
   :defer t)
 
+;; css
+(use-package css-mode
+  :ensure nil
+  :mode (("\\.rasi\\'" . css-mode))
+  :defer t)
+
 ;; markdown, md
 (use-package markdown-mode
   :ensure t

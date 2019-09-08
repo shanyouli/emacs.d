@@ -27,7 +27,6 @@
 (use-package dired
   :ensure nil
   :bind (:map dired-mode-map
-              ("H" . dired-omit-mode)
               ("RET" . dired-find-alternate-file)
               ("C-c C-e" . wdired-change-to-wdired-mode))
   :config
@@ -71,6 +70,8 @@
   :commands (dired-omit-mode)
   :defer 0.1
   :hook (dired-mode . dired-omit-mode)
+  :bind (:map dired-mode-map
+         ("H" . dired-omit-mode))
   :config
   (setq dired-omit-verbose nil
         dired-omit-files

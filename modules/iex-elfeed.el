@@ -30,6 +30,7 @@
 
 ;;; Code:
 (package! 'elfeed t t)
+(lye/modules-require 'iex-pretty-hydra)
 
 (setq elfeed-db-directory (concat lye-emacs-cache-dir "elfeed"))
 
@@ -41,7 +42,6 @@
           "https://manateelazycat.github.io/feed.xml"
           "https://planet.emacslife.com/atom.xml"))
 
-(lye/modules-require 'iex-pretty-hydra)
 (pretty-hydra-define toggle-hydra-elfeed
   (:title (pretty-hydra-title "Elfeed" 'faicon "rss-square")
    :color amaranth :quit-key "q")
@@ -63,8 +63,7 @@
     ("p" previous-line "Previous")
     ("u" elfeed-search-untag-all-unread "mark unread")
     ("r" elfeed-search-untag-all-read "mark read")
-    ("RET" elfeed-search-show-entry "Show"))
-))
+    ("RET" elfeed-search-show-entry "Show"))))
 
 (lazy-load-local-keys '(("?" . toggle-hydra-elfeed/body)) elfeed-search-mode-map "iex-elfeed")
 
