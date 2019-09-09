@@ -121,8 +121,6 @@
               (awesome-tab-mode +1)
               (add-hook 'after-load-theme-hook #'lye/refresh-awesome-tab-mode))))
 
-(lye/modules-require 'iex-solair)
-
 (provide 'core-ui)
 
 ;;; core-ui.el ends here
