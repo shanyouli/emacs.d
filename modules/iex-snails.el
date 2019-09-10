@@ -38,7 +38,8 @@
 (package! '(snails-backend-themes :type git
                                   :host github
                                   :repo "shanyouli/snails-backend"
-                                  :no-bype-compile t)
+                                  :no-bype-compile t
+                                  :no-autoloads t)
           t)
 
 ;;; Code:
@@ -61,6 +62,12 @@
               "*company"
               "*esup"))
   (push buf snails-backend-buffer-blacklist))
+
+;;; snails-backend-themes
+(defun snails-load-theme ()
+  "Loading a theme use `snails'"
+  (interactive)
+  (snails '(snails-backend-themes)))
 
 (provide 'iex-snails)
 

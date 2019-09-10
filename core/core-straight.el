@@ -149,6 +149,10 @@
   (require 'straight)
   (mapc #'straight-use-recipes straight-core-package-sources))
 
+(defun goto-straight-buffer ()
+  (interactive)
+  (switch-to-buffer straight-process-buffer))
+
 (defun package! (pkg-name &optional loadp use-straight-p)
   "Install a package"
   (if (or use-straight-p

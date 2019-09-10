@@ -105,7 +105,7 @@
 (when (display-graphic-p)
   (lazy-load-unset-keys '("C-x C-b"))
   (lazy-load-global-keys '(("C-x C-b" . snails)
-                           ("C-z C-s" . snails-load-themes)) "iex-snails"))
+                           ("C-z C-s" . snails-load-theme)) "iex-snails"))
 
 ;; Better elisp help file format
 ;; (require-package 'helpful)

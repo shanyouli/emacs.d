@@ -28,7 +28,8 @@
 (use-package lua-mode
   :ensure nil
   :defer t
-  :mode ("\\.lua\\'" . lua-mode)
+  :mode (("\\.lua\\'" . lua-mode)
+         (".luacheckrc" . lua-mode))
   :config
   (setq lua-indent-level 4
         lua-indent-string-contents t))
