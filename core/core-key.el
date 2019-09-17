@@ -33,7 +33,7 @@
 (require 'lazy-load)
 
 ;; Global uninstall button
-(lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s" "C-r"))
+(lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC"))
 
 ;; esup
 (lazy-load-global-keys '(("C-z e" . esup)) "esup")

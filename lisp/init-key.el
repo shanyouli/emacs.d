@@ -117,6 +117,8 @@
 ;; iex-tldr
 (lazy-load-global-keys '(("C-z s h" . tldr)) "iex-tldr")
 
+;; iex-smart-align
+(lazy-load-global-keys '(("C-z s m" . smart-align)) "iex-smart-align")
 (provide 'init-key)
 
 ;;; init-key.el ends here
