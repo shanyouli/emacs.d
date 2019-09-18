@@ -29,10 +29,11 @@
   :ensure nil
   :defer t
   :mode (("\\.lua\\'" . lua-mode)
-         (".luacheckrc" . lua-mode))
+         (".luacheckrc" . lua-mode)
+         ("rc.lua.template" . lua-mode))
   :config
   (setq lua-indent-level 4
-        lua-indent-string-contents t))
+        lua-indent-string-contents nil))
 
 (use-package company-lua :straight t)
 
