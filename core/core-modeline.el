@@ -94,6 +94,20 @@
 (if (display-graphic-p)
     (progn
       (require 'awesome-tray)
+      ;; add-pyim-modules
+      (defface awesome-tray-module-pyim-face
+        '((t (:foreground "orange" :bold t)))
+        "Pyim face."
+        :group 'awesome-tray)
+
+      (defun awesome-tray-module-pyim-info ()
+        (if (and (featurep 'pyim) (string= current-input-method "pyim"))
+            (format "[%s]" 'I)
+          ""))
+
+      (add-to-list 'awesome-tray-module-alist
+                   '("pyim" . (awesome-tray-module-pyim-info
+                               awesome-tray-module-pyim-face)))
       (setq awesome-tray-active-modules
             '("pyim" "location"  "parent-dir"  "mode-name" "awesome-tab" "date"))
 
