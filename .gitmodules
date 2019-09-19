@@ -19,9 +19,6 @@
 [submodule "insert-translated-name"]
 	path = site-lisp/insert-translated-name
 	url = https://github.com/manateelazycat/insert-translated-name.git
-[submodule "lazycat-theme"]
-	path = site-lisp/lazycat-theme
-	url = https://github.com/shanyouli/lazycat-theme.git
 [submodule "lazy-search"]
 	path = site-lisp/lazy-search
 	url = https://github.com/manateelazycat/lazy-search.git
@@ -76,9 +73,9 @@
 [submodule "xr"]
 	path = site-lisp/xr
 	url = https://github.com/mattiase/xr.git
-[submodule "awesome-tray"]
-	path = site-lisp/awesome-tray
-	url = git@github.com:shanyouli/awesome-tray.git
 [submodule "ido-completing-read-plus"]
 	path = site-lisp/ido-completing-read-plus
 	url = https://github.com/DarwinAwardWinner/ido-completing-read-plus.git
+[submodule "awesome-tray"]
+	path = site-lisp/awesome-tray
+	url = https://github.com/shanyouli/awesome-tray.git
