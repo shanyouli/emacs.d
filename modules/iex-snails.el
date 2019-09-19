@@ -38,8 +38,7 @@
 (package! '(snails-backend-themes :type git
                                   :host github
                                   :repo "shanyouli/snails-backend"
-                                  :no-bype-compile t
-                                  :no-autoloads t)
+                                  :no-byte-compile t)
           t)
 
 ;;; Code:

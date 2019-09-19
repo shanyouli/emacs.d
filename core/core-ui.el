@@ -103,16 +103,8 @@
   (add-hook 'after-make-frame-functions #'lye/restore-frame-size)
 
   ;; font
-  (setq setup-english-font "Fantasque Sans Mono")
-  (setq setup-cjk-font (cond
-                        (system/linux
-                         "WenQuanYi Micro Hei")
-                        (system/mac
-                         "Hiragio Sans GB")
-                        (system/windows
-                         "Microsoft Yahei")))
-  (setq setup-font-default-size 14)
-  (setup-font-initialize)
+  (lye/modules-require 'lex-font)
+  (init-font-config)
 
   ;; awesome-tab
   (add-hook 'after-init-hook
