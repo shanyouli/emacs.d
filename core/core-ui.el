@@ -97,21 +97,21 @@
                (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
 
   ;; Frame Size after startup
-  (add-hook 'after-init-hook #'lye/restore-frame-size)
 
+  (add-hook 'emacs-startup-hook #'lye/restore-frame-size)
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
   (add-hook 'after-make-frame-functions #'lye/restore-frame-size)
-
-  ;; font
-  (lye/modules-require 'lex-font)
-  (init-font-config)
-
   ;; awesome-tab
   (add-hook 'after-init-hook
             (lambda ()
               (lye/modules-require 'lex-awesome-tab)
               (awesome-tab-mode +1)
               (add-hook 'after-load-theme-hook #'lye/refresh-awesome-tab-mode))))
+
+;; font
+(lye/modules-require 'lex-font)
+;;(add-hook 'window-setup-hook #'init-font-config )
+(init-font-config)
 
 (provide 'core-ui)
 
