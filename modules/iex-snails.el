@@ -62,7 +62,7 @@
               "*esup"
               " *pyim"
               " *server"
-              " *"))
+              " *sdcv"))
   (push buf snails-backend-buffer-blacklist))
 
 ;;; snails-backend-themes

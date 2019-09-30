@@ -34,7 +34,7 @@
 (defun init-font-config (&optional chinese english)
   "font initialization"
   (when (display-graphic-p)
-    (setq setup-english-font  "Fantasque Sans Mono"
+    (setq setup-english-font "Fantasque Sans Mono"
           setup-cjk-font  (cond
                            (system/linux
                             "WenQuanYi Micro Hei")
