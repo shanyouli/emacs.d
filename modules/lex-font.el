@@ -45,6 +45,9 @@
           setup-font-default-size 14)
     (setup-font-initialize)))
 
+;;;###autoload
+
+
 (provide 'lex-font)
 
 ;;; lex-font.el ends here

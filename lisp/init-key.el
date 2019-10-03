@@ -76,9 +76,6 @@
 ;; iex-vterm
 (lazy-load-global-keys '(("C-x s v" . term-toggle)) "iex-term")
 
-;; iex-speed-type.el
-(lazy-load-global-keys '(("C-z g s" . speed-type-text)) "iex-speed-type")
-
 ;; iex-pomidor.el
 (lazy-load-global-keys '(("C-z s c" . pomidor)) "iex-pomidor")
 

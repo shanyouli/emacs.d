@@ -71,6 +71,11 @@
   (interactive)
   (snails '(snails-backend-themes)))
 
+(add-hook 'snails-mode-hook
+          (lambda ()
+            (if (and (featurep 'evil) evil-mode)
+                (evil-emacs-state))))
+
 (provide 'iex-snails)
 
 ;;; iex-snails.el ends here

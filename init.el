@@ -98,7 +98,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-straight)       ; staraight, package
 (lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-ui)             ; UI
-(lye/core-require 'core-modeline)       ; mode-line
+;;(lye/core-require 'core-modeline)       ; mode-line
 (lye/core-require 'core-package)        ; packages initialization
 
 (lye/init-require 'init-key)          ; Keybindings
@@ -134,11 +134,11 @@ decrease this. If you experience stuttering, increase this.")
 ;;                      gcs-done)))
 
 ;; load all el-file in lye-emacs-modules-dir, When fist run.
-(unless lye-load-all-module-file-p
-  (run-with-idle-timer
-   2 nil
-   (lambda ()
-     (lye/core-require 'core-funcs)
-     (load-all-module-file)
-     (if (file-exists-p custom-file)
-         (append-to-file "\n (setq lye-load-all-module-file-p t)" nil custom-file)))))
+;; (unless lye-load-all-module-file-p
+;;   (run-with-idle-timer
+;;    2 nil
+;;    (lambda ()
+;;      (lye/core-require 'core-funcs)
+;;      (load-all-module-file)
+;;      (if (file-exists-p custom-file)
+;;          (append-to-file "\n (setq lye-load-all-module-file-p t)" nil custom-file)))))

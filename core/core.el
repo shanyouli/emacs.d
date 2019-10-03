@@ -133,7 +133,11 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   "Import all el files in lye-emacs-modules-dir on first run."
   :type 'boolean)
 
-(defcustom lye-sdcv-dictionary-data-dir (expand-file-name "stardict" lye-emacs-share-dir)
+(defcustom lye-sdcv-dictionary-data-dir
+  (let ((file (expand-file-name "stardict" lye-emacs-share-dir)))
+    (if (file-directory-p file)
+        file
+      (expand-file-name "~/.stardict/")))
   "Sdcv dictionary storage directory."
   :type 'string)
 
