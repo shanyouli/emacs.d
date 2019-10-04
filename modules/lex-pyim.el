@@ -32,7 +32,7 @@
 (require 'pyim)
 
 ;;; Start pyim function
-(defvar pyim-load-liberime-or-pyim-bigdict-p nil
+(defvar pyim-load-liberime-or-pyim-bigdict-p t
   "If pyim-load-liberime-or-pyim-bigdict-p is t and the liberime package exists,
 use liberime as the back end of the pyim input method.
 Conversely use pyim-bigdict as the lexical backend for the pyim input method.")

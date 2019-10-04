@@ -94,7 +94,6 @@ decrease this. If you experience stuttering, increase this.")
 
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
-(lye/core-require 'core-autoload)       ; Generate autoload file
 (lye/core-require 'core-straight)       ; staraight, package
 (lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-ui)             ; UI

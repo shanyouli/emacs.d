@@ -76,6 +76,14 @@
             (if (and (featurep 'evil) evil-mode)
                 (evil-emacs-state))))
 
+(add-hook 'snails-mode-hook
+          ;; UP, Down, Left, Right key bind
+          (defun +arrow-key-and-snails ()
+            (define-key snails-mode-map (kbd "<up>") 'snails-select-prev-item)
+            (define-key snails-mode-map (kbd "<down>") 'snails-select-next-item)
+            (define-key snails-mode-map (kbd "<left>") 'snails-select-prev-backend)
+            (define-key snails-mode-map (kbd "<right>") 'snails-select-next-backend)))
+
 (provide 'iex-snails)
 
 ;;; iex-snails.el ends here

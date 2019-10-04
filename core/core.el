@@ -141,6 +141,10 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   "Sdcv dictionary storage directory."
   :type 'string)
 
+(defcustom lye-emacs-autoload-dir (expand-file-name "autoload/" lye-emacs-cache-dir)
+  "Automatic generation autoload file storage directory."
+  :type 'string)
+
 (defcustom lye-emacs-autoload-file (expand-file-name "loadfs.el" lye-emacs-cache-dir)
   "Extract the autoload magic annotation file from the third party package."
   :type '(choice (string :tag "Fire Name")
@@ -149,6 +153,10 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 ;; Set the temporal directory
 (unless (file-exists-p lye-emacs-cache-dir)
   (make-directory lye-emacs-cache-dir))
+
+;; make-directory lye-emacs-autoload-dir
+(unless (file-exists-p lye-emacs-autoload-dir)
+  (make-directory lye-emacs-autoload-dir))
 
 ;;; Load `custom-file'
 (setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
@@ -184,17 +192,23 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
                    collecting (expand-file-name dir))
              load-path)))))
 
+(defun add-to-load-path (dir-path)
+  "If the `DIR-PATH' exists adding `load-path'"
+  (if (file-directory-p dir-path)
+      (push dir-path load-path)))
+
 (defun lye/update-load-path (&rest _)
   "Update `load-path'."
 
-  ;; add `lye-emacs-init-dir' to load-path
-  (push lye-emacs-init-dir load-path)
+  (mapc 'add-to-load-path
+        `(
+          ,lye-emacs-core-dir      ; add `lye-emacs-core-dir' to load-path
+          ,lye-emacs-init-dir      ; add `lye-emacs-init-dir' to load-path
+          ,lye-emacs-modules-dir   ; add `lye-emacs-modules-dir' to load-path
+          ))
 
   ;; add `lye-emacs-site-lisp-dir' to load-path
-  (lye/add-subdidrs-to-load-path lye-emacs-site-lisp-dir)
-
-  ;; add `lye-emacs-modules-dir' to load-path
-  (push lye-emacs-modules-dir load-path))
+  (lye/core-require 'core-site-lisp))
 
 (advice-add #'package-initialize :after #'lye/update-load-path)
 
