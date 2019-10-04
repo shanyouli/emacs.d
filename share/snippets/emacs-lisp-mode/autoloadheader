@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: autoloadheader
+# key: ahd
+# --
+;;; ${1:name}.el -*- lexical-binding: t -*-
