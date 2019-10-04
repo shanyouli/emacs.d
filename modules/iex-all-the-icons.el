@@ -63,6 +63,7 @@
 ;; dir-icons
 ;;------------------------------------------------------------------------------
 (push '("Videos?" all-the-icons-faicon "film") all-the-icons-dir-icon-alist)
+(push '("Work" all-the-icons-material "work") all-the-icons-dir-icon-alist)
 
 (provide 'iex-all-the-icons)
 

@@ -201,7 +201,7 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 (lye/update-load-path)
 
 ;;; bechmark-init
-(when lye-enable-benchmark-p
+(when t ;;lye-enable-benchmark-p
   (require 'benchmark-init-modes)
   (require 'benchmark-init)
   (benchmark-init/activate))
