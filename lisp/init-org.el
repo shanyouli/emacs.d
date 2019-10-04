@@ -64,6 +64,7 @@
 (use-package org-bullets
   :ensure t
   :if (char-displayable-p ?◉)
+
   :hook (org-mode . org-bullets-mode)
   :config
   (setq org-bullets-bullet-list

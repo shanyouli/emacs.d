@@ -142,13 +142,17 @@ If you can't use liberime, use pyim-bigdict."
   (interactive)
   ;; Set the color of pyim-bage
   (changes-pyim-page-color-from-theme)
-
-  (if pyim-load-liberime-or-pyim-bigdict-p
-      (progn
+  (cond
+   (pyim-load-liberime-or-pyim-bigdict-p
         (pyim-load-liberime-or-pyim-bigdict)
         (setq pyim-load-liberime-or-pyim-bigdict-p nil)
         (set-input-method "pyim"))
-    (toggle-input-method)))
+   ((not default-input-method)
+    (setq default-input-method "pyim")
+    (pyim-load-bigdict)
+    (set-input-method "pyim"))
+   (t
+    (toggle-input-method))))
 
 (defun lye/toggle-pyim-punctuation-translate()
   "Half-width punctuation and full-width punctuation conversion."

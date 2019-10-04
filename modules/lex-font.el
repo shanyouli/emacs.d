@@ -31,7 +31,7 @@
 ;;; Code:
 
 ;;;###autoload
-(defun init-font-config (&optional chinese english)
+(defun +init-font-config (&optional chinese english)
   "font initialization"
   (when (display-graphic-p)
     (setq setup-english-font "Fantasque Sans Mono"
@@ -46,7 +46,10 @@
     (setup-font-initialize)))
 
 ;;;###autoload
-
+(defun +init|daemonp-font (frame)
+  (with-selected-frame frame
+    (if (display-graphic-p)
+        (+init-font-config))))
 
 (provide 'lex-font)
 
