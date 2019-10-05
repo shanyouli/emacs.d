@@ -13,8 +13,7 @@ Dot-directories and directories contain `.nosearch' will be skipped."
     (mapcar (lambda (d) (expand-file-name d dir)))
     (cl-remove-if-not #'file-directory-p)
     (cl-remove-if (lambda (d)
-                    (file-exists-p (expand-file-name ".nosearch"
-                                                     d))))))
+                    (file-exists-p (expand-file-name ".nosearch" d))))))
 
 ;;;###autoload
 (defun +find-el-file-recursively (dir)
