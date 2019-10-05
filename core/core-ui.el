@@ -50,33 +50,11 @@
     (push '(menu-bar-lines . 0) default-frame-alist)))
 
 ;; Suppress GUI features
-(setq use-file-dialog nil)
-(setq use-dialog-box nil)
-(setq initial-buffer-choice nil)
-
-;; Misc
-(setq frame-resize-pixelwise t) ;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
-
-;; Frame Size
-(defun lye/frame-default-height ()
-  "The ratio of the default height to the screen height is 0.618."
-  (/ (* 618 (x-display-pixel-height)) (* 1000 (frame-char-height))))
-
-(defun lye/frame-default-width ()
-  "The default width is half of the screen, and the error is between 2px."
-  (- (/ (x-display-pixel-width) (* 2 (frame-char-width))) 2))
-
-(defun lye/restore-frame-size (&optional frame)
-  "Frame default size configuration."
-  (interactive)
-  (when (display-graphic-p)
-    (when frame (select-frame frame))
-    (if ( and (boundp system/windows) system/windows)
-        (progn
-          (set-frame-width (selected-frame) (lye/frame-default-width))
-          (set-frame-height (selected-frame) (lye/frame-default-height)))
-      (set-frame-size (selected-frame)
-                      (lye/frame-default-width) (lye/frame-default-height)))))
+(setq use-file-dialog nil
+      use-dialog-box nil
+      initial-buffer-choice nil
+      ;;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
+      frame-resize-pixelwise t)
 
 ;; THEME
 (setq theme-switch-light      'doom-one-light
@@ -98,9 +76,11 @@
 
   ;; Frame Size after startup
 
-  (add-hook 'emacs-startup-hook #'lye/restore-frame-size)
+  (add-hook 'emacs-startup-hook #'lye/default-frame-size)
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-  (add-hook 'after-make-frame-functions #'lye/restore-frame-size)
+  (add-hook 'after-make-frame-functions
+            (lambda (frame)
+              (lye/default-frame-size frame)))
   ;; awesome-tab
   (add-hook 'after-init-hook
             (lambda ()

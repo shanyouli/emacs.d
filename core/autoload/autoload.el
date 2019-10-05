@@ -32,7 +32,7 @@ like: `~/.emacs.d/modules' ==> modules"
 
 ;;;###autoload
 (defun generate-autoload-and-refresh (dir &optional target)
-  ""
+  "Building or refreshing `autoload'."
   (require 'autoload)
   (let* ((dir dir)
          (target

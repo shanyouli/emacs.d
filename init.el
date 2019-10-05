@@ -137,7 +137,6 @@ decrease this. If you experience stuttering, increase this.")
 ;;   (run-with-idle-timer
 ;;    2 nil
 ;;    (lambda ()
-;;      (lye/core-require 'core-funcs)
 ;;      (load-all-module-file)
 ;;      (if (file-exists-p custom-file)
 ;;          (append-to-file "\n (setq lye-load-all-module-file-p t)" nil custom-file)))))
