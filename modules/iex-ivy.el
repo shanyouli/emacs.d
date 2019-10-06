@@ -105,7 +105,7 @@
  ivy-minibuffer-map)
 
 (ivy-mode +1)
-(counsel-mode +1)
+
 ;; -----------------------------------------------------------------------------
 
 ;;; Linkage between ivy and yasnippet

@@ -110,6 +110,12 @@
             (add-hook 'after-save-hook #'backup-file)
             (lazy-load-set-keys '(("C-z s b" . backup-file-log)))))
 
+;;; Highlight diff
+(use-package diff-hl
+  :ensure t
+  :commands (global-diff-hl-mode)
+  :hook (after-init . global-diff-hl-mode))
+
 (provide 'core-package)
 
 ;;; core-package.el ends here

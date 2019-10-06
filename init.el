@@ -120,9 +120,6 @@ decrease this. If you experience stuttering, increase this.")
                              (lye/init-require 'init-hugo)
                              (lye/init-require 'init-org)))
 
-;;(require 'dashboard)
-;;(dashboard-setup-startup-hook)
-
 ;; get emascs startup time
 ;; (add-hook 'emacs-startup-hook
 ;;           (lambda ()

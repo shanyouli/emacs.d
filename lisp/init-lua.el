@@ -34,7 +34,6 @@
   :config
   (setq lua-indent-level 4
         lua-indent-string-contents nil))
-
 (use-package company-lua :straight t)
 
 (add-hook 'lua-mode-hook

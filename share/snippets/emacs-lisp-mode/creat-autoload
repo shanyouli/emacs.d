@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: creat-autoload
+# key: a;
+# --
+;;;###autoload
