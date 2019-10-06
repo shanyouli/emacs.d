@@ -95,7 +95,6 @@
     (add-hook 'after-make-frame-functions #'+init|daemonp-font)
   (+init-font-config))
 
-
 (provide 'core-ui)
 
 ;;; core-ui.el ends here

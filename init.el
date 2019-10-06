@@ -113,7 +113,7 @@ decrease this. If you experience stuttering, increase this.")
                                 (lye/init-require 'init-elisp)
                                 (lye/init-require 'init-scheme)
                                 (lye/init-require 'init-sh)
-                                (lye/init-require 'init-lua)
+                                ;;(lye/init-require 'init-lua)
                                 (lye/init-require 'init-python)))
 ;; Org mode
 (run-with-idle-timer 1 nil (lambda ()
