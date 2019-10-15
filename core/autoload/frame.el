@@ -26,7 +26,7 @@
   (interactive)
   (when (display-graphic-p)
     (when frame (select-frame frame))
-    (if ( and (boundp system/windows) system/windows)
+    (if (memq system-type '(windows-nt ms-dos cygwin))
         (progn
           (set-frame-width (selected-frame) (+frame-width-half))
           (set-frame-height (selected-frame) (+frame-height-golden-section)))

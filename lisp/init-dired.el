@@ -29,6 +29,7 @@
   :bind (:map dired-mode-map
               ("RET" . dired-find-alternate-file)
               ("C-c C-e" . wdired-change-to-wdired-mode))
+  :hook (dired-mode . dired-hide-details-mode)
   :config
   (setq dired-recursive-copies t) ; Recursive copying
   (setq dired-recursive-deletes t) ; Recursive deletion
@@ -42,7 +43,7 @@
   :bind (:map dired-mode-map
          ("C" . dired-async-do-copy)
          ("R" . dired-async-do-rename))
-  :hook (dired-mode-hook . dired-async-mode))
+  :hook (dired-mode . dired-async-mode))
 
 (use-package all-the-icons-dired
   :straight t

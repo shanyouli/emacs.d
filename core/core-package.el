@@ -100,15 +100,16 @@
             (if (display-graphic-p) (global-disable-mouse-mode))))
 
 ;;; Backup-file
-(add-hook 'lye-init-hook
-          (lambda ()
-            (require 'diff-mode)
-            (package! '(backup-file :type git :host github
+(unless system/windows
+  (add-hook 'lye-init-hook
+            (lambda ()
+              (require 'diff-mode)
+              (package! '(backup-file :type git :host github
                                     :repo "Andersbakken/emacs-backup-file") t)
-            (setq backup-file-location (expand-file-name "backup"
+              (setq backup-file-location (expand-file-name "backup"
                                                          lye-emacs-cache-dir))
-            (add-hook 'after-save-hook #'backup-file)
-            (lazy-load-set-keys '(("C-z s b" . backup-file-log)))))
+              (add-hook 'after-save-hook #'backup-file)
+              (lazy-load-set-keys '(("C-z s b" . backup-file-log))))))
 
 ;;; Highlight diff
 (use-package diff-hl
