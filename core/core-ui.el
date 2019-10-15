@@ -88,7 +88,7 @@
 
 ;; font
 (lye/modules-require 'lex-font)
-;;(add-hook 'window-setup-hook #'init-font-config )
+
 (if (and (fboundp 'daemonp) (daemonp))
     (add-hook 'after-make-frame-functions #'+init|daemonp-font)
   (+init-font-config))

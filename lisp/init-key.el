@@ -99,7 +99,7 @@
 (lazy-load-global-keys '(("C-x p i" . org-cliplink)) "org-cliplink")
 
 ;; lex-snails
-(when (display-graphic-p)
+(when (and (not system/windows) (display-graphic-p))
   (lazy-load-unset-keys '("C-x C-b"))
   (lazy-load-global-keys '(("C-x C-b" . snails)
                            ("C-z C-s" . snails-load-theme)) "iex-snails"))
@@ -112,7 +112,8 @@
 ;;  "helpful")
 
 ;; iex-tldr
-(lazy-load-global-keys '(("C-z s h" . tldr)) "iex-tldr")
+(unless system/windows
+  (lazy-load-global-keys '(("C-z s h" . tldr)) "iex-tldr"))
 
 ;; iex-smart-align
 (lazy-load-global-keys '(("C-z s m" . smart-align)) "iex-smart-align")

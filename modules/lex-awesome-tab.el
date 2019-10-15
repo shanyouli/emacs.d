@@ -29,9 +29,11 @@
 ;; awesome-tab
 
 ;;; Code:
-(lye/modules-require 'iex-all-the-icons)
+(unless system/windows
+  (lye/modules-require 'iex-all-the-icons))
 
-(setq awesome-tab-style 'slant) ; awesome-tab style
+;; awesome-tab style: slant, wave,alternate,bar,box,chamfer,rounded,zigzag
+(setq awesome-tab-style 'box)
 
 (defun lye/awesome-tab-hide-tab (x)
   (let ((name (format "%s" x)))

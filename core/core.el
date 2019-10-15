@@ -172,7 +172,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 (if (file-exists-p custom-file) (load custom-file))
 ;; -----------------------------------------------------------------------------
 
-
 ;; =============================================================================
 (defvar lye-core-autoload-file
   (expand-file-name "core-loadfs.el" lye-emacs-autoload-dir))

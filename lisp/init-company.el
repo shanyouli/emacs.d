@@ -48,7 +48,7 @@
   ;; aligns annotation to the right hand side
   (setq company-tooltip-align-annotations t)
 
-  (setq company-idle-delay 0
+  (setq company-idle-delay 0.3
         compant-echo-delay (if (display-graphic-p) nil 0)
         company-tooltip-limit 10
         company-require-match nil
@@ -68,25 +68,26 @@
         '(company-pseudo-tooltip-unless-just-one-frontend
           company-preview-if-just-one-frontend))
 
-   ;; Use company-tabnine
-  (use-package company-tabnine
-    :ensure t
-    :init
-    (setq company-tabnine-binaries-folder
-          (expand-file-name "TabNine" lye-emacs-share-dir))
+  ;; Use company-tabnine
+  (unless system/windows
+    (use-package company-tabnine
+      :ensure t
+      :init
+      (setq company-tabnine-binaries-folder
+            (expand-file-name "TabNine" lye-emacs-share-dir))
 
-    (add-to-list 'company-backends #'company-tabnine))
-
-  ;; The free version of TabNine is good enough,
-  ;; and below code is recommended that TabNine not always
-  ;; prompt me to purchase a paid version in a large project.
-  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-    (let ((company-message-func (ad-get-arg 0)))
-      (when (and company-message-func
-                 (stringp (funcall company-message-func)))
-        (unless (string-match "The free version of TabNine only indexes up to"
-                              (funcall company-message-func))
-          ad-do-it))))
+      (add-to-list 'company-backends #'company-tabnine)
+      :config
+      ;; The free version of TabNine is good enough,
+      ;; and below code is recommended that TabNine not always
+      ;; prompt me to purchase a paid version in a large project.
+      (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
+        (let ((company-message-func (ad-get-arg 0)))
+          (when (and company-message-func
+                     (stringp (funcall company-message-func)))
+            (unless (string-match "The free version of TabNine only indexes up to"
+                                  (funcall company-message-func))
+              ad-do-it))))))
 
   ;; Support yas in commpany
   ;; Note: Must be the last to involve all backends
