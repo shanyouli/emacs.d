@@ -78,9 +78,7 @@
 
   (add-hook 'emacs-startup-hook #'lye/default-frame-size)
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-  (add-hook 'after-make-frame-functions
-            (lambda (frame)
-              (lye/default-frame-size frame)))
+  (add-hook 'after-make-frame-functions #'+frame-size-after-make-frame-functions)
   ;; awesome-tab
   (add-hook 'after-init-hook
             (lambda ()

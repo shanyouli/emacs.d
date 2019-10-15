@@ -33,3 +33,7 @@
       (set-frame-size (selected-frame)
                       (+frame-width-half)
                       (+frame-height-golden-section)))))
+
+;;;###autoload
+(defun +frame-size-after-make-frame-functions (frame)
+  (lye/default-frame-size frame))
