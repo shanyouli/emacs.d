@@ -94,11 +94,12 @@
   (+init-font-config))
 
 ;; mode-line
-(lye/modules-require 'iex-awesome-tray)
 (lye/modules-require 'lex-modeline)
 (if (display-graphic-p)
-    (+awesome-tray-initialize)
-  (setq-default mode-line-format default-mode-line-format))
+    (progn
+      (lye/modules-require 'iex-awesome-tray)
+      (+awesome-tray-initialize))
+  (setq-default mode-line-format lex-modeline-format))
 
 (provide 'core-ui)
 

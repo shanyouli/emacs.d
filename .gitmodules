@@ -76,6 +76,3 @@
 [submodule "ido-completing-read-plus"]
 	path = site-lisp/ido-completing-read-plus
 	url = https://github.com/DarwinAwardWinner/ido-completing-read-plus.git
-[submodule "awesome-tray"]
-	path = site-lisp/awesome-tray
-	url = https://github.com/manateelazycat/awesome-tray.git
