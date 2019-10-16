@@ -56,7 +56,7 @@
 ;; straight
 (setq straight-base-dir lye-emacs-cache-dir
       straight-repository-branch "develop"
-      ;;      straight-cache-autoloads nil
+      ;; straight-cache-autoloads nil
       straight-vc-git-default-clone-depth 1
       straight-recipes-emacsmirror-use-mirror t
       straight-process-buffer " *straight-process*" ; hide *straight-process*

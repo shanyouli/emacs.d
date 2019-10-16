@@ -93,6 +93,13 @@
     (add-hook 'after-make-frame-functions #'+init|daemonp-font)
   (+init-font-config))
 
+;; mode-line
+(lye/modules-require 'iex-awesome-tray)
+(lye/modules-require 'lex-modeline)
+(if (display-graphic-p)
+    (+awesome-tray-initialize)
+  (setq-default mode-line-format default-mode-line-format))
+
 (provide 'core-ui)
 
 ;;; core-ui.el ends here
