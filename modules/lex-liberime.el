@@ -52,8 +52,13 @@
   "Determine if the rime input method is installed."
   (if librime-share-dir t nil))
 
+(defun +mkdir-liberime-user-dir ()
+  (unless (file-directory-p liberime-user-dir)
+    (make-directory liberime-user-dir)))
+
 (defun liberime-load-p (&optional root-dir)
   "Import the liberime module."
+  (+mkdir-liberime-user-dir)
   (if (fboundp 'module-load)
       (let* ((liberime--root
               (or root-dir
