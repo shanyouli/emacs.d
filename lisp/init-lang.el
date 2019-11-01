@@ -94,8 +94,6 @@
   :mode (("\\.md\\'" . gfm-mode))
   :defer t
   :config
-  (lye/exec-path-from-shell-init)
-
   (when (executable-find "markdownfmt")
     (use-package markdownfmt
       :bind (:map markdown-mode-map
@@ -135,6 +133,14 @@
           "C:\\Windows\\system32\\WindowsPowerShell\\v1.0\\powershell.exe")
     ;; interactive, but no command prompt
     (setq explicit-powershell.exe-args '("-Command" "-"))))
+
+;; ebuild-mode
+(when (executable-find "emerge")
+  (package! 'ebuild-mode nil t)
+
+  (use-package ebuild-mode
+    :mode ("\\.ebuild\\'" . ebuild-mode)
+    :defer t))
 
 (provide 'init-lang)
 ;;; init-lang.el ends here

@@ -39,6 +39,11 @@
 (package! 'fuz t)
 
 (unless (require 'fuz-core nil t)
+  (cond
+   ((file-directory-p "/usr/lib/llvm/9")
+    (setenv "LIBCLANG_PATH" "/usr/lib/llvm/9/lib64"))
+   ((file-directory-p "/usr/lib/llvm/8")
+    (setenv "LIBCLANG_PATH" "/usr/lib/llvm/8/lib64")))
   (fuz-build-and-load-dymod))
 
 (provide 'iex-fuz)

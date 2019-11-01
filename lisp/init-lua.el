@@ -38,7 +38,6 @@
 
 (add-hook 'lua-mode-hook
           (lambda ()
-            (lye/exec-path-from-shell-init)
             (when (executable-find "luacheck")
               (lye/modules-require 'iex-flycheck)
               (flycheck-mode +1))

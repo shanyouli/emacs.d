@@ -31,6 +31,7 @@
 ;;;###autoload
 (defun lye/exec-path-from-shell-init ()
   "Avoid importing `exec-path-from-shell' on some operating systems."
+  (interactive)
   (when (memq window-system '(mac ns x))
     (or (locate-library "exec-path-from-shell")
         (package! 'exec-path-from-shell))

@@ -46,7 +46,8 @@
       all-the-icons-icon-alist)
 (push '("\\.rasi" all-the-icons-alltheicon "css3" :face all-the-icons-blue)
       all-the-icons-icon-alist)
-
+(push '("\\.ebuild$" all-the-icons-fileicon "gentoo" :face all-the-icons-purple)
+      all-the-icons-icon-alist)
 ;;------------------------------------------------------------------------------
 ;; mode icons
 ;;------------------------------------------------------------------------------
@@ -58,7 +59,8 @@
 
 (push '(conf-unix-mode all-the-icons-fileicon "config" :face all-the-icons-yellow)
       all-the-icons-mode-icon-alist)
-
+(push '(ebuild-mode all-the-icons-fileicon "gentoo" :face all-the-icons-purple)
+      all-the-icons-mode-icon-alist)
 ;;------------------------------------------------------------------------------
 ;; dir-icons
 ;;------------------------------------------------------------------------------

@@ -148,7 +148,12 @@
 
 ;;当在windows上运行时,确定 Msys2是否安装
 (and system/windows (lye/modules-require 'lex-window-os))
-(lye/modules-require 'lex-exec-path)
+(unless system/windows
+  (if lye-emacs-save-env-file
+      (progn
+        (setq env-path-from-shell-list '("MANPATH" "PATH"))
+        (+env-path-from-shell-init))
+    (lye/modules-require 'lex-exec-path)))
 
 (provide 'core-generic)
 

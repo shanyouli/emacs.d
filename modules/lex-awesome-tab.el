@@ -33,7 +33,7 @@
   (lye/modules-require 'iex-all-the-icons))
 
 ;; awesome-tab style: slant, wave,alternate,bar,box,chamfer,rounded,zigzag
-(setq awesome-tab-style 'box)
+(setq awesome-tab-style 'zigzag)
 
 (defun lye/awesome-tab-hide-tab (x)
   (let ((name (format "%s" x)))

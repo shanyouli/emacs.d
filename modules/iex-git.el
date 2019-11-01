@@ -32,9 +32,6 @@
 
 (package! 'magit t)
 
-;; PATH
-(lye/exec-path-from-shell-init)
-
 ;; Magit configuration.
 (setq magit-commit-ask-to-stage nil)   ; don't ask stage question
 (setq magit-display-buffer-noselect t) ; don't select magit buffer default

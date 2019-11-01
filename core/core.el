@@ -154,6 +154,10 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   :type '(choice (string :tag "Fire Name")
                  (const :tag "Error" nil)))
 
+(defcustom lye-emacs-save-env-file (expand-file-name "env-path.el" lye-emacs-cache-dir)
+  "Cache environment variables file. If you do not want to cache environment variables in `lye-emacs-save-env-file', set it to nil"
+  :type 'string)
+
 ;; Set the temporal directory
 (unless (file-exists-p lye-emacs-cache-dir)
   (make-directory lye-emacs-cache-dir))
