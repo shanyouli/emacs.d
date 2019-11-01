@@ -13,9 +13,6 @@
 [submodule "sdcv"]
 	path = site-lisp/sdcv
 	url = https://github.com/manateelazycat/sdcv.git
-[submodule "cache-path-from-shell"]
-	path = site-lisp/cache-path-from-shell
-	url = https://github.com/manateelazycat/cache-path-from-shell.git
 [submodule "insert-translated-name"]
 	path = site-lisp/insert-translated-name
 	url = https://github.com/manateelazycat/insert-translated-name.git
@@ -67,9 +64,6 @@
 [submodule "disable-mouse"]
 	path = site-lisp/disable-mouse
 	url = https://github.com/purcell/disable-mouse.git
-[submodule "exec-path-from-shell"]
-	path = site-lisp/exec-path-from-shell
-	url = https://github.com/purcell/exec-path-from-shell.git
 [submodule "xr"]
 	path = site-lisp/xr
 	url = https://github.com/mattiase/xr.git

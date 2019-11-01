@@ -1,4 +1,4 @@
-;;; lex-exec-path.el --- Initialize exec-path-from-shell -*- lexical-binding: t -*-
+;;; iex-exec-path.el --- Initialize exec-path-from-shell -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
@@ -27,21 +27,18 @@
 ;;; Commentary:
 
 ;;; Code:
+(package! 'exec-path-from-shell t t)
+(package! '(cache-path-from-shell :repo "manateelazycat/cache-path-from-shell"
+                                  :host github
+                                  :type git) t)
 
-;;;###autoload
-(defun lye/exec-path-from-shell-init ()
-  "Avoid importing `exec-path-from-shell' on some operating systems."
-  (interactive)
-  (when (memq window-system '(mac ns x))
-    (or (locate-library "exec-path-from-shell")
-        (package! 'exec-path-from-shell))
-    (require 'exec-path-from-shell)
-    (require 'cache-path-from-shell)
-    (setq exec-path-from-shell-check-startup-files nil)
-    ;; (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
-    (setq exec-path-from-shell-arguments '("-l"))
-    (exec-path-from-shell-initialize)))
 
-(provide 'lex-exec-path)
+(when (memq window-system '(mac ns x))
+  (setq exec-path-from-shell-check-startup-files nil)
+  (setq exec-path-from-shell-variables '("PATH" "MANPATH"))
+  (setq exec-path-from-shell-arguments '("-i"))
+  (exec-path-from-shell-initialize))
 
-;;; lex-exec-path.el ends here
+(provide 'iex-exec-path)
+
+;;; iex-exec-path.el ends here
