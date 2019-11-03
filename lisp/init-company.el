@@ -94,7 +94,7 @@
   (setq company-backends (mapcar #'company-backend-with-yas company-backends)))
 
 ;; Use company-posframe
-(eval-after-load 'company
+(with-eval-after-load 'company
   (when (display-graphic-p)
     (package! 'company-posframe t)
     (company-posframe-mode +1)))
