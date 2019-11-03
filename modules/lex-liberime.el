@@ -39,11 +39,16 @@
     (file-truename "/Library/Input Methods/Squirrel.app/Contents/SharedSupport")))
   "Personal data storage location.")
 
-(defvar liberime-user-dir (expand-file-name "pyim/rime" user-emacs-directory)
-  "Rime data save location.")
+(defconst liberime-default-custom-file
+  (expand-file-name "rime/default.custom.yaml" lye-emacs-share-dir)
+  "The default configuration definition file `liberime'")
 
-(defvar liberime-default-custom-file
-  (expand-file-name "rime/default.custom.yaml" lye-emacs-share-dir))
+(defcustom liberime-user-dir
+  (if pyim-dcache-directory
+      (expand-file-name "rime" (file-name-directory pyim-dcache-directory))
+    (expand-file-name "pyim/rime" lye-emacs-cache-dir))
+  "一个目录, 用于保存 rime配置目录."
+  :type 'directory)
 
 (defvar use-liberime-p nil
   "Whether Liberime-module has been loaded.")

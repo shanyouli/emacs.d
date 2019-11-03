@@ -90,5 +90,3 @@
   (env-path-from-shell-save-file)
   (load lye-emacs-save-env-file :no-error :no-message)
   (+init-exec-path))
-
-(+env-path-from-shell-init)
