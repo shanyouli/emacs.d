@@ -55,9 +55,6 @@
 [submodule "awesome-tab"]
 	path = site-lisp/awesome-tab
 	url = https://github.com/manateelazycat/awesome-tab.git
-[submodule "liberime"]
-	path = site-lisp/liberime
-	url = https://gitlab.com/liberime/liberime.git
 [submodule "hydra"]
 	path = site-lisp/hydra
 	url = https://github.com/abo-abo/hydra.git
@@ -70,3 +67,6 @@
 [submodule "ido-completing-read-plus"]
 	path = site-lisp/ido-completing-read-plus
 	url = https://github.com/DarwinAwardWinner/ido-completing-read-plus.git
+[submodule "liberime"]
+	path = site-lisp/liberime
+	url = https://github.com/merrickluo/liberime.git
