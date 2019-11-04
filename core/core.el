@@ -136,10 +136,14 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   :type 'boolean)
 
 (defcustom lye-sdcv-dictionary-data-dir
-  (let ((file (expand-file-name "stardict" lye-emacs-share-dir)))
-    (if (file-directory-p file)
-        file
-      (expand-file-name "~/.stardict/")))
+  (let ((file1 (expand-file-name "sdcv" lye-emacs-share-dir))
+        (file2 (expand-file-name "sdcv" (getenv "XDG_DATA_HOME"))))
+    (cond ((file-directory-p file2)
+           file2)
+          ((file-directory-p file1)
+           file)
+          (t
+           (expand-file-name "~/.stardict/"))))
   "Sdcv dictionary storage directory."
   :type 'directory)
 
