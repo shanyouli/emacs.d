@@ -88,7 +88,7 @@
 
             ;; Save Emacs buffers when they lose focus after 1.5s
             (setq auto-save-idle 1.5)
-            (setq auto-save-silent t)
+            (setq-default auto-save-silent t)
             (auto-save-enable)
 
             ;; Displays the key bindings following your currently entered
@@ -118,9 +118,9 @@
   :hook (after-init . global-diff-hl-mode))
 
 (lye/module-install-UI "cnfonts")
-;; (lye/module-install-UI "doom-modeline")
+(lye/module-install-UI "doom-modeline")
 (lye/module-install-UI "awesome-tab")
-(lye/module-install-UI "awesome-tray")
+;; (lye/module-install-UI "awesome-tray")
 
 (provide 'core-package)
 

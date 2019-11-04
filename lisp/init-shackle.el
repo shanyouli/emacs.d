@@ -40,7 +40,6 @@
           ("*Backtrace*" :select t :size 0.382 :align 'below)
           ("*Warnings*" :select t :size 0.382 :align 'below)
           ("*Messages*" :size 0.382 :align 'below :autoclose t)
-          (" *which-key*" :size 0.382 :align 'below :autoclose t)
           ("^\\*.*Shell Command.*\\*$" :regexp t :size 0.382 :align 'below :autoclose t)
           ("\\*[Wo]*Man.*\\*" :regexp t :select t :align 'below :autoclose t)
           ("*color-rg*" :size 0.382 :align 'below :autoclose t)

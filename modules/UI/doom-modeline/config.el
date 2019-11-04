@@ -9,8 +9,4 @@
 
   (setq doom-modeline-major-mode-color-icon t
         doom-modeline-minor-modes nil
-        doom-modeline-mu4e nil)
-
-  (unless (get-buffer "*scratch*")
-    (remove-hook 'after-change-major-mode-hook #'remove-scratch-buffer)
-    (switch-to-buffer "*scratch*")))
+        doom-modeline-mu4e nil))
