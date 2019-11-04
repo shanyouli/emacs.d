@@ -52,9 +52,6 @@
 [submodule "third-lisp"]
 	path = site-lisp/third-lisp
 	url = https://github.com/shanyouli/third-lisp.git
-[submodule "awesome-tab"]
-	path = site-lisp/awesome-tab
-	url = https://github.com/manateelazycat/awesome-tab.git
 [submodule "hydra"]
 	path = site-lisp/hydra
 	url = https://github.com/abo-abo/hydra.git

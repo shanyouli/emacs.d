@@ -1,6 +1,23 @@
 ;;; core/autoload/module.el -*- lexical-binding: t -*-
 
 ;;;###autoload
+(defvar lye-modules-autoload-file
+  (expand-file-name "moudles-loadfs.el" lye-emacs-autoload-dir)
+  "lye-modules-autoload-file directory automatically generated autoload file.")
+
+;;;###autoload
+(defun module-autoload-file-refresh ()
+  (interactive)
+  (generate-autoload-and-refresh lye-emacs-modules-dir lye-modules-autoload-file))
+
+;;;###autoload
+(defun +module-initialized ()
+  "Initialization site-lisp-autoload-file."
+  (unless (file-exists-p lye-modules-autoload-file)
+    (module-autoload-file-refresh)
+    (load lye-modules-autoload-file :no-error :no-message)))
+
+;;;###autoload
 (defmacro lye/modules-require (pkg)
   "Import the *.el file in the lye-emacs-modules-dir folder."
   `(require ,pkg (format "%s%s.el" ,lye-emacs-modules-dir ,pkg)))

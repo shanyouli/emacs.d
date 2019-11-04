@@ -38,12 +38,12 @@
 
 ;; Packages
 ;; Without this comment Emacs25 adds (package-initialize) here
-(setq package-user-dir (expand-file-name ".cache/elpa" user-emacs-directory))
-(setq package-archives
-      '(("gnu"   . "http://elpa.gnu.org/packages/")
-        ("melpa" . "http://melpa.org/packages/")))
-;; (setq package-archives '(("gnu"   . "http://elpa.emacs-china.org/gnu/")
-;;                           ("melpa" . "http://elpa.emacs-china.org/melpa/")))
+;; (setq package-user-dir (expand-file-name ".cache/elpa" user-emacs-directory))
+;; (setq package-archives
+;;       '(("gnu"   . "http://elpa.gnu.org/packages/")
+;;         ("melpa" . "http://melpa.org/packages/")))
+(setq package-archives '(("gnu"   . "http://elpa.emacs-china.org/gnu/")
+                          ("melpa" . "http://elpa.emacs-china.org/melpa/")))
 ;; Explicitly set the prefered coding systems to avoid annoying prompt
 ;; from emacs (especially on Microsoft Windows)
 (prefer-coding-system 'utf-8)

@@ -217,7 +217,9 @@ to `load-path'"
         `(,lye-emacs-core-dir ,lye-emacs-init-dir ,lye-emacs-modules-dir))
 
     (+add-site-lisp-to-load-path)
-    (+site-lisp-initialized))
+    (+site-lisp-initialized)
+
+    (+module-initialized))
 
 (advice-add #'package-initialize :after #'lye/update-load-path)
 

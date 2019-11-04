@@ -78,13 +78,7 @@
 
   (add-hook 'emacs-startup-hook #'lye/default-frame-size)
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-  (add-hook 'after-make-frame-functions #'+frame-size-after-make-frame-functions)
-  ;; awesome-tab
-  (add-hook 'after-init-hook
-            (lambda ()
-              (lye/modules-require 'lex-awesome-tab)
-              (awesome-tab-mode +1)
-              (add-hook 'after-load-theme-hook #'lye/refresh-awesome-tab-mode))))
+  (add-hook 'after-make-frame-functions #'+frame-size-after-make-frame-functions))
 
 ;; font
 (lye/modules-require 'lex-font)
@@ -94,12 +88,12 @@
   (+init-font-config))
 
 ;; mode-line
-(lye/modules-require 'lex-modeline)
-(if (display-graphic-p)
-    (progn
-      (lye/modules-require 'iex-awesome-tray)
-      (+awesome-tray-initialize))
-  (setq-default mode-line-format lex-modeline-format))
+;; (lye/modules-require 'lex-modeline)
+;; (if (display-graphic-p)
+;;     (progn
+;;       (lye/modules-require 'iex-awesome-tray)
+;;       (+awesome-tray-initialize))
+;;   (setq-default mode-line-format lex-modeline-format))
 
 (provide 'core-ui)
 
