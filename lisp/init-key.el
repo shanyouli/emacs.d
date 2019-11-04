@@ -84,9 +84,6 @@
   (lazy-load-global-keys '(("C-z m" . one-key-menu-simple-mpc))
                          "iex-simple-mpc"))
 
-;; iex-cnfonts.el
-(lazy-load-global-keys '(("C-z F" . cnfonts-ui)) "iex-cnfonts")
-
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
 (require-package 'link-hint)

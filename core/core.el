@@ -31,8 +31,6 @@
 ;;; Code:
 
 ;; depends
-;; (require 'cl-macs)
-;; (require 'cl-seq)
 (require 'subr-x)
 ;; constant
 
@@ -143,20 +141,15 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
         file
       (expand-file-name "~/.stardict/")))
   "Sdcv dictionary storage directory."
-  :type 'string)
+  :type 'directory)
 
 (defcustom lye-emacs-autoload-dir (expand-file-name "autoload/" lye-emacs-cache-dir)
   "Automatic generation autoload file storage directory."
-  :type 'string)
-
-(defcustom lye-emacs-autoload-file (expand-file-name "loadfs.el" lye-emacs-cache-dir)
-  "Extract the autoload magic annotation file from the third party package."
-  :type '(choice (string :tag "Fire Name")
-                 (const :tag "Error" nil)))
+  :type 'directory)
 
 (defcustom lye-emacs-save-env-file (expand-file-name "env-path.el" lye-emacs-cache-dir)
   "Cache environment variables file. If you do not want to cache environment variables in `lye-emacs-save-env-file', set it to nil"
-  :type 'string)
+  :type 'file)
 
 ;; Set the temporal directory
 (unless (file-exists-p lye-emacs-cache-dir)
@@ -206,11 +199,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 (dolist (f (directory-files lye-emacs-autoload-dir t "\\.el\\'"))
   (load f :no-error :no-message))
 
-;; modules
-(defmacro lye/modules-require (pkg)
-  "Import the *.el file in the lye-emacs-modules-dir folder."
-  `(require ,pkg (format "%s%s.el" ,lye-emacs-modules-dir ,pkg)))
-
 ;; init Dired
 (defmacro lye/init-require (pkg)
   "Import the `*.el' file in the lye-emacs-lisp-dir folder."
@@ -222,16 +210,12 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
       (push dir-path load-path)))
 
 (defun lye/update-load-path (&rest _)
-  "Update `load-path'."
-
+  "Update `load-path'.
+add `lye-emacs-core-dir',`lye-emacs-init-dir' and `lye-emacs-modules-dir etc.
+to `load-path'"
   (mapc 'add-to-load-path
-        `(
-          ,lye-emacs-core-dir      ; add `lye-emacs-core-dir' to load-path
-          ,lye-emacs-init-dir      ; add `lye-emacs-init-dir' to load-path
-          ,lye-emacs-modules-dir   ; add `lye-emacs-modules-dir' to load-path
-          ))
+        `(,lye-emacs-core-dir ,lye-emacs-init-dir ,lye-emacs-modules-dir))
 
-  ;; add `lye-emacs-site-lisp-dir' to load-path
     (+add-site-lisp-to-load-path)
     (+site-lisp-initialized))
 

@@ -117,6 +117,8 @@
   :commands (global-diff-hl-mode)
   :hook (after-init . global-diff-hl-mode))
 
+(lye/module-install-UI "cnfonts")
+
 (provide 'core-package)
 
 ;;; core-package.el ends here
