@@ -72,14 +72,13 @@
   (add-to-list 'default-frame-alist
                (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
   (add-to-list 'default-frame-alist
-               (cons 'left (/ (* 1 (x-display-pixel-height)) 2)))
+               (cons 'left (/ (* 1 (x-display-pixel-width)) 4)))
 
   ;; Frame Size after startup
 
-  (add-hook 'emacs-startup-hook #'lye/default-frame-size)
-  ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-  (add-hook 'after-make-frame-functions #'+frame-size-after-make-frame-functions))
-
+  (add-hook 'emacs-startup-hook #'md/frame-default-size)
+    ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
+  (add-hook 'after-make-frame-functions #'md/frame-size-after-make-frame-func+))
 
 (if (and (fboundp 'daemonp) (daemonp))
     (add-hook 'after-make-frame-functions #'lye/font-initialize-frame+)

@@ -7,6 +7,10 @@
     (setq doom-modeline--old-format mode-line-format)
     (setq-default mode-line-format '()))
 
-  (setq doom-modeline-major-mode-color-icon t
+  (setq doom-modeline-icon (display-graphic-p)
+        doom-modeline-major-mode-color-icon t
         doom-modeline-minor-modes nil
-        doom-modeline-mu4e nil))
+        doom-modeline-mu4e nil
+        doom-modeline-height 10
+        doom-modeline-bar-width 2
+        doom-modeline-buffer-file-name-style 'truncate-upto-root))
