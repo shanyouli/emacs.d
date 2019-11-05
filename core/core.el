@@ -55,6 +55,9 @@
 (defconst lye-emacs-core-autoload-dir (expand-file-name "autoload/" lye-emacs-core-dir)
   "autoload dir in `lye-emacs-core-dir'")
 
+(defconst lye-emacs-core-modules-dir (expand-file-name "modules/" lye-emacs-core-dir)
+  "modules dir in `lye-emacs-core-dir'")
+
 (defconst lye-emacs-init-dir (expand-file-name "lisp/" user-emacs-directory)
   "Initialize some packages that are installed using package.el.")
 

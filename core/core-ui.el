@@ -80,12 +80,10 @@
   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
   (add-hook 'after-make-frame-functions #'+frame-size-after-make-frame-functions))
 
-;; font
-(lye/modules-require 'lex-font)
 
 (if (and (fboundp 'daemonp) (daemonp))
-    (add-hook 'after-make-frame-functions #'+init|daemonp-font)
-  (+init-font-config))
+    (add-hook 'after-make-frame-functions #'lye/font-initialize-frame+)
+  (lye/font-initialize+))
 
 ;; mode-line
 ;; (lye/modules-require 'lex-modeline)
