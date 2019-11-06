@@ -27,6 +27,7 @@
 ;;; Commentary:
 
 ;; Theme Manager
+;;; @see https://github.com/guidoschmidt/circadian.el/
 
 ;;; Code:
 

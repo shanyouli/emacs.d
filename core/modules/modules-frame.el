@@ -76,7 +76,6 @@
          (fm-height (truncate (* fm-height-proportion y)))
          (frame-x (- (/ (- x fm-width) 2) (frame-char-width)))
          (frame-y (/ (- y fm-height) 2)))
-    (message "%s" fm-width)
     (when (display-graphic-p)
       (when frame (select-frame frame))
       (set-frame-position (selected-frame) frame-x frame-y)
