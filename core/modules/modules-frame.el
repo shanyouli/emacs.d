@@ -68,12 +68,11 @@
 (defun md/frame-default-size (&optional frame width-scale height-scale)
   "The default window size and position."
   (interactive)
-
   (let* ((x (x-display-pixel-width))
          (y (x-display-pixel-height))
          (fm-width-proportion (or width-scale md-frame-width-scale 0.5))
          (fm-height-proportion (or height-scale md-frame-height-scale 0.618))
-         (fm-width (* (md/frame-width-set+ fm-width-proportion) (frame-char-width)))
+         (fm-width (- (truncate (* x fm-width-proportion)) (* 2 (frame-char-width))))
          (fm-height (truncate (* fm-height-proportion y)))
          (frame-x (- (/ (- x fm-width) 2) (frame-char-width)))
          (frame-y (/ (- y fm-height) 2)))
