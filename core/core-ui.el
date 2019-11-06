@@ -57,13 +57,11 @@
       frame-resize-pixelwise t)
 
 ;; THEME
-(setq theme-switch-light      'doom-one-light
-      theme-switch-dark       'doom-one
-      theme-switch-light-time "08:30"
-      theme-switch-dark-time  "19:30")
+(setq mdt-theme-light-and-dark '(doom-one doom-molokai)
+      mdt-theme-switch-time '("08:30" . "18:00"))
 (add-hook 'after-init-hook (lambda ()
                              (require 'doom-themes)
-                             (theme-switch-light-or-dark-theme)))
+                             (mdt/switch-light-or-dark-theme+)))
 
 (when (display-graphic-p)
   ;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
