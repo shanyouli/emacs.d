@@ -43,9 +43,6 @@
 [submodule "thing-edit"]
 	path = site-lisp/thing-edit
 	url = https://github.com/manateelazycat/thing-edit.git
-[submodule "lazy-load"]
-	path = site-lisp/lazy-load
-	url = https://github.com/manateelazycat/lazy-load.git
 [submodule "posframe"]
 	path = site-lisp/posframe
 	url = https://github.com/tumashu/posframe.git

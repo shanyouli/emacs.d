@@ -3,7 +3,7 @@
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v1
-;; Package-Requires: (lazy-load )
+;; Package-Requires: ()
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: key
 
@@ -30,7 +30,7 @@
 ;;; Code:
 
 ;; iex-ivy.el
-(lazy-load-global-keys
+(mdk/set-keys!
  '(("M-x"     . counsel-M-x)
    ("C-x C-f" . counsel-find-file)
    ("C-x f"   . counsel-recentf)
@@ -39,23 +39,23 @@
    ("M-y"     . counsel-yank-pop)
    ("C-x b"   . ivy-switch-buffer)
    ("C-x d"   . counsel-dired))
- "iex-ivy")
+ nil nil "iex-ivy")
 
 ;; iex-elfeed
-(lazy-load-global-keys '(("C-z w" . elfeed)) "iex-elfeed")
+(mdk/set-keys! '(("C-z w" . elfeed)) nil nil "iex-elfeed")
 
 ;; iex-treemacs
-(lazy-load-global-keys '(("C-x t" . one-key-menu-treemacs)) "iex-treemacs")
+(mdk/set-keys! '(("C-x t" . one-key-menu-treemacs)) nil nil "iex-treemacs")
 
 ;; iex-youdao-dictionary
 (if (eq lye-enable-sdcv-or-youdao 'youdao)
-    (lazy-load-global-keys '(("C-z y" . youdao-dictionary-search-at-point++))
-                           "iex-youdao-dictionary"))
+    (mdk/set-keys! '(("C-z y" . youdao-dictionary-search-at-point++))
+                   nil nil "iex-youdao-dictionary"))
 
 ;; iex-git
 ;; transient file
 (setq-default transient-history-file
-        (concat lye-emacs-cache-dir "transient/history.el"))
+              (concat lye-emacs-cache-dir "transient/history.el"))
 (setq transient-values-file
       (concat lye-emacs-cache-dir "transient/values.el"))
 (setq transient-levels-file
@@ -63,57 +63,57 @@
 ;; Forge configuration
 (setq forge-database-file
       (expand-file-name "forge-database.sqlite" lye-emacs-cache-dir))
-(lazy-load-global-keys '(("C-x g" . one-key-menu-magit)) "iex-git")
+(mdk/set-keys! '(("C-x g" . one-key-menu-magit)) nil nil "iex-git")
 
 ;; iex-window
-(lazy-load-global-keys '(([remap other-window] . ace-window)
-                         ("C-x 4 u" . winner-undo)
-                         ("C-x 4 r" . winner-redo)) "iex-window")
+(mdk/set-keys! '(([remap other-window] . ace-window)
+                 ("C-x 4 u" . winner-undo)
+                 ("C-x 4 r" . winner-redo)) nil nil "iex-window")
 
 ;; iex-avy
-(lazy-load-global-keys '(("M-s" . one-key-menu-avy)) "iex-avy")
+(mdk/set-keys! '(("M-s" . one-key-menu-avy)) nil nil "iex-avy")
 
 ;; iex-vterm
-(lazy-load-global-keys '(("C-x s v" . term-toggle)) "iex-term")
+(mdk/set-keys! '(("C-x s v" . term-toggle)) nil nil "iex-term")
 
 ;; iex-pomidor.el
-(lazy-load-global-keys '(("C-z s c" . pomidor)) "iex-pomidor")
+(mdk/set-keys! '(("C-z s c" . pomidor)) nil nil "iex-pomidor")
 
 ;; iex-simple-mpc
 (when (and (executable-find "mpc") (executable-find "mpd"))
-  (lazy-load-global-keys '(("C-z m" . one-key-menu-simple-mpc))
-                         "iex-simple-mpc"))
+  (mdk/set-keys! '(("C-z m" . one-key-menu-simple-mpc))
+                 nil nil "iex-simple-mpc"))
 
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
 (require-package 'link-hint)
-(lazy-load-global-keys
+(mdk/set-keys!
  '(("C-x p o" . link-hint-open-link)
    ("C-x p c" . link-hint-copy-link))
- "link-hint")
+ nil nil  "link-hint")
 
 (require-package 'org-cliplink)
-(lazy-load-global-keys '(("C-x p i" . org-cliplink)) "org-cliplink")
+(mdk/set-keys! '(("C-x p i" . org-cliplink)) nil nil "org-cliplink")
 
 ;; lex-snails
 (when (and (not system/windows) (display-graphic-p))
-  (lazy-load-unset-keys '("C-x C-b"))
-  (lazy-load-global-keys '(("C-x C-b" . snails)
-                           ("C-z C-s" . snails-load-theme)) "iex-snails"))
+  (mdk/unset-key! "C-x C-b")
+  (mdk/set-keys! '(("C-x C-b" . snails)
+                   ("C-z C-s" . snails-load-theme))  nil nil "iex-snails"))
 
 ;; Better elisp help file format
 ;; (require-package 'helpful)
-;; (lazy-load-global-keys
+;; (mdk/set-keys!
 ;;  '(("C-h k" . helpful-key)
 ;;    ("C-h d" . helpful-at-point))
 ;;  "helpful")
 
 ;; iex-tldr
 (unless system/windows
-  (lazy-load-global-keys '(("C-z s h" . tldr)) "iex-tldr"))
+  (mdk/set-keys! '(("C-z s h" . tldr))  nil nil "iex-tldr"))
 
 ;; iex-smart-align
-(lazy-load-global-keys '(("C-z s m" . smart-align)) "iex-smart-align")
+(mdk/set-keys! '(("C-z s m" . smart-align)) nil nil "iex-smart-align")
 (provide 'init-key)
 
 ;;; init-key.el ends here

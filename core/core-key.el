@@ -3,9 +3,9 @@
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v0.1
-;; Package-Requires: (eusp restart-emacs lazy-load )
+;; Package-Requires: (eusp restart-emacs)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: lazy-load
+;; Keywords: Keybindings
 
 
 ;; This file is not part of GNU Emacs
@@ -30,82 +30,74 @@
 
 ;;; Code:
 
-(require 'lazy-load)
-
 ;; Global uninstall button
-(lazy-load-unset-keys '("C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC"))
+(mdk/unset-keys! '("C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC"))
 
 ;; esup
-(lazy-load-global-keys '(("C-z e" . esup)) "esup")
+(mdk/set-key! "s e" #'esup nil "C-," "esup")
 
 ;; restart-emacs
-(lazy-load-global-keys '(("C-z r" . restart-emacs)) "restart-emacs")
+(mdk/set-key! "s r" #'restart-emacs nil "C-," "restart-emacs")
 
 ;; Chinese automatically translated as English
-(lazy-load-global-keys
+(mdk/set-keys!
  '(
-   ("C-z i o" . insert-translated-name-insert-original-translation)
-   ("C-z i u" . insert-translated-name-insert-with-underline)
-   ("C-z i l" . insert-translated-name-insert-with-line)
-   ("C-z i c" . insert-translated-name-insert-with-camel))
- "lex-insert-translated-name")
+   ("i o" . insert-translated-name-insert-original-translation)
+   ("i u" . insert-translated-name-insert-with-underline)
+   ("i l" . insert-translated-name-insert-with-line)
+   ("i c" . insert-translated-name-insert-with-camel))
+ nil "C-," "lex-insert-translated-name")
 
 ;; English word completion with Chinese comments
-(lazy-load-global-keys
- '(("C-z i t" . toggle-company-english-helper))
- "company-english-helper")
+(mdk/set-key! "i t" #'toggle-company-english-helper nil "C-," "company-english-helper")
 
 ;; lex-one-key.el
-(lazy-load-global-keys
- '(("C-z u"   . hydra-ui-menu/body)
-   ("C-z d"   . hydra-open-dir-menu/body))
- "lex-hydra")
+(mdk/set-keys! '(("u b" . hydra-ui-menu/body)
+                 ("o d" . hydra-open-dir-menu/body))
+               nil "C-," "lex-hydra")
 
 ;; lex-setup-font
 (when (and (display-graphic-p) (fboundp 'setup-font-initialize))
-  (lazy-load-global-keys '(("C-z s f" . hydra-font-size-menu/body))
-                         "lex-setup-font"))
+  (mdk/set-key! "u F" 'hydra-font-size-menu/body nil "C-," "lex-setup-font"))
 
 ;; lex-sdcv
 (if (and (executable-find "sdcv") (eq lye-enable-sdcv-or-youdao 'sdcv))
-    (lazy-load-global-keys '(("C-z y" . sdcv-search-at-point++))
-                           "lex-sdcv")
+    (mdk/set-key! "C-, y" 'sdcv-search-at-point++ nil nil "lex-sdcv")
   (setq lye-enable-sdcv-or-youdao 'youdao))
 
 ;; lex-search.el
-(lazy-load-global-keys '(("C-r" . one-key-menu-search)) "lex-search")
+(mdk/set-key! "C-r" 'one-key-menu-search nil nil "lex-search")
 
 ;; lex-thing-edit.el
-(lazy-load-global-keys '(("M-e" . one-key-menu-thing-edit)) "lex-thing-edit")
+(mdk/set-key! "M-e"  'one-key-menu-thing-edit nil nil "lex-thing-edit")
 
 ;; lex-pyim.el
-(lazy-load-global-keys
+(mdk/set-keys!
  '(("<f9>"    . toggle-default-pyim-input-method)
    ("C-<f9>"  . lye/toggle-pyim-punctuation-translate))
- "lex-pyim")
+ nil nil "lex-pyim")
 
 ;; lex-funcs
-(lazy-load-global-keys '(("C-z f" . hydra-functions-menu/body)) "lex-funcs")
+(mdk/set-key! "C-z f" 'hydra-functions-menu/body nil nil  "lex-funcs")
 
 ;; lex-temp
-(lazy-load-global-keys '(("C-z b" . hydra-tmp-scratch-menu/body)) "lex-temp")
+(mdk/set-key! "C-z b" 'hydra-tmp-scratch-menu/body nil nil "lex-temp")
 
 ;; awesome-tab.el
-(lazy-load-global-keys '(("C-z j" . awesome-tab-ace-jump)) "awesome-tab")
+(mdk/set-key! "C-z j" 'awesome-tab-ace-jump nil nil "awesome-tab")
 
 ;; lex-smex
-(lazy-load-global-keys
+(mdk/set-keys!
  '(("M-x" . smex)
-   ("C-x M-x" . smex-major-mode-commands)) "lex-ido")
+   ("C-x M-x" . smex-major-mode-commands)) nil nil "lex-ido")
 
 ;;; toolkit
-(lazy-load-set-keys
+(mdk/set-keys!
  '(("C-x SPC" . set-mark-command)    ; Instead C-SPC for Chinese input method
    ("C-x C-h" . rectangle-mark-mode) ; rectangle-mark-mode
    ("C-z c"   . shell-command)       ; I don't know why the `M-!' in awesomewm can't be used.
    ("C-z C-z" . suspend-frame)       ; Suspend-frame
    ))
-
 
 (provide 'core-key)
 

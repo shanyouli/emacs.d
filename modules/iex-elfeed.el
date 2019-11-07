@@ -65,7 +65,7 @@
     ("r" elfeed-search-untag-all-read "mark read")
     ("RET" elfeed-search-show-entry "Show"))))
 
-(lazy-load-local-keys '(("?" . toggle-hydra-elfeed/body)) elfeed-search-mode-map "iex-elfeed")
+(mdk/set-keys! '(("?" . toggle-hydra-elfeed/body)) elfeed-search-mode-map nil "iex-elfeed")
 
 
 (provide 'iex-elfeed)

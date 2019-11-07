@@ -109,7 +109,7 @@
               (setq backup-file-location (expand-file-name "backup"
                                                          lye-emacs-cache-dir))
               (add-hook 'after-save-hook #'backup-file)
-              (lazy-load-set-keys '(("C-z s b" . backup-file-log))))))
+              (mdk/set-key! "C-z s b"  'backup-file-log))))
 
 ;;; Highlight diff
 (use-package diff-hl
