@@ -1,4 +1,4 @@
-;;; moduless-tmp-scratch.el --- Substituted scratch-buffer -*- lexical-binding: t -*-
+;;; modules-tmp-scratch.el --- Substituted scratch-buffer -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
@@ -76,7 +76,8 @@
                     file-buffer-name "*mts-txt*"))))
      (switch-to-buffer file-buffer)
      (when file-buffer-name
-       (rename-buffer file-buffer-name))))
+       (rename-buffer file-buffer-name))
+     (setq default-directory (getenv "HOME"))))
 
 ;;;###autoload
 (defun mts/scratch-initialize-el ()
@@ -96,6 +97,6 @@
   (interactive)
   (mts/scratch-initialize+ "mts.py"))
 
-(provide 'moduless-tmp-scratch)
+(provide 'modules-tmp-scratch)
 
-;;; moduless-tmp-scratch.el ends here
+;;; modules-tmp-scratch.el ends here
