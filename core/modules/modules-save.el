@@ -41,43 +41,53 @@
   "modulse-save mode's keymap.")
 
 (defcustom md-save-triggers
-  '(switch-to-buffer other-window windmove-up windmove-down windmove-left windmove-right next-buffer previous-buffer)
+  '(switch-to-buffer other-window windmove-up windmove-down
+                     windmove-left windmove-right next-buffer
+                     previous-buffer)
   "A list of commands which would trigger `md/save-command+'."
-  :group 'modules-save
-  :type '(repeat symbol))
+  :type '(repeat symbol)
+  :group 'modules-save)
 
 (defcustom md-save-hook-triggers
   '(mouse-leave-buffer-hook focus-out-hook)
   "A list of hooks which would trigger `md/save-command+'"
-  :group 'modules-save
-  :type '(repeat symbol))
+
+  :type '(repeat symbol)
+  :group 'modules-save)
 
 (defcustom md-save-auto-save-when-idle t
   "If the file is automatically saved as t, the time delay,
 otherwise use a trigger to automatically save the file. "
-  :group 'modules-save
-  :type 'boolean)
+  :type 'boolean
+  :group 'modules-save)
 
 (defcustom md-save-idle-duraion 2
   "The number of seconds Emacs has to be idle. before auto-saveing the current buffer."
-  :group 'modules-save
-  :type 'float)
+  :type 'float
+  :group 'modules-save)
 
 (defcustom md-save-remote-files t
   "Save remote files when t, ignore them otherwise."
-  :group 'modules-save
-  :type 'boolean)
+  :type 'boolean
+  :group 'modules-save)
 
 (defcustom md-save-silent-p nil
   "prompted to save information when t, ignore theme otherwise."
-  :group 'modules-save
-  :type 'boolean)
+  :type 'boolean
+  :group 'modules-save)
 
 (defcustom md-save-exclude nil
   "A list of regexps for buffer-file-name excludede from modules-save.
 When a buffer-file-name matches any of the regexps it is ignored."
-  :group 'modules-save
-  :type '(repeat (choice regexp)))
+  :type '(repeat (choice regexp))
+  :group 'modules-save)
+
+(defcustom md-save-delete-trailing-whitespace nil
+  "Delete trailing whitespace when save if this option is non-nil."
+  :type 'boolean
+  :group 'modules-save)
+
+
 
 (defun md/save-include-p! (filename)
   "Return non-nil if FILENAME doesn't match any of the `md-save-execlude'."
@@ -165,6 +175,22 @@ When a buffer-file-name matches any of the regexps it is ignored."
           (advice-remove command #'md/save-all-buffers-command-advice+))
         md-save-triggers))
 
+;;;###autoload
+(defun md-save-delte-trailing-whitespace-execept-current-line ()
+  "Delete all the trailing space at the rear of the current row."
+  (interactive)
+  (let ((begin (line-beginning-position))
+        (end (line-end-position)))
+    (save-excursion
+      (when (< (point-min) begin)
+        (save-restriction
+          (narrow-to-region (point-min) (1- begin))
+          (delete-trailing-whitespace)))
+      (when (> (point-max) end)
+        (save-restriction
+          (narrow-to-region (1+ end) (point-max))
+          (delete-trailing-whitespace))))))
+
 (defvar md-save--save-idle-timer)
 (defvar md-save--all-save-idle-timer)
 
@@ -209,8 +235,18 @@ Otherwise, use a trigger to save all buffer."
   "A minor mode the saves your Current buffers when they lose focus."
   :lighter " modules-save"
   :keymap md-save-mode-map
-  (if md-save-mode (md/save-current-buffer-enable)
-   (md/save-current-buffer-disable)))
+  (if md-save-mode
+      (progn
+        (md/save-current-buffer-enable)
+        (if md-save-delete-trailing-whitespace
+            (add-hook 'before-save-hook
+                      #'md-save-delte-trailing-whitespace-execept-current-line))
+        (add-hook 'before-save-hook #'font-lock-flush))
+    (md/save-current-buffer-disable)
+    (if md-save-delete-trailing-whitespace
+        (remove-hook 'before-save-hook
+                     #'md-save-delte-trailing-whitespace-execept-current-line))
+    (remove-hook 'before-save-hook #'font-lock-flush)))
 
 ;;;###autoload
 (define-minor-mode md-save-global-mode
@@ -219,8 +255,17 @@ Otherwise, use a trigger to save all buffer."
   :keymap md-save-mode-map
   :global t
   (if md-save-global-mode
-      (md/save-all-buffers-enable)
-    (md/save-all-buffers-disable)))
+      (progn
+        (md/save-all-buffers-enable)
+        (if md-save-delete-trailing-whitespace
+            (add-hook 'before-save-hook
+                      #'md-save-delte-trailing-whitespace-execept-current-line))
+        (add-hook 'before-save-hook #'font-lock-flush))
+    (md/save-all-buffers-disable)
+    (if md-save-delete-trailing-whitespace
+            (remove-hook 'before-save-hook
+                      #'md-save-delte-trailing-whitespace-execept-current-line))
+    (remove-hook 'before-save-hook #'font-lock-flush)))
 
 (provide 'modules-save)
 
