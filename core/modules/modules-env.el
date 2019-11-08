@@ -44,21 +44,15 @@
   :group 'modules-env)
 
 (defcustom mde-path-from-shell-save-file
-  (expand-file-name "env-path" (if (boundp 'lye-emacs-cache-dir)
-                              lye-emacs-cache-dir
-                            user-emacs-directory))
+  (expand-file-name "env-path"
+                    (if (boundp 'lye-emacs-cache-dir)
+                        lye-emacs-cache-dir
+                      user-emacs-directory))
   "Cache environment variables file."
   :type 'file
   :group 'modules-env)
 
-(defun mde/shell-list-to-string+ ()
-  "Conversion `mde-path-from-shell-list' is a string!"
-  (let ((path-list mde-path-from-shell-list)
-        (path-str))
-    (while path-list
-      (setq path-str (concat path-str (format "${%s}#..#" (car path-list))))
-      (setq path-list (cdr path-list)))
-    (format "%s" path-str)))
+
 
 (defun mde/path-from-shell-getenv-to-string (path)
   (let* ((shell-executable (format "%s" (getenv "SHELL")))
@@ -69,7 +63,6 @@
                                   " '"))))
     (format "%s" shell-get-path)))
 
-;;;###autoload
 (defun mde/path-from-shell-save-file+ (&optional force-p save-file)
   (let ((env-file (if save-file
                       (expand-file-name save-file)
@@ -85,7 +78,7 @@
                            (substring (format "%s"  mde-path-from-shell-list) 1 -1))))
 
           (let* ((path-string (mde/path-from-shell-getenv-to-string
-                               (mde/shell-list-to-string+)))
+                               (mapconcat 'identity mde-path-from-shell-list "#..#")))
                  (path-var-list (split-string path-string "#..#"))
                  (path-list mde-path-from-shell-list))
             (while path-list
