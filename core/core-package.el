@@ -87,10 +87,9 @@
             (global-undo-tree-mode +1)
 
             ;; Save Emacs buffers when they lose focus after 1.5s
-            (setq auto-save-idle 1.5)
-            (setq-default auto-save-silent t)
-            (auto-save-enable)
-
+            (setq md-save-silent-p t
+                  md-save-idle-duraion 1.5)
+            (md-save-global-mode)
             ;; Displays the key bindings following your currently entered
             ;; incomplete command
             (setq which-key-idle-delay 0.5)

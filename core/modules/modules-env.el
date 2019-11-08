@@ -123,7 +123,6 @@
   (load mde-path-from-shell-save-file :no-error :no-message)
   (setq exec-path (split-string (getenv "PATH") ":")))
 
-
 (provide 'modules-env)
 
 ;;; modules-env.el ends here
