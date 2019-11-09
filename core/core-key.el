@@ -33,11 +33,13 @@
 ;; Global uninstall button
 (mdk/unset-keys! '("C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC"))
 
+(setq md-key-prefix "C-,")
+
 ;; esup
-(mdk/set-key! "s e" #'esup nil "C-," "esup")
+(mdk/set-key! "s e" #'esup nil t "esup")
 
 ;; restart-emacs
-(mdk/set-key! "s r" #'restart-emacs nil "C-," "restart-emacs")
+(mdk/set-key! "s r" #'restart-emacs nil t "restart-emacs")
 
 ;; Chinese automatically translated as English
 (mdk/set-keys!
@@ -46,19 +48,19 @@
    ("i u" . insert-translated-name-insert-with-underline)
    ("i l" . insert-translated-name-insert-with-line)
    ("i c" . insert-translated-name-insert-with-camel))
- nil "C-," "lex-insert-translated-name")
+ nil t "lex-insert-translated-name")
 
 ;; English word completion with Chinese comments
-(mdk/set-key! "i t" #'toggle-company-english-helper nil "C-," "company-english-helper")
+(mdk/set-key! "i t" #'toggle-company-english-helper nil t "company-english-helper")
 
 ;; lex-one-key.el
 (mdk/set-keys! '(("u b" . hydra-ui-menu/body)
                  ("o d" . hydra-open-dir-menu/body))
-               nil "C-," "lex-hydra")
+               nil t "lex-hydra")
 
 ;; lex-setup-font
 (when (and (display-graphic-p) (fboundp 'setup-font-initialize))
-  (mdk/set-key! "u F" 'hydra-font-size-menu/body nil "C-," "lex-setup-font"))
+  (mdk/set-key! "u F" 'hydra-font-size-menu/body nil t "lex-setup-font"))
 
 ;; lex-sdcv
 (if (and (executable-find "sdcv") (eq lye-enable-sdcv-or-youdao 'sdcv))

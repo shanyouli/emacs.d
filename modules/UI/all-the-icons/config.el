@@ -37,3 +37,8 @@
   ;;------------------------------------------------------------------------------
   (push '("Videos?" all-the-icons-faicon "film") all-the-icons-dir-icon-alist)
   (push '("Work" all-the-icons-material "work") all-the-icons-dir-icon-alist))
+
+;; all-the-icons-dired
+(use-package all-the-icons-dired
+  :if (and (display-graphic-p) (not system/windows))
+  :hook (dired-mode . all-the-icons-dired-mode))

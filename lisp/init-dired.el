@@ -45,11 +45,6 @@
          ("R" . dired-async-do-rename))
   :hook (dired-mode . dired-async-mode))
 
-(use-package all-the-icons-dired
-  :straight t
-  :if (and (display-graphic-p) (not system/windows))
-  :hook (dired-mode . all-the-icons-dired-mode))
-
 ;; colorful dired
 (use-package diredfl
   :ensure t

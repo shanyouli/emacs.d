@@ -59,7 +59,7 @@
 
 (defun +mkdir-liberime-user-dir ()
   (unless (file-directory-p liberime-user-dir)
-    (make-directory liberime-user-dir)))
+    (make-directory liberime-user-dir t)))
 
 (defun liberime-load-p (&optional root-dir)
   "Import the liberime module."

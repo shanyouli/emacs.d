@@ -70,10 +70,6 @@
   (noflet ((process-list ()))
           (apply save-buffers-kill-emacs rest)))
 (advice-add 'save-buffers-kill-emacs :around 'no-query-kill-emacs)
-;; (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
-;;    "Prevent annoying \"Active processes exist\" query when you quit Emacs."
-;;    (require 'noflet)
-;;    (noflet ((process-list ())) ad-do-it))
 
 ;; Don't ask me when kill process buffer
 (setq kill-buffer-query-functions

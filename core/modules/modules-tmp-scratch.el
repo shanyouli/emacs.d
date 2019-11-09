@@ -33,6 +33,7 @@
 ;;        * Streamline `mts/scratch-initialize+' function
 ;;        * add `mts/create-buffer+' `mts/buffer-list' `mts/close-all-mts-buffer' function
 ;;        * fix the `bf-list' error
+
 ;;; Code:
 
 (defgroup modules-tmp-scratch nil
@@ -103,16 +104,17 @@
   "Close all the prefix buffer *mts-"
   (interactive)
   (let ((mts-buf-list (mts/buffer-list)))
-    (mapc (lambda (x)
-            (set-buffer x)
-            (when (and (buffer-file-name)
-                       (buffer-modified-p))
-              (with-temp-message
-                  (with-current-buffer " *Minibuf-0*" (buffer-string))
-                (let ((inhibit-messsage t))
-                  (basic-save-buffer))))
-            (kill-buffer x))
-          mts-buf-list)))
+    (when mts-buf-list
+      (mapc (lambda (x)
+              (set-buffer x)
+              (when (and (buffer-file-name)
+                         (buffer-modified-p))
+                (with-temp-message
+                    (with-current-buffer " *Minibuf-0*" (buffer-string))
+                  (let ((inhibit-messsage t))
+                    (basic-save-buffer))))
+              (kill-buffer x))
+            mts-buf-list))))
 
 (provide 'modules-tmp-scratch)
 

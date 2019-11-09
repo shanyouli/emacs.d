@@ -78,7 +78,9 @@
                            (substring (format "%s"  mde-path-from-shell-list) 1 -1))))
 
           (let* ((path-string (mde/path-from-shell-getenv-to-string
-                               (mapconcat 'identity mde-path-from-shell-list "#..#")))
+                               (concat "$" (mapconcat
+                                            'identity
+                                            mde-path-from-shell-list "#..#$"))))
                  (path-var-list (split-string path-string "#..#"))
                  (path-list mde-path-from-shell-list))
             (while path-list
