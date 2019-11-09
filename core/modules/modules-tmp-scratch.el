@@ -28,6 +28,10 @@
 
 ;; `*scratch*' to replace the use of temporary files
 
+;;; Change log:
+;; 2019/11/09
+;;        * Streamline `mts/scratch-initialize+' function
+;;        * add `mts/create-buffer+' `mts/buffer-list' `mts/close-all-mts-buffer' function
 ;;; Code:
 
 (defgroup modules-tmp-scratch nil
@@ -43,41 +47,38 @@
   :type 'directory
   :group 'modules-tmp-scratch)
 
+
+
+(defun mds/create-buffer+ (file-name)
+  "Known file name to create a buffer name."
+  (concat "*"
+          (mapconcat 'identity (split-string file-name "\\.") "-")
+          "*"))
+
+(defun mts/buffer-list ()
+  "Get all prefixed `*mts' of buffer."
+  (remove-if-not (lambda (x)
+                   (string-prefix-p "*mts-" x))
+                 (mapcar 'buffer-name (buffer-list))))
+
 ;;;###autoload
 (defun mts/scratch-initialize+ (&optional file)
   "Create a temporary buffer to replace *scratch*. Use `file' save it"
   (interactive)
   (unless (file-directory-p mts-directory)
     (make-directory mts-directory t))
-  (let* ((file (expand-file-name (or file "mts.txt") mts-directory))
-         (bf-list (mapcar 'buffer-name (buffer-list)))
-         (file-buffer)
-         (file-buffer-name))
 
-     (cond ((string= "sh" (file-name-extension file))
-            (if (member "*mts-sh*" bf-list)
-                (setq file-buffer "*mts-sh*")
-              (setq file-buffer (find-file file)
-                    file-buffer-name "*mts-sh*")))
-           ((string= "py" (file-name-extension file))
-            (if (member "*mts-py*" bf-list)
-                (setq file-buffer "*mts-py*")
-              (setq file-buffer (find-file file)
-                    file-buffer-name "*mts-py*")))
-           ((string= "el" (file-name-extension file))
-            (if (member "*mts-el*" bf-list)
-                (setq file-buffer "*mts-el*")
-              (setq file-buffer (find-file file)
-                    file-buffer-name "*mts-el*")))
-           (t
-            (if (member "*mts-txt*" bf-list)
-                (setq file-buffer "*mts-txt*")
-              (setq file-buffer (find-file file)
-                    file-buffer-name "*mts-txt*"))))
-     (switch-to-buffer file-buffer)
-     (when file-buffer-name
-       (rename-buffer file-buffer-name))
-     (setq default-directory (getenv "HOME"))))
+  (let* ((file (expand-file-name (or file "mts.txt") mts-directory))
+         (buf-list (mts/buffer-list))
+         (buf-name (concat "*"
+                           (mapconcat 'identity
+                                      (split-string (file-name-nondirectory file) "\\.") "-")
+                           "*")))
+    (if (and buf-list (member buf-name bf-list))
+        (switch-to-buffer buf-name)
+      (switch-to-buffer (find-file file))
+      (rename-buffer buf-name))
+    (setq default-directory (getenv "HOME"))))
 
 ;;;###autoload
 (defun mts/scratch-initialize-el ()
@@ -96,6 +97,21 @@
   "Temporary Python-script test files."
   (interactive)
   (mts/scratch-initialize+ "mts.py"))
+
+(defun mts/close-all-mts-buffer ()
+  "Close all the prefix buffer *mts-"
+  (interactive)
+  (let ((mts-buf-list (mts/buffer-list)))
+    (mapc (lambda (x)
+            (set-buffer x)
+            (when (and (buffer-file-name)
+                       (buffer-modified-p))
+              (with-temp-message
+                  (with-current-buffer " *Minibuf-0*" (buffer-string))
+                (let ((inhibit-messsage t))
+                  (basic-save-buffer))))
+            (kill-buffer x))
+          mts-buf-list)))
 
 (provide 'modules-tmp-scratch)
 

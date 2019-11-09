@@ -66,8 +66,7 @@ Conversely Theme Settings range `(custom-available-themes)'."
     (intern (completing-read "Load custom theme: "
                              (if mdt-theme-list
                                  mdt-theme-list
-                               (custom-available-themes)
-                               )))))
+                               (custom-available-themes))))))
 
   (if (and theme (member theme (custom-available-themes)))
       (let ((progress-reporter (make-progress-reporter
