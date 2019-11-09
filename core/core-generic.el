@@ -64,10 +64,16 @@
                    (5 right)))))
 
 ;; Don't ask me when close emacs with process is running
-(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
-  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+(defun no-query-kill-emacs (save-buffers-kill-emacs &rest rest)
+  "Prevent annoying \"Activ process exits\" query when you quit Emacs."
   (require 'noflet)
-  (noflet ((process-list ())) ad-do-it))
+  (noflet ((process-list ()))
+          (apply save-buffers-kill-emacs rest)))
+(advice-add 'save-buffers-kill-emacs :around 'no-query-kill-emacs)
+;; (defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+;;    "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+;;    (require 'noflet)
+;;    (noflet ((process-list ())) ad-do-it))
 
 ;; Don't ask me when kill process buffer
 (setq kill-buffer-query-functions

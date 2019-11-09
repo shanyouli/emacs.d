@@ -32,6 +32,7 @@
 ;; 2019/11/09
 ;;        * Streamline `mts/scratch-initialize+' function
 ;;        * add `mts/create-buffer+' `mts/buffer-list' `mts/close-all-mts-buffer' function
+;;        * fix the `bf-list' error
 ;;; Code:
 
 (defgroup modules-tmp-scratch nil
@@ -74,11 +75,11 @@
                            (mapconcat 'identity
                                       (split-string (file-name-nondirectory file) "\\.") "-")
                            "*")))
-    (if (and buf-list (member buf-name bf-list))
+    (if (and buf-list (member buf-name buf-list))
         (switch-to-buffer buf-name)
       (switch-to-buffer (find-file file))
       (rename-buffer buf-name))
-    (setq default-directory (getenv "HOME"))))
+    (setq default-directory (concat (getenv "HOME") "/"))))
 
 ;;;###autoload
 (defun mts/scratch-initialize-el ()
