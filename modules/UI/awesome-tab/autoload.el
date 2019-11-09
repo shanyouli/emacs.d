@@ -14,7 +14,7 @@
      (unless (get-buffer "*scratch*")
        (string-prefix-p "*scratch*" name))
      (string-prefix-p "*One-Key*" name)
-     (string-match "^\\ \\*" name)
+     (string-prefix-p "*sdcv" name)
      (string-prefix-p "*Flycheck" name)
      (string-prefix-p "*flycheck-posframe-buffer*" name)
 

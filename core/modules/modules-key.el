@@ -29,7 +29,16 @@
 ;; Key bindings function.
 ;; Copy from @https://github.com/manateelazycat/lazy-load
 
+;;; Change log:
+;; 2019/11/09
+;;        * and option `md-key-prefix'.
+
+
 ;;; Code:
+
+(defcustom md-key-prefix nil
+  "Set the default shortcut prefix When using `mdk/set-key!' Or `mdk/set-keys!' Set shortcut."
+  :type 'string)
 
 ;;;###autoload
 (defun mdk/unset-key! (key-string &optional keymap)
@@ -54,9 +63,11 @@
 ;;;###autoload
 (defun mdk/set-key! (key-str def &optional keymap key-prefix filename)
   (let* ((keymap (or keymap (current-global-map)))
-         (key-prefix (if key-prefix
-                         (concat key-prefix " ")
-                       ""))
+         (key-prefix (cond ((and md-key-prefix key-prefix (booleanp key-prefix))
+                            (concat md-key-prefix " "))
+                           ((and key-prefix (stringp key-prefix))
+                            (concat key-prefix " "))
+                           (t "")))
          (key (cond ((stringp key-str) (read-kbd-macro (concat key-prefix key-str)))
                     ((vectorp key-str) key-str)
                     (t (signal 'wrong-type-argument (list 'array key-str))))))
