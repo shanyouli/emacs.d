@@ -29,6 +29,12 @@
 ;; Theme Manager
 ;;; @see https://github.com/guidoschmidt/circadian.el/
 
+;;; Change log:
+;;  2019/11/10:
+;;        * Adjusting `mdt/load-dark-after-some-time+' function
+;;        * Adjusting `mdt/load-theme' function,
+;;        * Is `mdt/load-theme-from-all' can be run interactively
+
 ;;; Code:
 
 (defgroup modules-theme nil
@@ -68,15 +74,21 @@ Conversely Theme Settings range `(custom-available-themes)'."
                                  mdt-theme-list
                                (custom-available-themes))))))
 
-  (if (and theme (member theme (custom-available-themes)))
+  (if (and (not (member theme custom-enabled-themes))
+           (member theme (custom-available-themes)))
       (let ((progress-reporter (make-progress-reporter
                                 (format "Loading theme %s..." theme))))
         (mapc 'disable-theme custom-enabled-themes)
         (load-theme theme t)
-        (progress-reporter-done progress-reporter))))
+        (progress-reporter-done progress-reporter)))
+  (message "`%s' theme was not there, or has been loaded." theme))
 
-(defun mdt/load-theme-from-all! (theme)
+(defun mdt/load-theme-from-all (theme)
   "Setting the choice of theme for all theme."
+  (interactive
+   (list
+    (intern (completing-read "Load custom theme: "
+                             (custom-available-themes)))))
   (let ((mdt-theme-list nil))
     (mdt/load-theme theme)))
 
@@ -86,33 +98,29 @@ Conversely Theme Settings range `(custom-available-themes)'."
 
 (advice-add #'load-theme :after #'mdt/run-after-load-theme-hook+)
 
-(defun mdt/time-convert-to-seconds! (hour-minute)
-  "Converting the `HOUR-MINUTE' is how many seconds.
-eg: `12:30' <==> (12*60+30)*60"
-  (let ((time-list (mapcar #'string-to-number (split-string hour-minute ":"))))
-    (* 60 (+ (* (car time-list) 60) (cadr time-list)))))
+(defun mdt/time-string-to-list (time-list)
+  "Convert HH:MM:SS to (HH MM SS)."
+  (mapcar #'string-to-number (split-string time-list ":")))
 
-(defun mdt/current-time-convert-to-minute+ ()
-  "It indicates the current time in minutes."
-  (let* ((ctime-str (substring (current-time-string) 11 19))
-         (ctime-list (split-string ctime-str ":"))
-         (ctime-seconds (mapcar #'string-to-number ctime-list)))
-    (+ (* (+ (* 60 (car ctime-seconds)) (cadr ctime-seconds)) 60)
-       (caddr ctime-seconds))))
+(defun mdt/time-minus (time-list1 time-list2)
+  "Two subtraction time."
+  (let ((time-1 (time-string-to-list time-list1))
+        (time-2 (time-string-to-list time-list2)))
+    (- (* 60 (+ (* (- (car time-1) (car time-2)) 60)
+                (- (cadr time-1) (cadr time-2))))
+       (or (caddr time-2) 0))))
 
 (defun mdt/load-dark-after-some-time+ (&optional time-list)
   "After how many seconds to switch the theme of dark."
   (let* ((time-list (or time-list mdt-theme-switch-time))
-         (light-time (mdt/time-convert-to-seconds! (car time-list)))
-         (dark-time (mdt/time-convert-to-seconds! (cdr time-list)))
-         (ctime (mdt/current-time-convert-to-minute+))
-         (ctime-d (- ctime light-time))
-         (ctime-l (- dark-time ctime )))
-    (if (< ctime-d 0)
-        ctime-d
-      (if (> ctime-l 0)
-          ctime-l
-        (- (- ctime (* 24 60 60)) dark-time)))))
+         (ltime (car time-list))
+         (dtime  (cdr time-list))
+         (ctime (substring (current-time-string) 11 19)))
+    (if (string> ltime ctime)
+      (- (time-minus ltime ctime))
+    (if (string> dtime ctime)
+        (time-minus dtime ctime)
+      (- (* 24 60 60) (- (time-minus ltime ctime)))))))
 
 ;;;###autoload
 (defun mdt/switch-light-or-dark-theme+ (&optional theme-list time-list)
@@ -128,7 +136,7 @@ eg: `12:30' <==> (12*60+30)*60"
             (setq next-theme (car mdt-theme-light-and-dark))
           (setq next-theme (cadr mdt-theme-light-and-dark)))
         (cancel-function-timers #'mdt/switch-light-or-dark-theme+)
-        (mdt/load-theme-from-all! next-theme)
+        (mdt/load-theme-from-all next-theme)
         (run-at-time (abs next-time) nil #'mdt/switch-light-or-dark-theme+))
     (cancel-function-timers #'mdt/switch-light-or-dark-theme+)))
 

@@ -49,6 +49,12 @@
   (unless (and (boundp system/mac) system/mac)
     (push '(menu-bar-lines . 0) default-frame-alist)))
 
+(run-at-time 1 nil (lambda ()
+                     (setq tool-bar-mode nil
+                           scroll-bar-mode nil)
+                     (unless  system/mac
+                       (setq menu-bar-mode nil))))
+
 ;; Suppress GUI features
 (setq use-file-dialog nil
       use-dialog-box nil
@@ -64,18 +70,8 @@
                              (mdt/switch-light-or-dark-theme+)))
 
 (when (display-graphic-p)
-  ;; @see http://kimi.im/2019-02-09-emacs-frame-dimention
-  ;; top, left ...
-  ;; Set the initial window size
-  (add-to-list 'default-frame-alist
-               (cons 'top (/ (* 191 (x-display-pixel-height)) 1000)))
-  (add-to-list 'default-frame-alist
-               (cons 'left (/ (* 1 (x-display-pixel-width)) 4)))
-
-  ;; Frame Size after startup
-
   (add-hook 'emacs-startup-hook #'md/frame-default-size)
-    ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
+   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
   (add-hook 'after-make-frame-functions #'md/frame-size-after-make-frame-func+))
 
 (if (and (fboundp 'daemonp) (daemonp))
