@@ -64,9 +64,7 @@
 
 ;; THEME
 (setq mdt-theme-light-and-dark '(doom-one doom-molokai)
-      ;;mdt-theme-switch-time '("08:30" . "18:00")
-      mdt-theme-switch-time '(22.357 . 114.117)
-      )
+      mdt-theme-switch-time '(30.93 . 113.92))
 (add-hook 'after-init-hook (lambda ()
                              (require 'doom-themes)
                              (mdt/switch-light-or-dark-theme+)))
@@ -76,17 +74,22 @@
    ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
   (add-hook 'after-make-frame-functions #'md/frame-size-after-make-frame-func+))
 
+;; font
 (if (and (fboundp 'daemonp) (daemonp))
     (add-hook 'after-make-frame-functions #'lye/font-initialize-frame+)
   (lye/font-initialize+))
+(run-with-idle-timer 3 nil (lambda () (lye/module-install-UI "cnfonts")))
+
+;; Use `all-the-icons'
+(lye/module-install-UI "all-the-icons")
 
 ;; mode-line
-;; (lye/modules-require 'lex-modeline)
-;; (if (display-graphic-p)
-;;     (progn
-;;       (lye/modules-require 'iex-awesome-tray)
-;;       (+awesome-tray-initialize))
-;;   (setq-default mode-line-format lex-modeline-format))
+(lye/module-install-UI "doom-modeline")
+;; or
+;; (lye/module-install-UI "awesome-tray")
+
+;; header-line, Tab
+(lye/module-install-UI "awesome-tab")
 
 (provide 'core-ui)
 

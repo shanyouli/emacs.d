@@ -31,11 +31,13 @@
 
 ;;; Change log:
 ;;  2019/11/10:
-;;        * Add latitude and longitude acquisition method using a switching time of light ;;          and dark theme, use `mdt/get-light-and-dark-time' function
+;;        * Add latitude and longitude acquisition method using a switching time of light
+;;          and dark theme, use `mdt/get-light-and-dark-time' function
 ;;        * add depends `solar'
 ;;        * Adjusting `mdt/load-dark-after-some-time+' function
 ;;        * Adjusting `mdt/load-theme' function,
 ;;        * Is `mdt/load-theme-from-all' can be run interactively
+;;        * fix Compare wrong time, and when it exceeds sunset, the theme of the error can not be replaced.
 ;;; Code:
 
 (defgroup modules-theme nil
@@ -109,7 +111,8 @@ Conversely Theme Settings range `(custom-available-themes)'."
   "Conver `time-number' hours to HH:MM. eg: Convert 16.8 hours to 16:48"
     (let* ((time-integer (truncate time-number))
          (time-decimal (truncate (* 60 (- time-number time-integer)))))
-    (concat (number-to-string time-integer)
+      (concat (and (< time-integer 10) "0")
+              (number-to-string time-integer)
             ":"
             (and (< time-decimal 10) "0")
             (number-to-string time-decimal))))
@@ -150,7 +153,7 @@ then return itself to return the sunrise and sunset time and vice versa."
       (- (mdt/time-minus ltime ctime))
     (if (string> dtime ctime)
         (mdt/time-minus dtime ctime)
-      (- (* 24 60 60) (- (mdt/time-minus ltime ctime)))))))
+      (- (- (mdt/time-minus ltime ctime)) (* 24 60 60))))))
 
 
 

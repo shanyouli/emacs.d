@@ -116,13 +116,6 @@
   :commands (global-diff-hl-mode)
   :hook (after-init . global-diff-hl-mode))
 
-(lye/module-install-UI "all-the-icons")
-(lye/module-install-UI "cnfonts")
-(lye/module-install-UI "doom-modeline")
-(lye/module-install-UI "awesome-tab")
-
-;; (lye/module-install-UI "awesome-tray")
-
 (provide 'core-package)
 
 ;;; core-package.el ends here
