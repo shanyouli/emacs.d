@@ -2,8 +2,8 @@
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: ()
+;; Version: v0.2
+;; Package-Requires: (solar)
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: theme
 
@@ -31,10 +31,11 @@
 
 ;;; Change log:
 ;;  2019/11/10:
+;;        * Add latitude and longitude acquisition method using a switching time of light ;;          and dark theme, use `mdt/get-light-and-dark-time' function
+;;        * add depends `solar'
 ;;        * Adjusting `mdt/load-dark-after-some-time+' function
 ;;        * Adjusting `mdt/load-theme' function,
 ;;        * Is `mdt/load-theme-from-all' can be run interactively
-
 ;;; Code:
 
 (defgroup modules-theme nil
@@ -62,6 +63,8 @@ eg: `(08:30 . 19:30)' Indication `light-theme' between 08:30 to 19:30,
 the remaining time using `dark-theme'."
   :type 'list
   :group 'modules-theme)
+
+
 
 ;;;###autoload
 (defun mdt/load-theme (theme)
@@ -92,35 +95,64 @@ Conversely Theme Settings range `(custom-available-themes)'."
   (let ((mdt-theme-list nil))
     (mdt/load-theme theme)))
 
+
+
 (defun mdt/run-after-load-theme-hook+ (&rest _)
   "Run `mdt-after-load-theme-hook'"
   (run-hooks 'mdt-after-load-theme-hook))
 
 (advice-add #'load-theme :after #'mdt/run-after-load-theme-hook+)
 
+
+
+(defun mdt/time-number-to-string (time-number)
+  "Conver `time-number' hours to HH:MM. eg: Convert 16.8 hours to 16:48"
+    (let* ((time-integer (truncate time-number))
+         (time-decimal (truncate (* 60 (- time-number time-integer)))))
+    (concat (number-to-string time-integer)
+            ":"
+            (and (< time-decimal 10) "0")
+            (number-to-string time-decimal))))
+
 (defun mdt/time-string-to-list (time-list)
   "Convert HH:MM:SS to (HH MM SS)."
   (mapcar #'string-to-number (split-string time-list ":")))
 
+(defun mdt/get-light-and-dark-time ()
+  "If the type is a string `mdt-theme-switch-time',
+then return itself to return the sunrise and sunset time and vice versa."
+  (if (stringp (car mdt-theme-switch-time))
+      mdt-theme-switch-time
+    (require 'solar)
+    (setq calendar-latitude (car mdt-theme-switch-time)
+          calendar-longitude (cdr mdt-theme-switch-time))
+    (let* ((time-sunrise-sunset (solar-sunrise-sunset (calendar-current-date)))
+       (time-sunrise (caar time-sunrise-sunset))
+       (time-sunset (caadr time-sunrise-sunset)))
+       (cons (mdt/time-number-to-string time-sunrise)
+             (mdt/time-number-to-string time-sunset)))))
+
 (defun mdt/time-minus (time-list1 time-list2)
   "Two subtraction time."
-  (let ((time-1 (time-string-to-list time-list1))
-        (time-2 (time-string-to-list time-list2)))
+  (let ((time-1 (mdt/time-string-to-list time-list1))
+        (time-2 (mdt/time-string-to-list time-list2)))
     (- (* 60 (+ (* (- (car time-1) (car time-2)) 60)
                 (- (cadr time-1) (cadr time-2))))
        (or (caddr time-2) 0))))
 
 (defun mdt/load-dark-after-some-time+ (&optional time-list)
   "After how many seconds to switch the theme of dark."
-  (let* ((time-list (or time-list mdt-theme-switch-time))
+  (let* ((time-list (or time-list (mdt/get-light-and-dark-time)))
          (ltime (car time-list))
          (dtime  (cdr time-list))
          (ctime (substring (current-time-string) 11 19)))
     (if (string> ltime ctime)
-      (- (time-minus ltime ctime))
+      (- (mdt/time-minus ltime ctime))
     (if (string> dtime ctime)
-        (time-minus dtime ctime)
-      (- (* 24 60 60) (- (time-minus ltime ctime)))))))
+        (mdt/time-minus dtime ctime)
+      (- (* 24 60 60) (- (mdt/time-minus ltime ctime)))))))
+
+
 
 ;;;###autoload
 (defun mdt/switch-light-or-dark-theme+ (&optional theme-list time-list)

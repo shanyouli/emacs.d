@@ -64,7 +64,9 @@
 
 ;; THEME
 (setq mdt-theme-light-and-dark '(doom-one doom-molokai)
-      mdt-theme-switch-time '("08:30" . "18:00"))
+      ;;mdt-theme-switch-time '("08:30" . "18:00")
+      mdt-theme-switch-time '(22.357 . 114.117)
+      )
 (add-hook 'after-init-hook (lambda ()
                              (require 'doom-themes)
                              (mdt/switch-light-or-dark-theme+)))
