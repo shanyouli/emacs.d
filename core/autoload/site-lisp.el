@@ -16,7 +16,6 @@
   (interactive)
   (generate-autoload-and-refresh lye-emacs-site-lisp-dir lye-site-lisp-autoload-file))
 
-
 ;;;###autoload
 (defun +site-lisp-initialized ()
   "Initialization site-lisp-autoload-file."

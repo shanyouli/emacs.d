@@ -40,6 +40,9 @@ like: `~/.emacs.d/modules' ==> modules"
                       lye-emacs-autoload-dir)))
          (generated-autoload-file target))
     (with-temp-file target
+      (insert (format "(setq %s \"%s\")\n"
+                      (concat "save-autoload-file-"
+                              (file-name-base  target)) dir))
       (dolist (f (+find-el-file-recursively dir))
         (let ((generated-autoload-load-name (file-name-sans-extension f)))
           (autoload-generate-file-autoloads f (current-buffer))))

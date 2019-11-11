@@ -30,8 +30,6 @@
 
 ;;; Code:
 
-;; depends
-(require 'subr-x)
 ;; constant
 
 (defconst system/windows (memq system-type '(windows-nt ms-dos cygwin))
@@ -177,60 +175,25 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 ;; -----------------------------------------------------------------------------
 
 ;; =============================================================================
-(defvar lye-core-autoload-file
-  (expand-file-name "core-loadfs.el" lye-emacs-autoload-dir))
+(require 'modules-autoload (format
+                            "%s%s.el" lye-emacs-core-modules-dir "modules-autoload"))
+(setq md-autoload-load-dir-alist
+      '((lye-emacs-core-dir . "core")
+        (lye-emacs-site-lisp-dir . "site-lisp")
+        (lye-emacs-modules-dir . "modules")))
 
-(defun core-autoload-initialize ()
-  (interactive)
-  (require 'autoload)
-  (let* ((target lye-core-autoload-file)
-         (generated-autoload-file target))
-    (with-temp-file target
-      (dolist ( f (directory-files lye-emacs-core-autoload-dir t "\\.el\\'"))
-        (let ((generated-autoload-load-name (file-name-sans-extension f)))
-          (autoload-generate-file-autoloads f (current-buffer))))
-      (insert (string-join `(,(char-to-string ?\C-l)
-                             ";; Local Varibles:"
-                             ";; version-control: never"
-                             ";; no-byte-compile: t"
-                             ";; no-update-autoloads: t"
-                             ";; coding: utf-8"
-                             ";; End:"
-                             ,(format ";;; %s ends here"
-                                      (file-name-nondirectory target)))
-                           "\n")))))
+(md/autoload-create-and-load-file-list)
 
-(unless (file-exists-p lye-core-autoload-file)
-  (core-autoload-initialize))
-
-(dolist (f (directory-files lye-emacs-autoload-dir t "\\.el\\'"))
-  (load f :no-error :no-message))
+(setq md-autoload-load-path-list '(lye-emacs-core-dir
+                                   lye-emacs-core-modules-dir
+                                   lye-emacs-modules-dir
+                                   (lye-emacs-site-lisp-dir)))
+(md/autoload-add-load-path-list)
 
 ;; init Dired
 (defmacro lye/init-require (pkg)
   "Import the `*.el' file in the lye-emacs-lisp-dir folder."
   `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
-
-(defun add-to-load-path (dir-path)
-  "If the `DIR-PATH' exists adding `load-path'"
-  (if (file-directory-p dir-path)
-      (push dir-path load-path)))
-
-(defun lye/update-load-path (&rest _)
-  "Update `load-path'.
-add `lye-emacs-core-dir',`lye-emacs-init-dir' and `lye-emacs-modules-dir etc.
-to `load-path'"
-  (mapc 'add-to-load-path
-        `(,lye-emacs-core-dir ,lye-emacs-init-dir ,lye-emacs-modules-dir))
-
-    (+add-site-lisp-to-load-path)
-    (+site-lisp-initialized)
-
-    (+module-initialized))
-
-(advice-add #'package-initialize :after #'lye/update-load-path)
-
-(lye/update-load-path)
 
 ;;; bechmark-init
 (when lye-enable-benchmark-p
