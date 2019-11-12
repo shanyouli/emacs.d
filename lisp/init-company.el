@@ -78,16 +78,22 @@
 
       (add-to-list 'company-backends #'company-tabnine)
       :config
+      (defun tabnine-start-advice (orig &rest rest)
+        (with-temp-message
+            (with-current-buffer " *Minibuf-0*" (buffer-string))
+          (let ((inherit-message t))
+            (apply orig rest))))
+      (advice-add 'company-tabnine-start-process :around 'tabnine-start-advice)
       ;; The free version of TabNine is good enough,
       ;; and below code is recommended that TabNine not always
       ;; prompt me to purchase a paid version in a large project.
-      (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-        (let ((company-message-func (ad-get-arg 0)))
-          (when (and company-message-func
-                     (stringp (funcall company-message-func)))
-            (unless (string-match "The free version of TabNine only indexes up to"
-                                  (funcall company-message-func))
-              ad-do-it))))))
+      (defun company-disable-tabnine-upgrade-message (orig args)
+        (when (and args
+                   (stringp (funcall args)))
+          (unless (string-match "The free version of TabNine only indexes up to"
+                                (funcall args))
+            (apply orig args))))
+      (advice-add 'company-echo-show :around 'company-disable-tabnine-upgrade-message)))
 
   ;; Support yas in commpany
   ;; Note: Must be the last to involve all backends

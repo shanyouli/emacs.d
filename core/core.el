@@ -124,10 +124,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   "Enable yasnippet for company backends or not."
   :type  'boolean)
 
-(defcustom lye-enable-benchmark-p nil
-  "Enable the init benchmark or not."
-  :type 'boolean)
-
 (defcustom lye-init-fullscreen-p nil
   "Full SCREEN or not when initializing."
   :type 'boolean)
@@ -152,10 +148,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
   "Automatic generation autoload file storage directory."
   :type 'directory)
 
-(defcustom lye-emacs-save-env-file (expand-file-name "env-path.el" lye-emacs-cache-dir)
-  "Cache environment variables file. If you do not want to cache environment variables in `lye-emacs-save-env-file', set it to nil"
-  :type 'file)
-
 ;; Set the temporal directory
 (unless (file-exists-p lye-emacs-cache-dir)
   (make-directory lye-emacs-cache-dir))
@@ -175,8 +167,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 ;; -----------------------------------------------------------------------------
 
 ;; =============================================================================
-(require 'modules-autoload (format
-                            "%s%s.el" lye-emacs-core-modules-dir "modules-autoload"))
 (setq md-autoload-load-dir-alist
       '((lye-emacs-core-dir . "core")
         (lye-emacs-site-lisp-dir . "site-lisp")
@@ -194,12 +184,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 (defmacro lye/init-require (pkg)
   "Import the `*.el' file in the lye-emacs-lisp-dir folder."
   `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
-
-;;; bechmark-init
-(when lye-enable-benchmark-p
-  (require 'benchmark-init-modes)
-  (require 'benchmark-init)
-  (benchmark-init/activate))
 
 ;;; Add after-load-theme-hook
 (defvar after-load-theme-hook nil

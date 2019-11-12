@@ -1,9 +1,6 @@
 [submodule "pyim"]
 	path = site-lisp/pyim
 	url = https://github.com/tumashu/pyim.git
-[submodule "benchmark-init-el"]
-	path = site-lisp/benchmark-init-el
-	url = https://github.com/dholm/benchmark-init-el.git
 [submodule "company-english-helper"]
 	path = site-lisp/company-english-helper
 	url = https://github.com/manateelazycat/company-english-helper.git

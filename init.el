@@ -91,13 +91,18 @@ decrease this. If you experience stuttering, increase this.")
 (defmacro lye/core-require (pkg)
   "Load PKG."
   `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory  "core") ,pkg)))
+(defmacro lye/core-modules (pkg)
+  "Load PKG."
+  `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory "core/modules") ,pkg)))
+
+(lye/core-modules 'modules-benchmark)
+(lye/core-modules 'modules-autoload)
 
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
 (lye/core-require 'core-straight)       ; staraight, package
 (lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-ui)             ; UI
-;;(lye/core-require 'core-modeline)       ; mode-line
 (lye/core-require 'core-package)        ; packages initialization
 
 (lye/init-require 'init-key)          ; Keybindings
