@@ -86,17 +86,9 @@ decrease this. If you experience stuttering, increase this.")
 (setq load-prefer-newer noninteractive)
 
 ;; Let 'er rip!
+(require 'core-custom (format "%s/%s.el" (concat user-emacs-directory  "core") "core-custom"))
 
-;; https://github.com/honmaple/dotfiles/blob/571d6f0dca10015886c56a1feab17f0d5a1bb1ab/emacs.d/init.el#L51
-(defmacro lye/core-require (pkg)
-  "Load PKG."
-  `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory  "core") ,pkg)))
-(defmacro lye/core-modules (pkg)
-  "Load PKG."
-  `(require ,pkg (format "%s/%s.el" (concat user-emacs-directory "core/modules") ,pkg)))
-
-(lye/core-modules 'modules-benchmark)
-(lye/core-modules 'modules-autoload)
+(lye/core-require 'modules-benchmark t)
 
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
