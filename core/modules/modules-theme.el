@@ -30,6 +30,8 @@
 ;;; @see https://github.com/guidoschmidt/circadian.el/
 
 ;;; Change log:
+;; 2019/11/12:
+;;        * fix "theme was not there, or has been loaded.'" when emacs startup.
 ;;  2019/11/10:
 ;;        * Add latitude and longitude acquisition method using a switching time of light
 ;;          and dark theme, use `mdt/get-light-and-dark-time' function
@@ -85,8 +87,8 @@ Conversely Theme Settings range `(custom-available-themes)'."
                                 (format "Loading theme %s..." theme))))
         (mapc 'disable-theme custom-enabled-themes)
         (load-theme theme t)
-        (progress-reporter-done progress-reporter)))
-  (message "`%s' theme was not there, or has been loaded." theme))
+        (progress-reporter-done progress-reporter))
+    (message "`%s' theme was not there, or has been loaded." theme)))
 
 (defun mdt/load-theme-from-all (theme)
   "Setting the choice of theme for all theme."
