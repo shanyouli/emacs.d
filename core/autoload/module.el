@@ -29,3 +29,7 @@
 ;;;###autoload
 (defun lye/apps-module-install (pkg &optional configp)
   (lye/modules-install "apps" pkg configp))
+
+;;;###autoload
+(defun lye/tools-module-install (pkg &optional configp)
+  (lye/modules-install "tools" pkg configp))

@@ -66,8 +66,7 @@
 (mdk/set-keys! '(("C-x g" . one-key-menu-magit)) nil nil "iex-git")
 
 ;; iex-window
-(mdk/set-keys! '(([remap other-window] . ace-window)
-                 ("C-x 4 u" . winner-undo)
+(mdk/set-keys! '(("C-x 4 u" . winner-undo)
                  ("C-x 4 r" . winner-redo)) nil nil "iex-window")
 
 ;; iex-avy

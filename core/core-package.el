@@ -116,6 +116,8 @@
   :commands (global-diff-hl-mode)
   :hook (after-init . global-diff-hl-mode))
 
+(lye/tools-module-install "winum")
+
 (provide 'core-package)
 
 ;;; core-package.el ends here

@@ -118,12 +118,3 @@ decrease this. If you experience stuttering, increase this.")
 (run-with-idle-timer 1 nil (lambda ()
                              (lye/init-require 'init-hugo)
                              (lye/init-require 'init-org)))
-
-;; load all el-file in lye-emacs-modules-dir, When fist run.
-;; (unless lye-load-all-module-file-p
-;;   (run-with-idle-timer
-;;    2 nil
-;;    (lambda ()
-;;      (load-all-module-file)
-;;      (if (file-exists-p custom-file)
-;;          (append-to-file "\n (setq lye-load-all-module-file-p t)" nil custom-file)))))

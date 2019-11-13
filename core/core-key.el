@@ -31,9 +31,11 @@
 ;;; Code:
 
 ;; Global uninstall button
-(md-key/unset-keys+ '("C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC"))
+(lye/core-require 'modules-key t)
 
 (setq md-key-prefix "C-,")
+
+(md-key/unset-keys+ '("C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC"))
 
 ;; esup
 (mdk/set-key! "s e" #'esup nil t "esup")
@@ -43,8 +45,7 @@
 
 ;; Chinese automatically translated as English
 (mdk/set-keys!
- '(
-   ("i o" . insert-translated-name-insert-original-translation)
+ '(("i o" . insert-translated-name-insert-original-translation)
    ("i u" . insert-translated-name-insert-with-underline)
    ("i l" . insert-translated-name-insert-with-line)
    ("i c" . insert-translated-name-insert-with-camel))

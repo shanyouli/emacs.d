@@ -74,6 +74,9 @@
    ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
   (add-hook 'after-make-frame-functions #'md/frame-size-after-make-frame-func+))
 
+(add-hook 'emacs-startup-hook
+          (lambda () (require 'winner) (winner-mode +1)))
+
 ;; font
 (if (and (fboundp 'daemonp) (daemonp))
     (add-hook 'after-make-frame-functions #'lye/font-initialize-frame+)
@@ -89,7 +92,7 @@
 ;; (lye/UI-module-install "awesome-tray")
 
 ;; header-line, Tab
-(lye/UI-module-install "awesome-tab")
+;; (lye/UI-module-install "awesome-tab")
 
 (provide 'core-ui)
 
