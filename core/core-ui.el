@@ -78,18 +78,18 @@
 (if (and (fboundp 'daemonp) (daemonp))
     (add-hook 'after-make-frame-functions #'lye/font-initialize-frame+)
   (lye/font-initialize+))
-(run-with-idle-timer 3 nil (lambda () (lye/module-install-UI "cnfonts")))
+(run-with-idle-timer 3 nil (lambda () (lye/UI-module-install "cnfonts")))
 
 ;; Use `all-the-icons'
-(lye/module-install-UI "all-the-icons")
+(lye/UI-module-install "all-the-icons")
 
 ;; mode-line
-(lye/module-install-UI "doom-modeline")
+(lye/UI-module-install "doom-modeline")
 ;; or
-;; (lye/module-install-UI "awesome-tray")
+;; (lye/UI-module-install "awesome-tray")
 
 ;; header-line, Tab
-(lye/module-install-UI "awesome-tab")
+(lye/UI-module-install "awesome-tab")
 
 (provide 'core-ui)
 

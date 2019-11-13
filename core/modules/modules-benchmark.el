@@ -98,11 +98,11 @@ LOAD-DURATION is the time taken in milliseconds to load FEATURE.")
 
 
 (defun md-benchmark/show-init-time ()
-  (message "init completed in %.2fms"
-           (md-benchmark/time-subtract-millis after-init-time before-init-time)))
+  (message "init completed in %.2fms with %d garbage collections."
+           (md-benchmark/time-subtract-millis after-init-time before-init-time)
+           gcs-done))
 
-(add-hook 'after-init-hook 'md-benchmark/show-init-time)
-
+(add-hook 'emacs-startup-hook 'md-benchmark/show-init-time)
 
 (provide 'modules-benchmark)
 

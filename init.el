@@ -86,9 +86,11 @@ decrease this. If you experience stuttering, increase this.")
 (setq load-prefer-newer noninteractive)
 
 ;; Let 'er rip!
-(require 'core-custom (format "%s/%s.el" (concat user-emacs-directory  "core") "core-custom"))
 
-(lye/core-require 'modules-benchmark t)
+(require 'core-custom ; Variables
+         (expand-file-name "core/core-custom.el" user-emacs-directory))
+
+(lye/core-require 'modules-benchmark t) ; benchmark
 
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
@@ -116,15 +118,6 @@ decrease this. If you experience stuttering, increase this.")
 (run-with-idle-timer 1 nil (lambda ()
                              (lye/init-require 'init-hugo)
                              (lye/init-require 'init-org)))
-
-;; get emascs startup time
-;; (add-hook 'emacs-startup-hook
-;;           (lambda ()
-;;             (message "Emacs ready in %s with %d garbage collections."
-;;                      (format "%.2f seconds"
-;;                              (float-time
-;;                               (time-subtract after-init-time before-init-time)))
-;;                      gcs-done)))
 
 ;; load all el-file in lye-emacs-modules-dir, When fist run.
 ;; (unless lye-load-all-module-file-p

@@ -60,7 +60,7 @@
 
 ;; lex-setup-font
 (when (and (display-graphic-p) (fboundp 'setup-font-initialize))
-  (mdk/set-key! "u F" 'hydra-font-size-menu/body nil t "lex-setup-font"))
+  (mdk/set-key! "u F" 'one-key-change-fontsize/menu nil t "lex-setup-font"))
 
 ;; lex-sdcv
 (if (and (executable-find "sdcv") (eq lye-enable-sdcv-or-youdao 'sdcv))
