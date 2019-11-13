@@ -30,6 +30,8 @@
 ;; Copy from @https://github.com/manateelazycat/lazy-load
 
 ;;; Change log:
+;; 2019/11/13
+;;        * Adjusting mdk/unset-key and mdk/unset-keys
 ;; 2019/11/09
 ;;        * and option `md-key-prefix'.
 
@@ -40,25 +42,25 @@
   "Set the default shortcut prefix When using `mdk/set-key!' Or `mdk/set-keys!' Set shortcut."
   :type 'string)
 
-;;;###autoload
-(defun mdk/unset-key! (key-string &optional keymap)
+(defun md-key/unset-key+ (key-string keymap)
   "The function is to little type when unset key binding.
 `KEYMAP' is add keymap for some binding, default is `current-global-map'
 `KEY-STRING' is no longer required to set the shortcut key."
-  (or keymap (setq keymap (current-global-map)))
   (cond ((stringp key-string) (setq key-string (read-kbd-macro (concat key-string))))
         ((vectorp key-string) nil)
         (t (signal 'wrong-type-argument (list 'array key-string))))
   (define-key keymap key-string nil))
 
 ;;;###autoload
-(defun mdk/unset-keys! (key-list &optional keymap)
+(defun md-key/unset-keys+ (key-list &optional keymap)
   "This function is to little type when unset key binding.
 `KEYMAP' is add keymap for some binding, default is `current-global-map'
 `KEY-LIST' is list contain key."
   (let ((keymap (or keymap (current-global-map))))
-    (dolist (key key-list)
-      (mdk/unset-key! key keymap))))
+    (if (stringp key-list)
+        (md-key/unset-key+ key-list keymap)
+      (dolist (key key-list)
+        (md-key/unset-key+ key keymap)))))
 
 ;;;###autoload
 (defun mdk/set-key! (key-str def &optional keymap key-prefix filename)

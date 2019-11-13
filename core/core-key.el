@@ -31,7 +31,7 @@
 ;;; Code:
 
 ;; Global uninstall button
-(mdk/unset-keys! '("C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC"))
+(md-key/unset-keys+ '("C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC"))
 
 (setq md-key-prefix "C-,")
 
