@@ -64,9 +64,11 @@
   (mdk/set-key! "u F" 'one-key-change-fontsize/menu nil t "lex-setup-font"))
 
 ;; lex-sdcv
-(if (and (executable-find "sdcv") (eq lye-enable-sdcv-or-youdao 'sdcv))
-    (mdk/set-key! "C-, y" 'sdcv-search-at-point++ nil nil "lex-sdcv")
-  (setq lye-enable-sdcv-or-youdao 'youdao))
+(if (executable-find "sdcv")
+    (mdk/set-key! "C-, y" 'sdcv-search-at-point++ nil nil
+                  (expand-file-name "apps/sdcv/config.el" lye-emacs-modules-dir))
+  (mdk/set-key! "C-, y" 'youdao-dictionary-search-at-point++ nil nil
+                  (expand-file-name "apps/ydcv/config.el" lye-emacs-modules-dir)))
 
 ;; lex-search.el
 (mdk/set-key! "C-r" 'one-key-menu-search nil nil "lex-search")

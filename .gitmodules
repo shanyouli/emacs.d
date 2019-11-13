@@ -4,9 +4,6 @@
 [submodule "company-english-helper"]
 	path = site-lisp/company-english-helper
 	url = https://github.com/manateelazycat/company-english-helper.git
-[submodule "sdcv"]
-	path = site-lisp/sdcv
-	url = https://github.com/manateelazycat/sdcv.git
 [submodule "insert-translated-name"]
 	path = site-lisp/insert-translated-name
 	url = https://github.com/manateelazycat/insert-translated-name.git
@@ -43,9 +40,6 @@
 [submodule "third-lisp"]
 	path = site-lisp/third-lisp
 	url = https://github.com/shanyouli/third-lisp.git
-[submodule "hydra"]
-	path = site-lisp/hydra
-	url = https://github.com/abo-abo/hydra.git
 [submodule "disable-mouse"]
 	path = site-lisp/disable-mouse
 	url = https://github.com/purcell/disable-mouse.git

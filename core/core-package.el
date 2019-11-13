@@ -118,6 +118,10 @@
 
 (lye/tools-module-install "winum")
 
+(if (executable-find "sdcv")
+    (lye/apps-module-install "sdcv" t)
+  (lye/apps-module-install "ydcv" t))
+
 (provide 'core-package)
 
 ;;; core-package.el ends here
