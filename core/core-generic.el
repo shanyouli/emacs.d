@@ -142,11 +142,9 @@
 (setq vc-follow-symlinks nil)
 
 ;; No display `*scratch*'
-(defun remove-scratch-buffer ()
-  (if (get-buffer "*scratch*")
-      (kill-buffer "*scratch*")))
-
-(add-hook 'after-change-major-mode-hook #'remove-scratch-buffer)
+(add-hook 'after-change-major-mode-hook
+          (lambda () (let ((buf "*scratch*"))
+                  (if (get-buffer buf) (kill-buffer buf)))))
 
 ;;当在windows上运行时,确定 Msys2是否安装
 (and system/windows (lye/modules-require 'lex-window-os))
