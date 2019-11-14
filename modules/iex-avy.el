@@ -37,22 +37,15 @@
 (setq avy-background 1)
 
 ;; key
-(defvar one-key-menu-avy-alist nil
-  "The `one-key' menu alist for AVY.")
-
-(setq one-key-menu-avy-alist
-      '((("c"   . "Goto Char") . avy-goto-char)
-        (("v"   . "Goto Char 2") . avy-goto-char-2)
-        (("w"   . "Goto word") . avy-goto-word-0)
-        (("e"   . "Goto Word 1") . avy-goto-word-1)
-        (("l"   . "Goto Begin Line") . avy-goto-line)
-        (("L"   . "Goto end Line") . avy-goto-end-of-line)
-        (("SPC" . "Goto char in line") . avy-goto-char-in-line)))
-
-(defun one-key-menu-avy ()
-  "The `one-key' menu for AVY."
-  (interactive)
-  (one-key-menu "AVY" one-key-menu-avy-alist t))
+(defonekey avy nil
+  "Font size."
+  ("c" avy-goto-char "Goto char")
+  ("v" avy-goto-char-2 "Goto Char 2")
+  ("w" avy-goto-word-0 "Got Word")
+  ("e" avy-goto-word-1 "Goto word 1")
+  ("l" avy-goto-line "Goto Begin Line")
+  ("L" avy-goto-end-of-line "Goto End Line")
+  ("SPC" avy-goto-char-in-line "Goto char inline"))
 
 ;; run
 (avy-setup-default)

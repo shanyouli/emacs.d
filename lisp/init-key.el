@@ -70,18 +70,13 @@
                  ("C-x 4 r" . winner-redo)) nil nil "iex-window")
 
 ;; iex-avy
-(mdk/set-keys! '(("M-s" . one-key-menu-avy)) nil nil "iex-avy")
+(mdk/set-keys! '(("M-s" . one-key-avy/menu)) nil nil "iex-avy")
 
 ;; iex-vterm
 (mdk/set-keys! '(("C-x s v" . term-toggle)) nil nil "iex-term")
 
 ;; iex-pomidor.el
 (mdk/set-keys! '(("C-z s c" . pomidor)) nil nil "iex-pomidor")
-
-;; iex-simple-mpc
-(when (and (executable-find "mpc") (executable-find "mpd"))
-  (mdk/set-keys! '(("C-z m" . one-key-menu-simple-mpc))
-                 nil nil "iex-simple-mpc"))
 
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/

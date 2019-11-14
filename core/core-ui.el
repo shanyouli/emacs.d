@@ -52,7 +52,7 @@
 (run-at-time 1 nil (lambda ()
                      (setq tool-bar-mode nil
                            scroll-bar-mode nil)
-                     (unless  system/mac
+                     (unless system/mac
                        (setq menu-bar-mode nil))))
 
 ;; Suppress GUI features
