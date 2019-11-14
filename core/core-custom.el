@@ -114,12 +114,6 @@ If it is `nil', Not use fuzzy match."
                  (const :tag "fuzzy" 'fuz)
                  (const :tag "Null" nil)))
 
-(defcustom lye-enable-sdcv-or-youdao 'sdcv
-  "If it is sdcv, use `sdcv' as a translation tool.
-If it is youdao, use `youdao-dictionary' as a translation tool."
-  :type '(choice (const :tag "Sdcv" sdcv)
-                 (const :tag "Youdao" youdao)))
-
 (defcustom lye-company-enable-yas nil
   "Enable yasnippet for company backends or not."
   :type  'boolean)
@@ -131,18 +125,6 @@ If it is youdao, use `youdao-dictionary' as a translation tool."
 (defcustom lye-load-all-module-file-p nil
   "Import all el files in lye-emacs-modules-dir on first run."
   :type 'boolean)
-
-(defcustom lye-sdcv-dictionary-data-dir
-  (let ((file1 (expand-file-name "sdcv" lye-emacs-share-dir))
-        (file2 (expand-file-name "sdcv" (getenv "XDG_DATA_HOME"))))
-    (cond ((file-directory-p file2)
-           file2)
-          ((file-directory-p file1)
-           file)
-          (t
-           (expand-file-name "~/.stardict/"))))
-  "Sdcv dictionary storage directory."
-  :type 'directory)
 
 (defcustom lye-emacs-autoload-dir (expand-file-name "autoload/" lye-emacs-cache-dir)
   "Automatic generation autoload file storage directory."

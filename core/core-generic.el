@@ -38,7 +38,6 @@
 ;; Restore emacs session.
 (setq initial-buffer-choice t)
 ;; Hide *scratch* buffer after entering the interface
-;;(run-with-timer 1 nil #'(lambda () (bury-buffer)))
 
 (fset 'yes-or-no-p 'y-or-n-p)           ; 以 y/n代表 yes/no
 (blink-cursor-mode -1)                  ; 指针不闪动
@@ -147,8 +146,8 @@
                   (if (get-buffer buf) (kill-buffer buf)))))
 
 ;;当在windows上运行时,确定 Msys2是否安装
-(and system/windows (lye/modules-require 'lex-window-os))
-(unless system/windows
+(if system/windows
+    (lye/core-require 'modules-winos t)
   (mde/path-from-shell-initialize+))
 
 (provide 'core-generic)

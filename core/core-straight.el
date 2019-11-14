@@ -35,10 +35,8 @@
 ;; Set the location where the elpa folder is stored
 (setq package-user-dir (expand-file-name "elpa" lye-emacs-cache-dir))
 
-(advice-add 'package--save-selected-packages :override #'my-save-selected-packages)
-;; Set package archives, You can choose Repo with melpa, melpa-mirrors
-;; emacs-china, netease, tuna, tencent
-(+set-package-archives lye-package-archives)
+(setq md-pkg-archives 'tuna)
+(md-pkg/initialize! nil t)
 
 ;;; straight.el
 (defvar straight-core-package-sources
@@ -96,7 +94,7 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
   (if (or use-straight-p
           (consp pkg-name))
       (straight-use-package pkg-name)
-    (require-package pkg-name))
+    (md-pkg/install+ pkg-name))
 
   (when loadp
     (let ((package-name (if (consp pkg-name)

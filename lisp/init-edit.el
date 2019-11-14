@@ -112,7 +112,7 @@
 ;; Page break lines
 ;;------------------------------------------------------------------------------
 
-(require-package 'page-break-lines)
+(md-pkg/install+ 'page-break-lines)
 (add-hook 'after-init-hook #'global-page-break-lines-mode)
 
 (provide 'init-edit)

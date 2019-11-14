@@ -47,11 +47,6 @@
 ;; iex-treemacs
 (mdk/set-keys! '(("C-x t" . one-key-menu-treemacs)) nil nil "iex-treemacs")
 
-;; iex-youdao-dictionary
-(if (eq lye-enable-sdcv-or-youdao 'youdao)
-    (mdk/set-keys! '(("C-z y" . youdao-dictionary-search-at-point++))
-                   nil nil "iex-youdao-dictionary"))
-
 ;; iex-git
 ;; transient file
 (setq-default transient-history-file
@@ -80,13 +75,13 @@
 
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
-(require-package 'link-hint)
+(md-pkg/install+ 'link-hint)
 (mdk/set-keys!
  '(("C-x p o" . link-hint-open-link)
    ("C-x p c" . link-hint-copy-link))
  nil nil  "link-hint")
 
-(require-package 'org-cliplink)
+(md-pkg/install+ 'org-cliplink)
 (mdk/set-keys! '(("C-x p i" . org-cliplink)) nil nil "org-cliplink")
 
 ;; lex-snails
@@ -96,7 +91,7 @@
                    ("C-z C-s" . snails-load-theme))  nil nil "iex-snails"))
 
 ;; Better elisp help file format
-;; (require-package 'helpful)
+;; (md-pkg/install+ 'helpful)
 ;; (mdk/set-keys!
 ;;  '(("C-h k" . helpful-key)
 ;;    ("C-h d" . helpful-at-point))

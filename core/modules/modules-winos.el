@@ -1,11 +1,11 @@
-;;; lex-window-os.el --- Initialize window os PATH -*- lexical-binding: t -*-
+;;; modules-winos.el --- Windows NT PATH -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v0.1
-;; Package-Requires: ()
+;; Package-Requires: (dependencies)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: path
+;; Keywords: PATH
 
 
 ;; This file is not part of GNU Emacs
@@ -26,11 +26,10 @@
 
 ;;; Commentary:
 
-;; window_system 的 PATH 配置
+;; Environment variable configuration
 
 ;;; Code:
 
-;;;Msys2 configuration
 (defvar msys2-root  nil "The root directory of msys2.")
 
 (defvar msys2-bin   nil "The executive of msys2.")
@@ -57,6 +56,6 @@
 
   (setenv "PATH" (concat msys2-bin ";" mingw64-bin ";" (getenv "PATH"))))
 
-(provide 'lex-window-os)
+(provide 'modules-winos)
 
-;;; lex-window-os.el ends here
+;;; modules-winos.el ends here
