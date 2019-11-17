@@ -106,9 +106,13 @@
 Autoload directory `DIR' generated for a file named `TARGET' in. And loading it.
 If the `TARGET' file already exists, Do nothing, only
 when `FORCEP' is non-nil, forcibly regenerate a new DIR file autoload and loading it."
+
   (require 'autoload)
   (let ((generated-autoload-file target)
         (target (md/autoload-get-autoload-file+ target)))
+    (let ((parent-dir (file-name-directory target)))
+      (unless (file-exists-p parent-dir)
+        (make-directory parent-dir t)))
     (when (or forcep (not (file-exists-p target)))
       (with-temp-file target
         (dolist (f (md/autoload-find-el-file-recurively+ dir))

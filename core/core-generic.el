@@ -63,11 +63,11 @@
                    (5 right)))))
 
 ;; Don't ask me when close emacs with process is running
-(defun no-query-kill-emacs (save-buffers-kill-emacs &rest rest)
+(defun no-query-kill-emacs (orign &rest rest)
   "Prevent annoying \"Activ process exits\" query when you quit Emacs."
   (require 'noflet)
   (noflet ((process-list ()))
-          (apply save-buffers-kill-emacs rest)))
+          (apply orign rest)))
 (advice-add 'save-buffers-kill-emacs :around 'no-query-kill-emacs)
 
 ;; Don't ask me when kill process buffer
@@ -149,6 +149,11 @@
 (if system/windows
     (lye/core-require 'modules-winos t)
   (mde/path-from-shell-initialize+))
+
+(advice-add 'find-file :before (lambda (arg1 &rest rest)
+                                 (let ((d (file-name-directory arg1)))
+                                   (unless (file-exists-p d)
+                                     (make-directory d t)))))
 
 (provide 'core-generic)
 

@@ -62,6 +62,21 @@
   (remove-if-not (lambda (x)
                    (string-prefix-p "*mts-" x))
                  (mapcar 'buffer-name (buffer-list))))
+(defun mts/close-all-mts-buffer ()
+  "Close all the prefix buffer *mts-"
+  (interactive)
+  (let ((mts-buf-list (mts/buffer-list)))
+    (when mts-buf-list
+      (mapc (lambda (x)
+              (set-buffer x)
+              (when (and (buffer-file-name)
+                         (buffer-modified-p))
+                (with-temp-message
+                    (with-current-buffer " *Minibuf-0*" (buffer-string))
+                  (let ((inhibit-messsage t))
+                    (basic-save-buffer))))
+              (kill-buffer x))
+            mts-buf-list))))
 
 ;;;###autoload
 (defun mts/scratch-initialize+ (&optional file)
@@ -72,10 +87,7 @@
 
   (let* ((file (expand-file-name (or file "mts.txt") mts-directory))
          (buf-list (mts/buffer-list))
-         (buf-name (concat "*"
-                           (mapconcat 'identity
-                                      (split-string (file-name-nondirectory file) "\\.") "-")
-                           "*")))
+         (buf-name (mds/create-buffer+ (file-name-nondirectory file))))
     (if (and buf-list (member buf-name buf-list))
         (switch-to-buffer buf-name)
       (switch-to-buffer (find-file file))
@@ -99,22 +111,6 @@
   "Temporary Python-script test files."
   (interactive)
   (mts/scratch-initialize+ "mts.py"))
-
-(defun mts/close-all-mts-buffer ()
-  "Close all the prefix buffer *mts-"
-  (interactive)
-  (let ((mts-buf-list (mts/buffer-list)))
-    (when mts-buf-list
-      (mapc (lambda (x)
-              (set-buffer x)
-              (when (and (buffer-file-name)
-                         (buffer-modified-p))
-                (with-temp-message
-                    (with-current-buffer " *Minibuf-0*" (buffer-string))
-                  (let ((inhibit-messsage t))
-                    (basic-save-buffer))))
-              (kill-buffer x))
-            mts-buf-list))))
 
 (provide 'modules-tmp-scratch)
 

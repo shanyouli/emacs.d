@@ -97,15 +97,6 @@
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
 
-(defcustom lye-package-archives 'melpa
-  "Set package archives from which to fetch."
-  :type '(choice (const :tag "Melpa" melpa)
-                 (const :tag "Melpa-mirror" melpa-mirror)
-                 (const :tag "Emacs-china" emacs-china)
-                 (const :tag "Netease" netease)
-                 (const :tag "Tuna" tuna)
-                 (const :tag "Tencent" tencent)))
-
 (defcustom lye-use-fuz-or-flx-in-ivy nil
   "If it is `flx', use fuzzy match with `flx' package.
 If it is `fuz', use fuzzy match with `fuz' package.
