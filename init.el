@@ -29,7 +29,6 @@
 ;; Initialize startup
 
 ;;; Code:
-
 (eval-when-compile
   (if (version< emacs-version "25.3")
       (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
@@ -90,7 +89,7 @@ decrease this. If you experience stuttering, increase this.")
 (require 'core-custom ; Variables
          (expand-file-name "core/core-custom.el" user-emacs-directory))
 
-(lye/core-require 'modules-benchmark t) ; benchmark
+(lye/core-require 'core-benchmark)      ; benchmark
 
 (lye/core-require 'core)                ; `load-path', Variables, benchmark
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
@@ -106,15 +105,17 @@ decrease this. If you experience stuttering, increase this.")
 (lye/init-require 'init-reads)        ; Reader tools
 (lye/init-require 'init-company)      ; company
 
-(run-with-idle-timer 0.1 nil (lambda ()
-                                ;; Program language common tool
-                                (lye/init-require 'init-lang)
-                                (lye/init-require 'init-elisp)
-                                (lye/init-require 'init-scheme)
-                                (lye/init-require 'init-sh)
-                                ;;(lye/init-require 'init-lua)
-                                (lye/init-require 'init-python)))
+(run-with-idle-timer 0.1 nil
+                     (lambda ()
+                       ;; Program language common tool
+                       (lye/init-require 'init-lang)
+                       (lye/init-require 'init-elisp)
+                       (lye/init-require 'init-scheme)
+                       (lye/init-require 'init-sh)
+                       ;;(lye/init-require 'init-lua)
+                       (lye/init-require 'init-python)))
 ;; Org mode
-(run-with-idle-timer 1 nil (lambda ()
-                             (lye/init-require 'init-hugo)
-                             (lye/init-require 'init-org)))
+(run-with-idle-timer 1 nil
+                     (lambda ()
+                       (lye/init-require 'init-hugo)
+                       (lye/init-require 'init-org)))
