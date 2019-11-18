@@ -37,9 +37,6 @@
 [submodule "posframe"]
 	path = site-lisp/posframe
 	url = https://github.com/tumashu/posframe.git
-[submodule "third-lisp"]
-	path = site-lisp/third-lisp
-	url = https://github.com/shanyouli/third-lisp.git
 [submodule "disable-mouse"]
 	path = site-lisp/disable-mouse
 	url = https://github.com/purcell/disable-mouse.git
@@ -52,3 +49,6 @@
 [submodule "liberime"]
 	path = site-lisp/liberime
 	url = https://github.com/merrickluo/liberime.git
+[submodule "onekey"]
+	path = site-lisp/onekey
+	url = https://github.com/shanyouli/onekey.git

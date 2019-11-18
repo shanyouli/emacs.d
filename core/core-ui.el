@@ -62,7 +62,19 @@
       ;;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
       frame-resize-pixelwise t)
 
-;; THEME
+;;
+;;; THEME
+
+;; Add after-load-theme-hook
+(defvar after-load-theme-hook nil
+  "Hook run after a color theme is loaded using `load-theme'.")
+
+(defun run-after-load-theme-hook (&rest _)
+  "Run `after-load-theme-hook'."
+  (run-hooks 'after-load-theme-hook))
+
+(advice-add #'load-theme :after #'run-after-load-theme-hook)
+
 (setq mdt-theme-light-and-dark '(doom-one doom-molokai)
       mdt-theme-switch-time '(30.93 . 113.92))
 (add-hook 'after-init-hook (lambda ()

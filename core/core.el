@@ -76,16 +76,6 @@ decrease this. If you experience stuttering, increase this.")
   "Import the `*.el' file in the lye-emacs-lisp-dir folder."
   `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
 
-;;; Add after-load-theme-hook
-(defvar after-load-theme-hook nil
-  "Hook run after a color theme is loaded using `load-theme'.")
-
-(defun run-after-load-theme-hook (&rest _)
-  "Run `after-load-theme-hook'."
-  (run-hooks 'after-load-theme-hook))
-
-(advice-add #'load-theme :after #'run-after-load-theme-hook)
-
 ;;; Add lye-init-hook
 (defvar lye-init-hook nil
   "HOOK runs after after-start-hook.")
