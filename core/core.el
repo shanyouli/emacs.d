@@ -44,38 +44,30 @@
   "The default value to use for `gc-cons-threshold'. If you experience freezing,
 decrease this. If you experience stuttering, increase this.")
 
-;;; Directories/files
-(defconst lye-emacs-dir
-  (eval-when-compile (file-truename user-emacs-directory))
-  "The path to the currently loaded .emacs.d directory. Must end with a slash.")
-
-
-(defconst lye-core-dir (concat lye-emacs-dir "core/")
-  "The root directory of Lye-Emacs's core files. Must end with a slash.")
 
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
-(setq file-name-handler-alist nil)
+;; (setq file-name-handler-alist nil)
 
 (lye/core-require 'modules-autoload t)
 (setq md-autoload-load-dir-alist
-      '((lye-emacs-core-dir . "core")
+      '((lye-core-dir . "core")
         (lye-emacs-site-lisp-dir . "site-lisp")
         (lye-emacs-modules-dir . "modules")))
 
 (md/autoload-create-and-load-file-list)
 
-(setq md-autoload-load-path-list '(lye-emacs-core-dir
+(setq md-autoload-load-path-list '(lye-core-dir
                                    lye-emacs-core-modules-dir
                                    lye-emacs-modules-dir
                                    (lye-emacs-site-lisp-dir)))
 (md/autoload-add-load-path-list)
 
-;; init Dired
 (defmacro lye/init-require (pkg)
   "Import the `*.el' file in the lye-emacs-lisp-dir folder."
   `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
 
+;;
 ;;; Add lye-init-hook
 (defvar lye-init-hook nil
   "HOOK runs after after-start-hook.")

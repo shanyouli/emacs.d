@@ -30,17 +30,22 @@
 
 ;;; Code:
 
+;;; Directories/files
+(defconst lye-emacs-dir
+  (eval-when-compile (file-truename user-emacs-directory))
+  "The path to the currently loaded .emacs.d directory. Must end with a slash.")
+
+(defconst lye-core-dir (concat lye-emacs-dir "core/")
+  "The root directory of Lye-Emacs's core files. Must end with a slash.")
+
 (defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory)
   "The root directory of third packages.")
 
-(defconst lye-emacs-core-dir (expand-file-name "core/" user-emacs-directory)
-  "Initialize some packages that are not installed using package.el.")
+(defconst lye-emacs-core-autoload-dir (expand-file-name "autoload/" lye-core-dir)
+  "autoload dir in `lye-core-dir'")
 
-(defconst lye-emacs-core-autoload-dir (expand-file-name "autoload/" lye-emacs-core-dir)
-  "autoload dir in `lye-emacs-core-dir'")
-
-(defconst lye-emacs-core-modules-dir (expand-file-name "modules/" lye-emacs-core-dir)
-  "modules dir in `lye-emacs-core-dir'")
+(defconst lye-emacs-core-modules-dir (expand-file-name "modules/" lye-core-dir)
+  "modules dir in `lye-core-dir'")
 
 (defconst lye-emacs-init-dir (expand-file-name "lisp/" user-emacs-directory)
   "Initialize some packages that are installed using package.el.")
@@ -124,10 +129,10 @@ If it is `nil', Not use fuzzy match."
 ;; https://github.com/honmaple/dotfiles/blob/571d6f0dca10015886c56a1feab17f0d5a1bb1ab/emacs.d/init.el#L51
 (defmacro lye/core-require (pkg &optional modulep)
   "Load PKG. When MODULEP is non-nil, the presence of PKG using directory
-`lye-emacs-core-modules-dir', and vice versa for `lye-emacs-core-dir'."
+`lye-emacs-core-modules-dir', and vice versa for `lye-core-dir'."
   (let ((dir (if modulep
                  lye-emacs-core-modules-dir
-               lye-emacs-core-dir)))
+               lye-core-dir)))
     `(require ,pkg (expand-file-name (format "%s" ,pkg) ,dir))))
 
 (provide 'core-custom)

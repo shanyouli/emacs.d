@@ -74,7 +74,7 @@
 (mdk/set-key! "C-r" 'one-key-menu-search nil nil "lex-search")
 
 ;; lex-thing-edit.el
-(mdk/set-key! "M-e"  'one-key-menu-thing-edit nil nil "lex-thing-edit")
+(mdk/set-key! "M-e"  'one-key-thing-edit/menu nil nil "lex-thing-edit")
 
 ;; lex-pyim.el
 (mdk/set-keys!

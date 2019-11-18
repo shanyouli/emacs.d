@@ -31,49 +31,31 @@
 ;;; Code:
 (require 'thing-edit)
 
-(defvar one-key-menu-thing-edit-alist nil
-  "The `one-key' menu alist for THING-EDIT")
+(defonekey thing-edit nil
+  "Thing-edit"
+  ("w" thing-copy-word "Copy word")
+  ("s" thing-copy-symbol "Copy symbol")
+  ("f" thing-copy-filename "Copy-filename")
+  ("x" thing-copy-sexp "Copy sexp")
+  ("g" thing-copy-page "Copy Page")
+  ("i" thing-copy-list "copy list")
+  ("h" thing-copy-defun "copy functions")
+  ("p" thing-copy-parentheses "Copy Parentheses")
+  ("l" thing-copy-region-or-line "Copy line or region")
+  ("a" thing-copy-to-line-beginning "Copy to Line begin")
+  ("e" thing-copy-to-line-end "Copy to Line End")
 
-(setq one-key-menu-thing-edit-alist
-      '(;; Copy
-        (("w" . "Copy word")           . thing-copy-word)
-        (("s" . "Copy Symbol")         . thing-copy-symbol)
-        (("m" . "Copy Email")          . thing-copy-email)
-        (("f" . "Copy Filename")       . thing-copy-filename)
-        (("u" . "Copy URL")            . thing-copy-url)
-        (("x" . "Copy Sexp")           . thing-copy-sexp)
-        (("g" . "Copy Page")           . thing-copy-page)
-        (("t" . "Copy Sentence")       . thing-copy-sentence)
-        (("o" . "Copy Whitespace")     . thing-copy-whitespace)
-        (("i" . "Copy List")           . thing-cop-list)
-        (("h" . "Copy Functions")      . thing-copy-defun)
-        (("p" . "Copy Parentheses")    . thing-copy-parentheses)
-        (("l" . "Copy line or region") . thing-copy-region-or-line)
-        (("a" . "Copy to Line Begin")  . thing-copy-to-line-beginning)
-        (("e" . "Copy to Line End")    . thing-copy-to-line-end)
-
-        ;;Cut
-        (("W" . "Cut word")            . thing-cut-word)
-        (("S" . "Cut Symbol")          . thing-cut-symbol)
-        (("M" . "Cut Email")           . thing-cut-email)
-        (("F" . "Cut Filename")        . thing-cut-filename)
-        (("U" . "Cut URL")             . thing-cut-url)
-        (("X" . "Cut Sexp")            . thing-cut-sexp)
-        (("G" . "Cut Page")            . thing-cut-page)
-        (("T" . "Cut Sentence")        . thing-cut-sentence)
-        (("O" . "Cut Whitespace")      . thing-cut-whitespace)
-        (("I" . "Cut List")            . thing-cop-list)
-        (("H" . "Cut Functions")       . thing-cut-defun)
-        (("P" . "Cut Parentheses")     . thing-cut-parentheses)
-        (("L" . "Cut line or region")  . thing-cut-region-or-line)
-        (("A" . "Cut to Line Begin")   . thing-cut-to-line-beginning)
-        (("E" . "Cut to Line End")     . thing-cut-to-line-end)
-        ))
-
-(defun one-key-menu-thing-edit ()
-  "The `one-key' menu for THING-EDIT."
-  (interactive)
-  (one-key-menu "THING-EDIT" one-key-menu-thing-edit-alist t))
+  ("W" thing-Cut-word "Cut word")
+  ("S" thing-Cut-symbol "Cut symbol")
+  ("F" thing-Cut-filename "Cut-filename")
+  ("X" thing-Cut-sexp "Cut sexp")
+  ("G" thing-Cut-page "Cut Page")
+  ("I" thing-Cut-list "Cut list")
+  ("H" thing-Cut-defun "Cut functions")
+  ("P" thing-Cut-parentheses "Cut Parentheses")
+  ("L" thing-Cut-region-or-line "Cut line or region")
+  ("A" thing-Cut-to-line-beginning "Cut to Line begin")
+  ("E" thing-Cut-to-line-end "Cut to Line End"))
 
 (provide 'lex-thing-edit)
 
