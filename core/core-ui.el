@@ -99,7 +99,8 @@
 (lye/UI-module-install "all-the-icons")
 
 ;; mode-line
-(lye/UI-module-install "doom-modeline")
+(md-modeline-mode  +1)
+;; (lye/UI-module-install "doom-modeline")
 ;; or
 ;; (lye/UI-module-install "awesome-tray")
 
