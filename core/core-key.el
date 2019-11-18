@@ -60,7 +60,7 @@
                nil t "lex-hydra")
 
 ;; lex-setup-font
-(when (and (display-graphic-p) (fboundp 'setup-font-initialize))
+(when (and (display-graphic-p) (fboundp 'mdf/monospace-font-initialize+))
   (mdk/set-key! "u F" 'one-key-change-fontsize/menu nil t "lex-setup-font"))
 
 ;; lex-sdcv
