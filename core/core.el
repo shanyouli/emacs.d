@@ -37,7 +37,6 @@
 
 (defvar lye--initial-file-name-handler-alist file-name-handler-alist)
 
-
 ;;
 ;;; Global variables
 
@@ -86,7 +85,6 @@ decrease this. If you experience stuttering, increase this.")
   (run-hooks 'after-load-theme-hook))
 
 (advice-add #'load-theme :after #'run-after-load-theme-hook)
-;; -----------------------------------------------------------------------------
 
 ;;; Add lye-init-hook
 (defvar lye-init-hook nil
@@ -97,7 +95,6 @@ decrease this. If you experience stuttering, increase this.")
   (run-at-time 0.1 nil (lambda () (run-hooks 'lye-init-hook))))
 
 (add-hook 'after-init-hook #'run-lye-init-hook)
-;; -----------------------------------------------------------------------------
 
 (provide 'core)
 

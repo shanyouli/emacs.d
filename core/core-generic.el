@@ -35,29 +35,87 @@
 (setq user-full-name    lye-full-name
       user-mail-address lye-mail-address)
 
-;; Restore emacs session.
-(setq initial-buffer-choice t)
+;; Disable warnings from legacy advice system. They aren't useful, and we can't
+;; often do anything about them besides changing packages upstream
+(setq ad-redefinition-action 'accept)
+
+;; Make apropos omnipotent. It's more useful this way.
+(setq apropos-do-all t)
+
+;; Display the bare minimum at startup. We don't need all that noise. The
+;; dashboard/empty scratch buffer is good enough.
+(setq inhibit-startup-message t
+      inhibit-startup-echo-area-message user-login-name
+      inhibit-default-init t
+      initial-major-mode 'fundamental-mode
+      initial-scratch-message nil
+      ;; Avoid emacsclient opening *scratch* buffer and getting an error
+      initial-buffer-choice '(lambda () (switch-to-next-buffer)))
+(fset #'display-startup-echo-area-message #'ignore)
+
+;; Emacs "updates" its ui more often than it needs to, so we slow it down
+;; slightly, from 0.5s:
+(setq idle-update-delay 1)
+
+;; Emacs on Windows frequently confuses HOME (C:\Users\<NAME>) and APPDATA,
+;; causing `abbreviate-home-dir' to produce incorrect paths.
+(when IS-WINDOWS
+  (setq abbreviated-home-dir "\\'`"))
+
+;;
+;;; Optimizations
+
+;; Disable bidirectional text rendering for a modest performance boost. Of
+;; course, this renders Emacs unable to detect/display right-to-left languages
+;; (sorry!), but for us left-to-right language speakers/writers, it's boon.
+(setq-default bidi-display-reordering 'left-to-right)
+
+;; Reduce rendering/line scan work for Emacs by not rendering cursors or regions
+;; in non-focused windows.
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
+
+;; More performant rapid scrolling over unfontified regions. May cause brief
+;; spells of inaccurate fontification immediately after scrolling.
+(setq fast-but-imprecise-scrolling t)
+
+
+;; Resizing the Emacs frame can be a terribly expensive part of changing the
+;; font. By inhibiting this, we halve startup times, particcularly when we use
+;; fonts that are larger than the system default (which would resize the frame).
+(setq frame-inhibit-implied-resize t)
+
+;; Don't ping things that look like domain names.
+(setq ffap-machine-p-known 'reject)
+
 
 (fset 'yes-or-no-p 'y-or-n-p)           ; 以 y/n代表 yes/no
 (blink-cursor-mode -1)                  ; 指针不闪动
 (transient-mark-mode +1)                 ; 标记高亮
 (setq use-dialog-box nil)               ; never pop dialog
-(setq inhibit-startup-screen t)         ;inhibit start screen
-(setq initial-scratch-message "")       ;关闭启动空白buffer, 这个buffer会干扰session恢复
 (setq-default comment-style 'indent)    ;设定自动缩进的注释风格
 (setq ring-bell-function 'ignore)       ;关闭烦人的出错时的提示声
 (setq default-major-mode 'text-mode)    ; 设置默认的主模式为TEXT
 (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
 (setq x-select-enable-clipboard t)      ;支持emacs和外部程序的粘贴
 (setq split-width-threshold nil)        ;分屏的时候使用上下分屏
+
+;; Performance on Windows is considerably worse than elsewhere. We'll need
+;; everything we can get.
 (when IS-WINDOWS
-  ;; Reduce the workload when doing file IO
-  (setq w32-get-true-filettributes nil)
+  ;;Reduce the workload when doing file IO
+  (setq w32-get-true-fileattributes nil)
 
   ;; Font compacting can be terribly expensive, especially for rendering icon
   ;; fonts on Windows. Whether it has a noteable affect on Linux and Mac hasn't
   ;; been determined.
-  (setq inhibit-compacting-font-caches t)) ;使用字体缓存，避免卡顿
+   ;使用字体缓存，避免卡顿
+  (setq inhibit-compacting-font-caches t))
+
+;; Remove command line options that aren't relevant to our current OS; that
+;;means less to process at startup.
+(unless IS-MAC (setq command-line-ns-option-alist nil))
+(unless IS-LINUX (setq command-line-x-option-alist nil))
 
 (setq profiler-report-cpu-line-format   ;让 profiler-report 第一列宽一点
       '((100 left)
@@ -102,9 +160,6 @@
 (setq set-mark-command-repeat-pop t) ; Repeating C-SPC after poping mark pops it again
 (setq sentence-end "\\([。！？]\\|……\\|[.?!][]\"')}]*\\($\\|[ \t]\\)\\)[ \t\n]*")
 (setq sentence-end-double-space nil)
-
-;; Avoid emacsclient opening *scratch* buffer and getting an error
-(setq initial-buffer-choice '(lambda () (switch-to-next-buffer)))
 
 ;; Tab and Space
 ;; Permanently indent with spaces, never with TABs

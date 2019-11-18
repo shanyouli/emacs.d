@@ -119,7 +119,7 @@ If it is `nil', Not use fuzzy match."
          (not (file-exists-p custom-file)))
     (copy-file lye-emacs-custom-temp-file custom-file))
 
-(if (file-exists-p custom-file) (load custom-file))
+(if (file-exists-p custom-file) (load custom-file :no-error :no-message))
 
 ;; https://github.com/honmaple/dotfiles/blob/571d6f0dca10015886c56a1feab17f0d5a1bb1ab/emacs.d/init.el#L51
 (defmacro lye/core-require (pkg &optional modulep)

@@ -30,6 +30,8 @@
 ;;; @see https://github.com/guidoschmidt/circadian.el/
 
 ;;; Change log:
+;; 2019/11/18:
+;;        * remove hook
 ;; 2019/11/12:
 ;;        * fix "theme was not there, or has been loaded.'" when emacs startup.
 ;;  2019/11/10:
@@ -49,11 +51,6 @@
 (defcustom mdt-theme-list nil
   "Custom theme list."
   :type 'list
-  :group 'modules-theme)
-
-(defcustom mdt-after-load-theme-hook '()
-  "A hook run after a color theme is loaded using `load-theme'"
-  :type 'hook
   :group 'modules-theme)
 
 (defcustom mdt-theme-light-and-dark '()
@@ -98,14 +95,6 @@ Conversely Theme Settings range `(custom-available-themes)'."
                              (custom-available-themes)))))
   (let ((mdt-theme-list nil))
     (mdt/load-theme theme)))
-
-
-
-(defun mdt/run-after-load-theme-hook+ (&rest _)
-  "Run `mdt-after-load-theme-hook'"
-  (run-hooks 'mdt-after-load-theme-hook))
-
-(advice-add #'load-theme :after #'mdt/run-after-load-theme-hook+)
 
 
 
