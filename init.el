@@ -29,6 +29,8 @@
 ;; Initialize startup
 
 ;;; Code:
+
+
 (eval-when-compile
   (if (version< emacs-version "25.3")
       (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
@@ -77,7 +79,7 @@ decrease this. If you experience stuttering, increase this.")
   ;; you get a minor speed up by nooping this.
   (setq file-name-handler-alist nil)
   ;; Not restoring these to their defaults will cause stuttering/freezes.
-  (add-hook 'after-init-hook #'lye/restore-startup-optimizations))
+  (add-hook 'emacs-startup-hook #'lye/restore-startup-optimizations))
 
 ;; In noninteractive sessions,prioritize non-byte-compiled source files to
 ;; prevent stable, byte-compiled code from running. However, if you're getting
@@ -85,6 +87,9 @@ decrease this. If you experience stuttering, increase this.")
 (setq load-prefer-newer noninteractive)
 
 ;; Let 'er rip!
+
+;; Enusre Lye-Emacs is running out of this file's directory
+(setq user-emacs-directory (file-name-directory load-file-name))
 
 (require 'core-custom ; Variables
          (expand-file-name "core/core-custom.el" user-emacs-directory))

@@ -37,7 +37,6 @@
 
 ;; Restore emacs session.
 (setq initial-buffer-choice t)
-;; Hide *scratch* buffer after entering the interface
 
 (fset 'yes-or-no-p 'y-or-n-p)           ; 以 y/n代表 yes/no
 (blink-cursor-mode -1)                  ; 指针不闪动
@@ -51,8 +50,15 @@
 (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
 (setq x-select-enable-clipboard t)      ;支持emacs和外部程序的粘贴
 (setq split-width-threshold nil)        ;分屏的时候使用上下分屏
-(when system/windows
+(when IS-WINDOWS
+  ;; Reduce the workload when doing file IO
+  (setq w32-get-true-filettributes nil)
+
+  ;; Font compacting can be terribly expensive, especially for rendering icon
+  ;; fonts on Windows. Whether it has a noteable affect on Linux and Mac hasn't
+  ;; been determined.
   (setq inhibit-compacting-font-caches t)) ;使用字体缓存，避免卡顿
+
 (setq profiler-report-cpu-line-format   ;让 profiler-report 第一列宽一点
       '((100 left)
         (24 right ((19 right)
@@ -82,7 +88,7 @@
 (prefer-coding-system 'utf-8)
 ;; Optional
 ;; (setq locale-coding-system 'utf-8)
-(unless system/windows
+(unless IS-WINDOWS
   (setq selection-coding-system 'utf-8))
 
 ;;; Miscs
@@ -105,6 +111,10 @@
 (setq-default c-basic-offset 4
               tab-width 4
               indent-tabs-mode nil)
+
+;; 当光标到屏幕的倒数三行时,屏幕下移一行
+(setq scroll-margin 3
+      scroll-conservatively 1000000)
 
 ;; Store all temporal files in a temporal directory instead of being
 ;; disseminated in the $HOME directory
@@ -146,14 +156,15 @@
                   (if (get-buffer buf) (kill-buffer buf)))))
 
 ;;当在windows上运行时,确定 Msys2是否安装
-(if system/windows
+(if IS-WINDOWS
     (lye/core-require 'modules-winos t)
   (mde/path-from-shell-initialize+))
 
-(advice-add 'find-file :before (lambda (arg1 &rest rest)
-                                 (let ((d (file-name-directory arg1)))
-                                   (unless (file-exists-p d)
-                                     (make-directory d t)))))
+(advice-add 'find-file
+            :before (lambda (arg1 &rest rest)
+                      (let ((d (file-name-directory arg1)))
+                        (unless (file-exists-p d)
+                          (make-directory d t)))))
 
 (provide 'core-generic)
 

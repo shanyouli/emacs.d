@@ -46,13 +46,13 @@
   (push '(vertical-scroll-bars) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
 
-  (unless (and (boundp system/mac) system/mac)
+  (unless (and (boundp IS-MAC) IS-MAC)
     (push '(menu-bar-lines . 0) default-frame-alist)))
 
 (run-at-time 1 nil (lambda ()
                      (setq tool-bar-mode nil
                            scroll-bar-mode nil)
-                     (unless system/mac
+                     (unless IS-MAC
                        (setq menu-bar-mode nil))))
 
 ;; Suppress GUI features

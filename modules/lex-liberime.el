@@ -32,9 +32,9 @@
 
 (defconst librime-share-dir
   (cond
-   ((and system/linux (file-directory-p "/usr/share/rime-data"))
+   ((and IS-LINUX (file-directory-p "/usr/share/rime-data"))
     (file-truename "/usr/share/rime-data"))
-   ((and system/mac
+   ((and IS-MAC
          (file-directory-p "/Library/Input Methods/Squirrel.app/Contents/SharedSupport"))
     (file-truename "/Library/Input Methods/Squirrel.app/Contents/SharedSupport")))
   "Personal data storage location.")

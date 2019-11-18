@@ -30,7 +30,7 @@
 
 ;; Start server
 ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
-(when (and (display-graphic-p) (not system/windows))
+(when (and (display-graphic-p) (not IS-WINDOWS))
   (add-hook 'lye-init-hook
             (lambda ()
               (require 'server)
@@ -99,7 +99,7 @@
             (if (display-graphic-p) (global-disable-mouse-mode))))
 
 ;;; Backup-file
-(unless system/windows
+(unless IS-WINDOWS
   (add-hook 'lye-init-hook
             (lambda ()
               (require 'diff-mode)

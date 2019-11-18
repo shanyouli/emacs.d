@@ -79,9 +79,9 @@
         dired-omit-files
         (concat dired-omit-files "\\|^\\..+$\\|\\.pdf$\\|\\.tex$\\|\\*~$"))
   (let ((cmd (cond
-              (system/windows "start")
-              (system/linux "xdg-open")
-              (system/mac "open"))))
+              (IS-WINDOWS "start")
+              (IS-LINUX "xdg-open")
+              (IS-MAC "open"))))
     (setq dired-guess-shell-alist-user
           `(("\\.pdf\\'" ,cmd)
             ("\\.docx\\'" ,cmd)

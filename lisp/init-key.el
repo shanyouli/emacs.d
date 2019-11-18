@@ -85,7 +85,7 @@
 (mdk/set-keys! '(("C-x p i" . org-cliplink)) nil nil "org-cliplink")
 
 ;; lex-snails
-(when (and (not system/windows) (display-graphic-p))
+(when (and (not IS-WINDOWS) (display-graphic-p))
   (md-key/unset-keys+ "C-x C-b")
   (mdk/set-keys! '(("C-x C-b" . snails)
                    ("C-z C-s" . snails-load-theme))  nil nil "iex-snails"))
@@ -98,7 +98,7 @@
 ;;  "helpful")
 
 ;; iex-tldr
-(unless system/windows
+(unless IS-WINDOWS
   (mdk/set-keys! '(("C-z s h" . tldr))  nil nil "iex-tldr"))
 
 ;; iex-smart-align

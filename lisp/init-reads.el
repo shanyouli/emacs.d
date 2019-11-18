@@ -46,7 +46,7 @@
     :config
         ;; WORKAROUND: Fix compilation errors on macOS.
     ;; @see https://github.com/politza/pdf-tools/issues/480
-    (when system/mac
+    (when IS-MAC
       (setenv "PKG_CONFIG_PATH"
               "/usr/local/lib/pkgconfig:/usr/local/opt/libffi/lib/pkgconfig"))
     (pdf-tools-install t nil t t)

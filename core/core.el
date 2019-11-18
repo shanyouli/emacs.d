@@ -3,9 +3,7 @@
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v0.1
-;; Package-Requires: (cl)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: load-path
 
 
 ;; This file is not part of GNU Emacs
@@ -23,12 +21,42 @@
 ;; For a full copy of the GNU General Public License
 ;; see <http://www.gnu.org/licenses/>.
 
-
-;;; Commentary:
-
-;; Initialize Load-Path
-
 ;;; Code:
+
+(when (version< emacs-version "26.1")
+  (error "Detected Emacs %s. Lye-Emacs only supportss Emacs 16.2 and higher"
+         emacs-version))
+
+(defconst EMACS27+ (> emacs-major-version 26))
+(defconst IS-MAC (eq system-type 'darwin))
+(defconst IS-LINUX (eq system-type 'gnu/linux))
+(defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-doc)))
+
+;; Ensure `lye-core-dir' is in `load-path'
+(add-to-list 'load-path (file-name-directory load-file-name))
+
+(defvar lye--initial-file-name-handler-alist file-name-handler-alist)
+
+
+;;
+;;; Global variables
+
+(defvar lye--gc-cons-threshold 33554432 ; 32Mib
+  "The default value to use for `gc-cons-threshold'. If you experience freezing,
+decrease this. If you experience stuttering, increase this.")
+
+;;; Directories/files
+(defconst lye-emacs-dir
+  (eval-when-compile (file-truename user-emacs-directory))
+  "The path to the currently loaded .emacs.d directory. Must end with a slash.")
+
+
+(defconst lye-core-dir (concat lye-emacs-dir "core/")
+  "The root directory of Lye-Emacs's core files. Must end with a slash.")
+
+;; This is consulted on every `require', `load' and various path/io functions.
+;; You get a minor speed up by nooping this.
+(setq file-name-handler-alist nil)
 
 (lye/core-require 'modules-autoload t)
 (setq md-autoload-load-dir-alist

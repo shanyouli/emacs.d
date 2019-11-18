@@ -40,5 +40,5 @@
 
 ;; all-the-icons-dired
 (use-package all-the-icons-dired
-  :if (and (display-graphic-p) (not system/windows))
+  :if (and (display-graphic-p) (not IS-WINDOWS))
   :hook (dired-mode . all-the-icons-dired-mode))

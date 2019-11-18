@@ -30,19 +30,6 @@
 
 ;;; Code:
 
-
-(defconst system/windows (memq system-type '(windows-nt ms-dos cygwin))
-  "Are we running on a Windows System?")
-
-(defconst system/mac (eq system-type 'darwin)
-  "Are we running on a Mac System?")
-
-(defconst system/linux (eq system-type 'gnu/linux)
-  "Are we running on a GNU/Linux System?")
-
-(defconst *root* (string-equal "root" (getenv "USER"))
-  "Are you using ROOT user?")
-
 (defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory)
   "The root directory of third packages.")
 
@@ -83,7 +70,6 @@
 (defconst lye-emacs-custom-temp-file
   (expand-file-name "custom-template.el" lye-emacs-share-dir)
   "The custom template of `custom-file'.")
-
 
 ;;; customization
 (defcustom lye-full-name "shanyouli"

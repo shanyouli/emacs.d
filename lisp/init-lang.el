@@ -119,7 +119,7 @@
     (plantuml-download-jar)))
 
 ;; Only suitable for Windows Languages-Packages major-mode
-(when  system/windows
+(when  IS-WINDOWS
   ;; ahk-mode
   (use-package ahk-mode :ensure t :mode "\\.ahk\\'"  :defer t)
 

@@ -69,7 +69,7 @@
           company-preview-if-just-one-frontend))
 
   ;; Use company-tabnine
-  (unless (or system/windows (executable-find "wsl.exe"))
+  (unless (or IS-WINDOWS (executable-find "wsl.exe"))
     (use-package company-tabnine
       :ensure t
       :init
