@@ -32,14 +32,14 @@
 
 ;;; Directories/files
 (defconst lye-emacs-dir
-  (eval-when-compile (file-truename user-emacs-directory))
+  (file-truename user-emacs-directory)
   "The path to the currently loaded .emacs.d directory. Must end with a slash.")
 
 (defconst lye-core-dir (concat lye-emacs-dir "core/")
   "The root directory of Lye-Emacs's core files. Must end with a slash.")
 
 (defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory)
-  "The root directory of third packages.")
+  "The root directory of third packages. Must end with a slash.")
 
 (defconst lye-emacs-core-autoload-dir (expand-file-name "autoload/" lye-core-dir)
   "autoload dir in `lye-core-dir'")
@@ -99,14 +99,6 @@ If it is `nil', Not use fuzzy match."
 (defcustom lye-company-enable-yas nil
   "Enable yasnippet for company backends or not."
   :type  'boolean)
-
-(defcustom lye-init-fullscreen-p nil
-  "Full SCREEN or not when initializing."
-  :type 'boolean)
-
-(defcustom lye-load-all-module-file-p nil
-  "Import all el files in lye-emacs-modules-dir on first run."
-  :type 'boolean)
 
 (defcustom lye-emacs-autoload-dir (expand-file-name "autoload/" lye-emacs-cache-dir)
   "Automatic generation autoload file storage directory."

@@ -30,6 +30,9 @@
 ;; commentary
 
 ;;; Change log:
+;;
+;; 11/19/19
+;;        * 添加留白
 ;; 11/18/19
 ;;        * add `md-modeline-window-number'
 ;;
@@ -152,7 +155,9 @@
   "Return a string of `window-width' length containing LEFT and RIGHT, aligned respectively."
   (let ((reserve (length right)))
     (concat left
-            " "
+            (propertize " "
+                        'display '(height 1.4))
+            (propertize " " 'display '(raise -0.3))
             (propertize " "
                         'display `((space :align-to (- right ,reserve))))
             right)))
@@ -340,7 +345,8 @@
 
         ;; Set the new mode-line-format
         (setq-default mode-line-format
-                      '((:eval
+                      '(
+                        (:eval
                          (--format-md-modeline
                           ;; Left
                           (format-mode-line

@@ -2,8 +2,7 @@
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: ()
+;; Version: v0.2
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: init
 
@@ -29,7 +28,6 @@
 ;; Initialize startup
 
 ;;; Code:
-
 
 (eval-when-compile
   (if (version< emacs-version "25.3")
