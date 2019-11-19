@@ -118,7 +118,7 @@ If it is `nil', Not use fuzzy match."
 
 (if (file-exists-p custom-file) (load custom-file :no-error :no-message))
 
-;; https://github.com/honmaple/dotfiles/blob/571d6f0dca10015886c56a1feab17f0d5a1bb1ab/emacs.d/init.el#L51
+;; https://github.coom/honmaple/dotfiles/blob/571d6f0dca10015886c56a1feab17f0d5a1bb1ab/emacs.d/init.el#L51
 (defmacro lye/core-require (pkg &optional modulep)
   "Load PKG. When MODULEP is non-nil, the presence of PKG using directory
 `lye-emacs-core-modules-dir', and vice versa for `lye-core-dir'."

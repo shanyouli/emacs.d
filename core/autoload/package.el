@@ -1,4 +1,5 @@
 ;;; core/autoload/package.el -*- lexical-binding: t -*-
+
 ;;;###autoload
 (defun switch-to-straight-buffer ()
   "Open the `*straight-process*'."

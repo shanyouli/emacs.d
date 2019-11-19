@@ -35,8 +35,7 @@
 
 (setq md-key-prefix "C-,")
 
-(md-key/unset-keys+ '("C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC"))
-
+(md-key/unset-global+ "C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC")
 ;; esup
 (mdk/set-key! "s e" #'esup nil t "esup")
 

@@ -86,7 +86,7 @@
 
 ;; lex-snails
 (when (and (not IS-WINDOWS) (display-graphic-p))
-  (md-key/unset-keys+ "C-x C-b")
+  (md-key/unset-global+ "C-x C-b")
   (mdk/set-keys! '(("C-x C-b" . snails)
                    ("C-z C-s" . snails-load-theme))  nil nil "iex-snails"))
 

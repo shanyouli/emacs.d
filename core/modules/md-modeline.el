@@ -32,7 +32,7 @@
 ;;; Change log:
 ;;
 ;; 11/19/19
-;;        * 添加留白
+;;        * 添加留白, 参考: https://emacs-china.org/t/mode-line/8656
 ;; 11/18/19
 ;;        * add `md-modeline-window-number'
 ;;
@@ -314,9 +314,9 @@
     (if (and (< 0 (length num))
              (< (if (active-minibuffer-window) 2 1)
                 (length (cl-mapcan #'window-list (visible-frame-list)))))
-        (propertize (format "%s" num)
-                    'face 'md-modeline-window-number)
-      )))
+        (concat " "
+                (propertize (format "%s" num) 'face 'md-modeline-window-number)
+                " "))))
 
 ;;
 ;; Activation function

@@ -30,6 +30,10 @@
 ;; Copy from @https://github.com/manateelazycat/lazy-load
 
 ;;; Change log:
+;;
+;; 2019/11/19:
+;;        * add `md-key/unset-global+'
+;;        * add `md-key/unset-local+', remove `md-key/unset-keys+'
 ;; 2019/11/13
 ;;        * Adjusting mdk/unset-key and mdk/unset-keys
 ;; 2019/11/09
@@ -52,15 +56,23 @@
   (define-key keymap key-string nil))
 
 ;;;###autoload
-(defun md-key/unset-keys+ (key-list &optional keymap)
+(defun md-key/unset-local+ (keymap &rest keybind)
   "This function is to little type when unset key binding.
-`KEYMAP' is add keymap for some binding, default is `current-global-map'
-`KEY-LIST' is list contain key."
-  (let ((keymap (or keymap (current-global-map))))
-    (if (stringp key-list)
-        (md-key/unset-key+ key-list keymap)
-      (dolist (key key-list)
-        (md-key/unset-key+ key keymap)))))
+`KEYMAP' is add keymap for some binding, `KEYBIND' is list contain key."
+    (let* ((keybind (copy-tree keybind))
+         (len (length keybind))
+         (key-list))
+    (cond ((and (= len 1) (listp (car keybind)))
+                (setq key-list (car keybind)))
+          (t
+           (setq key-list keybind)))
+    (dolist (k key-list)
+      (md-key/unset-key+ k keymap))))
+
+;;;###autoload
+(defun md-key/unset-global+ (&rest keybind)
+  "`keybind' button is not binding. the key-map is `current-global-map'"
+  (md-key/unset-local+ (current-global-map) keybind))
 
 ;;;###autoload
 (defun mdk/set-key! (key-str def &optional keymap key-prefix filename)
