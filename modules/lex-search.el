@@ -60,22 +60,14 @@
 ;; -----------------------------------------------------------------------------
 
 ;; one-key configurations
-(defvar one-key-menu-search-alist nil
-  "The `one-key' menu list for SEARCH.")
-
-(setq one-key-menu-search-alist
-      '((("g" . "Use rg search symbol") . color-rg-search-symbol)
-        (("h" . "Use rg search input") . color-rg-search-input)
-        (("j" . "Use rg search symbol in project") . color-rg-search-symbol-in-project)
-        (("k" . "Use rg search input in project")  . color-rg-search-input-in-project)
-        (("," . "Use rg search symbol in current file") . color-rg-search-symbol-in-current-file)
-        (("." . "Use rg search input in current file") . color-rg-search-input-in-current-file)
-        (("l" . "lazy search") . lazy-search)))
-
-(defun one-key-menu-search ()
-  "The `one-key' menu for SEARCH"
-  (interactive)
-  (one-key-menu "SEARCH" one-key-menu-search-alist t))
+(defonekey color-rg-search nil
+  "Search"
+  ("s" color-rg-search-symbol "symbol")
+  ("i" color-rg-search-input "input")
+  ("p" color-rg-search-symbol-in-project "symbol in proj")
+  ("j" color-rg-search-input-in-project "input in proj")
+  ("c" color-rg-search-symbol-in-current-file "symbol in file")
+  ("v" color-rg-search-input-in-current-file "input in file"))
 
 (provide 'lex-search)
 

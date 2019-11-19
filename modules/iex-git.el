@@ -53,34 +53,24 @@
 (with-eval-after-load "magit-files"
   (define-key magit-file-mode-map (kbd "C-x g") nil))
 
-(defvar one-key-menu-magit-alist nil
-  "The `one-key' menu alist for MAGIT.")
-
-(setq one-key-menu-magit-alist
-      '((("s" . "Magit Status")               . magit-status+)
-        (("c" . "Magit checkout")             . magit-checkout)
-        (("C" . "Magit Commit")               . magit-commit)
-        (("u" . "Magit push to Pushremote")   . magit-push-current-to-pushremote)
-        (("p" . "Magit Delete remote branch") . magit-delete-remote-branch)
-        (("i" . "Magit Pull")                 . magit-pull-from-upstream)
-        (("r" . "Magit rebase")               . magit-rebase)
-        (("e" . "Magit Merge")                . magit-merge)
-        (("l" . "Magit Log")                  . magit-log-all)
-        (("L" . "Magit blame")                . magit-blame+)
-        (("b" . "Magit branch")               . magit-branch)
-        (("B" . "Magit buffer")               . magit-process-buffer)
-        (("m" . "Magit submodule add")        . magit-submodule-add+)
-        (("d" . "Magit submodule remove")     . magit-submodule-remove+)
-        (("M" . "Magit submodule list")       . magit-list-submodules)
-        (("D" . "Magit discarded")            . magit-discard)
-        (("," . "Magit init")                 . magit-init)
-        (("." . "Magit add remote")           . magit-remote-add)
-        ))
-
-(defun one-key-menu-magit ()
-  "The `one-key' menu for MAGIT."
-  (interactive)
-  (one-key-menu "MAGIT" one-key-menu-magit-alist t))
+(defonekey magit nil
+  "Magit keybindings"
+  ("s" magit-status+ "Magit status")
+  ("c" magit-checkout "Magit Checkout")
+  ("C" magit-commit "Magit commit")
+  ("u" magit-push-current-to-pushremote "Magit push to Pushremote")
+  ("i" magit-pull-from-upstream  "Magit Pull")
+  ("r" magit-rebase "Magit rebase")
+  ("e" magit-merge "Megit Merge")
+  ("l" magit-log-all "Megit Log")
+  ("L" magit-blame+ "Magit blame")
+  ("b" magit-branch "Magit branch")
+  ("B" magit-process-buffer "Magit branch")
+  ("m" magit-submodule-add+ "Magit submodule add")
+  ("d" magit-submodule-remove+ "Magit submodule remove")
+  ("D" magit-discard "Magit discarded")
+  ("." magit-init "Magit init")
+  ("," magit-remote-add "Magit add remote"))
 
 ;; @https://github.com/manateelazycat/lazycat-emacs/blob/master/site-lisp/config/init-git.el#L154
   (defun magit-submodule-add+ (url)

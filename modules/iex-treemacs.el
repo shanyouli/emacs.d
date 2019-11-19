@@ -93,22 +93,6 @@
 (if (locate-library "doom-themes")
     (require 'doom-themes-ext-treemacs))
 
-;; treemacs-key
-(defvar one-key-menu-treemacs-alist nil
-  "The `one-key' menu alist for treemacs")
-(setq one-key-menu-treemacs-alist
-      '((("o" . "Open or close treemacs tree") . treemacs)
-        (("s" . "Select window") . treemacs-select-window)
-        (("k" . "Delete other-windows") . treemacs-delete-other-windows)
-        (("f" . "Find file") . treemacs-find-file)
-        (("t" . "Find Tags") . treemacs-find-tag)
-        (("p" . "treemacs Projectile") . treemacs-projectile)))
-
-(defun one-key-menu-treemacs ()
-  "The `one-key' menu for TREEMACS."
-  (interactive)
-  (one-key-menu "TREEMACS" one-key-menu-treemacs-alist t))
-
 (provide 'iex-treemacs)
 
 ;;; iex-treemacs.el ends here

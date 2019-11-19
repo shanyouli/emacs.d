@@ -44,9 +44,6 @@
 ;; iex-elfeed
 (mdk/set-keys! '(("C-z w" . elfeed)) nil nil "iex-elfeed")
 
-;; iex-treemacs
-(mdk/set-keys! '(("C-x t" . one-key-menu-treemacs)) nil nil "iex-treemacs")
-
 ;; iex-git
 ;; transient file
 (setq-default transient-history-file
@@ -58,7 +55,7 @@
 ;; Forge configuration
 (setq forge-database-file
       (expand-file-name "forge-database.sqlite" lye-emacs-cache-dir))
-(mdk/set-keys! '(("C-x g" . one-key-menu-magit)) nil nil "iex-git")
+(mdk/set-keys! '(("C-x g" . one-key-magit/menu)) nil nil "iex-git")
 
 ;; iex-window
 (mdk/set-keys! '(("C-x 4 u" . winner-undo)

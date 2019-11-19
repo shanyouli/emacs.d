@@ -46,6 +46,8 @@
   "Set the default shortcut prefix When using `mdk/set-key!' Or `mdk/set-keys!' Set shortcut."
   :type 'string)
 
+;;
+;;; 移除快捷键.
 (defun md-key/unset-key+ (key-string keymap)
   "The function is to little type when unset key binding.
 `KEYMAP' is add keymap for some binding, default is `current-global-map'
@@ -60,8 +62,8 @@
   "This function is to little type when unset key binding.
 `KEYMAP' is add keymap for some binding, `KEYBIND' is list contain key."
     (let* ((keybind (copy-tree keybind))
-         (len (length keybind))
-         (key-list))
+           (len (length keybind))
+           (key-list))
     (cond ((and (= len 1) (listp (car keybind)))
                 (setq key-list (car keybind)))
           (t
@@ -73,6 +75,19 @@
 (defun md-key/unset-global+ (&rest keybind)
   "`keybind' button is not binding. the key-map is `current-global-map'"
   (md-key/unset-local+ (current-global-map) keybind))
+
+
+
+;;
+;;; 函数快捷键绑定
+
+(defun md-key/set+ (keymap key def)
+  "Binding `def' shortcut function is `key', the key-map is `keymap'."
+  (cond ((stringp key)
+         (setq key (read-kbd-macro (concat key))))
+         ((vectorp key) (setq key key))
+         (t (signal 'wrong-type-argument (list 'array key))))
+  (define-key keymap key def))
 
 ;;;###autoload
 (defun mdk/set-key! (key-str def &optional keymap key-prefix filename)
