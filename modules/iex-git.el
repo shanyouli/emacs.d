@@ -74,7 +74,7 @@
   ("." magit-init "Magit init")
   ("," magit-remote-add "Magit add remote"))
 
-;; @https://github.com/manateelazycat/lazycat-emacs/blob/master/site-lisp/config/init-git.el#L154
+;; @https://github.com/manateelazycat/lazycat-emacs/blob/master/site-lisp/config/md-git.el#L154
   (defun magit-submodule-add+ (url)
     "It's more convenient to add third-party packages that don't use package
 management for Emacs."

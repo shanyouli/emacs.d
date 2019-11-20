@@ -1,4 +1,4 @@
-;;; init-company.el --- Initialize Company configurations.  -*- lexical-binding: t; -*-
+;;; md-company.el --- Initialize Company configurations.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  lye li
 
@@ -106,5 +106,5 @@
     (require 'company-posframe)
     (company-posframe-mode +1)))
 
-(provide 'init-company)
-;;; init-company.el ends here
+(provide 'md-company)
+;;; md-company.el ends here

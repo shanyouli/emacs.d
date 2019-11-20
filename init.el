@@ -86,36 +86,30 @@ decrease this. If you experience stuttering, increase this.")
 ;; Enusre Lye-Emacs is running out of this file's directory
 (setq user-emacs-directory (file-name-directory load-file-name))
 
-(require 'core-custom ; Variables
-         (expand-file-name "core/core-custom.el" user-emacs-directory))
-
-(lye/core-require 'core-benchmark)      ; benchmark
-
-(lye/core-require 'core)                ; `load-path', Variables, benchmark
+(load (concat user-emacs-directory "core/core-benchmark") nil 'nomessage)
+(load (concat user-emacs-directory "core/core") nil 'nomessage)
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
 (lye/core-require 'core-straight)       ; staraight, package
 (lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-ui)             ; UI
 (lye/core-require 'core-package)        ; packages initialization
 
-(lye/init-require 'init-key)          ; Keybindings
-(lye/init-require 'init-edit)         ; better edit
-(lye/init-require 'init-shackle)      ; Window rule
-(lye/init-require 'init-dired)        ; Dired
-(lye/init-require 'init-reads)        ; Reader tools
-(lye/init-require 'init-company)      ; company
+(lye/modules-require 'md-edit)         ; better edit
+(lye/modules-require 'md-shackle)      ; Window rule
+(lye/modules-require 'md-dired)       ; Dired
+(lye/modules-require 'md-reads)          ; Reader tools
+(lye/modules-require 'md-company)      ; company
 
 (run-with-idle-timer 0.1 nil
                      (lambda ()
                        ;; Program language common tool
-                       (lye/init-require 'init-lang)
-                       (lye/init-require 'init-elisp)
-                       (lye/init-require 'init-scheme)
-                       (lye/init-require 'init-sh)
-                       ;;(lye/init-require 'init-lua)
-                       (lye/init-require 'init-python)))
+                       (lye/modules-require 'md-lang)
+                       (lye/modules-require 'md-elisp)
+                       (lye/modules-require 'md-scheme)
+                       (lye/modules-require 'md-sh)
+                       (lye/modules-require 'md-python)))
 ;; Org mode
 (run-with-idle-timer 1 nil
                      (lambda ()
-                       (lye/init-require 'init-hugo)
-                       (lye/init-require 'init-org)))
+                       (lye/modules-require 'md-hugo)
+                       (lye/modules-require 'md-org)))

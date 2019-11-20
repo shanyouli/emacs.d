@@ -1,4 +1,4 @@
-;;; init-python.el ---Initialize python              -*- lexical-binding: t; -*-
+;;; md-python.el ---Initialize python              -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  lye li
 
@@ -55,5 +55,5 @@
                 (setq-local company-backends
                             (mapcar #'company-backend-with-yas company-backends))))))
 
-(provide 'init-python)
-;;; init-python.el ends here
+(provide 'md-python)
+;;; md-python.el ends here

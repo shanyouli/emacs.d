@@ -1,4 +1,4 @@
-;;; init-hugo.el --- Initalize Hugo                  -*- lexical-binding: t; -*-
+;;; md-hugo.el --- Initalize Hugo                  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  lye li
 
@@ -39,5 +39,5 @@
 (use-package easy-hugo :ensure t)
 
 
-(provide 'init-hugo)
-;;; init-hugo.el ends here
+(provide 'md-hugo)
+;;; md-hugo.el ends here

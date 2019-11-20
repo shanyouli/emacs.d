@@ -1,4 +1,4 @@
-;;; init-scheme.el --- Initialize Scheme Configurations.  -*- lexical-binding: t; -*-
+;;; md-scheme.el --- Initialize Scheme Configurations.  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  lye li
 
@@ -85,5 +85,5 @@
   (add-hook 'scheme-mode-hook #'enable-paredit-mode)
   )
 
-(provide 'init-scheme)
-;;; init-scheme.el ends here
+(provide 'md-scheme)
+;;; md-scheme.el ends here

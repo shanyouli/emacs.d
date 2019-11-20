@@ -1,4 +1,4 @@
-;;; init-sh.el --- Shell Script Configurations -*- lexical-binding: t -*-
+;;; md-sh.el --- Shell Script Configurations -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
@@ -62,5 +62,5 @@
                ;;             (mapcar #'company-backend-with-yas company-backends))
                (add-hook 'lsp--managed-mode-hook (lambda () (eldoc-mode -1)))))))
 
-(provide 'init-sh)
-;;; init-sh.el ends here
+(provide 'md-sh)
+;;; md-sh.el ends here

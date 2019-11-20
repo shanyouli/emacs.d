@@ -1,11 +1,12 @@
-;;; init-reads.el --- Initialize pdf-tools epub-mode -*- lexical-binding: t -*-
+;;; md-reads.el --- Read tools -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v0.1
-;; Package-Requires: (pdf-tools nov-mode)
-;; Homepage: homepage
-;; Keywords: read-tools
+;; Package-Requires: (dependencies)
+;; Homepage: https://github.com/shanyouli/emacs.d
+;; Keywords: Reads, Tools
+;; Last-Updated: 2019-11-20 15:44:37
 
 
 ;; This file is not part of GNU Emacs
@@ -26,7 +27,11 @@
 
 ;;; Commentary:
 
-;; commentary
+;; Read tools
+
+;;; Change log:
+;;
+;; 11/20/19
 
 ;;; Code:
 
@@ -49,7 +54,7 @@
     (when IS-MAC
       (setenv "PKG_CONFIG_PATH"
               "/usr/local/lib/pkgconfig:/usr/local/opt/libffi/lib/pkgconfig"))
-    (pdf-tools-install t nil t t)
+    ;; (pdf-tools-install t nil t t)
 
     ;; Recover last viewed position
     (when (< 26 emacs-major-version)
@@ -71,6 +76,7 @@
     ;; :hook (nov-mode . my-nov-setup)
     :config
     (setq nov-save-place-file (concat lye-emacs-cache-dir "nov-places"))))
-(provide 'init-reads)
 
-;;; init-reads.el ends here
+(provide 'md-reads)
+
+;;; md-reads.el ends here

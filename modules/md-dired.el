@@ -1,26 +1,37 @@
-;;; init-dired.el --- Initialize Dired               -*- lexical-binding: t; -*-
+;;; md-dired.el --- Initialize Module dired -*- lexical-binding: t -*-
 
-;; Copyright (C) 2019  lye li
+;; Author: shanyouli
+;; Maintainer: shanyouli
+;; Version: v0.1
+;; Package-Requires: ()
+;; Homepage: https://github.com/shanyouli/emacs.d
+;; Keywords: dired, hl
+;; Last-Updated: 2019-11-20 15:39:28
 
-;; Author: lye li <shanyouli6@gmail.com>
-;; Keywords:
 
-;; This program is free software; you can redistribute it and/or modify
+;; This file is not part of GNU Emacs
+
+;; This file is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation, either version 3 of the License, or
-;; (at your option) any later version.
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
 
 ;; This program is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
 
-;; You should have received a copy of the GNU General Public License
-;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;; For a full copy of the GNU General Public License
+;; see <http://www.gnu.org/licenses/>.
+
 
 ;;; Commentary:
 
+;;  Initialize Module Dired
+
+;;; Change log:
 ;;
+;; 11/20/19
 
 ;;; Code:
 
@@ -95,5 +106,6 @@
             ("\\.html?\\'" ,cmd)
             ("\\.md\\'" ,cmd)))))
 
-(provide 'init-dired)
-;;; init-dired.el ends here
+(provide 'md-dired)
+
+;;; md-dired.el ends here

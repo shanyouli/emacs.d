@@ -1,4 +1,4 @@
-;;; init-lua.el ---Initialize Lua Language           -*- lexical-binding: t; -*-
+;;; md-lua.el ---Initialize Lua Language           -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  lye li
 
@@ -45,5 +45,5 @@
                         (cons '(company-lua company-tabnine company-yasnippet)
                               company-backends))))
 
-(provide 'init-lua)
-;;; init-lua.el ends here
+(provide 'md-lua)
+;;; md-lua.el ends here

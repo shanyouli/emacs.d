@@ -1,4 +1,4 @@
-;;; init-elisp.el --- Iniliatize Emacs Lisp Configurations  -*- lexical-binding: t; -*-
+;;; md-elisp.el --- Iniliatize Emacs Lisp Configurations  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  lye li
 
@@ -137,5 +137,5 @@
 (add-hook 'emacs-lisp-hook
             (function sly-el-indent-setup))
 
-(provide 'init-elisp)
-;;; init-elisp.el ends here
+(provide 'md-elisp)
+;;; md-elisp.el ends here

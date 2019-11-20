@@ -1,4 +1,4 @@
-;;; init-org.el ---Org-mode configurations.          -*- lexical-binding: t; -*-
+;;; md-org.el ---Org-mode configurations.          -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2018  lye li
 
@@ -46,7 +46,7 @@
                     (setq truncate-lines nil) ; 不自动换行
 
                     ;; Beautify Org Checkbox Symbol
-                    ;; @seehttps://github.com/seagle0128/.emacs.d/blob/master/lisp/init-org.el#L44
+                    ;; @seehttps://github.com/seagle0128/.emacs.d/blob/master/lisp/md-org.el#L44
                     (when (char-displayable-p ?☐)
                       (push '("[ ]" . "☐") prettify-symbols-alist))
                     (when (char-displayable-p ?☑)
@@ -128,5 +128,5 @@
 
 (use-package htmlize :ensure t)
 
-(provide 'init-org)
-;;; init-org.el ends here
+(provide 'md-org)
+;;; md-org.el ends here

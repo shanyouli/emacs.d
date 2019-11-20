@@ -38,9 +38,100 @@
 ;;
 ;;; Global variables
 
-(defvar lye--gc-cons-threshold 33554432 ; 32Mib
-  "The default value to use for `gc-cons-threshold'. If you experience freezing,
-decrease this. If you experience stuttering, increase this.")
+
+;;; Directories/files
+(defconst lye-emacs-dir
+  (file-truename user-emacs-directory)
+  "The path to the currently loaded .emacs.d directory. Must end with a slash.")
+
+(defconst lye-core-dir (concat lye-emacs-dir "core/")
+  "The root directory of Lye-Emacs's core files. Must end with a slash.")
+
+(defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory)
+  "The root directory of third packages. Must end with a slash.")
+
+(defconst lye-emacs-core-autoload-dir (expand-file-name "autoload/" lye-core-dir)
+  "autoload dir in `lye-core-dir'")
+
+(defconst lye-emacs-core-modules-dir (expand-file-name "modules/" lye-core-dir)
+  "modules dir in `lye-core-dir'")
+
+(defconst lye-emacs-modules-dir (expand-file-name "modules/" user-emacs-directory)
+  "You don't need to load directly but use the extended key to load the package
+ configuration folder.")
+
+(defconst lye-emacs-cache-dir (concat user-emacs-directory ".cache/")
+  "Is the cache directory this?")
+
+(defconst lye-emacs-share-dir (expand-file-name "share/" user-emacs-directory)
+  "Store files in non-el format, such as `plantuml.jar', `pyim-bigdict.pyim.gz'.")
+
+(defconst lye-emacs-pyim-big-file
+  (expand-file-name "pyim-dict/pyim-bigdict.pyim.gz" lye-emacs-share-dir)
+  "Store the location of the pyim-dictionary.")
+
+(defconst lye-emacs-plantuml-file
+  (expand-file-name "plantuml/plantuml.jar" lye-emacs-share-dir)
+  "Store the location of the plantuml.jar.")
+
+(defconst lye-emacs-yas-snippets-dir
+  (expand-file-name "snippets" lye-emacs-share-dir)
+  "Store the location of the `Yas-snippets'.")
+
+(defconst lye-emacs-custom-temp-file
+  (expand-file-name "custom-template.el" lye-emacs-share-dir)
+  "The custom template of `custom-file'.")
+
+;;; customization
+(defcustom lye-full-name "shanyouli"
+  "Set user full name."
+  :type 'string)
+
+(defcustom lye-mail-address "shanyouli6@gmail.com"
+  "Set user mail address."
+  :type 'string)
+
+(defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
+  "The Github page of My Emacs Configurations.")
+
+(defcustom lye-use-fuz-or-flx-in-ivy nil
+  "If it is `flx', use fuzzy match with `flx' package.
+If it is `fuz', use fuzzy match with `fuz' package.
+If it is `nil', Not use fuzzy match."
+  :type '(choice (const :tag "fuzzy match" 'flx)
+                 (const :tag "fuzzy" 'fuz)
+                 (const :tag "Null" nil)))
+
+(defcustom lye-company-enable-yas nil
+  "Enable yasnippet for company backends or not."
+  :type  'boolean)
+
+(defcustom lye-emacs-autoload-dir (expand-file-name "autoload/" lye-emacs-cache-dir)
+  "Automatic generation autoload file storage directory."
+  :type 'directory)
+
+(dolist (d (list lye-emacs-cache-dir
+                 lye-emacs-autoload-dir))
+  (unless (file-directory-p d)
+    (make-directory d t)))
+
+;;; Load `custom-file'
+(setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
+
+(if (and (file-exists-p lye-emacs-custom-temp-file)
+         (not (file-exists-p custom-file)))
+    (copy-file lye-emacs-custom-temp-file custom-file))
+
+(if (file-exists-p custom-file) (load custom-file :no-error :no-message))
+
+;; https://github.com/honmaple/dotfiles/blob/571d6f0dca10015886c56a1feab17f0d5a1bb1ab/emacs.d/init.el#L51
+(defmacro lye/core-require (pkg &optional modulep)
+  "Load PKG. When MODULEP is non-nil, the presence of PKG using directory
+`lye-emacs-core-modules-dir', and vice versa for `lye-core-dir'."
+  (let ((dir (if modulep
+                 lye-emacs-core-modules-dir
+               lye-core-dir)))
+    `(require ,pkg (expand-file-name (format "%s" ,pkg) ,dir))))
 
 
 ;; This is consulted on every `require', `load' and various path/io functions.
@@ -60,10 +151,6 @@ decrease this. If you experience stuttering, increase this.")
                                    lye-emacs-modules-dir
                                    (lye-emacs-site-lisp-dir)))
 (md/autoload-add-load-path-list)
-
-(defmacro lye/init-require (pkg)
-  "Import the `*.el' file in the lye-emacs-lisp-dir folder."
-  `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
 
 ;;
 ;;; Add lye-init-hook

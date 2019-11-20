@@ -1,4 +1,4 @@
-;;; init-lang.el ---Some Program Language Initialize  -*- lexical-binding: t; -*-
+;;; md-lang.el ---Some Program Language Initialize  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2019  lye li
 
@@ -142,5 +142,5 @@
     :mode ("\\.ebuild\\'" . ebuild-mode)
     :defer t))
 
-(provide 'init-lang)
-;;; init-lang.el ends here
+(provide 'md-lang)
+;;; md-lang.el ends here

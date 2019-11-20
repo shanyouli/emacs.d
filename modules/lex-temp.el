@@ -68,11 +68,11 @@
 
   (setq default-directory (concat (getenv "HOME") "/")))
 
-(defun temp-scratch-init-sh ()
+(defun temp-scratch-md-sh ()
   (interactive)
   (temp-scratch-init temp-scratch-sh-file))
 
-(defun temp-scratch-init-el ()
+(defun temp-scratch-md-el ()
   (interactive)
   (temp-scratch-init temp-scratch-el-file))
 
@@ -81,8 +81,8 @@
 (defhydra hydra-tmp-scratch-menu (:exit t)
   "Temp file scratch"
   ("SPC" temp-scratch-init "Original")
-  ("e" temp-scratch-init-el "Emacs-lisp")
-  ("s" temp-scratch-init-sh "Shell Script"))
+  ("e" temp-scratch-md-el "Emacs-lisp")
+  ("s" temp-scratch-md-sh "Shell Script"))
 
 (provide 'lex-temp)
 
