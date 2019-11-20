@@ -92,7 +92,8 @@
             (md-save-global-mode)
             ;; Displays the key bindings following your currently entered
             ;; incomplete command
-            (setq which-key-idle-delay 0.5)
+            (setq which-key-idle-delay 0.5
+                  which-key-popup-type 'minibuffer)
             (which-key-mode +1)
 
           ;; not use mouse
