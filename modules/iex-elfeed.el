@@ -29,7 +29,8 @@
 ;; A RSS feed reader
 
 ;;; Code:
-(package! 'elfeed t t)
+(package! 'elfeed  t)
+(require 'elfeed)
 (lye/modules-require 'iex-pretty-hydra)
 
 (setq elfeed-db-directory (concat lye-emacs-cache-dir "elfeed"))

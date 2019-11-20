@@ -1,8 +1,8 @@
 ;;; moudles/apps/ydcv/packages.el -*- lexical-binding: t -*-
 
-(package! 'youdao-dictionary nil t)
-(package! 'popup nil t)
-(package! 'pos-tip nil t)
-(package! 'chinese-word-at-point nil t)
-(package! 'names nil t)
-(package! 'posframe nil t)
+(package! 'youdao-dictionary t)
+(package! 'popup t)
+(package! 'pos-tip t)
+(package! 'chinese-word-at-point t)
+(package! 'names t)
+(package! 'posframe t)

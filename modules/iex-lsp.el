@@ -31,9 +31,12 @@
 ;;; Code:
 
 ;; Installed packages
-(package! 'lsp-mode t)
-(package! 'lsp-ui t)
-(package! 'company-lsp t)
+(package! 'lsp-mode)
+(package! 'lsp-ui)
+(package! 'company-lsp)
+(require 'lsp-mode)
+(require 'lsp-ui)
+(require 'company-lsp)
 
 
 ;; lsp-mode Configurations

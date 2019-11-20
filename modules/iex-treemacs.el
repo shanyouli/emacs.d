@@ -31,7 +31,8 @@
 ;;; Code:
 
 ;; install treemacs ------------------------------------------------------------
-(package! 'treemacs t)
+(package! 'treemacs)
+(require 'treemacs)
 ;;------------------------------------------------------------------------------
 
 (setq treemacs-collapse-dirs                 (if (executable-find "python") 3 0)
@@ -76,10 +77,12 @@
      (treemacs-git-mode 'simple))))
 
 ;; Projectile integration for treemacs
-(package! 'treemacs-projectile t)
+(package! 'treemacs-projectile)
+(require 'treemacs-projectile)
 
 ;; Magit integration for treemacs
-(package! 'treemacs-magit t)
+(package! 'treemacs-magit)
+(require 'treemacs-magit)
 
 (with-eval-after-load 'treemacs
   (with-eval-after-load 'magit

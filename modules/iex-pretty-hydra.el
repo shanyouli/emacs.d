@@ -29,7 +29,8 @@
 ;; Initialize pretty-hydra
 
 ;;; Code:
-(package! 'pretty-hydra t)
+(package! 'pretty-hydra)
+(require 'pretty-hydra)
 (require 'cl-macs)
 (cl-defun pretty-hydra-title (title &optional icon-type icon-name
                                       &key face height v-adjust)

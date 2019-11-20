@@ -2,4 +2,4 @@
 (package! '(awesome-tab :type git
                         :host github
                         :repo "manateelazycat/awesome-tab"
-                        :no-byte-compile t) nil t)
+                        :no-byte-compile t) t)

@@ -32,7 +32,7 @@
 
 (defgroup md-pkg nil
   "Package extensions."
-  :group 'md-pkg)
+  :group 'package)
 
 (defcustom md-pkg-save-variable-in-custom-file nil
   "Whether to save the installation package variables in custom file."

@@ -89,30 +89,24 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
     (require 'straight)
     (mapc #'straight-use-recipes straight-core-package-sources)))
 
-(defun package! (pkg-name &optional loadp use-straight-p)
+(defun package! (pkg-name &optional use-straight-p)
   "Install a package"
   (if (or use-straight-p
-          (consp pkg-name))
+          (listp pkg-name))
       (straight-use-package pkg-name)
-    (md-pkg/install+ pkg-name))
-
-  (when loadp
-    (let ((package-name (if (consp pkg-name)
-                            (car pkg-name)
-                          pkg-name)))
-      (require package-name nil t))))
+    (md-pkg/install+ pkg-name)))
 
 (straight-initialize-packages)
 
 ;; use package
-(package! 'use-package t t)
-(package! 'bind-key t t)
+(package! 'use-package t)
+(package! 'bind-key t)
 
 ;; some useful library
-(package! 's nil t)
-(package! 'async nil t)
-(package! 'f nil t)
-(package! 'dash nil t)
+(package! 's t)
+(package! 'async t)
+(package! 'f  t)
+(package! 'dash t)
 
 ;; pardox
 (run-with-idle-timer 5 nil (lambda () (lye/modules-require 'iex-paradox)))

@@ -1,11 +1,12 @@
-;;; iex-paradox.el --- Initialize Paradox -*- lexical-binding: t -*-
+;;; core-modules.el --- Initialize modules -*- lexical-binding: t -*-
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v2.0
-;; Package-Requires: (paradox)
+;; Version: v0.1
+;; Package-Requires: (dependencies)
 ;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: package tools
+;; Keywords: modules
+;; Last-Updated: 2019-11-20 11:06:33
 
 
 ;; This file is not part of GNU Emacs
@@ -26,20 +27,20 @@
 
 ;;; Commentary:
 
-;; Package management tools
+;; `lye-emacs-modules-dir'初始化
+
+;;; Change log:
+;;
+;; 11/20/19
 
 ;;; Code:
-(package! 'paradox)
-(require 'paradox)
 
-(advice-add #'list-packages :before
-            (lambda (&rest _)
-              (require 'paradox)
-              (setq paradox-execute-asynchronously t)
-              (setq paradox-github-token t)
-              (setq paradox-display-star-count nil)
-              (paradox-enable)))
+(defcustom lye-modules-package-list '()
+  "`lye-modules-dir' 中需要的 packages"
+  :type 'list)
 
-(provide 'iex-paradox)
 
-;;; iex-paradox.el ends here
+
+(provide 'core-modules)
+
+;;; core-modules.el ends here

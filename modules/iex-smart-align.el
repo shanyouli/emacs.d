@@ -31,7 +31,8 @@
 ;;; Code:
 
 (package! '(smart-align :type git :host github :repo "manateelazycat/smart-align"
-            :no-byte-compile t) t)
+                        :no-byte-compile t))
+(require 'smart-align)
 
 (provide 'iex-smart-align)
 

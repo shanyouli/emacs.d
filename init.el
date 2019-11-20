@@ -34,12 +34,9 @@
       (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
              emacs-version)))
 
-(defvar lye-gc-cons-threshold 16777216 ; 16mb
+(defvar lye--gc-cons-threshold (* 20 1024 1024)
   "The default value to use for `gc-cons-threshold'. If you experience freezing,
 decrease this. If you experience stuttering, increase this.")
-
-(defvar lye-gc-cons-upper-linit most-positive-fixnum
-  "The temporary value for `gc-cons-threshold' to defer it.")
 
 (defvar lye--file-name-handler-alist file-name-handler-alist)
 
@@ -53,26 +50,26 @@ decrease this. If you experience stuttering, increase this.")
   (run-with-idle-timer
    3 nil
    (lambda ()
-     (setq-default gc-cons-threshold lye-gc-cons-threshold)
+     (setq-default gc-cons-threshold lye--gc-cons-threshold)
      ;; To speed up minibuffer commands (like helm and ivy), we defer garbage
      ;; collection while the minibuffer is active.
      (defun lye/defer-garbage-collection ()
-       (setq gc-cons-threshold lye-gc-cons-upper-linit))
+       (setq gc-cons-threshold most-positive-fixnum))
      (defun lye/restore-garbage-collection ()
        ;; Defer it so that commands launched from the minibuffer can enjoy the
        ;; benefits.
-       (run-at-time 1 nil (lambda () (setq gc-cons-threshold lye-gc-cons-threshold))))
+       (run-at-time 1 nil (lambda () (setq gc-cons-threshold lye--gc-cons-threshold))))
      (add-hook 'minibuffer-setup-hook #'lye/defer-garbage-collection)
      (add-hook 'minibuffer-exit-hook #'lye/restore-garbage-collection)
      ;; GC all sneaky breaky like
      (add-hook 'focus-out-hook #'garbage-collect))))
 
 (if (ignore-errors (or after-init-time noninteractive))
-    (setq gc-cons-threshold lye-gc-cons-threshold)
+    (setq gc-cons-threshold lye--gc-cons-threshold)
   ;; A big contributor to startup times is garbage collection. We up the gc
   ;; threshold to temporarily prevent it from running, then reset it later in
   ;; `lye/restore-startup-optimizations'
-  (setq gc-cons-threshold lye-gc-cons-upper-linit)
+  (setq gc-cons-threshold most-positive-fixnum)
   ;; This is consulted on every `require', `load' andvarious path/io functions.
   ;; you get a minor speed up by nooping this.
   (setq file-name-handler-alist nil)

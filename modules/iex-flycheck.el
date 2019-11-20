@@ -29,7 +29,8 @@
 ;; commentary
 
 ;;; Code:
-(package! 'flycheck t t)
+(package! 'flycheck t)
+(require 'flycheck)
 
 ;; flycheck-configurations
 (setq flycheck-indication-mode 'right-fringe)
@@ -40,7 +41,8 @@
 
 (with-eval-after-load 'flycheck
   (when (display-graphic-p)
-    (package! 'flycheck-posframe t t)
+    (package! 'flycheck-posframe t)
+    (require 'flycheck-posframe)
     (setq flycheck-posframe-buffer " *flycheck-posframe-buffer*")
     (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)))
 

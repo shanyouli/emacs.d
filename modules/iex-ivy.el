@@ -33,10 +33,14 @@
 ;;; Code:
 
 ;;; Must package
-(package! 'amx t t)
-(package! 'ivy t)
-(package! 'counsel t)
-(package! 'swiper t)
+(package! 'amx t)
+(package! 'ivy)
+(package! 'counsel)
+(package! 'swiper)
+(require 'amx)
+(require 'ivy)
+(require 'counsel)
+(require 'swiper)
 ;; -----------------------------------------------------------------------------
 
 ;;; AMX
@@ -57,12 +61,14 @@
    (setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy)))
 
    (with-eval-after-load 'ivy
-     (package! '(ivy-fuz :host github :repo "cireu/fuz.el" :files ("ivy-fuz.el")) t)
+     (package! '(ivy-fuz :host github :repo "cireu/fuz.el" :files ("ivy-fuz.el")))
+     (require 'ivy-fuz)
      (add-to-list 'ivy-highlight-functions-alist
                   '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn))))
 
   ('flx
-   (package! 'flx t t)
+   (package! 'flx t)
+   (require 'flx)
    (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))))
 ;; -----------------------------------------------------------------------------
 
@@ -110,7 +116,8 @@
 
 ;;; Linkage between ivy and yasnippet
 (when (locate-library "yasnippet")
-  (package! 'ivy-yasnippet t)
+  (package! 'ivy-yasnippet)
+  (require 'ivy-yasnippet)
   (mdk/set-keys! '(("C-c y" . ivy-yasnippet))))
 ;; -----------------------------------------------------------------------------
 

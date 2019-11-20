@@ -104,7 +104,8 @@
             (lambda ()
               (require 'diff-mode)
               (package! '(backup-file :type git :host github
-                                    :repo "Andersbakken/emacs-backup-file") t)
+                                      :repo "Andersbakken/emacs-backup-file"))
+              (require 'backup-file)
               (setq backup-file-location (expand-file-name "backup"
                                                          lye-emacs-cache-dir))
               (add-hook 'after-save-hook #'backup-file)

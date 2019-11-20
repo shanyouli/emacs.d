@@ -103,6 +103,7 @@
 (with-eval-after-load 'company
   (when (display-graphic-p)
     (package! 'company-posframe t)
+    (require 'company-posframe)
     (company-posframe-mode +1)))
 
 (provide 'init-company)

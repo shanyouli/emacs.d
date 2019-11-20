@@ -32,14 +32,15 @@
 (package! '(snails :type git
                    :host github
                    :repo "manateelazycat/snails"
-                   :no-byte-compile t)
-          t)
+                   :no-byte-compile t))
 
 (package! '(snails-backend-themes :type git
                                   :host github
                                   :repo "shanyouli/snails-backend"
-                                  :no-byte-compile t)
-          t)
+                                  :no-byte-compile t))
+
+(require 'snails)
+(require 'snails-backend-themes)
 
 ;;; Code:
 

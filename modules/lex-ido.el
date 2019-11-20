@@ -30,9 +30,12 @@
 ;;; Code:
 (require 'ido)
 (require 'ido-completing-read+)
-(package! 'smex t t)
-(package! 'flx-ido t t)
-(package! 'ido-sort-mtime t t)
+(package! 'smex t)
+(package! 'flx-ido t)
+(package! 'ido-sort-mtime t)
+(require 'smex)
+(require 'flx-ido)
+(require 'ido-sort-mtime)
 
 (setq ido-enable-flex-matching  t
       ido-everywhere            nil

@@ -123,7 +123,8 @@
 
 ;; Function that highlights global variables
 (package! '(elispfl :type git :host github
-                    :repo "cireu/elispfl") t t)
+                    :repo "cireu/elispfl"))
+(require 'elispfl)
 (elispfl-mode +1)
 
 (package! '(sly-el-indent
@@ -131,7 +132,8 @@
             :host github
             :repo "cireu/sly-el-indent"
             :files (:defaults "lib")
-            :no-byte-compile t) t)
+            :no-byte-compile t))
+(require 'sly-el-indent)
 (add-hook 'emacs-lisp-hook
             (function sly-el-indent-setup))
 
