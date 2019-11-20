@@ -82,33 +82,31 @@ decrease this. If you experience stuttering, increase this.")
 (setq load-prefer-newer noninteractive)
 
 ;; Let 'er rip!
-
-;; Enusre Lye-Emacs is running out of this file's directory
-(setq user-emacs-directory (file-name-directory load-file-name))
-
 (load (concat user-emacs-directory "core/core") nil 'nomessage)
+
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
 (lye/core-require 'core-straight)       ; staraight, package
 (lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-ui)             ; UI
 (lye/core-require 'core-package)        ; packages initialization
 
-(lye/modules-require 'md-edit)         ; better edit
-(lye/modules-require 'md-shackle)      ; Window rule
-(lye/modules-require 'md-dired)       ; Dired
-(lye/modules-require 'md-reads)          ; Reader tools
-(lye/modules-require 'md-company)      ; company
+(lye/modules-require 'md-edit)          ; better edit
+(lye/modules-require 'md-shackle)       ; Window rule
+(lye/modules-require 'md-dired)         ; Dired
+(lye/modules-require 'md-reads)         ; Reader tools
+(lye/modules-require 'md-company)       ; company
 
-(run-with-idle-timer 0.1 nil
-                     (lambda ()
-                       ;; Program language common tool
-                       (lye/modules-require 'md-lang)
-                       (lye/modules-require 'md-elisp)
-                       (lye/modules-require 'md-scheme)
-                       (lye/modules-require 'md-sh)
-                       (lye/modules-require 'md-python)))
+(run-with-idle-timer
+ 0.1 nil (lambda ()
+           ;; Program language common tool
+           (lye/modules-require 'md-lang)
+           (lye/modules-require 'md-elisp)
+           (lye/modules-require 'md-scheme)
+           (lye/modules-require 'md-sh)
+           (lye/modules-require 'md-python)))
+
 ;; Org mode
-(run-with-idle-timer 1 nil
-                     (lambda ()
-                       (lye/modules-require 'md-hugo)
-                       (lye/modules-require 'md-org)))
+(run-with-idle-timer
+ 1 nil (lambda ()
+         (lye/modules-require 'md-hugo)
+         (lye/modules-require 'md-org)))

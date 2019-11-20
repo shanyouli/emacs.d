@@ -33,19 +33,19 @@
 (defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-doc)))
 
 ;; Ensure `lye-core-dir' is in `load-path'
-(add-to-list 'load-path (file-name-directory load-file-name))
-
-(require 'core-benchmark)
-
-;;
-;;; Global variables
-
 ;;; Directories/files
 (defconst lye-emacs-dir (file-truename user-emacs-directory)
   "The path to the currently loaded .emacs.d directory. Must end with a slash.")
 
 (defconst lye-core-dir (concat lye-emacs-dir "core/")
   "The root directory of Lye-Emacs's core files. Must end with a slash.")
+
+(add-to-list 'load-path lye-core-dir)
+
+(require 'core-benchmark)
+
+;;
+;;; Global variables
 
 (defconst lye-emacs-site-lisp-dir (concat lye-emacs-dir"site-lisp/")
   "The root directory of third packages. Must end with a slash.")
