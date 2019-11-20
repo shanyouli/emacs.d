@@ -54,11 +54,13 @@
 ;; straight
 (setq straight-base-dir lye-emacs-cache-dir
       straight-repository-branch "develop"
-      ;; straight-cache-autoloads nil
+      straight-cache-autoloads nil  ; use-autoload
+      straight-disable-autoloads t
       straight-vc-git-default-clone-depth 1
       straight-recipes-emacsmirror-use-mirror t
       straight-process-buffer " *straight-process*" ; hide *straight-process*
-      straight-check-for-modifications nil)
+      straight-check-for-modifications nil
+      straight-build-dir (concat straight-base-dir "straight/build"))
 
 (defun doom-ensure-straight ()
   (defvar bootstrap-version)
@@ -98,8 +100,10 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
 
 (straight-initialize-packages)
 
+(md/autoload-create-and-load '(straight-build-dir . "straight"))
 ;; use package
 (package! 'use-package t)
+(require 'use-package)
 (package! 'bind-key t)
 
 ;; some useful library

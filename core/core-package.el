@@ -102,10 +102,8 @@
 (unless IS-WINDOWS
   (add-hook 'lye-init-hook
             (lambda ()
-              (require 'diff-mode)
               (package! '(backup-file :type git :host github
-                                      :repo "Andersbakken/emacs-backup-file"))
-              (require 'backup-file)
+                                      :repo "shanyouli/emacs-backup-file"))
               (setq backup-file-location (expand-file-name "backup"
                                                          lye-emacs-cache-dir))
               (add-hook 'after-save-hook #'backup-file)

@@ -82,7 +82,8 @@
   "Find all `.el' files in DIR and its subdirectories."
   (let ((elfiles (directory-files dir t "\\.el\\'"))
         (subdir (md/autoload-find-subdir+ dir)))
-    (nconc elfiles
+
+    (nconc (cl-remove-if #'file-directory-p elfiles)
            (mapcan #'md/autoload-find-el-file-recurively+ subdir))))
 
 
