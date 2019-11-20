@@ -27,7 +27,7 @@
 
 ;;; Commentary:
 
-;; `lye-emacs-modules-dir'初始化
+;; `lye-modules-dir'初始化
 
 ;;; Change log:
 ;;

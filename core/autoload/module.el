@@ -2,8 +2,8 @@
 
 ;;;###autoload
 (defmacro lye/modules-require (pkg)
-  "Import the *.el file in the lye-emacs-modules-dir folder."
-  `(require ,pkg (format "%s%s.el" ,lye-emacs-modules-dir ,pkg)))
+  "Import the *.el file in the lye-modules-dir folder."
+  `(require ,pkg (format "%s%s.el" ,lye-modules-dir ,pkg)))
 
 (defmacro load-nomessage (load-file)
   `(load ,load-file :no-error :no-message))
@@ -12,7 +12,7 @@
   "Loading or installation configuration in a directory."
   (let* ((dir (if (string= dir (file-truename dir))
                  dir
-               (expand-file-name dir lye-emacs-modules-dir)))
+               (expand-file-name dir lye-modules-dir)))
          (pkg-dir (expand-file-name pkg (file-name-as-directory dir))))
     (when (file-exists-p pkg-dir)
       (let ((pkg-install-file (format "%s/%s" pkg-dir "packages.el"))

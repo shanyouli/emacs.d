@@ -38,8 +38,8 @@
 
 ;;;###autoload
 (defun load-all-module-file ()
-  "Import all el files in lye-emacs-modules-dir."
-  (dolist (f (directory-files lye-emacs-modules-dir t "\\.el\\'"))
+  "Import all el files in lye-modules-dir."
+  (dolist (f (directory-files lye-modules-dir t "\\.el\\'"))
     (load f :no-error :no-message)))
 
 ;;;###autoload

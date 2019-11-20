@@ -65,9 +65,9 @@
 ;; lex-sdcv
 (if (executable-find "sdcv")
     (mdk/set-key! "C-c y" 'sdcv-search-at-point++ nil nil
-                  (expand-file-name "apps/sdcv/config.el" lye-emacs-modules-dir))
+                  (expand-file-name "apps/sdcv/config.el" lye-modules-dir))
   (mdk/set-key! "C-c y" 'youdao-dictionary-search-at-point++ nil nil
-                (expand-file-name "apps/ydcv/config.el" lye-emacs-modules-dir)))
+                (expand-file-name "apps/ydcv/config.el" lye-modules-dir)))
 
 ;; lex-search.el
 (mdk/set-key! "C-c s" 'one-key-color-rg-search/menu nil nil "lex-search")

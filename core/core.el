@@ -35,56 +35,53 @@
 ;; Ensure `lye-core-dir' is in `load-path'
 (add-to-list 'load-path (file-name-directory load-file-name))
 
+(require 'core-benchmark)
+
 ;;
 ;;; Global variables
 
-
 ;;; Directories/files
-(defconst lye-emacs-dir
-  (file-truename user-emacs-directory)
+(defconst lye-emacs-dir (file-truename user-emacs-directory)
   "The path to the currently loaded .emacs.d directory. Must end with a slash.")
 
 (defconst lye-core-dir (concat lye-emacs-dir "core/")
   "The root directory of Lye-Emacs's core files. Must end with a slash.")
 
-(defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory)
+(defconst lye-emacs-site-lisp-dir (concat lye-emacs-dir"site-lisp/")
   "The root directory of third packages. Must end with a slash.")
 
-(defconst lye-emacs-core-autoload-dir (expand-file-name "autoload/" lye-core-dir)
-  "autoload dir in `lye-core-dir'")
+(defconst lye-core-modules-dir (concat lye-core-dir "modules/")
+  "modules dir in `lye-core-dir', Must end with a slash.")
 
-(defconst lye-emacs-core-modules-dir (expand-file-name "modules/" lye-core-dir)
-  "modules dir in `lye-core-dir'")
-
-(defconst lye-emacs-modules-dir (expand-file-name "modules/" user-emacs-directory)
+(defconst lye-modules-dir (concat lye-emacs-dir "modules/")
   "You don't need to load directly but use the extended key to load the package
  configuration folder.")
 
-(defconst lye-emacs-cache-dir (concat user-emacs-directory ".cache/")
+(defconst lye-emacs-cache-dir (concat lye-emacs-dir ".cache/")
   "Is the cache directory this?")
 
-(defconst lye-emacs-share-dir (expand-file-name "share/" user-emacs-directory)
+(defconst lye-emacs-share-dir (concat lye-emacs-dir "share/")
   "Store files in non-el format, such as `plantuml.jar', `pyim-bigdict.pyim.gz'.")
 
 (defconst lye-emacs-pyim-big-file
-  (expand-file-name "pyim-dict/pyim-bigdict.pyim.gz" lye-emacs-share-dir)
+  (concat lye-emacs-share-dir "pyim-dict/pyim-bigdict.pyim.gz")
   "Store the location of the pyim-dictionary.")
 
 (defconst lye-emacs-plantuml-file
-  (expand-file-name "plantuml/plantuml.jar" lye-emacs-share-dir)
+  (concat lye-emacs-share-dir "plantuml/plantuml.jar")
   "Store the location of the plantuml.jar.")
 
 (defconst lye-emacs-yas-snippets-dir
-  (expand-file-name "snippets" lye-emacs-share-dir)
+  (concat lye-emacs-share-dir "snippets")
   "Store the location of the `Yas-snippets'.")
 
 (defconst lye-emacs-custom-temp-file
-  (expand-file-name "custom-template.el" lye-emacs-share-dir)
+  (concat lye-emacs-share-dir "custom-template.el")
   "The custom template of `custom-file'.")
 
+;;
 ;;; customization
-(defcustom lye-full-name "shanyouli"
-  "Set user full name."
+(defcustom lye-full-name "shanyouli" "Set user full name."
   :type 'string)
 
 (defcustom lye-mail-address "shanyouli6@gmail.com"
@@ -106,7 +103,7 @@ If it is `nil', Not use fuzzy match."
   "Enable yasnippet for company backends or not."
   :type  'boolean)
 
-(defcustom lye-emacs-autoload-dir (expand-file-name "autoload/" lye-emacs-cache-dir)
+(defcustom lye-emacs-autoload-dir (concat lye-emacs-cache-dir "autoload/")
   "Automatic generation autoload file storage directory."
   :type 'directory)
 
@@ -116,7 +113,7 @@ If it is `nil', Not use fuzzy match."
     (make-directory d t)))
 
 ;;; Load `custom-file'
-(setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
+(setq custom-file (concat lye-emacs-cache-dir "custom.el"))
 
 (if (and (file-exists-p lye-emacs-custom-temp-file)
          (not (file-exists-p custom-file)))
@@ -127,12 +124,11 @@ If it is `nil', Not use fuzzy match."
 ;; https://github.com/honmaple/dotfiles/blob/571d6f0dca10015886c56a1feab17f0d5a1bb1ab/emacs.d/init.el#L51
 (defmacro lye/core-require (pkg &optional modulep)
   "Load PKG. When MODULEP is non-nil, the presence of PKG using directory
-`lye-emacs-core-modules-dir', and vice versa for `lye-core-dir'."
+`lye-core-modules-dir', and vice versa for `lye-core-dir'."
   (let ((dir (if modulep
-                 lye-emacs-core-modules-dir
+                 lye-core-modules-dir
                lye-core-dir)))
-    `(require ,pkg (expand-file-name (format "%s" ,pkg) ,dir))))
-
+    `(require ,pkg (concat ,dir (format "%s" ,pkg)))))
 
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
@@ -142,13 +138,13 @@ If it is `nil', Not use fuzzy match."
 (setq md-autoload-load-dir-alist
       '((lye-core-dir . "core")
         (lye-emacs-site-lisp-dir . "site-lisp")
-        (lye-emacs-modules-dir . "modules")))
+        (lye-modules-dir . "modules")))
 
 (md/autoload-create-and-load-file-list)
 
 (setq md-autoload-load-path-list '(lye-core-dir
-                                   lye-emacs-core-modules-dir
-                                   lye-emacs-modules-dir
+                                   lye-core-modules-dir
+                                   lye-modules-dir
                                    (lye-emacs-site-lisp-dir)))
 (md/autoload-add-load-path-list)
 

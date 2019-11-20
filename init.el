@@ -86,7 +86,6 @@ decrease this. If you experience stuttering, increase this.")
 ;; Enusre Lye-Emacs is running out of this file's directory
 (setq user-emacs-directory (file-name-directory load-file-name))
 
-(load (concat user-emacs-directory "core/core-benchmark") nil 'nomessage)
 (load (concat user-emacs-directory "core/core") nil 'nomessage)
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
 (lye/core-require 'core-straight)       ; staraight, package
