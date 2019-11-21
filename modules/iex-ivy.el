@@ -33,10 +33,6 @@
 ;;; Code:
 
 ;;; Must package
-(package! 'amx t)
-(package! 'ivy)
-(package! 'counsel)
-(package! 'swiper)
 (require 'amx)
 (require 'ivy)
 (require 'counsel)
@@ -61,13 +57,11 @@
    (setq ivy-re-builders-alist '((t . ivy-fuz-regex-fuzzy)))
 
    (with-eval-after-load 'ivy
-     (package! '(ivy-fuz :host github :repo "cireu/fuz.el" :files ("ivy-fuz.el")))
      (require 'ivy-fuz)
      (add-to-list 'ivy-highlight-functions-alist
                   '(ivy-fuz-regex-fuzzy . ivy-fuz-highlight-fn))))
 
   ('flx
-   (package! 'flx t)
    (require 'flx)
    (setq ivy-re-builders-alist '((t . ivy--regex-fuzzy)))))
 ;; -----------------------------------------------------------------------------
@@ -116,7 +110,6 @@
 
 ;;; Linkage between ivy and yasnippet
 (when (locate-library "yasnippet")
-  (package! 'ivy-yasnippet)
   (require 'ivy-yasnippet)
   (mdk/set-keys! '(("C-c y" . ivy-yasnippet))))
 ;; -----------------------------------------------------------------------------

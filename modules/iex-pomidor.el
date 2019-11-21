@@ -29,7 +29,7 @@
 ;; Tomato clock
 
 ;;; Code:
-(package! 'pomidor)
+
 (require 'pomidor)
 
 (setq pomidor-seconds (* 25 60)) ; 25 minutes for the work period

@@ -89,6 +89,7 @@ decrease this. If you experience stuttering, increase this.")
 (lye/core-require 'core-key)            ; Keybindings
 (lye/core-require 'core-ui)             ; UI
 (lye/core-require 'core-package)        ; packages initialization
+(lye/core-require 'core-modules)
 
 (lye/modules-require 'md-edit)          ; better edit
 (lye/modules-require 'md-shackle)       ; Window rule

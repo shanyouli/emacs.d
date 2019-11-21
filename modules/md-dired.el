@@ -58,12 +58,10 @@
 
 ;; colorful dired
 (use-package diredfl
-  :ensure t
   :hook (dired-mode . diredfl-mode))
 
 ;;Git show modify information
 (use-package diff-hl
-  :ensure t
   :commands (diff-hl-dired-mode)
   :hook (dired-mode . diff-hl-dired-mode))
 

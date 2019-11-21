@@ -30,9 +30,6 @@
 ;;; Code:
 (require 'ido)
 (require 'ido-completing-read+)
-(package! 'smex t)
-(package! 'flx-ido t)
-(package! 'ido-sort-mtime t)
 (require 'smex)
 (require 'flx-ido)
 (require 'ido-sort-mtime)

@@ -43,11 +43,10 @@
 
 ;; Pair Automatic completion
 (use-package autopair
-  :ensure t
   :diminish autopair-mode
   :hook (after-init . autopair-global-mode))
+
 (use-package rainbow-delimiters
-  :ensure t
   :hook (autopair-mode . rainbow-delimiters-mode))
 
 ;; Chinese input automatically adds spaces in Chinese
@@ -57,7 +56,6 @@
 
 ;; Big blank delete
 (use-package hungry-delete
-  :ensure t
   :diminish hungry-delete-mode
   :hook (after-init . global-hungry-delete-mode))
 
@@ -81,14 +79,13 @@
 ;; Set blank highlight when use display graphic
 (if  (display-graphic-p)
     (use-package highlight-indent-guides
-      :ensure t
       :hook (prog-mode . highlight-indent-guides-mode)
       :config
       (setq highlight-indent-guides-method 'character)
       (setq highlight-indent-guides-responsive t)))
 
 ;; add color display
-(use-package rainbow-mode :ensure t :hook (prog-mode . rainbow-mode))
+(use-package rainbow-mode :hook (prog-mode . rainbow-mode))
 
 ;; Extra blank hint
 (use-package whitespace
@@ -125,7 +122,6 @@
 ;; Page break lines
 ;;------------------------------------------------------------------------------
 
-(md-pkg/install+ 'page-break-lines)
 (add-hook 'after-init-hook #'global-page-break-lines-mode)
 
 (provide 'md-edit)

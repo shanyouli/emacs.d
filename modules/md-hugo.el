@@ -29,9 +29,6 @@
   ;; :config
   ;; (setq org-hugo-section "post"))
 
-(unless (package-installed-p 'ox-hugo)
-  (package-install 'ox-hugo t))
-
 (with-eval-after-load 'ox
   (require 'ox-hugo)
   (setq org-hugo-section "post"))

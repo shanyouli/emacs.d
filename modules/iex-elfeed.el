@@ -29,7 +29,7 @@
 ;; A RSS feed reader
 
 ;;; Code:
-(package! 'elfeed  t)
+
 (require 'elfeed)
 (lye/modules-require 'iex-pretty-hydra)
 

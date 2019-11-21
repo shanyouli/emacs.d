@@ -29,7 +29,7 @@
 ;; commentary
 
 ;;; Code:
-(package! 'flycheck t)
+
 (require 'flycheck)
 
 ;; flycheck-configurations
@@ -41,7 +41,6 @@
 
 (with-eval-after-load 'flycheck
   (when (display-graphic-p)
-    (package! 'flycheck-posframe t)
     (require 'flycheck-posframe)
     (setq flycheck-posframe-buffer " *flycheck-posframe-buffer*")
     (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode)))

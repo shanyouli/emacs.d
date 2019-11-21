@@ -24,7 +24,6 @@
 ;;; Code:
 
 (use-package company
-  :ensure t
   :diminish company-mode
   :defines (company-dabbrev-ignore-case company-dabbrev-downcase)
   :preface
@@ -71,7 +70,6 @@
   ;; Use company-tabnine
   (unless (or IS-WINDOWS (executable-find "wsl.exe"))
     (use-package company-tabnine
-      :ensure t
       :init
       (setq company-tabnine-binaries-folder
             (expand-file-name "TabNine" lye-emacs-share-dir))
@@ -102,7 +100,6 @@
 ;; Use company-posframe
 (with-eval-after-load 'company
   (when (display-graphic-p)
-    (package! 'company-posframe t)
     (require 'company-posframe)
     (company-posframe-mode +1)))
 

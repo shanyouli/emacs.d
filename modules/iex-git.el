@@ -30,7 +30,7 @@
 
 ;;; Code:
 
-(package! 'magit)
+
 (require 'magit)
 
 ;; Magit configuration.

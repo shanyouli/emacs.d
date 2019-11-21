@@ -112,27 +112,18 @@
 
 ;; Interacitve macro expander
 (use-package macrostep
-  :ensure t
   :bind (:map emacs-lisp-mode-map
           ("C-c e" . macrostep-expand)
           :map lisp-interaction-mode-map
           ("C-c e" . macrostep-expand)))
 
 ;; Semantic code search for emacs lisp
-(use-package elisp-refs :ensure t)
+(use-package elisp-refs)
 
 ;; Function that highlights global variables
-(package! '(elispfl :type git :host github
-                    :repo "cireu/elispfl"))
 (require 'elispfl)
 (elispfl-mode +1)
 
-(package! '(sly-el-indent
-            :type git
-            :host github
-            :repo "cireu/sly-el-indent"
-            :files (:defaults "lib")
-            :no-byte-compile t))
 (require 'sly-el-indent)
 (add-hook 'emacs-lisp-hook
             (function sly-el-indent-setup))

@@ -31,7 +31,6 @@
 ;;; Code:
 
 ;; install treemacs ------------------------------------------------------------
-(package! 'treemacs)
 (require 'treemacs)
 ;;------------------------------------------------------------------------------
 
@@ -77,11 +76,9 @@
      (treemacs-git-mode 'simple))))
 
 ;; Projectile integration for treemacs
-(package! 'treemacs-projectile)
 (require 'treemacs-projectile)
 
 ;; Magit integration for treemacs
-(package! 'treemacs-magit)
 (require 'treemacs-magit)
 
 (with-eval-after-load 'treemacs

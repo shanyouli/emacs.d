@@ -30,8 +30,6 @@
 
 ;;; Code:
 
-(package! 'avy t)
-(package! 'ace-pinyin t)
 (require 'avy)
 (require 'ace-pinyin)
 

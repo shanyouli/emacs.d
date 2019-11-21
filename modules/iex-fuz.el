@@ -36,7 +36,7 @@
 
 ;; Because straight.el does not support dynamic modules, every time the emacs
 ;; version changes, it will require recompilation.
-(package! 'fuz)
+
 (require 'fuz)
 
 (unless (require 'fuz-core nil t)

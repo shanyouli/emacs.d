@@ -23,8 +23,6 @@
 ;;
 
 ;;; Code:
-(package! '(lua-mode :type git :host github
-                    :repo "immerrr/lua-mode"))
 (use-package lua-mode
   :ensure nil
   :defer t
@@ -34,7 +32,6 @@
   :config
   (setq lua-indent-level 4
         lua-indent-string-contents nil))
-(use-package company-lua :straight t)
 
 (add-hook 'lua-mode-hook
           (lambda ()

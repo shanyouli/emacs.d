@@ -29,7 +29,7 @@
 ;; Package management tools
 
 ;;; Code:
-(package! 'paradox)
+
 (require 'paradox)
 
 (advice-add #'list-packages :before

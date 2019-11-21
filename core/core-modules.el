@@ -39,7 +39,103 @@
   "`lye-modules-dir' 中需要的 packages"
   :type 'list)
 
+(setq lye-modules-package-list
+      '(
+        ;; iex-avy
+        (avy)
+        (ace-pinyin)
+        ;; iex-elfeed
+        elfeed
+        ;; iex-exec-path.el
+        (exec-path-from-shell)
+        (cache-path-from-shell :repo "manateelazycat/cache-path-from-shell"
+                               :host github
+                               :type git)
+        ;; iex-flycheck
+        (flycheck)
+        (flycheck-posframe)
+        ;; iex-fuz
+        fuz
+        ;; iex-git
+        (magit)
+        ;; iex-ivy.el
+        (amx)
+        (ivy)
+        (counsel)
+        (swiper)
+        (ivy-fuz :host github :repo "cireu/fuz.el" :files ("ivy-fuz.el"))
+        (flx)
+        (ivy-yasnippet)
+        ;; iex-lsp
+        (lsp-mode)
+        (lsp-ui)
+        (company-lsp)
+        ;; iex-paradox
+        paradox
+        ;; iex-pomidor
+        pomidor
+        ;; iex-pretty-hydra
+        (pretty-hydra)
+        ;; iex-smart-align
+        (smart-align :type git :host github :repo "manateelazycat/smart-align"
+                     :no-byte-compile t)
+        ;; iex-snails
+        (snails :type git
+                :host github
+                :repo "manateelazycat/snails"
+                :no-byte-compile t)
+        (snails-backend-themes :type git
+                               :host github
+                               :repo "shanyouli/snails-backend"
+                               :no-byte-compile t)
+        ;; iex-term
+        vterm
+        ;;iex-treemacs
+        (treemacs)
+        (treemacs-projectile)
+        (treemacs-magit)
+        ;; lex-hydra
+        (hydra)
+        ;; lex-ido
+        (ido-completing-read+)
+        (smex)
+        (flx-ido)
+        (ido-sort-mtime)
+        ;; md-company
+        (company)
+        (company-tabnine)
+        (company-posframe)
+        ;; md-dired
+        (async)
+        (diff-hl)
+        (diredfl)
+        ;; md-edit
+        (autopair)
+        (rainbow-delimiters)
+        (hungry-delete)
+        (highlight-indent-guides)
+        (rainbow-mode)
+        (page-break-lines)
+        ;; md-elisp
+        macrostep
+        elisp-refs
+        (elispfl :type git :host github
+                 :repo "cireu/elispfl")
+        (sly-el-indent :type git
+                       :host github
+                       :repo "cireu/sly-el-indent"
+                       :files (:defaults "lib")
+                       :no-byte-compile t)
+        ;; md-hugo
+        (ox-hugo)
+        ;;md-lua
+        (lua-mode :type git :host github
+                  :repo "immerrr/lua-mode")
+        (company-lua)
+        ))
 
+(dolist (md-package lye-modules-package-list)
+  (package+ md-package))
 
 (provide 'core-modules)
 

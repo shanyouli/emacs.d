@@ -27,11 +27,7 @@
 ;;; Commentary:
 
 ;;; Code:
-(package! 'exec-path-from-shell t)
 (require 'exec-path-from-shell)
-(package! '(cache-path-from-shell :repo "manateelazycat/cache-path-from-shell"
-                                  :host github
-                                  :type git))
 (require 'cache-path-from-shell)
 
 

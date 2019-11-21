@@ -95,8 +95,20 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
   "Install a package"
   (if (or use-straight-p
           (listp pkg-name))
-      (straight-use-package pkg-name)
+      (let* ((pkg-name (if (and (listp pkg-name) (= 1 (length pkg-name)))
+                            (car pkg-name)
+                         pkg-name)))
+        (straight-use-package pkg-name))
     (md-pkg/install+ pkg-name)))
+
+(defmacro package+ (pkg-name)
+  "install a package"
+  `(if (listp ,pkg-name)
+      (let* ((pkg (if (= 1 (length ,pkg-name))
+                           (car ,pkg-name)
+                         ,pkg-name)))
+        (straight-use-package pkg))
+     (md-pkg/install+ ,pkg-name)))
 
 (straight-initialize-packages)
 (md/autoload-create-and-load '(straight-build-dir . "straight"))
@@ -109,7 +121,9 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
 ;; some useful library
 (package! 's t)
 (package! 'async t)
-(package! 'f  t)
+;; (package! 'f  t)
+(package! '(f))
+(package+ '(org :type built-in)) ;Org during installation to avoid cloning plug org.
 (package! 'dash t)
 
 ;; pardox
