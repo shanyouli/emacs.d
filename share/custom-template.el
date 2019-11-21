@@ -8,7 +8,6 @@
 ;; (setq lye-mail-address "user@email.com") ; Email address
 (setq lye-use-fuz-or-flx-in-ivy nil)
 (setq lye-company-enable-yas t)         ; Whether to use the company to complete yas-snippet
-(setq lye-enable-benchmark-p nil)       ; Enable initialization benchmark or not: t or nil
 ;;; Fonts set all unicode characters
 (when (display-graphic-p)
   ;; Specify font for all unicode characters

@@ -33,7 +33,7 @@
 ;;; package management
 
 ;; Set the location where the elpa folder is stored
-(setq package-user-dir (expand-file-name "elpa" lye-emacs-cache-dir))
+(setq package-user-dir (concat lye-emacs-cache-dir "elpa"))
 
 (setq md-pkg-archives 'tuna)
 (md-pkg/initialize! nil t)
@@ -99,8 +99,8 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
     (md-pkg/install+ pkg-name)))
 
 (straight-initialize-packages)
-
 (md/autoload-create-and-load '(straight-build-dir . "straight"))
+
 ;; use package
 (package! 'use-package t)
 (require 'use-package)
