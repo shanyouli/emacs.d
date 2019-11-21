@@ -111,7 +111,7 @@
 ;;; Linkage between ivy and yasnippet
 (when (locate-library "yasnippet")
   (require 'ivy-yasnippet)
-  (mdk/set-keys! '(("C-c y" . ivy-yasnippet))))
+  (mdk/set-keys! '(("C-c i y" . ivy-yasnippet))))
 ;; -----------------------------------------------------------------------------
 
 (provide 'iex-ivy)

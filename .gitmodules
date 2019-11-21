@@ -43,9 +43,6 @@
 [submodule "xr"]
 	path = site-lisp/xr
 	url = https://github.com/mattiase/xr.git
-[submodule "ido-completing-read-plus"]
-	path = site-lisp/ido-completing-read-plus
-	url = https://github.com/DarwinAwardWinner/ido-completing-read-plus.git
 [submodule "liberime"]
 	path = site-lisp/liberime
 	url = https://github.com/merrickluo/liberime.git

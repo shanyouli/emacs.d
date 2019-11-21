@@ -131,8 +131,7 @@
         ;;md-lua
         (lua-mode :type git :host github
                   :repo "immerrr/lua-mode")
-        (company-lua)
-        ))
+        (company-lua)))
 
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))
