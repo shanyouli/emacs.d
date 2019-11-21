@@ -1,2 +1,2 @@
 ;;; UI/cnfonts/packages.el
-(package! 'cnfonts t)
+(package+ '(cnfonts))

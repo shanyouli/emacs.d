@@ -1,3 +1,3 @@
 ;;; modules/apps/tldr/packages.el -*- lexical-binding: t -*-
 
-(package! 'tldr t)
+(package+ '(tldr))

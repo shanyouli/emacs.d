@@ -23,10 +23,8 @@
 ;;
 
 ;;; Code:
-
-(package! 'live-py-mode)
-(package! 'pyenv-mode)
-(package! 'pyenv-mode-auto)
+(dolist (pkg '(live-py-mode pyenv-mode pyenv-mode-auto))
+  (package+ pkg))
 
 ;; Format using YAPF
 ;; Install: pip install yapf

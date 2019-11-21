@@ -103,7 +103,7 @@
 (unless IS-WINDOWS
   (add-hook 'lye-init-hook
             (lambda ()
-              (package! '(backup-file :type git :host github
+              (package+ '(backup-file :type git :host github
                                       :repo "shanyouli/emacs-backup-file"))
               (setq backup-file-location (expand-file-name "backup"
                                                          lye-emacs-cache-dir))

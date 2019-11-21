@@ -136,7 +136,7 @@
 
 ;; ebuild-mode
 (when (executable-find "emerge")
-  (package! 'ebuild-mode  t)
+  (package+ '(ebuild-mode))
 
   (use-package ebuild-mode
     :mode ("\\.ebuild\\'" . ebuild-mode)
