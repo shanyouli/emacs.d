@@ -84,8 +84,8 @@
 ;; lex-funcs
 (mdk/set-key! "C-z f" 'hydra-functions-menu/body nil nil  "lex-funcs")
 
-;; lex-temp
-(mdk/set-key! "C-z b" 'hydra-tmp-scratch-menu/body nil nil "lex-temp")
+;; md-tmp-ext
+(mdk/set-key! "o t" 'one-key-tmp-scratch/menu nil t "md-tmp-ext")
 
 ;; awesome-tab.el
 (mdk/set-key! "C-z j" 'awesome-tab-ace-jump nil nil "awesome-tab")
