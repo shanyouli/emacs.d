@@ -26,9 +26,9 @@
 (use-package elisp-mode
   :ensure nil
   :bind (:map emacs-lisp-mode-map
-          ("C-c C-x" . ielm)
-          ("C-c C-c" . eval-defun)
-          ("C-c C-b" . eval-buffer))
+              ("C-c C-x" . ielm)
+              ("C-c C-c" . eval-defun)
+              ("C-c C-b" . eval-buffer))
   :hook (emacs-lisp-mode  . (lambda ()
                               "Beautify emasc-lisp"
                               (push '("lambda" .  "λ") prettify-symbols-alist)
@@ -113,20 +113,26 @@
 ;; Interacitve macro expander
 (use-package macrostep
   :bind (:map emacs-lisp-mode-map
-          ("C-c e" . macrostep-expand)
-          :map lisp-interaction-mode-map
-          ("C-c e" . macrostep-expand)))
+              ("C-c e" . macrostep-expand)
+              :map lisp-interaction-mode-map
+              ("C-c e" . macrostep-expand)))
 
 ;; Semantic code search for emacs lisp
 (use-package elisp-refs)
 
 ;; Function that highlights global variables
-(require 'elispfl)
-(elispfl-mode +1)
+(with-eval-after-load 'ielm
+  (require 'elispfl)
+  (elispfl-ielm-mode))
+(with-eval-after-load 'elisp-mode
+  (require 'elispfl)
+  (elispfl-mode))
 
-(require 'sly-el-indent)
-(add-hook 'emacs-lisp-hook
-            (function sly-el-indent-setup))
+;; indentation
+(add-hook 'emacs-lisp-mode-hook
+          (lambda ()
+            (require 'sly-el-indent)
+            (sly-el-indent-setup)))
 
 (provide 'md-elisp)
 ;;; md-elisp.el ends here
