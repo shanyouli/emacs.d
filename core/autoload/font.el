@@ -21,4 +21,4 @@
 ;;;###autoload
 (defun lye/font-initialize-frame+ (frame &optional english chinese default-size)
   (with-selected-frame frame
-    (lye/font-initialize+)))
+    (lye/font-initialize+ english chinese default-size)))

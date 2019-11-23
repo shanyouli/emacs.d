@@ -148,13 +148,10 @@
 
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
-(md-pkg/install+ 'link-hint)
 (mdk/set-keys!
  '(("C-x p o" . link-hint-open-link)
    ("C-x p c" . link-hint-copy-link))
  nil nil  "link-hint")
-
-(md-pkg/install+ 'org-cliplink)
 (mdk/set-keys! '(("C-x p i" . org-cliplink)) nil nil "org-cliplink")
 
 ;; lex-snails

@@ -33,7 +33,7 @@
 (require 'elfeed)
 (lye/modules-require 'iex-pretty-hydra)
 
-(setq elfeed-db-directory (concat lye-emacs-cache-dir "elfeed"))
+(setq-default elfeed-db-directory (concat lye-emacs-cache-dir "elfeed"))
 
 (setq elfeed-feeds
         '("http://www.masteringemacs.org/feed/"

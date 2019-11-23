@@ -101,7 +101,7 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
      (md-pkg/install+ ,pkg-name)))
 
 (straight-initialize-packages)
-(md/autoload-create-and-load '(straight-build-dir . "straight"))
+(run-with-idle-timer 5 nil (lambda () (md/autoload-create-and-load '(straight-build-dir . "straight"))))
 
 ;; use package
 
