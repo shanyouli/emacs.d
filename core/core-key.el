@@ -36,67 +36,68 @@
 (setq md-key-prefix "C-,")
 
 (md-key/unset-global+ "C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC")
+
 ;; esup
-(mdk/set-key! "s e" #'esup nil t "esup")
+(md-key/set-ext "s e" #'esup nil t "esup")
 
 ;; restart-emacs
-(mdk/set-key! "s r" #'restart-emacs nil t "restart-emacs")
+(md-key/set-ext "s r" #'restart-emacs nil t "restart-emacs")
 
 ;; Chinese automatically translated as English
-(mdk/set-keys!
+(md-key/set-global
  '(("i o" . insert-translated-name-insert-original-translation)
    ("i u" . insert-translated-name-insert-with-underline)
    ("i l" . insert-translated-name-insert-with-line)
    ("i c" . insert-translated-name-insert-with-camel))
- nil t "lex-insert-translated-name")
+ t "lex-insert-translated-name")
 
 ;; English word completion with Chinese comments
-(mdk/set-key! "i t" #'toggle-company-english-helper nil t "company-english-helper")
+(md-key/set-ext "i t" #'toggle-company-english-helper nil t "company-english-helper")
 
 ;; lex-one-key.el
-(mdk/set-keys! '(("u b" . hydra-ui-menu/body)
-                 ("o d" . hydra-open-dir-menu/body))
-               nil t "lex-hydra")
+(md-key/set-global '(("u b" . hydra-ui-menu/body)
+                     ("o d" . hydra-open-dir-menu/body))
+                   t "lex-hydra")
 
 ;; lex-setup-font
 (when (and (display-graphic-p) (fboundp 'mdf/monospace-font-initialize+))
-  (mdk/set-key! "u F" 'one-key-change-fontsize/menu nil t "lex-setup-font"))
+  (md-key/set-ext "u F" 'one-key-change-fontsize/menu nil t "lex-setup-font"))
 
 ;; lex-sdcv
 (if (executable-find "sdcv")
-    (mdk/set-key! "C-c y" 'sdcv-search-at-point++ nil nil
+    (md-key/set-ext "C-c y" 'sdcv-search-at-point++ nil nil
                   (expand-file-name "apps/sdcv/config.el" lye-modules-dir))
-  (mdk/set-key! "C-c y" 'youdao-dictionary-search-at-point++ nil nil
+  (md-key/set-ext "C-c y" 'youdao-dictionary-search-at-point++ nil nil
                 (expand-file-name "apps/ydcv/config.el" lye-modules-dir)))
 
 ;; lex-search.el
-(mdk/set-key! "C-c s" 'one-key-color-rg-search/menu nil nil "lex-search")
+(md-key/set-ext "C-c s" 'one-key-color-rg-search/menu nil nil "lex-search")
 
 ;; lex-thing-edit.el
-(mdk/set-key! "M-e"  'one-key-thing-edit/menu nil nil "lex-thing-edit")
+(md-key/set-ext "M-e"  'one-key-thing-edit/menu nil nil "lex-thing-edit")
 
 ;; lex-pyim.el
-(mdk/set-keys!
+(md-key/set-global
  '(("<f9>"    . toggle-default-pyim-input-method)
    ("C-<f9>"  . lye/toggle-pyim-punctuation-translate))
- nil nil "lex-pyim")
+ nil "lex-pyim")
 
 ;; lex-funcs
-(mdk/set-key! "C-z f" 'hydra-functions-menu/body nil nil  "lex-funcs")
+(md-key/set-ext "C-z f" 'hydra-functions-menu/body nil nil  "lex-funcs")
 
 ;; md-tmp-ext
-(mdk/set-key! "o t" 'one-key-tmp-scratch/menu nil t "md-tmp-ext")
+(md-key/set-ext "o t" 'one-key-tmp-scratch/menu nil t "md-tmp-ext")
 
 ;; awesome-tab.el
-(mdk/set-key! "C-z j" 'awesome-tab-ace-jump nil nil "awesome-tab")
+(md-key/set-ext "C-z j" 'awesome-tab-ace-jump nil nil "awesome-tab")
 
 ;; lex-smex
-(mdk/set-keys!
+(md-key/set-global
  '(("M-x" . smex)
-   ("C-x M-x" . smex-major-mode-commands)) nil nil "lex-ido")
+   ("C-x M-x" . smex-major-mode-commands)) nil "lex-ido")
 
 ;;; toolkit
-(mdk/set-keys!
+(md-key/set-global
  '(("C-x SPC" . set-mark-command)    ; Instead C-SPC for Chinese input method
    ("C-x C-h" . rectangle-mark-mode) ; rectangle-mark-mode
    ("C-z c"   . shell-command)       ; I don't know why the `M-!' in awesomewm can't be used.
@@ -106,7 +107,7 @@
 
 
 ;; iex-ivy.el
-(mdk/set-keys!
+(md-key/set-global
  '(("M-x"     . counsel-M-x)
    ("C-x C-f" . counsel-find-file)
    ("C-x f"   . counsel-recentf)
@@ -115,10 +116,10 @@
    ("M-y"     . counsel-yank-pop)
    ("C-x b"   . ivy-switch-buffer)
    ("C-x d"   . counsel-dired))
- nil nil "iex-ivy")
+ nil "iex-ivy")
 
 ;; iex-elfeed
-(mdk/set-keys! '(("C-z w" . elfeed)) nil nil "iex-elfeed")
+(md-key/set-global '(("C-z w" . elfeed)) nil "iex-elfeed")
 
 ;; iex-git
 ;; transient file
@@ -131,40 +132,40 @@
 ;; Forge configuration
 (setq forge-database-file
       (expand-file-name "forge-database.sqlite" lye-emacs-cache-dir))
-(mdk/set-keys! '(("C-x g" . one-key-magit/menu)) nil nil "iex-git")
+(md-key/set-global '(("C-x g" . one-key-magit/menu)) nil "iex-git")
 
 ;; iex-window
-(mdk/set-keys! '(("C-x 4 u" . winner-undo)
-                 ("C-x 4 r" . winner-redo)) nil nil "iex-window")
+(md-key/set-global '(("C-x 4 u" . winner-undo)
+                 ("C-x 4 r" . winner-redo)) nil "iex-window")
 
 ;; iex-avy
-(mdk/set-keys! '(("M-s" . one-key-avy/menu)) nil nil "iex-avy")
+(md-key/set-global '(("M-s" . one-key-avy/menu)) nil "iex-avy")
 
 ;; iex-vterm
-(mdk/set-keys! '(("C-x s v" . term-toggle)) nil nil "iex-term")
+(md-key/set-global '(("C-x s v" . term-toggle)) nil "iex-term")
 
 ;; iex-pomidor.el
-(mdk/set-keys! '(("C-z s c" . pomidor)) nil nil "iex-pomidor")
+(md-key/set-global '(("C-z s c" . pomidor)) nil "iex-pomidor")
 
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
-(mdk/set-keys!
+(md-key/set-global
  '(("C-x p o" . link-hint-open-link)
    ("C-x p c" . link-hint-copy-link))
- nil nil  "link-hint")
-(mdk/set-keys! '(("C-x p i" . org-cliplink)) nil nil "org-cliplink")
+ nil "link-hint")
+(md-key/set-global '(("C-x p i" . org-cliplink)) nil "org-cliplink")
 
 ;; lex-snails
 (when (and (not IS-WINDOWS) (display-graphic-p))
   (md-key/unset-global+ "C-x C-b")
-  (mdk/set-keys! '(("C-x C-b" . snails)
-                   ("C-z C-s" . snails-load-theme))  nil nil "iex-snails"))
+  (md-key/set-global '(("C-x C-b" . snails)
+                   ("C-z C-s" . snails-load-theme))  nil "iex-snails"))
 ;; iex-tldr
 (unless IS-WINDOWS
-  (mdk/set-keys! '(("C-z s h" . tldr))  nil nil "iex-tldr"))
+  (md-key/set-global '(("C-z s h" . tldr))  nil "iex-tldr"))
 
 ;; iex-smart-align
-(mdk/set-keys! '(("C-z s m" . smart-align)) nil nil "iex-smart-align")
+(md-key/set-global '(("C-z s m" . smart-align)) nil "iex-smart-align")
 
 (provide 'core-key)
 

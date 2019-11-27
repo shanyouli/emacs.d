@@ -2,8 +2,7 @@
 
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: ()
+;; Version: v0.2
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: font
 
@@ -187,10 +186,8 @@
 (defun mdf/monospace-font-initialize+ (&optional english-font cjk-font default-size)
   "Initialization English monospaced font."
 
-  (if english-font
-      (setq mdf-english english-font))
-  (if cjk-font
-      (setq mdf-cjk cjk-font))
+  (and english-font (setq mdf-english english-font))
+  (and cjk-font (setq mdf-cjk cjk-font))
   (when default-size
     (if (listp default-size)
         (setq mdf-size-pair default-size)

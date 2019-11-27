@@ -97,9 +97,9 @@
   (setq counsel-describe-variable-function #'helpful-variable))
 
 ;; load-locate-key
-(mdk/set-key! [escape] 'minibuffer-keyboard-quit swiper-map)
+(md-key/set-ext [escape] 'minibuffer-keyboard-quit swiper-map)
 
-(mdk/set-keys!
+(md-key/set-local
  '(("<C-return>" . ivy-immediate-done)
    ([escape]     . minibuffer-keyboard-quit))
  ivy-minibuffer-map)
@@ -111,7 +111,7 @@
 ;;; Linkage between ivy and yasnippet
 (when (locate-library "yasnippet")
   (require 'ivy-yasnippet)
-  (mdk/set-keys! '(("C-c i y" . ivy-yasnippet))))
+  (md-key/set-global '(("C-c i y" . ivy-yasnippet))))
 ;; -----------------------------------------------------------------------------
 
 (provide 'iex-ivy)
