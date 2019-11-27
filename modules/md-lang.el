@@ -26,7 +26,6 @@
 
 ;;; yasnippet
 (use-package yasnippet
-  :ensure t
   :hook ((prog-mode org-mode) . yas-minor-mode)
   :init
   (setq yas-snippet-dirs (list lye-emacs-yas-snippets-dir))
@@ -36,7 +35,7 @@
   (when (file-exists-p yas--default-user-snippets-dir)
     (delete-directory yas--default-user-snippets-dir))
 
-  (use-package yasnippet-snippets :ensure t))
+  (use-package yasnippet-snippets))
 
 ;;; prettify-mode
 (setq-default prettify-symbols-alist

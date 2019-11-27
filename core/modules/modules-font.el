@@ -189,20 +189,15 @@
 
   (if english-font
       (setq mdf-english english-font))
-
   (if cjk-font
       (setq mdf-cjk cjk-font))
-
   (when default-size
     (if (listp default-size)
         (setq mdf-size-pair default-size)
       (setq mdf-default-size default-size)))
-
   (if (and mdf-english mdf-cjk (or mdf-size-pair mdf-default-size))
       (mdf/monospace-font! mdf-english mdf-cjk mdf-size-pair)
     (message "Unable to set monospaced font!!")))
-
-;; (mdf/monospace-font-initialize+ "Fira Code" "WenQuanYi Micro Hei" 14)
 
 ;; {%org-mode%}
 ;; here are 20 hanzi and 40 english chars, see if they are the same width

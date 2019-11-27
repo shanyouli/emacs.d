@@ -134,7 +134,10 @@
         (company-lua)
         ;;
         (link-hint)
-        (org-cliplink)))
+        (org-cliplink)
+        ;;
+        (yasnippet)
+        (yasnippet-snippets)))
 
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))

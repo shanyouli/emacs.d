@@ -156,11 +156,10 @@ If you can't use liberime, use pyim-bigdict."
 (defun lye/toggle-pyim-punctuation-translate()
   "Half-width punctuation and full-width punctuation conversion."
   (interactive)
-  (toggle-input-method)
   (if (string= "no" (car pyim-punctuation-translate-p))
       (setq-default pyim-punctuation-translate-p '(auto yes no))
     (setq-default pyim-punctuation-translate-p '(no yes auto)))
-  (toggle-input-method))
+  (pyim-restart-1 t t))
 
 (provide 'lex-pyim)
 
