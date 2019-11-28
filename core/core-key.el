@@ -153,7 +153,8 @@
  '(("C-x p o" . link-hint-open-link)
    ("C-x p c" . link-hint-copy-link))
  nil "link-hint")
-(md-key/set-global '(("C-x p i" . org-cliplink)) nil "org-cliplink")
+(with-eval-after-load 'org
+  (md-key/set-local '(("C-x p i" . org-cliplink)) org-mode-map :file "org-cliplink"))
 
 ;; lex-snails
 (when (and (not IS-WINDOWS) (display-graphic-p))

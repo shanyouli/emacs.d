@@ -57,6 +57,9 @@
   "You don't need to load directly but use the extended key to load the package
  configuration folder.")
 
+(defconst lye-etc-dir (concat lye-emacs-dir "etc/")
+  "etc dir in `lye-emacs-dir', Must end with a slash.")
+
 (defconst lye-emacs-cache-dir (concat lye-emacs-dir ".cache/")
   "Is the cache directory this?")
 
@@ -144,6 +147,7 @@ If it is `nil', Not use fuzzy match."
 (setq md-autoload-load-path-list '(lye-core-dir
                                    lye-core-modules-dir
                                    lye-modules-dir
+                                   (lye-etc-dir)
                                    (lye-emacs-site-lisp-dir)))
 (md/autoload-add-load-path-list)
 

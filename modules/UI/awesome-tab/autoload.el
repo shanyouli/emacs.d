@@ -22,7 +22,6 @@
      (and (string-prefix-p "magit" name)
           (not (file-name-extension name))))))
 
-
 ;;;###autoload
 (defun lye/refresh-awesome-tab-mode+ ()
   "Refresh `awesome-tab-mode', especially after replacing themes."
