@@ -28,99 +28,86 @@
 
 ;;; Code:
 
-;; Start server
-;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
-(when (and (display-graphic-p) (not IS-WINDOWS))
-  (add-hook 'lye-init-hook
-            (lambda ()
-              (require 'server)
-              (unless (server-running-p)
-                (server-start)))))
+(add-hook! 'after-init-hook
+  :defer 0.1
+  :append t
+  ;; Start server
+  ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
+  (when (and (display-graphic-p) (not IS-WINDOWS))
+    (autoload 'server-running-p "server")
+    (unless (server-running-p) (server-start)))
 
-;; Save cursor position for everyfile you opened. So,  next time you open
-;; the file, the cursor will be at the position you last opened it.
-(add-hook 'lye-init-hook
-          (lambda ()
-            (require 'saveplace)
-            (save-place-mode +1)))
+  ;; Save cursor position for everyfile you opened. So,  next time you open
+  ;; the file, the cursor will be at the position you last opened it.
+  (autoload 'save-place-mode "saveplace")
+  (save-place-mode +1)
 
-;; Miantain a history of past actions and a resonable number of lists
-(add-hook 'lye-init-hook
-          (lambda ()
-            (require 'savehist)
-            (setq-default history-length 1000)
-            (setq enable-recursive-minibuffers t
-                  history-delete-duplicates t
-                  savehist-additional-variables '(mark-ring
-                                                  global-mark-ring
-                                                  search-ring
-                                                  regexp-search-ring
-                                                  extended-command-history)
-                  savehist-autosave-interval 60)
-            (savehist-mode +1)))
+  ;; Miantain a history of past actions and a resonable number of lists
+  (autoload 'savehist-mode "savehist")
+  (setq-default history-length 1000)
+  (setq enable-recursive-minibuffers t
+        history-delete-duplicates t
+        savehist-additional-variables '(mark-ring
+                                        global-mark-ring
+                                        search-ring
+                                        regexp-search-ring
+                                        extended-command-history)
+        savehist-autosave-interval 60)
+  (savehist-mode +1)
 
-;; Save recentf file and open them
-(add-hook 'lye-init-hook
-          (lambda ()
-            (require 'recentf)
+  ;; Save recentf file and open them
+  (autoload 'recentf-mode "recentf")
+  (setq recentf-max-saved-items 200
+        ;;Do not add these files to the recently opened text
+        recentf-exclude '((expand-file-name package-user-dir)
+                          ".cache"
+                          ".cask"
+                          "bookmarks"
+                          "ido.*"
+                          "recentf"
+                          "url"
+                          "COMMIT_EDITMSG\\'"
+                          "COMMIT_MSG"))
+  (recentf-mode +1)
 
-            (setq recentf-max-saved-items 200
-                  ;;Do not add these files to the recently opened text
-                  recentf-exclude '((expand-file-name package-user-dir)
-                                    ".cache"
-                                    ".cask"
-                                    "bookmarks"
-                                    "ido.*"
-                                    "recentf"
-                                    "url"
-                                    "COMMIT_EDITMSG\\'"
-                                    "COMMIT_MSG"
-                                    ))
-            (recentf-mode)))
+  ;; Automatically refresh files that have been changed elsewhere
+  (global-auto-revert-mode +1)
 
-;; Automatically refresh files that have been changed elsewhere
-(add-hook 'lye-init-hook (lambda () (global-auto-revert-mode +1)))
+  ;; Use undo-tree
+  (global-undo-tree-mode +1)
 
-(add-hook 'lye-init-hook
-          (lambda ()
-            ;; Use undo-tree
-            (global-undo-tree-mode +1)
+  ;; Save Emacs buffers when they lose focus after 1.5s
+  (setq md-save-silent-p t
+        md-save-idle-duraion 1.5)
+  (md-save-global-mode +1)
+  ;; Displays the key bindings following your currently entered
+  ;; incomplete command
+  (setq which-key-idle-delay 0.5
+        which-key-popup-type 'minibuffer)
+  (which-key-mode +1)
 
-            ;; Save Emacs buffers when they lose focus after 1.5s
-            (setq md-save-silent-p t
-                  md-save-idle-duraion 1.5)
-            (md-save-global-mode)
-            ;; Displays the key bindings following your currently entered
-            ;; incomplete command
-            (setq which-key-idle-delay 0.5
-                  which-key-popup-type 'minibuffer)
-            (which-key-mode +1)
+  ;; not use mouse
+  (when (display-graphic-p) (global-disable-mouse-mode +1))
 
-          ;; not use mouse
-            (if (display-graphic-p) (global-disable-mouse-mode))))
+  ;; Backup-file
+  (unless IS-WINDOWS
+    (package+ '(backup-file :type git :host github
+                :repo "shanyouli/emacs-backup-file"))
+    (setq backup-file-location (expand-file-name "backup"
+                                                 lye-emacs-cache-dir))
+    (add-hook! 'after-save-hook 'backup-file)
+    (md-key/set-global "C-z s b"  'backup-file-log nil "backup-file"))
 
-;;; Backup-file
-(unless IS-WINDOWS
-  (add-hook 'lye-init-hook
-            (lambda ()
-              (package+ '(backup-file :type git :host github
-                                      :repo "shanyouli/emacs-backup-file"))
-              (setq backup-file-location (expand-file-name "backup"
-                                                         lye-emacs-cache-dir))
-              (add-hook 'after-save-hook #'backup-file)
-              (md-key/set-global "C-z s b"  'backup-file-log nil "backup-file"))))
+  ;; Highlight diff
+  (autoload 'global-diff-hl-mode "diff-hl")
+  (global-diff-hl-mode +1)
 
-;;; Highlight diff
-(use-package diff-hl
-  :ensure t
-  :commands (global-diff-hl-mode)
-  :hook (after-init . global-diff-hl-mode))
+  ;; window-move
+  (lye/tools-module-install "winum")
 
-(lye/tools-module-install "winum")
-
-(if (executable-find "sdcv")
-    (lye/apps-module-install "sdcv" t)
-  (lye/apps-module-install "ydcv" t))
+  (if (executable-find "sdcv")
+      (lye/apps-module-install "sdcv" t)
+    (lye/apps-module-install "ydcv" t)))
 
 (provide 'core-package)
 

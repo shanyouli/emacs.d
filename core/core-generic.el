@@ -206,9 +206,13 @@
 (setq vc-follow-symlinks nil)
 
 ;; No display `*scratch*'
-(add-hook 'after-change-major-mode-hook
-          (lambda () (let ((buf "*scratch*"))
-                  (if (get-buffer buf) (kill-buffer buf)))))
+(defun delete--scratch-buffer ()
+  "Delete the buffer `*scratch*'"
+  (let ((buf "*scratch*"))
+    (when (get-buffer buf)
+      (kill-buffer buf)
+      (fmakunbound 'delete--scratch-buffer))))
+(add-hook-once 'after-change-major-mode-hook 'delete--scratch-buffer)
 
 ;;当在windows上运行时,确定 Msys2是否安装
 (if IS-WINDOWS

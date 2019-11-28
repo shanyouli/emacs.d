@@ -73,16 +73,17 @@
                              (mdt/switch-light-or-dark-theme+)))
 
 (when (display-graphic-p)
-  (add-hook 'emacs-startup-hook #'md/frame-default-size)
+  (add-hook! 'emacs-startup-hook #'md/frame-default-size)
    ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-  (add-hook 'after-make-frame-functions #'md/frame-size-after-make-frame-func+))
+  (add-hook! 'after-make-frame-functions #'md/frame-size-after-make-frame-func+))
 
-(add-hook 'emacs-startup-hook
-          (lambda () (require 'winner) (winner-mode +1)))
+(add-hook! 'emacs-startup-hook
+  (autoload 'winner-mode "winner")
+  (winner-mode +1))
 
 ;; font
 (if (and (fboundp 'daemonp) (daemonp))
-    (add-hook 'after-make-frame-functions #'lye/font-initialize-frame+)
+    (add-hook! 'after-make-frame-functions #'lye/font-initialize-frame+)
   (lye/font-initialize+))
 (run-with-idle-timer 3 nil (lambda () (lye/UI-module-install "cnfonts")))
 

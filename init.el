@@ -45,7 +45,9 @@
   (when load-file-name
     (setq user-emacs-directory (file-name-directory load-file-name))))
 
-  ;; Load the heart of Lye-Emacs
+;; Start Time Test
+(load (concat user-emacs-directory "core/core-benchmark") nil 'nomessage)
+;; Load the heart of Lye-Emacs
 (load (concat user-emacs-directory "core/core") nil 'nomessage)
 
 (eval-when-compile
@@ -67,17 +69,15 @@
 (lye/modules-require 'md-reads)         ; Reader tools
 (lye/modules-require 'md-company)       ; company
 
-(run-with-idle-timer
- 0.1 nil (lambda ()
-           ;; Program language common tool
-           (lye/modules-require 'md-lang)
-           (lye/modules-require 'md-elisp)
-           (lye/modules-require 'md-scheme)
-           (lye/modules-require 'md-sh)
-           (lye/modules-require 'md-python)))
+(run-with-idle-timer! :defer 0.5
+  ;; Program language common tool
+  (lye/modules-require 'md-lang)
+  (lye/modules-require 'md-elisp)
+  (lye/modules-require 'md-scheme)
+  (lye/modules-require 'md-sh)
+  (lye/modules-require 'md-python))
 
 ;; Org mode
-(run-with-idle-timer
- 1 nil (lambda ()
-         (lye/modules-require 'md-hugo)
-         (lye/modules-require 'md-org)))
+(run-with-idle-timer! :defer 1
+  (lye/modules-require 'md-hugo)
+  (lye/modules-require 'md-org))

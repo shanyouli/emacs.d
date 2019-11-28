@@ -32,8 +32,68 @@
 ;;; Change log:
 ;;
 ;; 11/28/19
-
+;;        * initialize
 ;;; Code:
+
+(defun plist-get+ (args key &optional default)
+  "Custom `plist-get' with ARGS and KEY DEFAULT."
+  (or (plist-get args key)
+      (plist-get (cdr args) key)
+      default))
+
+;; run-with-idle-timer 扩展
+(defmacro run-with-idle-timer! (&rest args)
+  "Delay operates without `lambda'."
+  (declare (indent defun))
+  (let ((-if (plist-get+ args :if t))
+         (-secs (plist-get+ args :defer))
+         (-repeats (plist-get+ args :repeat nil))
+         (funcs (let ((val (car args)))
+                 (if (memq (car-safe val) '(quote function))
+                     (if (cdr-safe (cadr val)) (cadr val)
+                       (list (cadr val)))
+                   (list `(lambda (&rest _) ,@args)))))
+        forms)
+    (unless (numberp -secs)
+      (setq -secs 0.5))
+    (dolist (fn funcs)
+      (push `(run-with-idle-timer ,-secs ,-repeats (function ,fn)) forms))
+    `(when ,-if ,@forms)))
+
+;; add-hook 扩展
+(defmacro add-hook! (hook &rest args)
+  "Custom hook with HOOK and ARGS no need lambda."
+  (declare (indent defun))
+  (let ((-if (plist-get+ args :if t))
+        (-local (plist-get+ args :local))
+        (-defer (plist-get+ args :defer))
+        (-append (plist-get+ args :append))
+        (funcs (let ((val (car args)))
+                 (if (memq (car-safe val) '(quote function))
+                     (if (cdr-safe (cadr val)) (cadr val)
+                       (list (cadr val)))
+                   (list `(lambda (&rest _) ,@args)))))
+        forms)
+    (dolist (fn funcs)
+      (setq fn (if (numberp -defer)
+                   `(lambda (&rest _)
+                      (run-with-idle-timer ,-defer nil
+                                           (function ,fn)))
+                 `(function ,fn)))
+      (push `(add-hook ,hook  ,fn ,-append ,-local) forms))
+    `(when ,-if ,@forms)))
+
+(defmacro add-hook-once (hook f &optional append local)
+  "Like `add-hook', remove after call with HOOK F &OPTIONAL APPEND LOCAL."
+  (let ((func (intern (format "lye/run-once-%s"
+                              (cond ((symbolp f) (symbol-name f))
+                                    (t (symbol-name (cadr f))))))))
+    `(progn
+       (defun ,func ()
+         (remove-hook ,hook ',func ,local)
+         (funcall ,f)
+         (fmakunbound ',func))
+       (add-hook ,hook ',func ,append ,local))))
 
 ;; Add after-load-theme-hook
 (defvar after-load-theme-hook nil
@@ -42,11 +102,7 @@
 (defun run-after-load-theme-hook (&rest _)
   "Run `after-load-theme-hook'."
   (run-hooks 'after-load-theme-hook))
-
 (advice-add #'load-theme :after #'run-after-load-theme-hook)
-
-;; run-with-idle-timer 扩展
-
 
 (provide 'core-libs)
 

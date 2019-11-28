@@ -52,9 +52,6 @@
   (setq file-name-handler-alist lye--initial-file-name-handler-alist))
 (add-hook 'emacs-startup-hook #'lye--reset-file-handler-alist-h)
 
-;; Start Time Test
-(require 'core-benchmark)
-
 ;; Load the bare necessities
 (require 'core-libs)
 
@@ -81,13 +78,13 @@ decrease this. If you experience stuttering, increase this.")
        ;; Defer it so that commands launched from the minibuffer can enjoy the
        ;; benefits.
        (run-at-time 1 nil (lambda () (setq gc-cons-threshold lye--gc-cons-threshold))))
-     (add-hook 'minibuffer-setup-hook #'lye/defer-garbage-collection)
-     (add-hook 'minibuffer-exit-hook #'lye/restore-garbage-collection)
+     (add-hook! 'minibuffer-setup-hook #'lye/defer-garbage-collection)
+     (add-hook! 'minibuffer-exit-hook #'lye/restore-garbage-collection)
      ;; GC all sneaky breaky like
-     (add-hook 'focus-out-hook #'garbage-collect))))
+     (add-hook! 'focus-out-hook #'garbage-collect))))
 
 ;; Not restoring these to their defaults will cause stuttering/freezes.
-(add-hook 'emacs-startup-hook #'lye/restore-startup-optimizations)
+(add-hook! 'emacs-startup-hook #'lye/restore-startup-optimizations)
 
 ;;
 ;;; Global variables
@@ -197,17 +194,6 @@ If it is `nil', Not use fuzzy match."
                                    (lye-etc-dir)
                                    (lye-emacs-site-lisp-dir)))
 (md/autoload-add-load-path-list)
-
-;;
-;;; Add lye-init-hook
-(defvar lye-init-hook nil
-  "HOOK runs after after-start-hook.")
-
-(defun run-lye-init-hook (&rest _)
-  "Run `lye-init-hook'."
-  (run-at-time 0.1 nil (lambda () (run-hooks 'lye-init-hook))))
-
-(add-hook 'after-init-hook #'run-lye-init-hook)
 
 (provide 'core)
 
