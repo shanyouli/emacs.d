@@ -1,3 +1,0 @@
-* 收集或自定义主题
-** 收集的主题
-***  [[https://github.com/manateelazycat/lazycat-theme][lazycat-theme]]
