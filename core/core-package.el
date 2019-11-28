@@ -108,7 +108,7 @@
               (setq backup-file-location (expand-file-name "backup"
                                                          lye-emacs-cache-dir))
               (add-hook 'after-save-hook #'backup-file)
-              (md-key/set-ext "C-z s b"  'backup-file-log))))
+              (md-key/set-global "C-z s b"  'backup-file-log nil "backup-file"))))
 
 ;;; Highlight diff
 (use-package diff-hl

@@ -29,7 +29,7 @@
 ;; (setq package-enable-at-startup nil)
 
 ;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold 268435456)
+(setq gc-cons-threshold most-positive-fixnum)
 
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. Doom handles package

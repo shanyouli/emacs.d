@@ -29,61 +29,31 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (if (version< emacs-version "25.3")
-      (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
-             emacs-version)))
-
-(defvar lye--gc-cons-threshold (* 20 1024 1024)
-  "The default value to use for `gc-cons-threshold'. If you experience freezing,
-decrease this. If you experience stuttering, increase this.")
-
-(defvar lye--file-name-handler-alist file-name-handler-alist)
-
-(defun lye/restore-startup-optimizations ()
-  "Resets garbage collection settings to reasonable defaults (a large
-`gc-cons-threshold' can cause random freezes otherwise) and resets
-`file-name-handler-alist'."
-  (setq file-name-handler-alist lye--file-name-handler-alist)
-  ;; Do this on idle timer to defer a possible GC pause that could result; also
-  ;; allows deferred packages to take advantage of these optimizations.
-  (run-with-idle-timer
-   3 nil
-   (lambda ()
-     (setq-default gc-cons-threshold lye--gc-cons-threshold)
-     ;; To speed up minibuffer commands (like helm and ivy), we defer garbage
-     ;; collection while the minibuffer is active.
-     (defun lye/defer-garbage-collection ()
-       (setq gc-cons-threshold most-positive-fixnum))
-     (defun lye/restore-garbage-collection ()
-       ;; Defer it so that commands launched from the minibuffer can enjoy the
-       ;; benefits.
-       (run-at-time 1 nil (lambda () (setq gc-cons-threshold lye--gc-cons-threshold))))
-     (add-hook 'minibuffer-setup-hook #'lye/defer-garbage-collection)
-     (add-hook 'minibuffer-exit-hook #'lye/restore-garbage-collection)
-     ;; GC all sneaky breaky like
-     (add-hook 'focus-out-hook #'garbage-collect))))
-
-(if (ignore-errors (or after-init-time noninteractive))
-    (setq gc-cons-threshold lye--gc-cons-threshold)
-  ;; A big contributor to startup times is garbage collection. We up the gc
-  ;; threshold to temporarily prevent it from running, then reset it later in
-  ;; `lye/restore-startup-optimizations'
-  (setq gc-cons-threshold most-positive-fixnum)
-  ;; This is consulted on every `require', `load' andvarious path/io functions.
-  ;; you get a minor speed up by nooping this.
-  (setq file-name-handler-alist nil)
-  ;; Not restoring these to their defaults will cause stuttering/freezes.
-  (add-hook 'emacs-startup-hook #'lye/restore-startup-optimizations))
+;; A big contributor to startup times is garbage collection. We up the gc
+;; threshold to temporarily prevent it from running, then reset it later with
+;; `lye-restore-garbage-collection-h'. Not resetting it will cause
+;; stuttering/freezes.
+(setq gc-cons-threshold most-positive-fixnum)
 
 ;; In noninteractive sessions,prioritize non-byte-compiled source files to
 ;; prevent stable, byte-compiled code from running. However, if you're getting
 ;; recursive load errors, it may help to set this to nil.
 (setq load-prefer-newer noninteractive)
 
-;; Let 'er rip!
+(let (file-name-handler-alist)
+  ;; Ensure Lye-Emacs is running out of this file's directory
+  (when load-file-name
+    (setq user-emacs-directory (file-name-directory load-file-name))))
+
+  ;; Load the heart of Lye-Emacs
 (load (concat user-emacs-directory "core/core") nil 'nomessage)
 
+(eval-when-compile
+   (if (version< emacs-version "25.3")
+       (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
+              emacs-version)))
+
+;; Let 'er rip!
 (lye/core-require 'core-generic)        ; generic and delete *scratch*
 (lye/core-require 'core-straight)       ; staraight, package
 (lye/core-require 'core-ui)             ; UI

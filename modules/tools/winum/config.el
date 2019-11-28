@@ -2,7 +2,7 @@
 
 (require 'winum)
 (winum-mode)
-(md-key/set-local
+(md-key/set-local+
  '(("M-0" . winum-select-window-0-or-10)
    ("M-1" . winum-select-window-1)
    ("M-2" . winum-select-window-2)

@@ -141,6 +141,7 @@
 
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))
+;; (run-with-idle-timer 5 nil (lambda () (md/autoload-create-and-load '(straight-build-dir . "straight"))))
 
 (provide 'core-modules)
 

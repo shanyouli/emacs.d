@@ -55,7 +55,7 @@
 (setq straight-base-dir lye-emacs-cache-dir
       straight-repository-branch "develop"
       straight-cache-autoloads nil  ; use-autoload
-      straight-disable-autoloads t
+      ;; straight-disable-autoloads t
       straight-vc-git-default-clone-depth 1
       straight-recipes-emacsmirror-use-mirror t
       straight-process-buffer " *straight-process*" ; hide *straight-process*
@@ -101,7 +101,7 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
      (md-pkg/install+ ,pkg-name)))
 
 (straight-initialize-packages)
-(run-with-idle-timer 5 nil (lambda () (md/autoload-create-and-load '(straight-build-dir . "straight"))))
+
 
 ;; use package
 

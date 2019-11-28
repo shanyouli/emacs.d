@@ -32,20 +32,68 @@
 (defconst IS-LINUX (eq system-type 'gnu/linux))
 (defconst IS-WINDOWS (memq system-type '(cygwin windows-nt ms-doc)))
 
-;; Ensure `lye-core-dir' is in `load-path'
-;;; Directories/files
-(defconst lye-emacs-dir (file-truename user-emacs-directory)
-  "The path to the currently loaded .emacs.d directory. Must end with a slash.")
-
-(defconst lye-core-dir (concat lye-emacs-dir "core/")
+(defconst lye-core-dir
+  (file-truename (if load-file-name
+                     (file-name-directory load-file-name)
+                   (concat user-emacs-directory "core/")))
   "The root directory of Lye-Emacs's core files. Must end with a slash.")
 
+;; Ensure `lye-core-dir' is in `load-path'
 (add-to-list 'load-path lye-core-dir)
 
+;; This is consulted on every `require', `load' and various path/io handling
+;; encrypted or compressed files, among other things.
+(defvar lye--initial-file-name-handler-alist file-name-handler-alist)
+(setq file-name-handler-alist nil)
+
+;; Restore `file-name-handler-alist', because it is needed for handling
+;; encrypted or compressed files, among other things.
+(defun lye--reset-file-handler-alist-h ()
+  (setq file-name-handler-alist lye--initial-file-name-handler-alist))
+(add-hook 'emacs-startup-hook #'lye--reset-file-handler-alist-h)
+
+;; Start Time Test
 (require 'core-benchmark)
+
+;; Load the bare necessities
+(require 'core-libs)
+
+;; Do this on idle timer to defer a possible GC pause that could result; also
+;; allows deferred packages to take advantage of these optimizations.
+(defvar lye--gc-cons-threshold  20971520  ; 20M (* 20 1024 1024)
+  "The default value to use for `gc-cons-threshold'. If you experience freezing,
+decrease this. If you experience stuttering, increase this.")
+
+(defun lye/restore-startup-optimizations ()
+  "Resets garbage collection settings to reasonable defaults (a large
+`gc-cons-threshold' can cause random freezes otherwise)"
+  ;; Do this on idle timer to defer a possible GC pause that could result; also
+  ;; allows deferred packages to take advantage of these optimizations.
+  (run-with-idle-timer
+   3 nil
+   (lambda ()
+     (setq-default gc-cons-threshold lye--gc-cons-threshold)
+     ;; To speed up minibuffer commands (like helm and ivy), we defer garbage
+     ;; collection while the minibuffer is active.
+     (defun lye/defer-garbage-collection ()
+       (setq gc-cons-threshold most-positive-fixnum))
+     (defun lye/restore-garbage-collection ()
+       ;; Defer it so that commands launched from the minibuffer can enjoy the
+       ;; benefits.
+       (run-at-time 1 nil (lambda () (setq gc-cons-threshold lye--gc-cons-threshold))))
+     (add-hook 'minibuffer-setup-hook #'lye/defer-garbage-collection)
+     (add-hook 'minibuffer-exit-hook #'lye/restore-garbage-collection)
+     ;; GC all sneaky breaky like
+     (add-hook 'focus-out-hook #'garbage-collect))))
+
+;; Not restoring these to their defaults will cause stuttering/freezes.
+(add-hook 'emacs-startup-hook #'lye/restore-startup-optimizations)
 
 ;;
 ;;; Global variables
+(defconst lye-emacs-dir
+  (eval-when-compile (file-truename user-emacs-directory))
+  "The path to the currently loaded .emacs.d directory. Must end with a slash.")
 
 (defconst lye-emacs-site-lisp-dir (concat lye-emacs-dir"site-lisp/")
   "The root directory of third packages. Must end with a slash.")
@@ -144,8 +192,7 @@ If it is `nil', Not use fuzzy match."
 
 (md/autoload-create-and-load-file-list)
 
-(setq md-autoload-load-path-list '(lye-core-dir
-                                   lye-core-modules-dir
+(setq md-autoload-load-path-list '(lye-core-modules-dir
                                    lye-modules-dir
                                    (lye-etc-dir)
                                    (lye-emacs-site-lisp-dir)))
