@@ -102,7 +102,6 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
 
 (straight-initialize-packages)
 
-
 ;; use package
 
 ;; 安装一些必须的packages
@@ -118,7 +117,7 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
 (dolist (pkg core--base-package)
   (package+ pkg))
 
-(require 'use-package)
+(eval-when-compile (require 'use-package))
 
 ;; pardox
 (run-with-idle-timer 5 nil (lambda () (lye/modules-require 'iex-paradox)))

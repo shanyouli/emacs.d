@@ -3,7 +3,6 @@
 ;; Author: shanyouli
 ;; Maintainer: shanyouli
 ;; Version: v0.1
-;; Package-Requires: ()
 ;; Homepage: https://github.com/shanyouli/emacs.d
 ;; Keywords: UI
 

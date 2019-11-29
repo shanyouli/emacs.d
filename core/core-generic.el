@@ -219,10 +219,11 @@
   (mde/path-from-shell-initialize+))
 
 (advice-add 'find-file
-            :before (lambda (arg1 &rest rest)
-                      (let ((d (file-name-directory arg1)))
-                        (unless (file-exists-p d)
-                          (make-directory d t)))))
+            :before
+            (lambda (arg1 &rest rest)
+              (let ((d (file-name-directory arg1)))
+                (unless (file-exists-p d)
+                  (make-directory d t)))))
 
 (provide 'core-generic)
 
