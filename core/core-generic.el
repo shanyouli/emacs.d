@@ -49,8 +49,7 @@
       inhibit-default-init t
       initial-major-mode 'fundamental-mode
       initial-scratch-message nil
-      ;; Avoid emacsclient opening *scratch* buffer and getting an error
-      initial-buffer-choice '(lambda () (switch-to-next-buffer)))
+      )
 (fset #'display-startup-echo-area-message #'ignore)
 
 ;; Emacs "updates" its ui more often than it needs to, so we slow it down
@@ -206,13 +205,13 @@
 (setq vc-follow-symlinks nil)
 
 ;; No display `*scratch*'
-(defun delete--scratch-buffer ()
-  "Delete the buffer `*scratch*'"
-  (let ((buf "*scratch*"))
-    (when (get-buffer buf)
-      (kill-buffer buf)
-      (fmakunbound 'delete--scratch-buffer))))
-(add-hook-once 'after-change-major-mode-hook 'delete--scratch-buffer)
+(run-with-idle-timer! :defer 0.2 (bury-buffer))
+(add-hook! 'after-change-major-mode-hook
+    (let ((buf "*scratch*"))
+      ;; Avoid emacsclient opening *scratch* buffer and getting an error
+      (unless initial-buffer-choice
+        (setq initial-buffer-choice '(lambda () (switch-to-next-buffer))))
+      (when (get-buffer buf) (kill-buffer buf))))
 
 ;;当在windows上运行时,确定 Msys2是否安装
 (if IS-WINDOWS

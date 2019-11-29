@@ -45,15 +45,15 @@
 (when (< emacs-major-version 27)
   (push '(vertical-scroll-bars) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
-
+  (push '(ns-transparent-titlebar . t) default-frame-alist)
   (unless (and (boundp IS-MAC) IS-MAC)
     (push '(menu-bar-lines . 0) default-frame-alist)))
 
-(run-at-time 1 nil (lambda ()
-                     (setq tool-bar-mode nil
-                           scroll-bar-mode nil)
-                     (unless IS-MAC
-                       (setq menu-bar-mode nil))))
+(run-with-idle-timer! :defer 1
+  (setq tool-bar-mode nil
+        scroll-bar-mode nil)
+  (unless IS-MAC
+    (setq menu-bar-mode nil)))
 
 ;; Suppress GUI features
 (setq use-file-dialog nil
@@ -64,18 +64,19 @@
 
 ;;
 ;;; THEME
+(add-hook! 'after-init-hook
+    (eval-when-compile (require 'doom-themes))
+  (setq mdt-theme-light-and-dark '(doom-one doom-molokai)
+        mdt-theme-switch-time '(30.93 . 113.92))
+  (mdt/switch-light-or-dark-theme+))
 
-(setq mdt-theme-light-and-dark '(doom-one doom-molokai)
-      mdt-theme-switch-time '(30.93 . 113.92))
-
-(add-hook 'after-init-hook (lambda ()
-                             (require 'doom-themes)
-                             (mdt/switch-light-or-dark-theme+)))
-
-(when (display-graphic-p)
-  (add-hook! 'emacs-startup-hook #'md/frame-default-size)
+(add-hook! 'emacs-startup-hook
+  :if (display-graphic-p)
+  #'md/frame-default-size)
    ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-  (add-hook! 'after-make-frame-functions #'md/frame-size-after-make-frame-func+))
+(add-hook! 'after-make-frame-functions
+  :if (display-graphic-p)
+  #'md/frame-size-after-make-frame-func+)
 
 (add-hook! 'emacs-startup-hook
   (autoload 'winner-mode "winner")
@@ -85,7 +86,7 @@
 (if (and (fboundp 'daemonp) (daemonp))
     (add-hook! 'after-make-frame-functions #'lye/font-initialize-frame+)
   (lye/font-initialize+))
-(run-with-idle-timer 3 nil (lambda () (lye/UI-module-install "cnfonts")))
+(run-with-idle-timer! :defer 3 (lye/UI-module-install "cnfonts"))
 
 ;; Use `all-the-icons'
 (lye/UI-module-install "all-the-icons")

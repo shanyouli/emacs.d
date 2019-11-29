@@ -42,6 +42,7 @@
 (add-to-list 'default-frame-alist '(tool-bar-lines . 0))
 (add-to-list 'default-frame-alist '(menu-bar-lines . 0))
 (add-to-list 'default-frame-alist '(vertical-scroll-bars))
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
 
 ;; One less file to load at startup
 (setq site-run-file nil)
