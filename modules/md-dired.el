@@ -104,6 +104,15 @@
             ("\\.html?\\'" ,cmd)
             ("\\.md\\'" ,cmd)))))
 
+(use-package all-the-icons-dired
+  :if (and (display-graphic-p) (not IS-WINDOWS))
+  :commands all-the-icons-dired-mode
+  :preface
+  (defun all-the-icons-dired-enable+ ()
+    (lye/modules-require 'ui-all-the-icons)
+    (all-the-icons-dired-mode))
+  :hook (dired-mode . all-the-icons-dired-enable+))
+
 (provide 'md-dired)
 
 ;;; md-dired.el ends here

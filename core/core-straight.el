@@ -32,11 +32,89 @@
 
 ;;; package management
 
+;;
+;;; package.el, 配置
+(defcustom core-pkg-archives 'melpa
+  "Set package archives from which to fetch."
+  :type '(choice
+          (const :tag "Melpa" melpa)
+          (const :tag "Melpa-mirror" melpa-mirror)
+          (const :tag "Emacs-china" emacs-china)
+          (const :tag "Netease" netease)
+          (const :tag "Tuna" tuna)
+          (const :tag "Tencent" tencent)))
+
+;; HACK: Do not save the variable "Package-selected-packages" in custom file
+;; @see https://github.com/jwiegley/use-package/issues/383#issuecomment-247801751
+(defun core-pkg-save-selected (&optional value)
+  "Set and (don't save `package-selected-packages' to VALUE.)"
+  (when value
+    (setq package-selected-packages value))
+  (unless after-init-time
+    (add-hook 'after-init-hook #'package--save-selected-packages)))
+
+;; ELPA: refer to https://melpa.org and https://elpa.emacs-china.org
+;;;###autoload
+(defun core-pkg-set-archives (archives)
+  "Set specific package ARCHIVES repository."
+  (interactive
+   (list (intern (completing-read "Choose package archives: "
+                                  '(melpa melpa-mirror emacs-china
+                                          netease tencent tuna)))))
+
+  (setq package-archives
+        (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                            (not (gnutls-available-p))))
+               (proto (if no-ssl "http" "https")))
+          (pcase archives
+            ('melpa
+             `(,(cons "gnu"   (concat proto "://elpa.gnu.org/packages/"))
+               ,(cons "melpa" (concat proto "://melpa.org/packages/"))))
+            ('melpa-mirror
+             `(,(cons "gnu"   (concat proto "://elpa.gnu.org/packages/"))
+               ,(cons "melpa" (concat proto "://www.mirrorservice.org/sites/melpa.org/packages/"))))
+            ('emacs-china
+             `(,(cons "gnu"   (concat proto "://elpa.emacs-china.org/gnu/"))
+               ,(cons "melpa" (concat proto "://elpa.emacs-china.org/melpa/"))))
+            ('netease
+             `(,(cons "gnu"   (concat proto "://mirrors.163.com/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.163.com/elpa/melpa/"))))
+            ('tuna
+             `(,(cons "gnu"   (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/"))))
+            ('tencent
+             `(,(cons "gnu" (concat proto "://mirrors.cloud.tencent.com/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.cloud.tencent.com/elpa/melpa/"))))
+            (archives
+             (error "Unknown archives: `%s'" archives)))))
+
+  (message "Set package archives to `%s'." archives))
+
+;; @see https://github.com/redguardtoo/emacs.d/blob/3c54e19d7793e8178b8a357502ae33c62b2db23a/lisp/init-elpa.el#L207
+;; On-demand installation of packages
+(defun core-pkg-install (package &optional min-version no-refresh)
+  "Ask elpa to install given PACKAGE."
+  (cond
+   ((package-installed-p package min-version)
+    t)
+   ((or (assoc package package-archive-contents) no-refresh)
+    (package-install package))
+   (t
+    (package-refresh-contents)
+    (core-pkg-install package min-version t))))
+
+(defun core-pkg-initialize (&optional save-p melpa-archive)
+  (let ((melpa-archive (or melpa-archive core-pkg-archives)))
+    (core-pkg-set-archives melpa-archive)
+    (unless save-p
+      (advice-add 'package--save-selected-packages
+                  :override #'core-pkg-save-selected))))
+
 ;; Set the location where the elpa folder is stored
 (setq package-user-dir (concat lye-emacs-cache-dir "elpa"))
 
-(setq md-pkg-archives 'tuna)
-(md-pkg/initialize! nil t)
+(setq core-pkg-archives 'tuna)
+(core-pkg-initialize t)
 
 ;;; straight.el
 (defvar straight-core-package-sources
@@ -98,7 +176,7 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
                            (car ,pkg-name)
                          ,pkg-name)))
         (straight-use-package pkg))
-     (md-pkg/install+ ,pkg-name)))
+     (core-pkg-install ,pkg-name)))
 
 (straight-initialize-packages)
 

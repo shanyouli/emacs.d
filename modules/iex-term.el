@@ -44,7 +44,7 @@
                 (kill-buffer "vterm")
               (switch-to-buffer "vterm"))
           (vterm))))
-  (md-pkg/install+ 'multi-term)
+  (core-pkg-install 'multi-term)
   (defalias 'term-toggle  'multi-term))
 
 (provide 'iex-term)

@@ -109,6 +109,7 @@
         (async)
         (diff-hl)
         (diredfl)
+        (all-the-icons-dired)
         ;; md-edit
         (autopair)
         (rainbow-delimiters)

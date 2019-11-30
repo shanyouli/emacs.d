@@ -45,7 +45,7 @@
                            (t nil))))
               (when pylsp
                 (when (eq pylsp 'mspyls)
-                  (md-pkg/install+ 'lsp-python-ms)
+                  (core-pkg-install 'lsp-python-ms)
                   (require 'lsp-python-ms)
                   (setq lsp-python-ms-executable "/usr/bin/mspyls"))
                 (setq lsp-session-file (concat lye-emacs-cache-dir "lsp-session" ))

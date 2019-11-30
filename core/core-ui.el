@@ -87,11 +87,8 @@
   (lye/font-initialize+))
 (run-with-idle-timer! :defer 3 (lye/UI-module-install "cnfonts"))
 
-;; Use `all-the-icons'
-(lye/UI-module-install "all-the-icons")
-
 ;; mode-line
-(md-modeline-mode  +1)
+(add-hook! 'after-init-hook (md-modeline-mode  +1))
 ;; (lye/UI-module-install "doom-modeline")
 ;; or
 ;; (lye/UI-module-install "awesome-tray")
