@@ -137,9 +137,16 @@
         ;;
         (yasnippet)
         (yasnippet-snippets)))
-
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))
+
+;; iex-fcitx
+(when (and IS-LINUX
+           (or (executable-find "fcitx-remote")
+               (executable-find "fcitx5-remote")))
+  (package+ 'fcitx)
+  (add-hook! 'after-init-hook :defer 0.1
+    (lye/modules-require 'iex-fcitx)))
 
 ;;
 ;;; lpm-install, vterm,
