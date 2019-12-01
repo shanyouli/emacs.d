@@ -73,10 +73,8 @@
         mdt-theme-switch-time '(30.93 . 113.92))
   (mdt/switch-light-or-dark-theme+))
 
-(add-hook! 'emacs-startup-hook
-  :if (display-graphic-p)
-  #'md/frame-default-size)
-   ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
+(when (display-graphic-p) (md/frame-default-size))
+;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
 (add-hook! 'after-make-frame-functions
   :if (display-graphic-p)
   #'md/frame-size-after-make-frame-func+)
