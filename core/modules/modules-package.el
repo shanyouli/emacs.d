@@ -103,7 +103,8 @@ Return t if success, nil if fail."
   (pcase package
     ((pred symbolp) package)
     ((pred stringp) (intern (file-name-base (directory-file-name package))))
-    ((pred listp) (car package))))
+    ((pred listp) (car package))
+    (_ (error "Cannot make  into package symbol: %s" package))))
 
 (defmacro lpm--with-recipe (symbols &rest body)
   "Process package and evaluate BODY.

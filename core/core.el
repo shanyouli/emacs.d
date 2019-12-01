@@ -66,22 +66,20 @@ decrease this. If you experience stuttering, increase this.")
 `gc-cons-threshold' can cause random freezes otherwise)"
   ;; Do this on idle timer to defer a possible GC pause that could result; also
   ;; allows deferred packages to take advantage of these optimizations.
-  (run-with-idle-timer
-   3 nil
-   (lambda ()
-     (setq-default gc-cons-threshold lye--gc-cons-threshold)
-     ;; To speed up minibuffer commands (like helm and ivy), we defer garbage
-     ;; collection while the minibuffer is active.
-     (defun lye/defer-garbage-collection ()
-       (setq gc-cons-threshold most-positive-fixnum))
-     (defun lye/restore-garbage-collection ()
-       ;; Defer it so that commands launched from the minibuffer can enjoy the
-       ;; benefits.
-       (run-at-time 1 nil (lambda () (setq gc-cons-threshold lye--gc-cons-threshold))))
-     (add-hook! 'minibuffer-setup-hook #'lye/defer-garbage-collection)
-     (add-hook! 'minibuffer-exit-hook #'lye/restore-garbage-collection)
-     ;; GC all sneaky breaky like
-     (add-hook! 'focus-out-hook #'garbage-collect))))
+  (run-with-idle-timer! :defer 3
+    (setq-default gc-cons-threshold lye--gc-cons-threshold)
+    ;; To speed up minibuffer commands (like helm and ivy), we defer garbage
+    ;; collection while the minibuffer is active.
+    (defun lye/defer-garbage-collection ()
+      (setq gc-cons-threshold most-positive-fixnum))
+    (defun lye/restore-garbage-collection ()
+      ;; Defer it so that commands launched from the minibuffer can enjoy the
+      ;; benefits.
+      (run-at-time 1 nil (lambda () (setq gc-cons-threshold lye--gc-cons-threshold))))
+    (add-hook! 'minibuffer-setup-hook #'lye/defer-garbage-collection)
+    (add-hook! 'minibuffer-exit-hook #'lye/restore-garbage-collection)
+    ;; GC all sneaky breaky like
+    (add-hook! 'focus-out-hook #'garbage-collect)))
 
 ;; Not restoring these to their defaults will cause stuttering/freezes.
 (add-hook! 'emacs-startup-hook #'lye/restore-startup-optimizations)
