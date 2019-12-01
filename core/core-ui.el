@@ -48,11 +48,15 @@
   (unless (and (boundp IS-MAC) IS-MAC)
     (push '(menu-bar-lines . 0) default-frame-alist)))
 
-(run-with-idle-timer! :defer 1
-  (setq tool-bar-mode nil
-        scroll-bar-mode nil)
-  (unless IS-MAC
-    (setq menu-bar-mode nil)))
+(when t
+  (run-with-idle-timer 3 nil
+                       (function
+                        (lambda
+                            (&rest _)
+                         :defer 3
+                         (setq tool-bar-mode nil scroll-bar-mode nil)
+                         (unless IS-MAC
+                           (setq menu-bar-mode nil))))))
 
 ;; Suppress GUI features
 (setq use-file-dialog nil
@@ -88,7 +92,7 @@
 (run-with-idle-timer! :defer 3 (lye/UI-module-install "cnfonts"))
 
 ;; mode-line
-(add-hook! 'after-init-hook (md-modeline-mode  +1))
+(add-hook! 'after-init-hook (md-modeline-mode +1))
 ;; (lye/UI-module-install "doom-modeline")
 ;; or
 ;; (lye/UI-module-install "awesome-tray")

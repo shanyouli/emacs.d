@@ -88,8 +88,6 @@
                                :host github
                                :repo "shanyouli/snails-backend"
                                :no-byte-compile t)
-        ;; iex-term
-        vterm
         ;;iex-treemacs
         (treemacs)
         (treemacs-projectile)
@@ -142,6 +140,18 @@
 
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))
+
+;;
+;;; lpm-install, vterm,
+(require 'modules-package)
+(setq lpm-package-dir (concat lye-emacs-cache-dir "lpm/"))
+(when (and (executable-find "make")
+           (executable-find "libtool")
+           (executable-find "cmake"))
+  (lpm-install '(vterm . (:type git
+                          :host 'github
+                          :repo "akermu/emacs-libvterm"))))
+
 ;; (run-with-idle-timer 5 nil (lambda () (md/autoload-create-and-load '(straight-build-dir . "straight"))))
 
 (provide 'core-modules)
