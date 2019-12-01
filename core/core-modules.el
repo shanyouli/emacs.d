@@ -145,6 +145,7 @@
 ;;; lpm-install, vterm,
 (require 'modules-package)
 (setq lpm-package-dir (concat lye-emacs-cache-dir "lpm/"))
+(lpm-add-load-path)
 (when (and (executable-find "make")
            (executable-find "libtool")
            (executable-find "cmake"))

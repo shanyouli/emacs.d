@@ -35,6 +35,7 @@
 ;;        * initialize, copy-from:
 
 ;;; Code:
+(require 'package)
 
 (defcustom lpm-package-dir (file-truename (concat user-emacs-directory "lpm/"))
   "The directory where LPM downloads packages to."
@@ -57,26 +58,32 @@ it should be like \"user/repo\".
 
 :dependency is a list of symbols of packages thar this package depends on.")
 
-(defun lpm-install (pkg-alist)
+(defun lpm-install (package)
   (lpm--handle-error
-   (let ((pkg-symbol (car pkg-alist)))
+   (lpm--with-recipe (package recipe package-symbol)
+     (unless (lpm-installed-p package)
+       (if recipe
+           (progn
+             (funcall 'lpm--git-install package-symbol recipe)
+             (add-to-list 'load-path (concat (file-name-as-directory lpm-package-dir)
+                                     (symbol-name package-symbol))))
+       (package-install package-symbol))))))
 
-     (unless (lpm-installp pkg-alist)
-       (funcall 'lpm--git-install pkg-symbol (cdr pkg-alist)))
+(defun lpm-installed-p (package)
+  "Return t if PACKAGE (symbol, recipe, dir string) in installed, nil if not."
+  (ignore package)
+  (lpm--with-recipe (package recipe package-symbol)
+    (or (package-installed-p package-symbol)
+        (member (symbol-name package-symbol) (directory-files lpm-package-dir)))))
 
-     (add-to-list 'load-path (concat lpm-package-dir
-                                     (symbol-name pkg-symbol))))))
-
-(defun lpm-installp (pkg-alist)
-  (let ((pkg-name (symbol-name (if (listp pkg-alist)
-                                   (car pkg-alist)
-                                 pkg-alist))))
-    (if (file-exists-p lpm-package-dir)
-        (progn
-          (member pkg-name (directory-files lpm-package-dir))
-          t)
-      (make-directory lpm-package-dir t)
-      nil)))
+(defmacro lpm-add-load-path ()
+  "Add every non-hidden subdir of PARENT-DIR to `load-path'."
+  (declare (indent defun))
+  (require 'cl-seq)
+  `(let ((dirs (cl-remove-if-not
+                (lambda (dir) (file-directory-p dir))
+                (directory-files ,lpm-package-dir t "^[^\\.]"))))
+     (setq load-path (append (if dirs dirs (list ,lpm-package-dir)) load-path))))
 
 (defvar lpm--error-func (lambda (err) (message (error-message-string err)))
   "The default error handling function used by `lpm--handle-error'.")
@@ -88,6 +95,30 @@ Return t if success, nil if fail."
   `(condition-case err (progn ,@form t)
      ((error) (funcall lpm--error-func err)
       nil)))
+
+(defun lpm--package-symbol (package)
+  "PACKAGE can be a recipe, a symbol or a dir. Return package symbol."
+  (pcase package
+    ((pred symbolp) package)
+    ((pred stringp) (intern (file-name-base (directory-file-name package))))
+    ((pred listp) (car package))))
+
+(defmacro lpm--with-recipe (symbols &rest body)
+  "Process package and evaluate BODY.
+If PACKAGE is a symbol or list, treat as package,
+if it is a string, treate as dir.
+RECIPE and PACKAGE-SYMBOL is the symbol represents
+the recipe and package symbol.
+\(fn (PACKAGE RECIPE RACKAGE-SYMBOL) BODY...)."
+  (declare (indent 1))
+  (let ((package-sym (nth 0 symbols))
+        (recipe-sym (nth 1 symbols))
+        (package-symbol-sym (nth 2 symbols)))
+    `(let* ((,package-symbol-sym (lpm--package-symbol ,package-sym))
+            (,recipe-sym (if (listp ,package-sym)
+                             (cdr ,package-sym)
+                           (aliast-get ,package-symbol-sym lpm-recipe-alist))))
+       ,@body)))
 
 (defun lpm--command (command dir &rest args)
   "Call process with COMMAND and ARGS in DIR."
