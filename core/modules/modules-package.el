@@ -30,6 +30,8 @@
 ;; Myself Package Manager
 
 ;;; Change log:
+;; 11/30/19
+;;        * add `package-install+'
 ;;
 ;; 11/30/19
 ;;        * initialize, copy-from:
@@ -67,7 +69,7 @@ it should be like \"user/repo\".
              (funcall 'lpm--git-install package-symbol recipe)
              (add-to-list 'load-path (concat (file-name-as-directory lpm-package-dir)
                                      (symbol-name package-symbol))))
-       (package-install package-symbol))))))
+       (package-install+ package-symbol))))))
 
 (defun lpm-installed-p (package)
   "Return t if PACKAGE (symbol, recipe, dir string) in installed, nil if not."
@@ -143,6 +145,15 @@ the recipe and package symbol.
                     (if repo
                         (concat url-header repo ".git")))
                   (symbol-name package))))
+
+;; package-install extension
+(defun package-install+ (package &optional no-refresh)
+  "Ask elpa to install given PACKAGE."
+  (cond ((or (assoc package package-archive-contents) no-refresh)
+         (package-install package))
+        (t
+         (package-refresh-contents)
+         (package-install package t))))
 
 (provide 'modules-package)
 
