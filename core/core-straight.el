@@ -90,19 +90,6 @@
 
   (message "Set package archives to `%s'." archives))
 
-;; @see https://github.com/redguardtoo/emacs.d/blob/3c54e19d7793e8178b8a357502ae33c62b2db23a/lisp/init-elpa.el#L207
-;; On-demand installation of packages
-(defun core-pkg-install (package &optional min-version no-refresh)
-  "Ask elpa to install given PACKAGE."
-  (cond
-   ((package-installed-p package min-version)
-    t)
-   ((or (assoc package package-archive-contents) no-refresh)
-    (package-install package))
-   (t
-    (package-refresh-contents)
-    (core-pkg-install package min-version t))))
-
 (defun core-pkg-initialize (&optional save-p melpa-archive)
   (let ((melpa-archive (or melpa-archive core-pkg-archives)))
     (core-pkg-set-archives melpa-archive)
@@ -162,12 +149,25 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
     (message "Initializing package...")
     (unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
       (setq package-enable-at-startup nil) ;To prevent initializing twice
+      (require 'modules-package)
+      (setq lpm-package-dir (concat lye-emacs-cache-dir "lpm/"))
+      (setq lpm-recipe-alist
+            '((vterm . (:type git :host github :repo "akermu/emacs-libvterm"))))
+      (lpm-add-load-path)
       (package-initialize)))
   (unless straight-init-notp
     (message "Initializing straight...")
     (doom-ensure-straight)
     (require 'straight)
     (mapc #'straight-use-recipes straight-core-package-sources)))
+
+(defun switch-to-straight-buffer ()
+  "Open the `*straight-process*'."
+  (interactive)
+  (let* ((straight-buffer straight-process-buffer)
+        (blist (mapcar #'buffer-name (buffer-list))))
+    (if (and straight-buffer (member straight-buffer blist))
+        (switch-to-buffer straight-buffer))))
 
 (defmacro package+ (pkg-name)
   "install a package"
@@ -176,7 +176,7 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
                            (car ,pkg-name)
                          ,pkg-name)))
         (straight-use-package pkg))
-     (core-pkg-install ,pkg-name)))
+     (lpm-install ,pkg-name)))
 
 (straight-initialize-packages)
 

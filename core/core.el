@@ -67,7 +67,8 @@ decrease this. If you experience stuttering, increase this.")
   ;; Do this on idle timer to defer a possible GC pause that could result; also
   ;; allows deferred packages to take advantage of these optimizations.
   (run-with-idle-timer! :defer 3
-    (setq-default gc-cons-threshold lye--gc-cons-threshold)
+    (setq-default gc-cons-threshold lye--gc-cons-threshold
+                  gc-cons-percentage 0.1)
     ;; To speed up minibuffer commands (like helm and ivy), we defer garbage
     ;; collection while the minibuffer is active.
     (defun lye/defer-garbage-collection ()

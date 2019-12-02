@@ -23,35 +23,24 @@
 ;;
 
 ;;; Code:
-(dolist (pkg '(live-py-mode pyenv-mode pyenv-mode-auto))
-  (package+ pkg))
 
 ;; Format using YAPF
 ;; Install: pip install yapf
 (when (executable-find "yapf")
   (use-package yapfify
-    :ensure t
     :commands (yapf-mode)
     :hook (python-mode . yapf-mode)))
 
 (add-hook 'python-mode-hook
           (lambda ()
-            (require 'pyenv-mode-auto)
-            (let* ((pylsp (cond
-                           ((executable-find "mspyls")
-                            'mspyls)
-                           ((executable-find "pyls")
-                            'pyls)
-                           (t nil))))
-              (when pylsp
-                (when (eq pylsp 'mspyls)
-                  (core-pkg-install 'lsp-python-ms)
-                  (require 'lsp-python-ms)
-                  (setq lsp-python-ms-executable "/usr/bin/mspyls"))
-                (setq lsp-session-file (concat lye-emacs-cache-dir "lsp-session" ))
-                (lsp)
-                (setq-local company-backends
-                            (mapcar #'company-backend-with-yas company-backends))))))
+            (when (locate-library "pyenv-mode-auto")
+              (require 'pyenv-mode-auto))
+            (when (locate-library "lsp-python-ms")
+              (require 'lsp-python-ms))
+            (setq lsp-session-file (concat lye-emacs-cache-dir "lsp-session" ))
+            (lsp)
+            (setq-local company-backends
+                        (mapcar #'company-backend-with-yas company-backends))))
 
 (provide 'md-python)
 ;;; md-python.el ends here

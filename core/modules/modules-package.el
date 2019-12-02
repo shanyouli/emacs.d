@@ -120,7 +120,7 @@ the recipe and package symbol.
     `(let* ((,package-symbol-sym (lpm--package-symbol ,package-sym))
             (,recipe-sym (if (listp ,package-sym)
                              (cdr ,package-sym)
-                           (aliast-get ,package-symbol-sym lpm-recipe-alist))))
+                           (alist-get ,package-symbol-sym lpm-recipe-alist))))
        ,@body)))
 
 (defun lpm--command (command dir &rest args)

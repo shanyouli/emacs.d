@@ -32,7 +32,8 @@
 ;; threshold to temporarily prevent it from running, then reset it later with
 ;; `lye-restore-garbage-collection-h'. Not resetting it will cause
 ;; stuttering/freezes.
-(setq gc-cons-threshold most-positive-fixnum)
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.6)
 
 ;; In noninteractive sessions,prioritize non-byte-compiled source files to
 ;; prevent stable, byte-compiled code from running. However, if you're getting

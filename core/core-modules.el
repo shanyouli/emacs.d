@@ -150,15 +150,24 @@
 
 ;;
 ;;; lpm-install, vterm,
-(require 'modules-package)
-(setq lpm-package-dir (concat lye-emacs-cache-dir "lpm/"))
-(lpm-add-load-path)
 (when (and (executable-find "make")
            (executable-find "libtool")
            (executable-find "cmake"))
-  (lpm-install '(vterm . (:type git
-                          :host 'github
-                          :repo "akermu/emacs-libvterm"))))
+  (lpm-install 'vterm))
+
+;; python-mode
+(defvar lye-lsp-python-ms-p nil
+  "当为 t 时, 使用 `lsp-python-ms-p'.")
+
+(if (executable-find "yapf")
+    (package+ 'yapf))
+(when (executable-find "pyenv")
+  (package+ 'pyenv-mode)
+  (package+ 'pyenv-mode-auto))
+(package+ 'live-py-mode)
+
+(when lye-lsp-python-ms-p
+  (package+ 'lsp-python-ms))
 
 ;; (run-with-idle-timer 5 nil (lambda () (md/autoload-create-and-load '(straight-build-dir . "straight"))))
 

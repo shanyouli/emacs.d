@@ -43,7 +43,7 @@
                 (kill-buffer "vterm")
               (switch-to-buffer "vterm"))
           (vterm))))
-  (core-pkg-install 'multi-term)
+  (lpm-install 'multi-term)
   (defalias 'term-toggle  'multi-term))
 
 (provide 'iex-term)
