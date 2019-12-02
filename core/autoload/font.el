@@ -4,11 +4,11 @@
 (defun lye/font-initialize+ (&optional english chinese default-size)
   "Font intialization"
   (when (display-graphic-p)
-    (setq mdf-english (cond ((and english (mdf/font-exist-p! english)) english)
+    (setq mdf-english (cond (english english)
                             ((mdf/font-exist-p! "Fantasque Sans Mono")
                              "Fantasque Sans Mono")
                             ((mdf/font-exist-p! "Fira Code") "Fira Code"))
-          mdf-cjk (cond ((and chinese (mdf/font-exist-p! chinese)) chinese)
+          mdf-cjk (cond (chinese  chinese)
                         (IS-LINUX "WenQuanYi Micro Hei")
                         (IS-MAC "Hiragio Sans GB")
                         (IS-WINDOWS "Microsoft Yahei")))
