@@ -178,7 +178,13 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
         (straight-use-package pkg))
      (lpm-install ,pkg-name)))
 
+(defmacro package! (pkg-name &rest args)
+  "Install a package. and add some configuration."
+
+  )
+
 (straight-initialize-packages)
+
 
 ;; use package
 

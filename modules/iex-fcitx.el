@@ -36,6 +36,7 @@
 ;;; Code:
 
 (require 'fcitx)
+
 ;; (setq fcitx-use-dbus nil)
 
 (fcitx-prefix-keys-add "C-h")

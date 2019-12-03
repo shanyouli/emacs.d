@@ -41,22 +41,17 @@
   (setq icon-title-format frame-title-format))
 
 ;; Not scroll-bar, tool-bar and menu-bar-mode
-(when (< emacs-major-version 27)
+(when (not EMACS27+)
   (push '(vertical-scroll-bars) default-frame-alist)
   (push '(tool-bar-lines . 0) default-frame-alist)
   (push '(ns-transparent-titlebar . t) default-frame-alist)
   (unless (and (boundp IS-MAC) IS-MAC)
     (push '(menu-bar-lines . 0) default-frame-alist)))
 
-(when t
-  (run-with-idle-timer 3 nil
-                       (function
-                        (lambda
-                            (&rest _)
-                         :defer 3
-                         (setq tool-bar-mode nil scroll-bar-mode nil)
-                         (unless IS-MAC
-                           (setq menu-bar-mode nil))))))
+(run-with-idle-timer! :defer 3
+  (setq tool-bar-mode nil scroll-bar-mode nil)
+  (unless IS-MAC
+    (setq menu-bar-mode nil)))
 
 ;; Suppress GUI features
 (setq use-file-dialog nil

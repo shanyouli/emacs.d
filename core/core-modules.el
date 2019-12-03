@@ -153,7 +153,7 @@
 (when (and (executable-find "make")
            (executable-find "libtool")
            (executable-find "cmake"))
-  (lpm-install 'vterm))
+  (package+ 'vterm))
 
 ;; python-mode
 (defvar lye-lsp-python-ms-p nil
