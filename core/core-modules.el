@@ -140,22 +140,30 @@
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))
 
-;; iex-fcitx
+;;
+;;; iex-fcitx
 (when (and IS-LINUX
            (or (executable-find "fcitx-remote")
                (executable-find "fcitx5-remote")))
   (package+ 'fcitx)
-  (add-hook! 'after-init-hook :defer 0.1
+  (run-with-idle-timer! :defer 2
+    (unless (eq 0 (call-process "pgrep" nil nil nil "-x fcitx >/dev/null")))
     (lye/modules-require 'iex-fcitx)))
 
 ;;
 ;;; lpm-install, vterm,
-(when (and (executable-find "make")
+(defvar lye-package--use-vterm  nil)
+(if (and module-file-suffix
+           (executable-find "make")
            (executable-find "libtool")
            (executable-find "cmake"))
-  (package+ 'vterm))
-
-;; python-mode
+    (progn
+      (package+ 'vterm)
+      (setq lye-package--use-vterm t))
+  (package+ 'multi-term))
+(package+ 'shell-pop)
+;;
+;;; python-mode
 (defvar lye-lsp-python-ms-p nil
   "当为 t 时, 使用 `lsp-python-ms-p'.")
 

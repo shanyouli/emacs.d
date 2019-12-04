@@ -30,21 +30,15 @@
 
 ;;; Code:
 
-;; @see https://github.com/akermu/emacs-libvterm#installation
-(if (and (executable-find "make")
-           (executable-find "libtool")
-           (executable-find "cmake"))
-    (progn
-      (require 'vterm)
-      (defun term-toggle ()
-        (interactive)
-        (if (member "vterm" (mapcar #'buffer-name (buffer-list)))
-            (if (string= "vterm" (buffer-name (current-buffer)))
-                (kill-buffer "vterm")
-              (switch-to-buffer "vterm"))
-          (vterm))))
-  (lpm-install 'multi-term)
-  (defalias 'term-toggle  'multi-term))
+(setq shell-pop-shell-type
+      (cond (lye-package--use-vterm
+             '("vterm"
+               "*vterm*"
+               (lambda () (require 'vterm) (vterm))))
+            (t
+             '("multi-term" "*Multi-TERM*" (lambda () (require 'multi-term) (multi-term))))))
+
+(require 'shell-pop)
 
 (provide 'iex-term)
 

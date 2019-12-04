@@ -142,7 +142,7 @@
 (md-key/set-global+ '(("M-s" . one-key-avy/menu)) nil "iex-avy")
 
 ;; iex-vterm
-(md-key/set-global+ '(("C-x s v" . term-toggle)) nil "iex-term")
+(md-key/set-global+ '(("<f5>" . shell-pop)) nil "iex-term")
 
 ;; iex-pomidor.el
 (md-key/set-global+ '(("C-z s c" . pomidor)) nil "iex-pomidor")
