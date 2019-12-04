@@ -136,7 +136,10 @@
         (org-cliplink)
         ;;
         (yasnippet)
-        (yasnippet-snippets)))
+        (yasnippet-snippets)
+        ;; iex-winum
+        (winum)
+        ))
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))
 

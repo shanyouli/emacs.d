@@ -65,10 +65,8 @@
 
 ;; lex-sdcv
 (if (executable-find "sdcv")
-    (md-key/set-global "C-c y" 'sdcv-search-at-point++ nil
-                  (expand-file-name "apps/sdcv/config.el" lye-modules-dir))
-  (md-key/set-global "C-c y" 'youdao-dictionary-search-at-point++ nil
-                (expand-file-name "apps/ydcv/config.el" lye-modules-dir)))
+    (md-key/set-global "C-c y" 'sdcv-search-at-point++ nil "iex-sdcv")
+  (md-key/set-global "C-c y" 'youdao-dictionary-search-at-point++ nil "iex-ydcv"))
 
 ;; lex-search.el
 (md-key/set-global "C-c s" 'one-key-color-rg-search/menu nil "lex-search")

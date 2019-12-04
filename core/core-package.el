@@ -103,11 +103,7 @@
   (global-diff-hl-mode +1)
 
   ;; window-move
-  (lye/tools-module-install "winum")
-
-  (if (executable-find "sdcv")
-      (lye/apps-module-install "sdcv" t)
-    (lye/apps-module-install "ydcv" t)))
+  (lye/modules-require 'iex-winum))
 
 (provide 'core-package)
 
