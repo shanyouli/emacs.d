@@ -40,8 +40,7 @@ Conversely use pyim-bigdict as the lexical backend for the pyim input method.")
 (defvar previous-themes-is nil
   "A variable determines if the Theme changes.")
 
-(when (and (>= emacs-major-version 26)
-           (locate-library "posframe"))
+(when (locate-library "posframe")
   (require 'posframe))
 
 ;; pyim-bigdict

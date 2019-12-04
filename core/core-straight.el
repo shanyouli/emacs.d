@@ -180,8 +180,19 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
 
 (defmacro package! (pkg-name &rest args)
   "Install a package. and add some configuration."
-
-  )
+  (declare (indent defun))
+  (let ((-if (plist-get+ args :if t))
+        (-straight (plist-get+ args :straight (listp pkg-name)))
+        (name (intern (format "lye--use-%s-p"
+                              (symbol-name (if (listp pkg-name)
+                                               (car pkg-name)
+                                             pkg-name))))))
+    `(progn
+       (defvar ,name ,-if)
+       (when ,-if
+         (if ,-straight
+             (straight-use-package ,pkg-name)
+           (lpm-install ,pkg-name))))))
 
 (straight-initialize-packages)
 
