@@ -139,6 +139,8 @@
         (yasnippet-snippets)
         ;; iex-winum
         (winum)
+        ;;
+        (cnfonts)
         ))
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))

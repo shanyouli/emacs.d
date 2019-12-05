@@ -167,6 +167,10 @@
 ;; iex-smart-align
 (md-key/set-global+ '(("C-z s m" . smart-align)) nil "iex-smart-align")
 
+;; cnfonts
+(setq cnfonts-directory (concat lye-emacs-cache-dir "cnfonts"))
+(md-key/set-global "C-, u f" 'cnfonts-ui nil "cnfonts")
+
 (provide 'core-key)
 
 ;;; core-key.el ends here
