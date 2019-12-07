@@ -141,7 +141,18 @@
         (winum)
         ;;
         (cnfonts)
-        ))
+        ;; iex-awetab
+        (awesome-tab :type git
+                     :host github
+                     :repo "manateelazycat/awesome-tab"
+                     :no-byte-compile t)
+        ;; iex-awetray
+        (awesome-tray :type git
+                      :host github
+                      :repo "manateelazycat/awesome-tray"
+                      :no-byte-compile t)
+        ;; iex-doom-modeline
+        (doom-modeline)))
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))
 

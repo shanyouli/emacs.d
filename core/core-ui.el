@@ -86,12 +86,6 @@
 
 ;; mode-line
 (add-hook! 'after-init-hook (md-modeline-mode +1))
-;; (lye/UI-module-install "doom-modeline")
-;; or
-;; (lye/UI-module-install "awesome-tray")
-
-;; header-line, Tab
-;; (lye/UI-module-install "awesome-tab")
 
 (provide 'core-ui)
 
