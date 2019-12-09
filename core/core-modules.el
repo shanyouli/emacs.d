@@ -163,7 +163,7 @@
                (executable-find "fcitx5-remote")))
   (package+ 'fcitx)
   (run-with-idle-timer! :defer 2
-    (unless (eq 0 (call-process "pgrep" nil nil nil "-x fcitx >/dev/null")))
+    ;; (unless (eq 0 (call-process "pgrep" nil nil nil "-x fcitx >/dev/null")))
     (lye/modules-require 'iex-fcitx)))
 
 ;;

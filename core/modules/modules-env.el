@@ -67,7 +67,7 @@
   (let ((env-file (if save-file
                       (expand-file-name save-file)
                     mde-path-from-shell-save-file)))
-    (if (or force-p
+    (when (or force-p
             (not (file-exists-p env-file)))
         (with-temp-file env-file
           (insert

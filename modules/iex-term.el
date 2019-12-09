@@ -29,7 +29,6 @@
 ;; Use vterm instead of term
 
 ;;; Code:
-
 (setq shell-pop-shell-type
       (cond (lye-package--use-vterm
              '("vterm"
@@ -37,6 +36,7 @@
                (lambda () (require 'vterm) (vterm))))
             (t
              '("multi-term" "*Multi-TERM*" (lambda () (require 'multi-term) (multi-term))))))
+(setq shell-pop-window-size 38)
 
 (require 'shell-pop)
 

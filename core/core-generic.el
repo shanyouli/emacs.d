@@ -216,6 +216,7 @@
 ;;当在windows上运行时,确定 Msys2是否安装
 (if IS-WINDOWS
     (lye/core-require 'modules-winos t)
+  (setq mde-path-from-shell-list '("PATH" "MANPATH" "NODENV_ROOT"))
   (mde/path-from-shell-initialize+))
 
 (advice-add 'find-file

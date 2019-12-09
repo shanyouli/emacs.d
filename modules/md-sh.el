@@ -55,12 +55,13 @@
                         (executable-find "bash-language-server"))
                (lye/modules-require 'iex-lsp)
                (lsp)
-               (setq-local company-backends
-                           (cons '(company-tabnine company-lsp)
-                                 company-backends))
+               ;; (setq-local company-backends
+               ;;             (cons '(company-tabnine company-lsp)
+               ;;                   company-backends))
                ;; (setq-local company-backends
                ;;             (mapcar #'company-backend-with-yas company-backends))
-               (add-hook 'lsp--managed-mode-hook (lambda () (eldoc-mode -1)))))))
+               ;; (add-hook 'lsp--managed-mode-hook (lambda () (eldoc-mode -1)))
+               ))))
 
 (provide 'md-sh)
 ;;; md-sh.el ends here
