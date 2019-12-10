@@ -41,7 +41,7 @@
 
 (defcustom lpm-package-dir (file-truename (concat user-emacs-directory "lpm/"))
   "The directory where LPM downloads packages to."
-  :type'directory)
+  :type 'directory)
 
 (defvar lpm-recipe-alist ()
   "Contains the recopies for each package.

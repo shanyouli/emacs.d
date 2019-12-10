@@ -40,18 +40,18 @@
 (with-eval-after-load 'all-the-icons
   ;;
   ;;; icons
-  (push '("\\(\\.\\|\\)conf\\(ig\\|\\)" all-the-icons-fileicon "config"
+  (push '("\\(\\.\\|\\)conf\\(ig\\|\\)\\'" all-the-icons-fileicon "config"
           :height 1.0 :face all-the-icons-blue)
         all-the-icons-icon-alist)
-  (push '("\\.lua\\(\\.template\\|\\)$" all-the-icons-fileicon  "lua"
+  (push '("\\.lua\\(\\.template\\|\\)\\'" all-the-icons-fileicon  "lua"
           :height 1.0 :face all-the-icons-blue)
         all-the-icons-icon-alist)
 
-  (push '("\\.mkv$" all-the-icons-faicon "film" :face all-the-icons-blue)
+  (push '("\\.mkv\\'" all-the-icons-faicon "film" :face all-the-icons-blue)
         all-the-icons-icon-alist)
-  (push '("\\.rasi" all-the-icons-alltheicon "css3" :face all-the-icons-blue)
+  (push '("\\.rasi\\'" all-the-icons-alltheicon "css3" :face all-the-icons-blue)
         all-the-icons-icon-alist)
-  (push '("\\.ebuild$" all-the-icons-fileicon "gentoo" :face all-the-icons-purple)
+  (push '("\\.ebuild\\'" all-the-icons-fileicon "gentoo" :face all-the-icons-purple)
         all-the-icons-icon-alist)
 
   ;;

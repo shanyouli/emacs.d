@@ -104,6 +104,14 @@
   (run-hooks 'after-load-theme-hook))
 (advice-add #'load-theme :after #'run-after-load-theme-hook)
 
+;; 判断程序是否运行
+(defun lye-is-running-p (cmd)
+  (let ((out (let (deactivate-mark)
+               (with-temp-buffer
+                 (call-process "pgrep" nil t nil "-x" cmd)
+                 (buffer-string)))))
+    (if (eq 0 (string-to-number out)) nil t)))
+
 (provide 'core-libs)
 
 ;;; core-libs.el ends here

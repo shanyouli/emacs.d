@@ -163,8 +163,8 @@
                (executable-find "fcitx5-remote")))
   (package+ 'fcitx)
   (run-with-idle-timer! :defer 2
-    ;; (unless (eq 0 (call-process "pgrep" nil nil nil "-x fcitx >/dev/null")))
-    (lye/modules-require 'iex-fcitx)))
+    (if (lye-is-running-p "fcitx")
+        (lye/modules-require 'iex-fcitx))))
 
 ;;
 ;;; lpm-install, vterm,
@@ -178,6 +178,7 @@
       (setq lye-package--use-vterm t))
   (package+ 'multi-term))
 (package+ 'shell-pop)
+
 ;;
 ;;; python-mode
 (defvar lye-lsp-python-ms-p nil
@@ -192,6 +193,12 @@
 
 (when lye-lsp-python-ms-p
   (package+ 'lsp-python-ms))
+
+(if (executable-find "sdcv")
+    (package+ '(sdcv :repo "manateelazycat/sdcv"
+                :host github
+                :type git))
+  (package+ 'youdao-dictionary))
 
 ;; (run-with-idle-timer 5 nil (lambda () (md/autoload-create-and-load '(straight-build-dir . "straight"))))
 
