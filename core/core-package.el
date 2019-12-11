@@ -103,7 +103,8 @@
   (global-diff-hl-mode +1)
 
   ;; window-move
-  (lye/modules-require 'iex-winum))
+  ;; (lye/modules-require 'iex-winum)
+  )
 
 (provide 'core-package)
 

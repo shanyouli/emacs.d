@@ -200,6 +200,13 @@
                 :type git))
   (package+ 'youdao-dictionary))
 
+;;
+;;; windows
+(package+ 'ace-window)
+(run-with-idle-timer! :defer 2
+  ;; window-move
+  (lye/modules-require 'iex-ace-window))
+
 ;; (run-with-idle-timer 5 nil (lambda () (md/autoload-create-and-load '(straight-build-dir . "straight"))))
 
 (provide 'core-modules)
