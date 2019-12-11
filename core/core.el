@@ -184,7 +184,8 @@ If it is `nil', Not use fuzzy match."
 (lye/core-require 'modules-autoload t)
 (setq md-autoload-load-dir-alist '((lye-core-dir . "core")
                                    (lye-emacs-site-lisp-dir . "site-lisp")
-                                   (lye-modules-dir . "modules")))
+                                   (lye-modules-dir . "modules")
+                                   (lye-etc-dir . "etc")))
 
 (md/autoload-create-and-load-file-list)
 

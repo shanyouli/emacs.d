@@ -40,6 +40,3 @@
 [submodule "liberime"]
 	path = site-lisp/liberime
 	url = https://github.com/merrickluo/liberime.git
-[submodule "onekey"]
-	path = site-lisp/onekey
-	url = https://github.com/shanyouli/onekey.git
