@@ -49,7 +49,7 @@
       (unless found
         (message "No specified window: %d" number)))))
 (dotimes (n 9)
-  (md-key/set-global (format "M-%d" (1+ n))
+  (lib-key-set-global (format "M-%d" (1+ n))
                      (lambda () (interactive) (aw--select-window (1+ n)))))
 
 (custom-set-faces '(aw-mode-line-face

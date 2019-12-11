@@ -97,9 +97,9 @@
   (setq counsel-describe-variable-function #'helpful-variable))
 
 ;; load-locate-key
-(md-key/set-local [escape] 'minibuffer-keyboard-quit swiper-map)
+(lib-key-set-local [escape] 'minibuffer-keyboard-quit swiper-map)
 
-(md-key/set-local+
+(lib-key-set-locals
  '(("<C-return>" . ivy-immediate-done)
    ([escape]     . minibuffer-keyboard-quit))
  ivy-minibuffer-map)
@@ -112,7 +112,7 @@
 (when (locate-library "yasnippet")
   ;; (require 'ivy-yasnippet)
   (with-eval-after-load 'yasnippet
-    (md-key/set-local+ '(("C-c i y" . ivy-yasnippet))
+    (lib-key-set-locals '(("C-c i y" . ivy-yasnippet))
                        yas-minor-mode-map nil "ivy-yasnippet")))
 ;; -----------------------------------------------------------------------------
 

@@ -53,7 +53,7 @@
 ;; @see https://github.com/magit/magit/issues/3522#issuecomment-407640436
 (with-eval-after-load "magit-files"
   ;; (define-key magit-file-mode-map (kbd "C-x g") nil)
-  (md-key/unset-local magit-file-mode-map "C-x g" ))
+  (lib-key-unset-local magit-file-mode-map "C-x g" ))
 
 (defonekey magit nil
   "Magit keybindings"

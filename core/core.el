@@ -193,6 +193,7 @@ If it is `nil', Not use fuzzy match."
                                    (lye-etc-dir)
                                    (lye-emacs-site-lisp-dir)))
 (md/autoload-add-load-path-list)
+(push (concat lye-emacs-dir "lib") load-path)
 
 (provide 'core)
 
