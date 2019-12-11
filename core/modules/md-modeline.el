@@ -60,14 +60,6 @@
 
 (declare-function flycheck-count-errors "flycheck" (errors))
 (declare-function mc/num-cursors "multiple-cursors" ())
-
-(declare-function window-numbering-clear-mode-line 'window-numbering)
-(declare-function window-numbering-get-number-string 'window-numbering)
-(declare-function window-numbering-install-mode-line 'window-numbering)
-(declare-function winum--clear-mode-line 'winum)
-(declare-function winum--install-mode-line 'winum)
-(declare-function winum-get-number-string 'winum)
-
 ;;
 ;; Config
 ;;
@@ -299,6 +291,14 @@
   (when mode-line-process
     (concat (--string-trim (format-mode-line mode-line-process)) "  ")))
 
+
+(declare-function window-numbering-clear-mode-line 'window-numbering)
+(declare-function window-numbering-get-number-string 'window-numbering)
+(declare-function window-numbering-install-mode-line 'window-numbering)
+(declare-function winum--clear-mode-line 'winum)
+(declare-function winum--install-mode-line 'winum)
+(declare-function winum-get-number-string 'winum)
+
 (defun md-modeline-segment-window-number ()
   "Displays the current window number."
   (let ((num (cond
@@ -343,6 +343,11 @@
         (add-hook 'after-save-hook #'md-modeline--update-vc-segment)
         (advice-add #'vc-refresh-state :after #'md-modeline--update-vc-segment)
 
+        ;; window-number
+        (advice-add #'window-numbering-install-mode-line :override #'ignore)
+        (advice-add #'window-numbering-clear-mode-line :override #'ignore)
+        (advice-add #'winum--install-mode-line :override #'ignore)
+        (advice-add #'winum--clear-mode-line :override #'ignore)
         ;; Set the new mode-line-format
         (setq-default mode-line-format
                       '(
@@ -380,6 +385,11 @@
       (remove-hook 'after-save-hook #'md-modeline--update-vc-segment)
       (advice-remove #'vc-refresh-state #'md-modeline--update-vc-segment)
 
+      ;; Remove winum
+      (advice-remove #'window-numbering-install-mode-line #'ignore)
+      (advice-remove #'window-numbering-clear-mode-line #'ignore)
+      (advice-remove #'winum--install-mode-line  #'ignore)
+      (advice-remove #'winum--clear-mode-line  #'ignore)
       ;; Restore the original mode-line format
       (setq-default mode-line-format md-modeline--default-mode-line))))
 
