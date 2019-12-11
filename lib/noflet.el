@@ -28,7 +28,10 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (if (version< emacs-version "27.0")
+      (require 'cl)
+    (require 'cl-macs)))
 (if (version< emacs-version "24.4.1")
     (load-library "cl-indent")
     (require 'cl-indent))
@@ -155,7 +158,7 @@ maintainers refuse to add the correct indentation spec to
            (indent noflet-indent-func))
   `(cl-flet ,bindings ,@body))
 
-(defmacro* letn (tag bindings &rest body)
+(cl-defmacro letn (tag bindings &rest body)
   (declare (debug (sexp sexp &rest form))
            (indent 2))
   `(cl-labels ((,tag ,(-map 'car bindings) ,@body))

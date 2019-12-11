@@ -25,9 +25,6 @@
 [submodule "esup"]
 	path = site-lisp/esup
 	url = https://github.com/jschaf/esup.git
-[submodule "emacs-noflet"]
-	path = site-lisp/emacs-noflet
-	url = https://github.com/nicferrier/emacs-noflet.git
 [submodule "thing-edit"]
 	path = site-lisp/thing-edit
 	url = https://github.com/manateelazycat/thing-edit.git
