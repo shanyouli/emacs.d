@@ -56,11 +56,6 @@
 ;; slightly, from 0.5s:
 (setq idle-update-delay 1)
 
-;; Emacs on Windows frequently confuses HOME (C:\Users\<NAME>) and APPDATA,
-;; causing `abbreviate-home-dir' to produce incorrect paths.
-(when IS-WINDOWS
-  (setq abbreviated-home-dir "\\'`"))
-
 ;;
 ;;; Optimizations
 
@@ -98,18 +93,6 @@
 (setq mouse-yank-at-point t)            ;粘贴于光标处,而不是鼠标指针处
 (setq x-select-enable-clipboard t)      ;支持emacs和外部程序的粘贴
 (setq split-width-threshold nil)        ;分屏的时候使用上下分屏
-
-;; Performance on Windows is considerably worse than elsewhere. We'll need
-;; everything we can get.
-(when IS-WINDOWS
-  ;;Reduce the workload when doing file IO
-  (setq w32-get-true-fileattributes nil)
-
-  ;; Font compacting can be terribly expensive, especially for rendering icon
-  ;; fonts on Windows. Whether it has a noteable affect on Linux and Mac hasn't
-  ;; been determined.
-   ;使用字体缓存，避免卡顿
-  (setq inhibit-compacting-font-caches t))
 
 ;; Remove command line options that aren't relevant to our current OS; that
 ;;means less to process at startup.
@@ -215,7 +198,7 @@
 
 ;;当在windows上运行时,确定 Msys2是否安装
 (if IS-WINDOWS
-    (lye/core-require 'modules-winos t)
+    (require 'lib-winos)
   (setq mde-path-from-shell-list '("PATH" "MANPATH" "NODENV_ROOT"))
   (mde/path-from-shell-initialize+))
 
