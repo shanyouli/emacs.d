@@ -38,9 +38,14 @@
             (when (executable-find "luacheck")
               (lye/modules-require 'iex-flycheck)
               (flycheck-mode +1))
-            (setq-local company-backends
-                        (cons '(company-lua company-tabnine company-yasnippet)
-                              company-backends))))
+            (require 'lsp-lua-emmy)
+            (setq lsp-lua-emmy-jar-path (expand-file-name
+                                         "~/.local/share/jar/emmylua/EmmyLua-LS-all.jar"))
+            (lsp)
+            ;; (setq-local company-backends
+            ;;             (cons '(company-lua company-tabnine company-yasnippet)
+            ;;                   company-backends)))
+            ))
 
 (provide 'md-lua)
 ;;; md-lua.el ends here

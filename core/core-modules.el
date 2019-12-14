@@ -207,6 +207,15 @@
   ;; window-move
   (lye/modules-require 'iex-ace-window))
 
+;;
+;;; md-lua
+(package+ '(lua-mode))
+(package+ '(company-lua))
+(package+ '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy"
+            :host github
+            :type git))
+(lye/modules-require 'md-lua)
+
 ;; (run-with-idle-timer 5 nil (lambda () (md/autoload-create-and-load '(straight-build-dir . "straight"))))
 
 (provide 'core-modules)
