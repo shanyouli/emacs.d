@@ -23,7 +23,7 @@
 ;; File List etc.
 
 ;;; Code:
-
+(require 'seq)
 (defun lib-delete-same-element-in-list (list)
   "Delete the same element in a list."
   (let ((old-list list)
@@ -56,6 +56,11 @@
                              (file-directory-p file)))
                       (directory-files dir t))))
 
+(defun lib-f-list-subdirectory (dir)
+  "Return a list of absolute directory and subdir in DIR."
+  (let ((subdir (lib-f-list-directory dir t)))
+    (nconc subdir (mapcan (lambda (dir) (lib-f-list-directory dir t)) subdir))))
+
 (defun lib-f-directory-files (dir &optional absolute)
   "Return a list of directories in DIR. Return absolute path if ABSOLUTE is t."
   ;; FULL argument in `directory-files' must be t,
@@ -68,6 +73,7 @@
                         (and (not (string-match "/\\.\\{1,2\\}$" file))
                              (file-regular-p file)))
                       (directory-files dir t))))
+
 
 (defun lib-f-join (&rest path-list)
   "Join paths in PATH-LIST."

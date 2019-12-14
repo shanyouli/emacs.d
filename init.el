@@ -50,8 +50,9 @@
 ;; Load the heart of Lye-Emacs
 (load (concat user-emacs-directory "core/core") nil 'nomessage)
 
-(eval-when-compile
-   (if (version< emacs-version "25.3")
+(cond ((version< emacs-version "27.0")
+       (load (concat user-emacs-directory "early-init") nil 'nomessage))
+      ((version< emacs-version "25.3")
        (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
               emacs-version)))
 
