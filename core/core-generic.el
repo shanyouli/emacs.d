@@ -198,9 +198,11 @@
 
 ;;当在windows上运行时,确定 Msys2是否安装
 (if IS-WINDOWS
-    (require 'lib-winos)
-  (setq mde-path-from-shell-list '("PATH" "MANPATH" "NODENV_ROOT"))
-  (mde/path-from-shell-initialize+))
+    (require 'lib-winos))
+(when (memq window-system '(x ns))
+  (require 'lib-env)
+  (setq lib-env-path-save-file (concat lye-emacs-cache-dir "env"))
+  (lib-env-from-shell-initialize))
 
 (advice-add 'find-file
             :before
