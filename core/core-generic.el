@@ -82,7 +82,6 @@
 ;; Don't ping things that look like domain names.
 (setq ffap-machine-p-known 'reject)
 
-
 (fset 'yes-or-no-p 'y-or-n-p)           ; 以 y/n代表 yes/no
 (blink-cursor-mode -1)                  ; 指针不闪动
 (transient-mark-mode +1)                 ; 标记高亮
@@ -109,12 +108,12 @@
                    (5 right)))))
 
 ;; Don't ask me when close emacs with process is running
-(defun no-query-kill-emacs (orign &rest rest)
+(defun no-query-kill-emacs+ (orign &rest rest)
   "Prevent annoying \"Activ process exits\" query when you quit Emacs."
   (require 'noflet)
   (noflet ((process-list ()))
           (apply orign rest)))
-(advice-add 'save-buffers-kill-emacs :around 'no-query-kill-emacs)
+(advice-add 'save-buffers-kill-emacs :around 'no-query-kill-emacs+)
 
 ;; Don't ask me when kill process buffer
 (setq kill-buffer-query-functions

@@ -43,5 +43,38 @@
     (setq result (lib-delete-same-element-in-list strtolist))
     (mapconcat 'identity result sepr)))
 
+(defun lib-f-list-directory (dir &optional absolute)
+  "Return a list of directories in DIR. Return absolute path if ABSOLUTE is t."
+  ;; FULL argument in `directory-files' must be t,
+  ;; otherwise 'file-directory-p' doesn't work.
+  (mapcar (lambda (path)
+            (if absolute
+                path
+              (file-name-nondirectory path)))
+          (seq-filter (lambda (file)
+                        (and (not (string-match "/\\.\\{1,2\\}$" file))
+                             (file-directory-p file)))
+                      (directory-files dir t))))
+
+(defun lib-f-directory-files (dir &optional absolute)
+  "Return a list of directories in DIR. Return absolute path if ABSOLUTE is t."
+  ;; FULL argument in `directory-files' must be t,
+  ;; otherwise 'file-directory-p' doesn't work.
+  (mapcar (lambda (path)
+            (if absolute
+                path
+              (file-name-nondirectory path)))
+          (seq-filter (lambda (file)
+                        (and (not (string-match "/\\.\\{1,2\\}$" file))
+                             (file-regular-p file)))
+                      (directory-files dir t))))
+
+(defun lib-f-join (&rest path-list)
+  "Join paths in PATH-LIST."
+  (if (eql (length path-list) 1)
+      (car path-list)
+    (expand-file-name (car (last path-list))
+                      (apply #'lib-f-join (butlast path-list)))))
+
 (provide 'lib-f)
 ;;; lib-f.el ends here
