@@ -34,13 +34,13 @@
 ;; 11/22/19
 
 ;;; Code:
-
+(require 'tmp-scratch)
 (defonekey tmp-scratch nil
   "Temp file scratch"
-  ("t" mts/scratch-initialize+ "text")
-  ("e" mts/scratch-initialize-el "Elisp")
-  ("p" mts/scratch-initialize-py "Python")
-  ("s" mts/scratch-initialize-sh "Bash/zsh"))
+  ("t" lib-scratch/orig "text")
+  ("e" lib-scratch/el   "Elisp")
+  ("p" lib-scratch/py   "Python")
+  ("s" lib-scratch/sh   "Bash/zsh"))
 
 (provide 'md-tmp-ext)
 

@@ -35,8 +35,9 @@
 
 ;;; Code:
 
-(defcustom lib-pm-directory
-  (file-truename (concat user-emacs-directory "libpm/"))
+(require 'lib-f)
+
+(defcustom lib-pm-directory (lib-f-join user-emacs-directory "libpms")
   "The directory where LIB-PM downloads packages to."
   :type 'directory)
 
@@ -148,14 +149,10 @@ the recipe and package symbol.
 
 ;;
 ;;; Initialize
-
-(defmacro lib-pm-add-load-path ()
+(defun lib-pm-add-load-path ()
   "Add every non-hidden subdir of PARENT-DIR to `load-path'."
-  (declare (indent defun))
-  `(let ((dirs (cl-remove-if-not
-                (lambda (dir) (file-directory-p dir))
-                (directory-files ,lib-pm-directory t "^[^\\.]"))))
-     (setq load-path (append (if dirs dirs (list ,lib-pm-directory)) load-path))))
+  (when (file-exists-p lib-pm-directory)
+    (push (lib-f-list-directory lib-pm-directory t) load-path)))
 
 (provide 'lib-pm)
 

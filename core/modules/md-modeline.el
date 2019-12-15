@@ -123,6 +123,10 @@
   "Face use for the `window number'."
   :group 'md-modeline)
 
+(defface md-modeline-pyim-run
+    '((t (:foreground "OrangeRed" :bold t)))
+  "Face use when pyim active."
+  :group 'md-modeline)
 ;;
 ;; Helper functions
 ;;
@@ -318,6 +322,12 @@
                 (propertize (format "%s" num) 'face 'md-modeline-window-number)
                 " "))))
 
+;; Pyim use
+(defun md-modeline-segment-pyim ()
+  (when (and (featurep 'pyim) (string= current-input-method "pyim"))
+    (concat "<"
+            (propertize "IM" 'face 'md-modeline-pyim-run)
+            ">")))
 ;;
 ;; Activation function
 ;;
@@ -373,6 +383,7 @@
                              (:eval (md-modeline-segment-flycheck))
                              (:eval (md-modeline-segment-flymake))
                              (:eval (md-modeline-segment-process))
+                             (:eval (md-modeline-segment-pyim))
                              " ")))))))
     (progn
 

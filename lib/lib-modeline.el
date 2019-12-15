@@ -24,15 +24,7 @@
 
 ;;; Code:
 
-(defun lib-modeline-segment-modified ()
-  "Displays a color-coded buffer modification/read-only indicator in the mode-line."
-  (if (not (string-match-p "\\*.*\\*\\'" (buffer-name)))
-      (if (buffer-modified-p)
-          (propertize "+ " 'face 'lib-modeline-modified)
-        (if (and buffer-read-only (buffer-file-name))
-            (propertize "R " 'face 'lib-modeline-read)
-          "  "))
-    "  "))
+
 
 
 (provide 'lib-modeline)
