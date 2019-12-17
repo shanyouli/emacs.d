@@ -157,8 +157,7 @@
 
 ;; lex-snails
 (when (and (not IS-WINDOWS) (display-graphic-p))
-  (lib-key-unset-global "C-x C-b")
-  (lib-key-set-globals '(("C-x C-b" . snails)
+  (lib-key-set-globals '(("C-x b" . snails)
                         ("C-z C-s" . snails-load-theme))  nil "iex-snails"))
 ;; iex-tldr
 (unless IS-WINDOWS
