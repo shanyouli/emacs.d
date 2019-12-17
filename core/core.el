@@ -91,6 +91,9 @@ decrease this. If you experience stuttering, increase this.")
   (eval-when-compile (file-truename user-emacs-directory))
   "The path to the currently loaded .emacs.d directory. Must end with a slash.")
 
+(defconst lye-library-dir (concat lye-emacs-dir "lib/")
+  "The root directory of libray directory. Must end with a slash.")
+
 (defconst lye-emacs-site-lisp-dir (concat lye-emacs-dir"site-lisp/")
   "The root directory of third packages. Must end with a slash.")
 
@@ -186,7 +189,8 @@ If it is `nil', Not use fuzzy match."
 (setq md-autoload-load-dir-alist '((lye-core-dir . "core")
                                    (lye-emacs-site-lisp-dir . "site-lisp")
                                    (lye-modules-dir . "modules")
-                                   (lye-etc-dir . "etc")))
+                                   (lye-etc-dir . "etc")
+                                   (lye-library-dir . "lib")))
 
 (md/autoload-create-and-load-file-list)
 
@@ -196,7 +200,7 @@ If it is `nil', Not use fuzzy match."
                                    (lye-emacs-site-lisp-dir)))
 (md/autoload-add-load-path-list)
 
-(push (concat lye-emacs-dir "lib") load-path)
+(push lye-library-dir load-path)
 
 (provide 'core)
 

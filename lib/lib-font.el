@@ -109,6 +109,7 @@
   (unless lib-font-size-pair
     (setq lib-font-size-pair (assoc lib-font-default-size lib-font--size-alist))))
 
+;;;###autoload
 (defun lib-font-set-monospace (english-font chinese-font english-size chinese-size)
   "Set the monospace font size when mixed Chinese and English words."
   (if (lib-font-exist-p english-font)
@@ -120,6 +121,7 @@
                         (font-spec :family chinese-font :size chinese-size))
     (warn "This %s font is not found." chinese-font)))
 
+;;;###autoload
 (defun lib-font-initialize-monospace ()
   "Initialize monspace-font."
   (let ((en lib-font-english)
@@ -147,6 +149,7 @@
       (lib-font-initialize-monospace)
       (lib-font/display-font-size))))
 
+;;;###autoload
 (defun lib-font/display-font-size ()
   "Display font-size."
   (interactive)
@@ -160,11 +163,13 @@
       (message "The font size of `%s' is %.1f and the pixelsize of `%s' is %.1f!"
                en en-size zh zh-size))))
 
+;;;###autoload
 (defun lib-font/increase-font-size ()
   "Increase font-size acording `lib-font--size-alist'."
   (interactive)
   (lib-font--change-size +1))
 
+;;;###autoload
 (defun lib-font/decrease-font-size ()
   "Decrease font-size acroding `lib-font--size-alist'."
   (interactive)

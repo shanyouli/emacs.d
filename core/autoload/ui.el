@@ -1,4 +1,4 @@
-;;; core/autoload/font.el -*- lexical-binding: t -*-
+;;; core/autoload/ui.el -*- lexical-binding: t -*-
 
 ;;;###autoload
 (defun lye-font-initialize ()
@@ -22,3 +22,7 @@
 ;;;###autoload
 (defun lye|font-initialize (frame)
   (with-selected-frame frame (lye-font-initialize)))
+
+;;;###autoload
+(defun lye|frame-default-size-with-frame (frame)
+  (lib-frame-default-size frame))
