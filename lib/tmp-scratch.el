@@ -33,6 +33,17 @@
   :type 'directory
   :group 'tmp-scratch)
 
+(defcustom tmp-scratch-lang-alist '(("zsh" . "sh")
+                                    ("bash" "sh")
+                                    ("shell" "sh")
+                                    ("python" . "py")
+                                    ("emacs-lisp" . "el")
+                                    ("elisp" . "el")
+                                    ("txt" . "txt"))
+  "常用的语言和对应文件名后缀."
+  :type 'alist
+  :group 'tmp-scratch)
+
 
 
 (defun tmp-scratch--buffer-list ()
@@ -57,14 +68,13 @@
             buf-list))))
 
 ;;;###autoload
-(defun tmp-scratch-initialize-orig (&optional extname)
+(defun tmp-scratch--initialize (extname)
   "Create a temporary buffer to replace *scratch*. Use `scratch.xx' save it.
 xx is EXTNAME."
-  (interactive)
   (unless (file-exists-p tmp-scratch-directory)
     (make-directory tmp-scratch-directory t))
   (let* ((base-name "scratch")
-         (file-ext (or extname "txt"))
+         (file-ext extname)
          (file-name (lib-f-join tmp-scratch-directory
                                 (concat base-name "." file-ext)))
          (buf-name (concat "*" base-name "--" file-ext "*")))
@@ -74,28 +84,28 @@ xx is EXTNAME."
              (rename-buffer buf-name)))
     (setq default-directory (concat (getenv "HOME") "/"))))
 
-;;;###autoload
-(defun tmp-scratch-initialize-el ()
-  "Temporary emacs-lisp test files."
-  (interactive)
-  (tmp-scratch-initialize-orig "el"))
+(defmacro tmp-scratch-create-fun! (prog-lang &optional ext-name)
+  (declare (indent 1))
+  (let* ((prog-lang (tmp-scratch--lang-symbol prog-lang))
+         (func-name (intern (format "tmp-scratch-initialize/%s" prog-lang)))
+         (alias-func (intern (format "lib-scratch/%s" prog-lang)))
+         (ext-name (or ext-name (tmp-scratch--alist-get prog-lang))))
+    `(progn
+       (defun ,func-name ()
+         (interactive)
+         (tmp-scratch--initialize ,ext-name))
+       (defalias ',alias-func ',func-name))))
 
-;;;###autoload
-(defun tmp-scratch-initialize-sh ()
-  "Temporary Sh-script test files."
-  (interactive)
-  (tmp-scratch-initialize-orig "sh"))
+(defun tmp-scratch--lang-symbol (prog-lang)
+  (pcase prog-lang
+    ((pred symbolp) (symbol-name prog-lang))
+    ((pred stringp) prog-lang)
+    ((pred listp) (symbol-name (cadr prog-lang)))
+    (_ (error "Cannot make into prog-lang symbol: %s" prog-lang))))
 
-;;;###autoload
-(defun tmp-scratch-initialize-py ()
-  "Temporary Python-script test files."
-  (interactive)
-  (tmp-scratch-initialize-orig "py"))
-
-(dolist (ext '(el sh py orig))
-  (let ((fun (intern (format "tmp-scratch-initialize-%s" ext)))
-        (new (intern (format "lib-scratch/%s" ext))))
-    (defalias new fun)))
+(defun tmp-scratch--alist-get (prog-lang)
+  (let ((n (assoc prog-lang tmp-scratch-lang-alist)))
+    (if n (cdr n) prog-lang)))
 
 (provide 'tmp-scratch)
 ;;; tmp-scratch.el ends here

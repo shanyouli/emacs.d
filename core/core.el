@@ -182,6 +182,7 @@ If it is `nil', Not use fuzzy match."
 ;; (setq file-name-handler-alist nil)
 
 (lye/core-require 'modules-autoload t)
+
 (setq md-autoload-load-dir-alist '((lye-core-dir . "core")
                                    (lye-emacs-site-lisp-dir . "site-lisp")
                                    (lye-modules-dir . "modules")

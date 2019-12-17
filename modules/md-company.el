@@ -42,12 +42,11 @@
          ("C-p" . company-select-previous)
          ("C-n" . company-select-next))
   :hook (after-init . global-company-mode)
-
   :config
   ;; aligns annotation to the right hand side
   (setq company-tooltip-align-annotations t)
 
-  (setq company-idle-delay 0.3
+  (setq company-idle-delay 0.1
         compant-echo-delay (if (display-graphic-p) nil 0)
         company-tooltip-limit 10
         company-require-match nil

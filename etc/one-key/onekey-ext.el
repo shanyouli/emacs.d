@@ -36,7 +36,6 @@
 ;;        * Initialize
 ;;; Code:
 
-
 (defun one-key--make-defun (cmd-name cmd-doc name menu-list &optional recursion-p)
   "Create a `one-menu-*' functions."
   `(defun ,cmd-name ()

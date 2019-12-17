@@ -75,7 +75,6 @@
 (if (and (fboundp 'daemonp) (daemonp))
     (add-hook! 'after-make-frame-functions #'lye/font-initialize-frame+)
   (lye/font-initialize+))
-(run-with-idle-timer! :defer 3 (lye/UI-module-install "cnfonts"))
 
 ;; mode-line
 (add-hook! 'after-init-hook (md-modeline-mode +1))

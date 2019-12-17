@@ -34,13 +34,20 @@
 ;; 11/22/19
 
 ;;; Code:
+
 (require 'tmp-scratch)
+
+(tmp-scratch-create-fun! 'orgin "txt")
+(tmp-scratch-create-fun! 'emacs-lisp)
+(tmp-scratch-create-fun! 'python)
+(tmp-scratch-create-fun! 'shell)
+
 (defonekey tmp-scratch nil
   "Temp file scratch"
-  ("t" lib-scratch/orig "text")
-  ("e" lib-scratch/el   "Elisp")
-  ("p" lib-scratch/py   "Python")
-  ("s" lib-scratch/sh   "Bash/zsh"))
+  ("t" lib-scratch/orign "text")
+  ("e" lib-scratch/emacs-lisp   "Elisp")
+  ("p" lib-scratch/python   "Python")
+  ("s" lib-scratch/shell   "Bash/zsh"))
 
 (provide 'md-tmp-ext)
 

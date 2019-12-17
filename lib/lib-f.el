@@ -23,14 +23,16 @@
 ;; File List etc.
 
 ;;; Code:
+
 (require 'seq)
+
 (defun lib-delete-same-element-in-list (list)
   "Delete the same element in a list."
   (let ((old-list list)
         new-list)
     (while old-list
       (let ((element (car old-list)))
-        (when (and element (not (member element new-list)))
+        (unless (member element new-list)
           (setq new-list (cons element new-list))))
       (setq old-list (cdr old-list)))
     (nreverse new-list)))
@@ -73,7 +75,6 @@
                         (and (not (string-match "/\\.\\{1,2\\}$" file))
                              (file-regular-p file)))
                       (directory-files dir t))))
-
 
 (defun lib-f-join (&rest path-list)
   "Join paths in PATH-LIST."

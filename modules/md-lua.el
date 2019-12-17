@@ -33,19 +33,25 @@
   (setq lua-indent-level 4
         lua-indent-string-contents nil))
 
+(with-eval-after-load 'lua-mode
+  (if (executable-find "luacheck")
+      (lye/modules-require 'iex-flycheck))
+
+  ;; lsp
+  (require 'lsp-lua-emmy)
+  (require 'iex-lsp)
+  (setq lsp-lua-emmy-jar-path
+        (expand-file-name "~/.local/share/jar/emmylua/EmmyLua-LS-all.jar"))
+  )
+
 (add-hook 'lua-mode-hook
           (lambda ()
             (when (executable-find "luacheck")
-              (lye/modules-require 'iex-flycheck)
               (flycheck-mode +1))
-            (require 'lsp-lua-emmy)
-            (setq lsp-lua-emmy-jar-path (expand-file-name
-                                         "~/.local/share/jar/emmylua/EmmyLua-LS-all.jar"))
             (lsp)
-            ;; (setq-local company-backends
-            ;;             (cons '(company-lua company-tabnine company-yasnippet)
-            ;;                   company-backends)))
-            ))
+            (setq-local company-backends
+                        (cons '(company-lsp company-lua company-yasnippet)
+                              company-backends))))
 
 (provide 'md-lua)
 ;;; md-lua.el ends here
