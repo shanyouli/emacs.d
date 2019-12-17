@@ -71,10 +71,15 @@
   (autoload 'winner-mode "winner")
   (winner-mode +1))
 
-;; font
+;;
+;;; font
+(defcustom lye-en-font nil "Customize English font." :type 'string)
+(defcustom lye-zh-font nil "Customize Chinese font." :type 'string)
+(defcustom lye-default-font-size nil "Customize font size." :type 'integer)
+
 (if (and (fboundp 'daemonp) (daemonp))
-    (add-hook! 'after-make-frame-functions #'lye/font-initialize-frame+)
-  (lye/font-initialize+))
+    (add-hook! 'after-make-frame-functions #'lye|font-initialize)
+  (lye-font-initialize))
 
 ;; mode-line
 (add-hook! 'after-init-hook (md-modeline-mode +1))
