@@ -36,7 +36,7 @@
 ;;; Code:
 
 (require 'tmp-scratch)
-
+(setq tmp-scratch-directory (lib-f-join lye-emacs-cache-dir "tmp-scratchs"))
 (tmp-scratch-create-fun! 'orgin "txt")
 (tmp-scratch-create-fun! 'emacs-lisp)
 (tmp-scratch-create-fun! 'python)

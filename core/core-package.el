@@ -67,7 +67,8 @@
                           "recentf"
                           "url"
                           "COMMIT_EDITMSG\\'"
-                          "COMMIT_MSG"))
+                          "COMMIT_MSG"
+                          "\\/sudo:root\\@localhost:*"))
   (recentf-mode +1)
 
   ;; Automatically refresh files that have been changed elsewhere

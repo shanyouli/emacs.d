@@ -76,8 +76,7 @@
   (let* ((edges (frame-edges))
          (width-start (nth 0 edges))
          (width-end (nth 2 edges)))
-    (truncate (/ (- width-end width-start)
-                 (frame-char-width)))))
+    (truncate (/ (- width-end width-start) (frame-char-width)))))
 
 (provide 'lib-frame)
 ;;; lib-frame.el ends here

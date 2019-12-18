@@ -25,10 +25,9 @@
 ;;; Code:
 (require 'cl-seq)
 (require 'cl-lib)
-(add-hook 'after-load-theme-hook
-          (lambda ()
-            (if (string-prefix-p "doom-" (symbol-name (car custom-enabled-themes)))
-                (require 'doom-themes-ext-org))))
+(add-hook! 'after-load-theme-hook
+    (if (string-prefix-p "doom-" (symbol-name (car custom-enabled-themes)))
+        (require 'doom-themes-ext-org)))
 
 (use-package org
   :ensure nil

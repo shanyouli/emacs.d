@@ -55,11 +55,21 @@
 
 ;;
 ;;; THEME
+(defcustom lye-autoload-switch-dark-or-light-p nil
+  "If it is non-nil, Not use `lib-theme-switch-theme'."
+  :type 'boolean)
+(defcustom lye-autoload-switch-theme-and-time nil
+  "Default dark or light theme"
+  :type 'list)
+(defcustom lye-theme-list nil "Using theme list." :type 'list)
+(defcustom lye-default-theme nil "Lye Default theme." :type 'list)
+
+(defvar lye--current-theme nil)
+(setq lye-autoload-switch-theme-and-time '((doom-one  doom-molokai) .
+                                           (30.93 . 113.92)))
 (add-hook! 'after-init-hook
     (eval-when-compile (require 'doom-themes))
-  (setq mdt-theme-light-and-dark '(doom-one doom-molokai)
-        mdt-theme-switch-time '(30.93 . 113.92))
-  (mdt/switch-light-or-dark-theme+))
+  (lye|initialize-theme))
 
 ;;
 ;;; Frame size

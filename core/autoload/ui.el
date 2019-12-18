@@ -26,3 +26,22 @@
 ;;;###autoload
 (defun lye|frame-default-size-with-frame (frame)
   (lib-frame-default-size frame))
+
+;;
+;;; theme
+
+;;;###autoload
+(defun lye|initialize-theme ()
+  (setq lib-theme-list lye-theme-list)
+  (if (or lye-autoload-switch-dark-or-light-p
+          lye-autoload-switch-theme-and-time)
+      (progn
+        (require 'lib-themes)
+        (setq lib-theme-switch (car lye-autoload-switch-theme-and-time)
+              lib-theme-switch-time (cdr lye-autoload-switch-theme-and-time))
+        (lib-theme-switch-theme))
+    (when lye-default-theme
+      (load-theme lye-default-theme t)))
+  (setq lye--current-theme (car custom-enabled-themes))
+  (add-hook! 'after-load-theme-hook
+    (setq lye--current-theme (car custom-enabled-themes))))
