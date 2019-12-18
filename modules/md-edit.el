@@ -125,5 +125,4 @@
 (add-hook 'after-init-hook #'global-page-break-lines-mode)
 
 (provide 'md-edit)
-
 ;;; md-edit.el ends here
