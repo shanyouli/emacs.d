@@ -37,14 +37,14 @@
 
 (require 'tmp-scratch)
 (setq tmp-scratch-directory (lib-f-join lye-emacs-cache-dir "tmp-scratchs"))
-(tmp-scratch-create-fun! 'orgin "txt")
+(tmp-scratch-create-fun! 'orign "txt")
 (tmp-scratch-create-fun! 'emacs-lisp)
 (tmp-scratch-create-fun! 'python)
 (tmp-scratch-create-fun! 'shell)
 
 (defonekey tmp-scratch nil
   "Temp file scratch"
-  ("t" lib-scratch/orign "text")
+  ("SPC" lib-scratch/orign "text")
   ("e" lib-scratch/emacs-lisp   "Elisp")
   ("p" lib-scratch/python   "Python")
   ("s" lib-scratch/shell   "Bash/zsh"))

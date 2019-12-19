@@ -25,7 +25,7 @@
 
 ;;;###autoload
 (defun lye|frame-default-size-with-frame (frame)
-  (lib-frame-default-size frame))
+   (lib-frame-default-size frame))
 
 ;;
 ;;; theme

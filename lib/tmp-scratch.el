@@ -89,7 +89,8 @@ xx is EXTNAME."
   (let* ((prog-lang (tmp-scratch--lang-symbol prog-lang))
          (func-name (intern (format "tmp-scratch-initialize/%s" prog-lang)))
          (alias-func (intern (format "lib-scratch/%s" prog-lang)))
-         (ext-name (or ext-name (tmp-scratch--alist-get prog-lang))))
+         (ext-name (or ext-name (alist-get prog-lang tmp-scratch-lang-alist
+                                           nil nil 'equal))))
     `(progn
        (defun ,func-name ()
          (interactive)
@@ -102,10 +103,6 @@ xx is EXTNAME."
     ((pred stringp) prog-lang)
     ((pred listp) (symbol-name (cadr prog-lang)))
     (_ (error "Cannot make into prog-lang symbol: %s" prog-lang))))
-
-(defun tmp-scratch--alist-get (prog-lang)
-  (let ((n (assoc prog-lang tmp-scratch-lang-alist)))
-    (if n (cdr n) prog-lang)))
 
 (provide 'tmp-scratch)
 ;;; tmp-scratch.el ends here

@@ -131,7 +131,7 @@ FORCEP is non-nil, Enforcement functions."
              next-theme)
         (setq next-theme (if (> next-time 0)
                              (cadr lib-theme-switch)
-                           (cadr lib-theme-switch)))
+                           (car lib-theme-switch)))
         (cancel-function-timers #'lib-theme-switch-theme)
         (lib-theme--load next-theme)
         (run-at-time (abs next-time) nil  #'lib-theme-switch-theme))
@@ -156,7 +156,7 @@ FORCEP is non-nil, Enforcement functions."
 (defun lib-theme/random-load-color ()
   "Random color themes."
   (interactive)
-  (lib-theme--random-load (or lib-theme-switch (custom-available-themes))))
+  (lib-theme--random-load (or lib-theme-list (custom-available-themes))))
 
 (provide 'lib-themes)
 ;;; lib-themes.el ends here
