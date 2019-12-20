@@ -58,25 +58,34 @@ If none specified, default to 'github.
 :repo is string representing a repository from github or gitlab,
 it should be like \"user/repo\".
 
-:dependency is a list of symbols of packages thar this package depends on.")
+:dependency is a list of symbols of packages thar this package depends on.
+:pseudo is for pseudo packages. for example, ivy, cunsel & swiper are in one package dir
+and subdir under that into load-path, if the package needs to add subdirs that are deeper
+to load-path, use this key to specify a relative path to package-dir. No preceeding slash
+or dont.")
 
 (defun lpm-install (package)
   (lpm--handle-error
    (lpm--with-recipe (package recipe package-symbol)
-     (unless (lpm-installed-p package)
        (if recipe
-           (progn
-             (funcall 'lpm--git-install package-symbol recipe)
-             (add-to-list 'load-path (concat (file-name-as-directory lpm-package-dir)
-                                     (symbol-name package-symbol))))
-       (package-install+ package-symbol))))))
+           (if-let ((pseudo (plist-get recipe :pseudo)))
+               (lpm-install pseudo)
+             (unless (lpm-installed-p package)
+               (funcall 'lpm--git-install package-symbol recipe)
+               (add-to-list 'load-path
+                            (concat
+                             (file-name-as-directory lpm-package-dir)
+                             (symbol-name package-symbol)))))
+         (package-install+ package-symbol)))))
 
 (defun lpm-installed-p (package)
   "Return t if PACKAGE (symbol, recipe, dir string) in installed, nil if not."
   (ignore package)
   (lpm--with-recipe (package recipe package-symbol)
-    (or (package-installed-p package-symbol)
-        (member (symbol-name package-symbol) (directory-files lpm-package-dir)))))
+    (if-let ((pseudo (plist-get recipe :pseudo)))
+        (lpm-installed-p pseudo)
+      (or (package-installed-p package-symbol)
+          (member (symbol-name package-symbol) (directory-files lpm-package-dir))))))
 
 (defmacro lpm-add-load-path ()
   "Add every non-hidden subdir of PARENT-DIR to `load-path'."

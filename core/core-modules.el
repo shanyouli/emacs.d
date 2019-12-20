@@ -63,7 +63,7 @@
         (ivy)
         (counsel)
         (swiper)
-        (ivy-fuz :host github :repo "cireu/fuz.el" :files ("ivy-fuz.el"))
+        ivy-fuz
         (flx)
         (ivy-yasnippet)
         ;; iex-lsp
@@ -109,7 +109,6 @@
         (diredfl)
         (all-the-icons-dired)
         ;; md-edit
-        (autopair)
         (rainbow-delimiters)
         (hungry-delete)
         (highlight-indent-guides)

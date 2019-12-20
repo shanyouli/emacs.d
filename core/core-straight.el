@@ -152,7 +152,9 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
       (require 'modules-package)
       (setq lpm-package-dir (concat lye-emacs-cache-dir "lpm/"))
       (setq lpm-recipe-alist
-            '((vterm . (:type git :host github :repo "akermu/emacs-libvterm"))))
+            '((vterm . (:type git :host github :repo "akermu/emacs-libvterm"))
+              (fuz . (:type git :host github :repo "cireu/fuz.el"))
+              (ivy-fuz . (:pseudo fuz))))
       (lpm-add-load-path)
       (package-initialize)))
   (unless straight-init-notp
