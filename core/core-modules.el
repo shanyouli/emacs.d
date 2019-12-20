@@ -213,7 +213,6 @@
 (package+ '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy"
             :host github
             :type git))
-(lye/modules-require 'md-lua)
 
 ;; (run-with-idle-timer 5 nil (lambda () (md/autoload-create-and-load '(straight-build-dir . "straight"))))
 

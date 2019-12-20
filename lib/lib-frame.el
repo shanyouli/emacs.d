@@ -39,20 +39,6 @@
 
 
 ;;;###autoload
-(defun lib-frame-setup-height (&optional scale)
-  "Setup frame height times the height of the screen SCALE. SCALE defaults to 0.618!"
-  (let ((scale (or scale lib-frame-height-scale 0.5))
-        (fm-height (/ (x-display-pixel-height) (frame-char-height) 1.0)))
-    (if (> scale 1) (/ fm-height scale) (* fm-height scale))))
-
-;;;###autoload
-(defun lib-frame-setup-width (&optional scale)
-  "Setup frame width times the width of the screen SCALE. SCALE defaults to 0.5!"
-  (let ((scale (or scale lib-frame-width-scale 0.5))
-        (fm-width (/ (x-display-pixel-width) (frame-char-width) 1.0)))
-    (if (> scale 1) (- (/ fm-width scale) 2) (- (* fm-width scale) 2))))
-
-;;;###autoload
 (defun lib-frame-default-size (&optional frame width-scale height-scale)
   "The default window size and position."
   (interactive)

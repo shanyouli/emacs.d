@@ -41,8 +41,7 @@
   (require 'lsp-lua-emmy)
   (require 'iex-lsp)
   (setq lsp-lua-emmy-jar-path
-        (expand-file-name "~/.local/share/jar/emmylua/EmmyLua-LS-all.jar"))
-  )
+        (expand-file-name "~/.local/share/jar/emmylua/EmmyLua-LS-all.jar")))
 
 (add-hook 'lua-mode-hook
           (lambda ()

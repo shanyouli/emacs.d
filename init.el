@@ -76,7 +76,8 @@
   (lye/modules-require 'md-elisp)
   (lye/modules-require 'md-scheme)
   (lye/modules-require 'md-sh)
-  (lye/modules-require 'md-python))
+  (lye/modules-require 'md-python)
+  (lye/modules-require 'md-lua))
 
 ;; Org mode
 (run-with-idle-timer! :defer 1
