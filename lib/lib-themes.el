@@ -130,7 +130,7 @@ FORCEP is non-nil, Enforcement functions."
              (next-time (lib-theme--load-need-time (car next-time) (cdr next-time)))
              next-theme)
         (setq next-theme (if (> next-time 0)
-                             (cdr lib-theme-switch)
+                             (car lib-theme-switch)
                            (cadr lib-theme-switch)))
         (cancel-function-timers #'lib-theme-switch-theme)
         (lib-theme--load next-theme)

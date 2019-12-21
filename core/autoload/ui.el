@@ -6,12 +6,8 @@
   (when (display-graphic-p)
     (require 'lib-font)
     (setq lib-font-english (or lye-en-font
-                               (let ((font "Fantasque Sans Mono"))
-                                 (if (lib-font-exist-p font)
-                                     font))
-                               (let ((font "Fira Code"))
-                                 (if (lib-font-exist-p font)
-                                     font)))
+                               (lib-font-exist-p "Fantasque Sans Mono")
+                               (lib-font-exist-p "Fira Code"))
           lib-font-chinese (or lye-zh-font
                                (and IS-LINUX "WenQuanYi Micro Hei")
                                (and IS-MAC "Hiragio Sans GB")

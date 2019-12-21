@@ -67,16 +67,16 @@ or dont.")
 (defun lpm-install (package)
   (lpm--handle-error
    (lpm--with-recipe (package recipe package-symbol)
+     (unless (lpm-installed-p package)
        (if recipe
            (if-let ((pseudo (plist-get recipe :pseudo)))
                (lpm-install pseudo)
-             (unless (lpm-installed-p package)
-               (funcall 'lpm--git-install package-symbol recipe)
-               (add-to-list 'load-path
-                            (concat
-                             (file-name-as-directory lpm-package-dir)
-                             (symbol-name package-symbol)))))
-         (package-install+ package-symbol)))))
+             (funcall 'lpm--git-install package-symbol recipe)
+             (add-to-list 'load-path
+                          (concat
+                           (file-name-as-directory lpm-package-dir)
+                           (symbol-name package-symbol))))
+         (package-install+ package-symbol))))))
 
 (defun lpm-installed-p (package)
   "Return t if PACKAGE (symbol, recipe, dir string) in installed, nil if not."

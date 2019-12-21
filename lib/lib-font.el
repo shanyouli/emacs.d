@@ -74,7 +74,7 @@
 
 (defun lib-font-exist-p (fontname)
   "Return t, The FONT-NAME font is exist."
-  (if (find-font (font-spec :family fontname)) t nil))
+  (if (find-font (font-spec :family fontname)) fontname nil))
 
 (defvar lib-font--size-alist nil)
 (defun lib-font--initialize-size-pair-list (english-font &optional pixelp)
