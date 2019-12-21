@@ -72,6 +72,7 @@
   :type 'list
   :group 'lib-font)
 
+;;;###autoload
 (defun lib-font-exist-p (fontname)
   "Return t, The FONT-NAME font is exist."
   (if (find-font (font-spec :family fontname)) fontname nil))

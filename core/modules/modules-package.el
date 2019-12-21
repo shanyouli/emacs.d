@@ -38,10 +38,14 @@
 
 ;;; Code:
 (require 'package)
+(require 'lib-autoload)
 
 (defcustom lpm-package-dir (file-truename (concat user-emacs-directory "lpm/"))
   "The directory where LPM downloads packages to."
   :type 'directory)
+
+(defvar lpm-package-autoload-file (expand-file-name "lpm-loadfs.el" lpm-package-dir)
+  "auoload file.")
 
 (defvar lpm-recipe-alist ()
   "Contains the recopies for each package.
@@ -76,7 +80,8 @@ or dont.")
                           (concat
                            (file-name-as-directory lpm-package-dir)
                            (symbol-name package-symbol))))
-         (package-install+ package-symbol))))))
+         (package-install+ package-symbol)))
+     (lib-autoload-create-and-update-file lpm-package-dir lpm-package-autoload-file))))
 
 (defun lpm-installed-p (package)
   "Return t if PACKAGE (symbol, recipe, dir string) in installed, nil if not."
@@ -95,6 +100,11 @@ or dont.")
                 (lambda (dir) (file-directory-p dir))
                 (directory-files ,lpm-package-dir t "^[^\\.]"))))
      (setq load-path (append (if dirs dirs (list ,lpm-package-dir)) load-path))))
+
+(defmacro lpm-initialize ()
+  "Lpm initialize."
+  (lpm-add-load-path)
+  (load lpm-package-autoload-file :no-error :no-message))
 
 (defvar lpm--error-func (lambda (err) (message (error-message-string err)))
   "The default error handling function used by `lpm--handle-error'.")

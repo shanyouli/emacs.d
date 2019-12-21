@@ -76,6 +76,24 @@
                              (file-regular-p file)))
                       (directory-files dir t))))
 
+(defun lib-f-directory-el-files (dir &optional absolute)
+  "Return a list of `*.el' in DIR. Return absolute path if ABSOLUTE is t."
+  (mapcar (lambda (path)
+            (if absolute
+                path
+              (file-name-nondirectory path)))
+          (seq-filter (lambda (file)
+                        (and (not (string-match "/\\.\\{1,2\\}$" file))
+                             (file-regular-p file)
+                             (string= (file-name-extension file) "el")))
+                      (directory-files dir t))))
+
+(defun lib-f-list-subfile (dir)
+  "Return a list of absolute directory and subfiles in DIR."
+  (let ((subdir (lib-f-list-directory dir t)))
+    (nconc (mapcan (lambda (dir) (lib-f-directory-el-files dir t)) subdir))))
+
+(lib-f-list-subfile "~/.emacs.d/.cache/lpm")
 (defun lib-f-join (&rest path-list)
   "Join paths in PATH-LIST."
   (if (eql (length path-list) 1)

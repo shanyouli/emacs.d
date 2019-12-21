@@ -149,13 +149,13 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
     (message "Initializing package...")
     (unless (bound-and-true-p package--initialized) ; To avoid warnings in 27
       (setq package-enable-at-startup nil) ;To prevent initializing twice
-      (require 'modules-package)
       (setq lpm-package-dir (concat lye-emacs-cache-dir "lpm/"))
       (setq lpm-recipe-alist
             '((vterm . (:type git :host github :repo "akermu/emacs-libvterm"))
               (fuz . (:type git :host github :repo "cireu/fuz.el"))
               (ivy-fuz . (:pseudo fuz))))
-      (lpm-add-load-path)
+      (require 'modules-package)
+      (lpm-initialize)
       (package-initialize)))
   (unless straight-init-notp
     (message "Initializing straight...")
