@@ -94,7 +94,9 @@
   (lye-font-initialize))
 
 ;; mode-line
-(add-hook! 'after-init-hook (md-modeline-mode +1))
+(defvar lye--default-modeline-format mode-line-format)
+(require 'lib-modeline)
+;; (add-hook! 'after-init-hook (md-modeline-mode +1))
 
 (provide 'core-ui)
 

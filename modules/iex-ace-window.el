@@ -48,6 +48,7 @@
           (aw-switch-to-window win)))
       (unless found
         (message "No specified window: %d" number)))))
+
 (dotimes (n 9)
   (lib-key-set-global (format "M-%d" (1+ n))
                      (lambda () (interactive) (aw--select-window (1+ n)))))
