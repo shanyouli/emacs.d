@@ -165,6 +165,8 @@
     (if (lye-is-running-p "fcitx")
         (lye/modules-require 'iex-fcitx))))
 
+(package+ 'pdf-tools)
+
 ;;
 ;;; lpm-install, vterm,
 (defvar lye-package--use-vterm  nil)

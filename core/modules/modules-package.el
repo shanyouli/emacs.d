@@ -79,9 +79,9 @@ or dont.")
              (add-to-list 'load-path
                           (concat
                            (file-name-as-directory lpm-package-dir)
-                           (symbol-name package-symbol))))
-         (package-install+ package-symbol)))
-     (lib-autoload-create-and-update-file lpm-package-dir lpm-package-autoload-file))))
+                           (symbol-name package-symbol)))
+             (lib-autoload-create-and-update-file lpm-package-dir lpm-package-autoload-file))
+         (package-install+ package-symbol))))))
 
 (defun lpm-installed-p (package)
   "Return t if PACKAGE (symbol, recipe, dir string) in installed, nil if not."

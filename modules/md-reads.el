@@ -38,7 +38,6 @@
 (when (display-graphic-p)
   ;; PDF View
   (use-package pdf-tools
-    :ensure t
     :diminish (pdf-view-midnight-minor-mode pdf-view-printer-minor-mode)
     :defines pdf-annot-activate-created-annotations
     :mode ("\\.[pP][dD][fF]\\'" . pdf-view-mode)
@@ -59,7 +58,6 @@
     ;; Recover last viewed position
     (when (< 26 emacs-major-version)
       (use-package pdf-view-restore
-        :ensure t
         :hook (pdf-view-mode . pdf-view-restore-mode)
         :init (setq pdf-view-restore-filename
                     (concat lye-emacs-cache-dir "pdf-view-restore")))))
