@@ -46,15 +46,16 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
                                   (file-name-nondirectory target))))
     (when (or forcep (not (file-exists-p target)))
       (require 'autoload)
+      (lib-f-make-parent-dir target)
       (with-temp-file target
-        (lib-f-make-parent-dir target)
         (dolist (f (lib-f-list-subfile dir))
           (let ((generated-autoload-load-name (file-name-sans-extension f)))
             (autoload-generate-file-autoloads f (current-buffer))))
         (when save-to-alist-p
           (prin1 `(push '(,dir . ,target) lib-autoload-directory-alist)
                  (current-buffer)))
-        (insert (string-join `(,(char-to-string ?\C-l)
+        (insert (string-join `("\n\n"
+                               ,(char-to-string ?\C-l)
                                ";; Local Varibles:"
                                ";; version-control: never"
                                ";; no-byte-compile: t"
@@ -86,7 +87,7 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
     (lib-autoload-create-and-update-file dir target forcep t)))
 
 ;;;###autoload
-(defun lib-autoload-generate-file-list (alist &optional forcep)
+(defun lib-autoload-generate-file-list (alist)
   (mapc #'lib-autoload--generate-file alist))
 
 (provide 'lib-autoload)
