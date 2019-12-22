@@ -106,11 +106,8 @@
 
 ;; 判断程序是否运行
 (defun lye-is-running-p (cmd)
-  (let ((out (let (deactivate-mark)
-               (with-temp-buffer
-                 (call-process "pgrep" nil t nil "-x" cmd)
-                 (buffer-string)))))
-    (if (eq 0 (string-to-number out)) nil t)))
+  (let ((out (call-process "pgrep" nil nil t "-x" cmd)))
+    (if (eq 0  out) t nil)))
 
 (provide 'core-libs)
 

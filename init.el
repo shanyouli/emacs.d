@@ -57,12 +57,7 @@
 (load (concat user-emacs-directory "core/core") nil 'nomessage)
 
 ;; Let 'er rip!
-(lye/core-require 'core-generic)        ; generic and delete *scratch*
-(lye/core-require 'core-straight)       ; staraight, package
-(lye/core-require 'core-ui)             ; UI
-(lye/core-require 'core-package)        ; packages initialization
-(lye/core-require 'core-modules)        ; Modeuls manager
-(lye/core-require 'core-key)            ; Keybindings
+(lye-core-initialize)
 
 (lye/modules-require 'md-edit)          ; better edit
 (lye/modules-require 'md-shackle)       ; Window rule

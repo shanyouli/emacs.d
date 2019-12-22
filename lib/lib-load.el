@@ -66,6 +66,7 @@ LIB-LOAD-MESSAGE-P will not work.")
       (save-buffer)
       (kill-buffer))))
 
+;;;###autoload
 (defun lib-load-relative (feature &rest args)
   "Load FILE relative to user-emacs-directory. ARGS are applied to `load'."
   (let ((symbol (lib-load--feature-symbol feature)))
@@ -90,7 +91,6 @@ if SUBDIR is non-nil, the subdirectory of PATH will add to `load-path'"
       (mapc (lambda (subpath) (push subpath load-path))
             (lib-f-list-directory path t))
     (push path load-path)))
-
 
 (provide 'lib-load)
 

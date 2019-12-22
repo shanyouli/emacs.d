@@ -39,7 +39,7 @@
   "The root directory of Lye-Emacs's core files. Must end with a slash.")
 
 ;; Ensure `lye-core-dir' is in `load-path'
-(add-to-list 'load-path lye-core-dir)
+(push lye-core-dir load-path)
 
 ;; This is consulted on every `require', `load' and various path/io handling
 ;; encrypted or compressed files, among other things.
@@ -153,40 +153,17 @@ If it is `nil', Not use fuzzy match."
   "Enable yasnippet for company backends or not."
   :type  'boolean)
 
-(defcustom lye-emacs-autoload-dir (concat lye-emacs-cache-dir "autoload/")
-  "Automatic generation autoload file storage directory."
-  :type 'directory)
-
-(dolist (d (list lye-emacs-cache-dir
-                 lye-emacs-autoload-dir))
-  (unless (file-directory-p d)
-    (make-directory d t)))
-
-;;; Load `custom-file'
-(setq custom-file (concat lye-emacs-cache-dir "custom.el"))
-
-(if (and (file-exists-p lye-emacs-custom-temp-file)
-         (not (file-exists-p custom-file)))
-    (copy-file lye-emacs-custom-temp-file custom-file))
-
-(if (file-exists-p custom-file) (load custom-file :no-error :no-message))
-
-;; https://github.com/honmaple/dotfiles/blob/571d6f0dca10015886c56a1feab17f0d5a1bb1ab/emacs.d/init.el#L51
-(defmacro lye/core-require (pkg &optional modulep)
-  "Load PKG. When MODULEP is non-nil, the presence of PKG using directory
-`lye-core-modules-dir', and vice versa for `lye-core-dir'."
-  (let ((dir (if modulep
-                 lye-core-modules-dir
-               lye-core-dir)))
-    `(require ,pkg (concat ,dir (format "%s" ,pkg)))))
+(unless (file-directory-p lye-emacs-cache-dir)
+  (make-directory lye-emacs-cache-dir t))
 
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
 ;; (setq file-name-handler-alist nil)
 (push lye-library-dir load-path)
 (require 'lib-autoload)
-(require 'lib-load)
+;; (require 'lib-load)
 
+(setq lib-autoload-save-directory (lib-f-join lye-emacs-cache-dir "autoloads"))
 (lib-autoload-generate-file-list '((lye-core-dir . "core")
                                    (lye-emacs-site-lisp-dir . "site-lisp")
                                    (lye-modules-dir . "modules")
@@ -197,6 +174,24 @@ If it is `nil', Not use fuzzy match."
 (lib-load-add-load-path lye-etc-dir t)
 (lib-load-add-load-path lye-emacs-site-lisp-dir t)
 (lib-load-add-load-path lye-modules-dir)
+
+;;; Load `custom-file'
+(setq custom-file (concat lye-emacs-cache-dir "custom.el"))
+
+(if (and (file-exists-p lye-emacs-custom-temp-file)
+         (not (file-exists-p custom-file)))
+    (copy-file lye-emacs-custom-temp-file custom-file))
+
+(if (file-exists-p custom-file) (load custom-file :no-error :no-message))
+
+(defun lye-core-initialize ()
+  "Load Lye's core files for an interactive session."
+  (lib-load-relative 'core/core-generic)   ; generic and delete *scratch*
+  (lib-load-relative 'core/core-straight)  ; staraight, package
+  (lib-load-relative 'core/core-ui)        ; UI
+  (lib-load-relative 'core/core-package)   ; packages initialization
+  (lib-load-relative 'core/core-key)       ; Keybindings
+  (lib-load-relative 'core/core-modules))  ; Modeuls manager
 
 (provide 'core)
 
