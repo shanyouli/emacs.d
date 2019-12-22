@@ -36,39 +36,48 @@
 ;;; Code:
 
 (require 'lib-f)
+(require 'subr-x)
 
 (defcustom lib-pm-directory (lib-f-join user-emacs-directory "libpms")
   "The directory where LIB-PM downloads packages to."
   :type 'directory)
 
-(defvar lib-pm-recipe-alist ()
+(defvar lib-pm-recipe-alist '()
   "Contains the recopies for each package.
 This is an alist of form:((package . properites)).
 package is a symbol, properties is a plist.
-Available keywords: :type, :host, repo, :dependency.
+Available keywords: :fetcher, repo, :dependency.
 
-:type is a symobl representing the source, available options are 'git, 'url.
-If none specified, default to 'git. TODO: 'url.
-
-:host is a symobl representing the source, available options are 'github,
-'gitlab. Just only use when :type is 'git.
-If none specified, default to 'github.
+:fetcher is a symobl representing the source, available options are 'gitub,'gitlab
+and 'url. If none specified, default to 'gitub. TODO: 'url.
 
 :repo is string representing a repository from github or gitlab,
 it sould be like \"user/repo\".
-:dependency is a list of symbols of packages thar this package depends on.")
+
+:dependency is a list of symbols of packages thar this package depends on.
+
+:pseudo is for pseudo packages. for example, ivy, cunsel & swiper are in one package dir
+and subdir under that into load-path, if the package needs to add subdirs that are deeper
+to load-path, use this key to specify a relative path to package-dir. No preceeding slash
+or dont.
+
+:load-path is added somepath to `load-path'. for example pdf-tools, *.el is exists in lisp/* dir.")
 
 (defun lib-pm-install (package)
   "Install a PACKAGE."
   (lib-pm-handle-error
    (lib-pm-with-recipe (package recipe package-symbol)
-     (if recipe
-         (if (lib-pm-installed-p package)
-             t
-           (funcall 'lib-pm--git-install package-symbol recipe)
+     (when recipe
+       (if-let ((pseudo (plist-get recipe :pseudo)))
+           (lib-pm-install pseudo)
+         (unless (lib-pm-installed-p package)
+           (funcall (intern (format "lib-pm--%s-install"
+                                    (symbol-name (or (plist-get recipe :fetcher)
+                                                     'github))))
+                    package-symbol recipe)
            (add-to-list 'load-path (concat (file-name-as-directory lpm-package-dir)
-                                           (symbol-name package-symbol)))))
-       nil)))
+                                           (symbol-name package-symbol)
+                                           (plist-get recipe :load-path)))))))))
 
 (defvar lib-pm-error-func (lambda (err) (message (error-message-string err)))
   "The default error handling function used by `lib--handle-error'.")
@@ -113,38 +122,46 @@ the recipe and package symbol.
   (lpm--with-recipe (package recipe package-symbol)
     (member (symbol-name package-symbol) (directory-files lib-pm-directory))))
 
-(defvar lib-pm-process-buffer " *pm-process*"
-  "It is used for LIB-PM-PROCESS-BUFFER.")
-
+;;
+;;; installed command
+(defvar lib-pm-process-buffer " *pm-process*" "It is used for LIB-PM-PROCESS-BUFFER.")
 (defun lib-pm--command (command dir &rest args)
   "Call process with COMMAND and ARGS in DIR."
   (let ((default-directory dir)
         (buffer lib-pm-process-buffer)
         status)
     (setq status (apply #'call-process command nil buffer t args))
-    (if (eq status 0)
-        nil
+    (unless (eq status 0)
       (pop-to-buffer buffer)
       (error "%s fails." command))))
 
-;;
-;;; git install
-(defun lib-pm--git-install (package recipe)
+;; github install
+(defun lib-pm--github-install (package recipe)
   "Clone the package specified by RECIPE and name it PACKAGE (symbol)."
-  (let* ((host (plist-get recipe :host))
-         (package-name (symbol-name package))
-         (url-header (if (eq 'gitlab host)
-                         "https://gitlab.com/"
-                       "https://github.com/")))
+  (let ((package-name (symbol-name package))
+        (url-header "https://github.com/"))
     (let ((progress-reporter (make-progress-reporter
                               (format "Installing `%s' package..." package-name))))
       (lib-pm--command "git" lib-pm-directory "clone" "--depth"
                        "1"
-                       (let ((repo (plist-get recipe :repo)))
-                         (if repo
-                             (concat url-header repo ".git")))
+                       (if-let ((repo (plist-get recipe :repo)))
+                           (concat url-header repo ".git"))
                        package-name)
       (progress-reporter-done progress-reporter))))
+
+;; gitlib install
+(defun lib-pm--githlib-install (package recipe)
+  "Clone the package specified by RECIPE and name it PACKAGE (symbol)."
+  (let* ((package-name (symbol-name package))
+         (url-header "https://gitlab.com/")
+         (progress-reporter (make-progress-reporter
+                             (format "Installing `%s' package..." package-name))))
+    (lib-pm--command "git" lib-pm-directory "clone" "--depth"
+                     "1"
+                     (if-let ((repo (plist-get recipe :repo)))
+                         (concat url-header repo ".git"))
+                     package-name)
+    (progress-reporter-done progress-reporter)))
 
 ;;
 ;;; Initialize

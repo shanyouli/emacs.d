@@ -73,7 +73,7 @@
 
 ;;
 ;;; Frame size
-(when (display-graphic-p) (lib-frame-default-size))
+(when (display-graphic-p) (lib-frame/default-size))
 ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
 (add-hook! 'after-make-frame-functions
   :if (display-graphic-p)

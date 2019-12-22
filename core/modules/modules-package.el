@@ -47,7 +47,7 @@
 (defvar lpm-package-autoload-file (expand-file-name "lpm-loadfs.el" lpm-package-dir)
   "auoload file.")
 
-(defvar lpm-recipe-alist ()
+(defvar lpm-recipe-alist '()
   "Contains the recopies for each package.
 This is an alist of form:((package . properties)).
 package is a symbol, properties is a plist.

@@ -34,7 +34,7 @@
 
 
 
-(defvar lib-autoload-directory-alist nil
+(defvar lib-autoload--directory-alist nil
   "Need to generate a list of all files stored autoload, the corresponding file.
 The default format is '((dir . target))")
 
@@ -53,7 +53,7 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
           (let ((generated-autoload-load-name (file-name-sans-extension f)))
             (autoload-generate-file-autoloads f (current-buffer))))
         (when save-to-alist-p
-          (prin1 `(cl-pushnew '(,dir . ,target) lib-autoload-directory-alist
+          (prin1 `(cl-pushnew '(,dir . ,target) lib-autoload--directory-alist
                               :test #'equal)
                  (current-buffer)))
         (insert (string-join `("\n"
@@ -66,7 +66,8 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
                                ";; End:"
                                ,(format ";;; %s ends here"
                                         (file-name-nondirectory target)))
-                             "\n"))))
+                             "\n")))
+      (byte-compile-file target))
     (load target :no-error :no-message)))
 
 (defun lib-autoload--get-true-file (fname)
@@ -93,16 +94,16 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
   (interactive
    (list (intern
           (completing-read "Need generated-autoload PATH: "
-                            lib-autoload-directory-alist))))
+                            lib-autoload--directory-alist))))
   (if (symbolp path)
       (setq path (symbol-name path)))
-  (let ((dir-target (assoc path lib-autoload-directory-alist)))
+  (let ((dir-target (assoc path lib-autoload--directory-alist)))
     (lib-autoload--generate-file dir-target t)))
 
 (defun lib-autoload/update-all-file ()
   (interactive)
   (mapc (lambda (dir-target) (lib-autoload--generate-file dir-target t))
-        lib-autoload-directory-alist))
+        lib-autoload--directory-alist))
 
 (provide 'lib-autoload)
 ;;; lib-autoload.el ends here

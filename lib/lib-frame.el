@@ -39,7 +39,7 @@
 
 
 ;;;###autoload
-(defun lib-frame-default-size (&optional frame width-scale height-scale)
+(defun lib-frame/default-size (&optional frame width-scale height-scale)
   "The default window size and position."
   (interactive)
   (let* ((x (x-display-pixel-width))
