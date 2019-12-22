@@ -109,8 +109,7 @@ the recipe and package symbol.
 (defun lib-pm-installed-p (package)
   "Return t if PACKAG (symbol, recipe, dir string) in installed, nil if not."
   (ignore package)
-  (unless (file-exists-p lib-pm-directory)
-    (make-directory lib-pm-directory t))
+  (lib-f-make-dir lib-pm-directory)
   (lpm--with-recipe (package recipe package-symbol)
     (member (symbol-name package-symbol) (directory-files lib-pm-directory))))
 

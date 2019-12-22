@@ -116,10 +116,15 @@
     (expand-file-name (car (last path-list))
                       (apply #'lib-f-join (butlast path-list)))))
 
+(defun lib-f-make-dir (dir)
+  "If the DIR isn't exists, create it."
+  (unless (file-exists-p dir)
+    (make-directory dir t)))
+
 (defun lib-f-make-parent-dir (dir)
   "If the parent-dir of DIR isn't exists, create it."
   (let ((parent-dir (file-name-directory dir)))
-    (unless (file-exists-p parent-dir) (make-directory parent-dir t))))
+    (lib-f-make-dir parent-dir)))
 
 (provide 'lib-f)
 ;;; lib-f.el ends here
