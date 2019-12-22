@@ -26,6 +26,7 @@
 
 (require 'lib-f)
 (require 'subr-x)
+(require 'cl-lib)
 
 (defcustom lib-autoload-save-directory (lib-f-join user-emacs-directory "autoloads")
   "Autoload Save Directory."
@@ -52,7 +53,8 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
           (let ((generated-autoload-load-name (file-name-sans-extension f)))
             (autoload-generate-file-autoloads f (current-buffer))))
         (when save-to-alist-p
-          (prin1 `(push '(,dir . ,target) lib-autoload-directory-alist)
+          (prin1 `(cl-pushnew '(,dir . ,target) lib-autoload-directory-alist
+                              :test #'equal)
                  (current-buffer)))
         (insert (string-join `("\n"
                                ,(char-to-string ?\C-l)
@@ -91,21 +93,16 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
   (interactive
    (list (intern
           (completing-read "Need generated-autoload PATH: "
-                           (lib-delete-same-element-in-list
-                            lib-autoload-directory-alist)))))
+                            lib-autoload-directory-alist))))
   (if (symbolp path)
       (setq path (symbol-name path)))
   (let ((dir-target (assoc path lib-autoload-directory-alist)))
-    (lib-autoload--generate-file dir-target t))
-  (setq lib-autoload-directory-alist
-        (lib-delete-same-element-in-list lib-autoload-directory-alist)))
+    (lib-autoload--generate-file dir-target t)))
 
 (defun lib-autoload/update-all-file ()
   (interactive)
   (mapc (lambda (dir-target) (lib-autoload--generate-file dir-target t))
-        lib-autoload-directory-alist)
-  (setq lib-autoload-directory-alist
-        (lib-delete-same-element-in-list lib-autoload-directory-alist)))
+        lib-autoload-directory-alist))
 
 (provide 'lib-autoload)
 ;;; lib-autoload.el ends here
