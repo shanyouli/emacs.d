@@ -28,6 +28,7 @@
 ;; But I need global-mode-string,
 ;; @see http://www.delorie.com/gnu/docs/elisp-manual-21/elisp_360.html
 ;; use setq-default to set it for /all/ modes
+
 (setq-default mode-line-format
               (list
     ;; the buffer name; the file name as a tool tip

@@ -49,6 +49,7 @@ LIB-LOAD-MESSAGE-P will not work.")
        (progn ,@body)
      (error (message (format "Error occured:\n%s\n" (error-message-string err))))))
 
+;;;###autoload
 (defun lib-safe-load (file &rest args)
   "Load FILE and don't error out. ARGS is as same as in `load'."
   (lib-load-message-error!
@@ -80,6 +81,16 @@ LIB-LOAD-MESSAGE-P will not work.")
     ((pred symbolp) feature)
     ((pred stringp) (file-name-sans-extension feature))
     (_ (error "Cannot make into package symbol: %s." feature))))
+
+;;;###autoload
+(defun lib-load-add-load-path (path &optional subdirp)
+  "add PATH to `load-path',
+if SUBDIR is non-nil, the subdirectory of PATH will add to `load-path'"
+  (if subdirp
+      (mapc (lambda (subpath) (push subpath load-path))
+            (lib-f-list-directory path t))
+    (push path load-path)))
+
 
 (provide 'lib-load)
 

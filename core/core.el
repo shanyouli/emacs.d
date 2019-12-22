@@ -183,24 +183,20 @@ If it is `nil', Not use fuzzy match."
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
 ;; (setq file-name-handler-alist nil)
+(push lye-library-dir load-path)
+(require 'lib-autoload)
+(require 'lib-load)
 
-(lye/core-require 'modules-autoload t)
-
-(setq md-autoload-load-dir-alist '((lye-core-dir . "core")
+(lib-autoload-generate-file-list '((lye-core-dir . "core")
                                    (lye-emacs-site-lisp-dir . "site-lisp")
                                    (lye-modules-dir . "modules")
                                    (lye-etc-dir . "etc")
                                    (lye-library-dir . "lib")))
 
-(md/autoload-create-and-load-file-list)
-
-(setq md-autoload-load-path-list '(lye-core-modules-dir
-                                   lye-modules-dir
-                                   (lye-etc-dir)
-                                   (lye-emacs-site-lisp-dir)))
-(md/autoload-add-load-path-list)
-
-(push lye-library-dir load-path)
+(lib-load-add-load-path lye-core-modules-dir)
+(lib-load-add-load-path lye-etc-dir t)
+(lib-load-add-load-path lye-emacs-site-lisp-dir t)
+(lib-load-add-load-path lye-modules-dir)
 
 (provide 'core)
 

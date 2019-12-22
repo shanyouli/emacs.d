@@ -43,18 +43,18 @@
 (let (file-name-handler-alist)
   ;; Ensure Lye-Emacs is running out of this file's directory
   (when load-file-name
-    (setq user-emacs-directory (file-name-directory load-file-name))))
+    (setq user-emacs-directory (file-name-directory load-file-name)))
+
+  (cond ((version< emacs-version "27.0")
+         (load (concat user-emacs-directory "early-init") nil 'nomessage))
+        ((version< emacs-version "25.3")
+         (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
+                emacs-version))))
 
 ;; Start Time Test
 (load (concat user-emacs-directory "core/core-benchmark") nil 'nomessage)
 ;; Load the heart of Lye-Emacs
 (load (concat user-emacs-directory "core/core") nil 'nomessage)
-
-(cond ((version< emacs-version "27.0")
-       (load (concat user-emacs-directory "early-init") nil 'nomessage))
-      ((version< emacs-version "25.3")
-       (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
-              emacs-version)))
 
 ;; Let 'er rip!
 (lye/core-require 'core-generic)        ; generic and delete *scratch*

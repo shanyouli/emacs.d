@@ -76,6 +76,16 @@
                              (file-regular-p file)))
                       (directory-files dir t))))
 
+(defun lib-f-list-file-or-dir (dir &optional absolute)
+  "Retrun a list of directories or file in DIR. Return absolute path if ABSOLUTE is t."
+  (mapcar (lambda (path)
+            (if absolute
+                path
+              (file-name-nondirectory path)))
+          (seq-filter (lambda (file)
+                        (not (string-match "/\\.\\{1,2\\}$" file)))
+                      (directory-files dir t))))
+
 (defun lib-f-directory-el-files (dir &optional absolute)
   "Return a list of `*.el' in DIR. Return absolute path if ABSOLUTE is t."
   (mapcar (lambda (path)
@@ -90,16 +100,26 @@
 
 (defun lib-f-list-subfile (dir)
   "Return a list of absolute directory and subfiles in DIR."
-  (let ((subdir (lib-f-list-directory dir t)))
-    (nconc (mapcan (lambda (dir) (lib-f-directory-el-files dir t)) subdir))))
+  (let ((subdir (lib-f-list-file-or-dir dir t)))
+    (nconc (seq-filter (lambda (file)
+                         (and (file-regular-p file)
+                              (string= (file-name-extension file) "el")))
+                       subdir)
+           (mapcan (lambda (dir)
+                     (and (file-directory-p dir) (lib-f-directory-el-files dir t)))
+                   subdir))))
 
-(lib-f-list-subfile "~/.emacs.d/.cache/lpm")
 (defun lib-f-join (&rest path-list)
   "Join paths in PATH-LIST."
   (if (eql (length path-list) 1)
       (car path-list)
     (expand-file-name (car (last path-list))
                       (apply #'lib-f-join (butlast path-list)))))
+
+(defun lib-f-make-parent-dir (dir)
+  "If the parent-dir of DIR isn't exists, create it."
+  (let ((parent-dir (file-name-directory dir)))
+    (unless (file-exists-p parent-dir) (make-directory parent-dir t))))
 
 (provide 'lib-f)
 ;;; lib-f.el ends here

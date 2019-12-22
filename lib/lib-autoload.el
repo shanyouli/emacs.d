@@ -23,23 +23,37 @@
 ;; Autoload extensions
 
 ;;; Code:
+
 (require 'lib-f)
 (require 'subr-x)
 
-(defun lib-autoload-create-and-update-file (dir target &optional forcep)
+(defcustom lib-autoload-save-directory (lib-f-join user-emacs-directory "autoloads")
+  "Autoload Save Directory."
+  :type 'directory)
+
+
+
+(defvar lib-autoload-directory-alist nil
+  "Need to generate a list of all files stored autoload, the corresponding file.
+The default format is '((dir . target))")
+
+;;;###autoload
+(defun lib-autoload-create-and-update-file (dir target &optional forcep save-to-alist-p)
   "Autoload directory DIR generated for a file named TARGET in.
-If the FORCEP is non-nil, forcibly regenerate a new DIR file autoload it."
-  (require 'autoload)
+If the FORCEP is non-nil, forcibly regenerate a new DIR file autoload it.
+If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-alist)"
   (let ((generated-autoload-file (file-name-sans-extension
-                                  (file-name-nondirectory target)))
-        (parent-dir (file-name-directory target)))
-    (unless (file-exists-p parent-dir)
-      (make-directory parent-dir t))
+                                  (file-name-nondirectory target))))
     (when (or forcep (not (file-exists-p target)))
+      (require 'autoload)
       (with-temp-file target
+        (lib-f-make-parent-dir target)
         (dolist (f (lib-f-list-subfile dir))
           (let ((generated-autoload-load-name (file-name-sans-extension f)))
             (autoload-generate-file-autoloads f (current-buffer))))
+        (when save-to-alist-p
+          (prin1 `(push '(,dir . ,target) lib-autoload-directory-alist)
+                 (current-buffer)))
         (insert (string-join `(,(char-to-string ?\C-l)
                                ";; Local Varibles:"
                                ";; version-control: never"
@@ -49,7 +63,31 @@ If the FORCEP is non-nil, forcibly regenerate a new DIR file autoload it."
                                ";; End:"
                                ,(format ";;; %s ends here"
                                         (file-name-nondirectory target)))
-                             "\n"))))))
+                             "\n"))))
+    (load target :no-error :no-message)))
+
+(defun lib-autoload--get-true-file (fname)
+  "Get true-file-path."
+  (if (string= fname (file-name-nondirectory fname))
+      (lib-f-join lib-autoload-save-directory
+                  (if (file-name-extension fname)
+                      fname
+                    (concat fname "-loadfs.el")))
+    (let ((dname (file-name-directory fname)))
+      (unless (file-exist-p dirname)
+        (make-directory (expand-file-name dirname) t))
+      fname)))
+
+(defun lib-autoload--generate-file (dir-target &optional forcep)
+  (let ((dir (car dir-target))
+        (target (lib-autoload--get-true-file (cdr dir-target))))
+    (if (symbolp dir)
+        (setq dir (symbol-value dir)))
+    (lib-autoload-create-and-update-file dir target forcep t)))
+
+;;;###autoload
+(defun lib-autoload-generate-file-list (alist &optional forcep)
+  (mapc #'lib-autoload--generate-file alist))
 
 (provide 'lib-autoload)
 ;;; lib-autoload.el ends here
