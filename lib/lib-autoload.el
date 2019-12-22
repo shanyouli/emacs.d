@@ -54,7 +54,7 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
         (when save-to-alist-p
           (prin1 `(push '(,dir . ,target) lib-autoload-directory-alist)
                  (current-buffer)))
-        (insert (string-join `("\n\n"
+        (insert (string-join `("\n"
                                ,(char-to-string ?\C-l)
                                ";; Local Varibles:"
                                ";; version-control: never"
@@ -74,21 +74,36 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
                   (if (file-name-extension fname)
                       fname
                     (concat fname "-loadfs.el")))
-    (let ((dname (file-name-directory fname)))
-      (unless (file-exist-p dirname)
-        (make-directory (expand-file-name dirname) t))
-      fname)))
+    (lib-f-make-parent-dir fname)
+    fname))
 
 (defun lib-autoload--generate-file (dir-target &optional forcep)
   (let ((dir (car dir-target))
         (target (lib-autoload--get-true-file (cdr dir-target))))
-    (if (symbolp dir)
-        (setq dir (symbol-value dir)))
+    (and (symbolp dir) (setq dir (symbol-value dir)))
     (lib-autoload-create-and-update-file dir target forcep t)))
 
 ;;;###autoload
 (defun lib-autoload-generate-file-list (alist)
   (mapc #'lib-autoload--generate-file alist))
+
+(defun lib-autoload/update-file (path)
+  (interactive
+   (list (intern
+          (completing-read "Need generated-autoload PATH: "
+                           (lib-delete-same-element-in-list
+                            lib-autoload-directory-alist)))))
+  (if (symbolp path)
+      (setq path (symbol-name path)))
+  (let ((dir-target (assoc path lib-autoload-directory-alist)))
+    (lib-autoload--generate-file dir-target t)))
+
+(defun lib-autoload/update-all-file ()
+  (interactive)
+  (mapc (lambda (dir-target) (lib-autoload--generate-file dir-target t))
+        lib-autoload-directory-alist)
+  (setq lib-autoload-directory-alist
+        (lib-delete-same-element-in-list lib-autoload-directory-alist)))
 
 (provide 'lib-autoload)
 ;;; lib-autoload.el ends here
