@@ -96,7 +96,9 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
   (if (symbolp path)
       (setq path (symbol-name path)))
   (let ((dir-target (assoc path lib-autoload-directory-alist)))
-    (lib-autoload--generate-file dir-target t)))
+    (lib-autoload--generate-file dir-target t))
+  (setq lib-autoload-directory-alist
+        (lib-delete-same-element-in-list lib-autoload-directory-alist)))
 
 (defun lib-autoload/update-all-file ()
   (interactive)

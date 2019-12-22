@@ -1,5 +1,0 @@
-r* Explanation
-
-#+begin_quote
- All files from this category can be used as a stand-alone package,It does not depend on external package.
-#+end_quote
