@@ -94,6 +94,8 @@
               (file-name-nondirectory path)))
           (seq-filter (lambda (file)
                         (and (not (string-match "/\\.\\{1,2\\}$" file))
+                             (not (string-match "^\\..*$"
+                                                (file-name-nondirectory file)))
                              (file-regular-p file)
                              (string= (file-name-extension file) "el")))
                       (directory-files dir t))))

@@ -157,7 +157,9 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
               (pdf-tools . (:repo "politza/pdf-tools"))))
       (require 'modules-package)
       (lpm-initialize)
-      (package-initialize)))
+      (package-initialize)
+      ;; (lib-package-ext-initialize)
+      ))
   (unless straight-init-notp
     (message "Initializing straight...")
     (doom-ensure-straight)

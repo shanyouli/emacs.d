@@ -42,11 +42,17 @@
   "The directory where LIB-PM downloads packages to."
   :type 'directory)
 
-(defvar lib-pm-recipe-alist '()
-  "Contains the recopies for each package.
-This is an alist of form:((package . properites)).
-package is a symbol, properties is a plist.
-Available keywords: :fetcher, repo, :dependency.
+(defcustom lib-pm-cache-file (lib-f-join lib-pm-directory "cache-loadfs.el")
+  "save installed package information."
+  :type 'file)
+
+(defvar lib-pm--save-package-alist '() "save all installed package-alist.")
+(defvar lib-pm--initialize-forcep nil)
+(defun lib-pm-install (package-alist)
+  "the PACKAGE is an alist of form:(PKG-NAME . RECIPES).
+PKG-NAME is a symbol, RECIPES is a plist.
+Abailable Keywords: fetcher, repo, dependency, pseudo. load-path.
+
 
 :fetcher is a symobl representing the source, available options are 'gitub,'gitlab
 and 'url. If none specified, default to 'gitub. TODO: 'url.
@@ -61,27 +67,30 @@ and subdir under that into load-path, if the package needs to add subdirs that a
 to load-path, use this key to specify a relative path to package-dir. No preceeding slash
 or dont.
 
-:load-path is added somepath to `load-path'. for example pdf-tools, *.el is exists in lisp/* dir.")
-
-(defun lib-pm-install (package)
-  "Install a PACKAGE."
+:load-path is added somepath to `load-path'. for example pdf-tools, *.el is exists
+in lisp/* dir."
   (lib-pm-handle-error
-   (lib-pm-with-recipe (package recipe package-symbol)
-     (when recipe
-       (if-let ((pseudo (plist-get recipe :pseudo)))
-           (lib-pm-install pseudo)
-         (unless (lib-pm-installed-p package)
-           (funcall (intern (format "lib-pm--%s-install"
-                                    (symbol-name (or (plist-get recipe :fetcher)
-                                                     'github))))
-                    package-symbol recipe)
-           (add-to-list 'load-path (concat (file-name-as-directory lpm-package-dir)
-                                           (symbol-name package-symbol)
-                                           (plist-get recipe :load-path)))))))))
+   (let ((package-name (car package-alist))
+         (recipe (cdr package-alist)))
+     (unless (lib-pm-installed-p package-name)
+       (lib-f-make-dir lib-pm-directory)
+       (funcall (intern (format "lib-pm--%s-install"
+                                (symbol-name (or (plist-get recipe :fetcher)
+                                                 'github))))
+                package-name recipe)
+       (cl-pushnew package-alist lib-pm--save-package-alist :test #'eqaul)
+       (cl-pushnew (concat (file-name-as-directory lib-pm-directory)
+                           (symbol-name package-name)
+                           (when-let ((path (plist-get recipe :load-path)))
+                             "/" path))
+                   load-path :test #'string=)
+       (lib-pm-initialize-package t)))
+   (when (or lib-pm--initialize-forcep (file-exists-p lib-pm-cache-file))
+     (setq lib-pm--initialize-forcep t)
+     (lib-pm-initialize-package t))))
 
 (defvar lib-pm-error-func (lambda (err) (message (error-message-string err)))
   "The default error handling function used by `lib--handle-error'.")
-
 (defmacro lib-pm-handle-error (&rest form)
   "Return t if success, nil if fail.
 
@@ -89,86 +98,110 @@ Eval FORM. Handle error with `lib-pm-error-func'."
   `(condition-case err (progn ,@form t)
      ((error) (funcall lib-pm-error-func err)
       nil)))
-
-(defun lib-pm--package-symbol (package)
-  "PACKAGE can be a recipe, a symol or a dir. Return package symbol."
-  (pcase package
-    ((pred symbolp) package)
-    ((pred stringp) (intern (file-name-base (directory-file-name package))))
-    ((pred listp) (car package))
-    (_ (error "Cannot make into package symbol: %s." package))))
-
-(defmacro lib-pm-with-recipe (symbols &rest body)
-  "Process package and evaluate BODY.
-If PACKAGE is a symbol or list, treat as package, if it is a string,
-treate as dir.
-RECIPE and PACKAGE-SYMBOL is the symbol represents
-the recipe and package symbol.
-\(fn (PACKAGE RECIPE PACKAGE-SYMBOL) BODY...)."
-  (declare (indent 1))
-  (let ((package-sym (nth 0 symbols))
-        (recipe-sym (nth 1 symbols))
-        (package-symbol-sym (nth 2 symbols)))
-    `(let* ((,package-symbol-sym (lib-pm--package-symbol ,package-sym))
-            (,recipe-sym (if (listp ,package-sym)
-                             (cdr ,package-sym)
-                           (alist-get ,package-symbol-sym lib-pm-recipe-alist))))
-       ,@body)))
-
-(defun lib-pm-installed-p (package)
-  "Return t if PACKAG (symbol, recipe, dir string) in installed, nil if not."
-  (ignore package)
-  (lib-f-make-dir lib-pm-directory)
-  (lpm--with-recipe (package recipe package-symbol)
-    (member (symbol-name package-symbol) (directory-files lib-pm-directory))))
-
 ;;
 ;;; installed command
-(defvar lib-pm-process-buffer " *pm-process*" "It is used for LIB-PM-PROCESS-BUFFER.")
 (defun lib-pm--command (command dir &rest args)
   "Call process with COMMAND and ARGS in DIR."
-  (let ((default-directory dir)
-        (buffer lib-pm-process-buffer)
-        status)
-    (setq status (apply #'call-process command nil buffer t args))
-    (unless (eq status 0)
-      (pop-to-buffer buffer)
-      (error "%s fails." command))))
+  (let ((default-directory dir))
+    (with-temp-buffer
+      (unless (eq 0 (apply #'call-process command nil t nil args))
+        (error (buffer-string))))))
 
 ;; github install
 (defun lib-pm--github-install (package recipe)
   "Clone the package specified by RECIPE and name it PACKAGE (symbol)."
-  (let ((package-name (symbol-name package))
-        (url-header "https://github.com/"))
-    (let ((progress-reporter (make-progress-reporter
-                              (format "Installing `%s' package..." package-name))))
-      (lib-pm--command "git" lib-pm-directory "clone" "--depth"
-                       "1"
-                       (if-let ((repo (plist-get recipe :repo)))
-                           (concat url-header repo ".git"))
-                       package-name)
-      (progress-reporter-done progress-reporter))))
+  (let* ((package-name (symbol-name package))
+         (url-header "https://github.com/")
+         (progress-reporter (make-progress-reporter
+                            (format "Installing `%s' package..." package-name))))
+    (lib-pm--command "git" lib-pm-directory "clone" "--depth=1"
+                     (when-let ((repo (plist-get recipe :repo)))
+                       (concat url-header repo ".git"))
+                     package-name)
+    (progress-reporter-done progress-reporter)))
 
-;; gitlib install
-(defun lib-pm--githlib-install (package recipe)
+;; gitlab install
+(defun lib-pm--gitlab-install (package recipe)
   "Clone the package specified by RECIPE and name it PACKAGE (symbol)."
   (let* ((package-name (symbol-name package))
          (url-header "https://gitlab.com/")
          (progress-reporter (make-progress-reporter
                              (format "Installing `%s' package..." package-name))))
-    (lib-pm--command "git" lib-pm-directory "clone" "--depth"
-                     "1"
-                     (if-let ((repo (plist-get recipe :repo)))
-                         (concat url-header repo ".git"))
+    (lib-pm--command "git" lib-pm-directory "clone" "--depth=1"
+                     (when-let ((repo (plist-get recipe :repo)))
+                       (concat url-header repo ".git"))
                      package-name)
     (progress-reporter-done progress-reporter)))
 
 ;;
-;;; Initialize
-(defun lib-pm-add-load-path ()
-  "Add every non-hidden subdir of PARENT-DIR to `load-path'."
-  (when (file-exists-p lib-pm-directory)
-    (push (lib-f-list-directory lib-pm-directory t) load-path)))
+;;; the package is installed or not.
+(defvar lib-pm--package-installed-list '() "save all package name.")
+(defun lib-pm-get-package-installed-list ()
+  "get all instelled package-name."
+  (let ((package-list (mapcar #'car lib-pm--save-package-alist))
+        (recipe-list (mapcar #'cdr lib-pm--save-package-alist)))
+    (mapcar (lambda (recipe)
+            (when-let ((pesudo (plist-get recipe :pesudo)))
+              (if (listp pesudo)
+                  (dolist (p pesudo)
+                    (cl-pushnew p package-list))
+                (cl-pushnew pesudo package-list))))
+          recipe-list)
+    (setq lib-pm--package-installed-list package-list)))
+
+(defun lib-pm-installed-p (package)
+  "Retrun t if PACKAGE is installed, nil if not."
+  (let* ((package (if (listp package) (cdr package) package)))
+    (if (and lib-pm--package-installed-list
+             (not lib-pm--initalize-forcep))
+        (memq package lib-pm--package-installed-list)
+      (member (symbol-name package) (lib-f-list-directory lib-pm-directory)))))
+
+;;
+;;; the package load path
+(defvar lib-pm--package-load-path '() "Save all installed package path.")
+(defun lib-pm--set-load-path ()
+  "add all package path."
+  (setq lib-pm--package-load-path
+        (mapcar (lambda (alist)
+                  (let ((pkg (car alist))
+                        (recipe (cdr alist)))
+                    (concat (file-name-as-directory lib-pm-directory)
+                            (symbol-name pkg)
+                            (when-let ((path (plist-get recipe :load-path)))
+                              "/" path))))
+                lib-pm--save-package-alist)))
+
+
+;;
+;;; initialize
+(defun lib-pm-initialize-package (&optional forcep)
+  (let ((generated-autoload-file (file-name-sans-extension
+                                  (file-name-nondirectory lib-pm-cache-file))))
+    (when (or forcep (not (file-exists-p lib-pm-cache-file)))
+      (when lib-pm--save-package-alist
+        (lib-pm--set-load-path)
+        (lib-pm-get-package-installed-list))
+      (with-temp-file lib-pm-cache-file
+        (dolist (path lib-pm--package-load-path)
+          (let ((default-directory path))
+            (require 'autoload)
+            (dolist (f (lib-f-directory-el-files path))
+              (let ((generated-autoload-load-name (file-name-sans-extension f)))
+                (autoload-generate-file-autoloads f (current-buffer))))))
+        (prin1 `(progn
+                  (setq lib-pm--package-load-path ,lib-pm--package-load-path
+                        lib-pm--save-package-alist ,lib-pm--save-package-alist
+                        lib-pm--package-installed-list ,lib-pm--package-installed-list))
+               (current-buffer))))))
+
+(defun lib-pm-initialize ()
+  (if (file-exists-p lib-pm-cache-file)
+      (load lib-pm-cache-file :no-error :no-message)
+    (mapcar (lambda (path)
+              (push path load-path))
+            lib-pm--package-load-path))
+  (setq lib-pm--initalize-forcep t))
 
 (provide 'lib-pm)
 
