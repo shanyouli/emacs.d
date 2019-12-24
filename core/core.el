@@ -23,27 +23,29 @@
 
 ;;; Code:
 
-(when (version< emacs-version "26.1")
-  (error "Detected Emacs %s. Lye-Emacs only supportss Emacs 16.2 and higher"
-         emacs-version))
-
 (defconst EMACS27+ (> emacs-major-version 26))
 (defconst IS-MAC (eq system-type 'darwin))
 (defconst IS-LINUX (eq system-type 'gnu/linux))
 (defconst IS-WINDOWS (memq system-type '(windows-nt ms-doc)))
 
-(defconst lye-core-dir
-  (file-truename (if load-file-name
-                     (file-name-directory load-file-name)
-                   (concat user-emacs-directory "core/")))
+(defconst lye-emacs-dir
+  (eval-when-compile (expand-file-name user-emacs-directory))
+  "The path to the currently loaded .emacs.d directory. Must end with a slash.")
+
+(defconst lye-core-dir (concat lye-emacs-dir "core/")
   "The root directory of Lye-Emacs's core files. Must end with a slash.")
 
-;; Ensure `lye-core-dir' is in `load-path'
+(defconst lye-library-dir (concat lye-emacs-dir "lib/")
+  "The root directory of libray directory. Must end with a slash.")
+
+;; Ensure `lye-core-dir' and `lye-library-dir'  in `load-path'
 (push lye-core-dir load-path)
+(push lye-library-dir load-path)
+
+(defvar lye--initial-file-name-handler-alist file-name-handler-alist)
 
 ;; This is consulted on every `require', `load' and various path/io handling
 ;; encrypted or compressed files, among other things.
-(defvar lye--initial-file-name-handler-alist file-name-handler-alist)
 (setq file-name-handler-alist nil)
 
 ;; Restore `file-name-handler-alist', because it is needed for handling
@@ -53,46 +55,45 @@
 (add-hook 'emacs-startup-hook #'lye--reset-file-handler-alist-h)
 
 ;; Load the bare necessities
-(require 'core-libs)
+
+(autoload 'lib-load-relative "lib-load")
+(autoload 'lib-f-join "lib-f")
+(autoload 'lib-autoload-generate-file-list "lib-autoload")
+(lib-load-relative 'core/core-libs)
 
 ;; Do this on idle timer to defer a possible GC pause that could result; also
 ;; allows deferred packages to take advantage of these optimizations.
-(defvar lye--gc-cons-threshold  20971520  ; 20M (* 20 1024 1024)
+;; see@https://github.com/emacsmirror/gcmh
+(defvar lye--gc-cons-threshold (if (display-graphic-p) #x1000000 #x400000)
   "The default value to use for `gc-cons-threshold'. If you experience freezing,
-decrease this. If you experience stuttering, increase this.")
+decrease this. If you experience stuttering, increase this.
+When use graphic, its value is 16Mib, otherwise 4Mib")
 
-(defun lye/restore-startup-optimizations ()
-  "Resets garbage collection settings to reasonable defaults (a large
-`gc-cons-threshold' can cause random freezes otherwise)"
-  ;; Do this on idle timer to defer a possible GC pause that could result; also
-  ;; allows deferred packages to take advantage of these optimizations.
-  (run-with-idle-timer! :defer 3
-    (setq-default gc-cons-threshold lye--gc-cons-threshold
-                  gc-cons-percentage 0.1)
-    ;; To speed up minibuffer commands (like helm and ivy), we defer garbage
-    ;; collection while the minibuffer is active.
-    (defun lye/defer-garbage-collection ()
-      (setq gc-cons-threshold most-positive-fixnum))
-    (defun lye/restore-garbage-collection ()
-      ;; Defer it so that commands launched from the minibuffer can enjoy the
-      ;; benefits.
-      (run-at-time 1 nil (lambda () (setq gc-cons-threshold lye--gc-cons-threshold))))
-    (add-hook! 'minibuffer-setup-hook #'lye/defer-garbage-collection)
-    (add-hook! 'minibuffer-exit-hook #'lye/restore-garbage-collection)
-    ;; GC all sneaky breaky like
-    (add-hook! 'focus-out-hook #'garbage-collect)))
+(defvar lye--gc-cons-upper-limit (if (display-graphic-p) #x20000000 #x8000000)
+  "The temporary value for `gc-cons-threshold' to defer it.
+Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 
-;; Not restoring these to their defaults will cause stuttering/freezes.
-(add-hook! 'emacs-startup-hook #'lye/restore-startup-optimizations)
+(defvar lye--gc-timer (run-with-idle-timer 10 t #'garbage-collect)
+  "Run garbarge collection when idle 10s.")
+(add-hook! 'emacs-startup-hook
+    (setq gc-cons-threshold lye--gc-cons-threshold)
+  ;; GC automatically while unfocusing the frame
+  ;; `focus-out-hook' is obsolete since 27.1
+  (if (boundp 'after-focus-change-function)
+      (add-function :after after-focus-change-function
+                    (lambda () (unless (frame-focus-state) (garbage-collect))))
+    (add-hook 'focus-out-hook #'garbage-collect))
+  ;; Avoid GCs while using `ivy'/`counsel'/`swiper' and `helm', etc.
+  ;; @see http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
+  (defun lye-minibuffer-setup-h ()
+    (setq gc-cons-threshold lye--gc-cons-upper-limit))
+  (defun lye-minibuffer-exit-h ()
+    (setq gc-cons-threshold lye--gc-cons-threshold))
+  (add-hook! 'minibuffer-setup-hook #'lye-minibuffer-setup-h)
+  (add-hook! 'minibuffer-exit-hook #'lye-minibuffer-exit-h))
 
 ;;
 ;;; Global variables
-(defconst lye-emacs-dir
-  (eval-when-compile (file-truename user-emacs-directory))
-  "The path to the currently loaded .emacs.d directory. Must end with a slash.")
-
-(defconst lye-library-dir (concat lye-emacs-dir "lib/")
-  "The root directory of libray directory. Must end with a slash.")
 
 (defconst lye-emacs-site-lisp-dir (concat lye-emacs-dir "site-lisp/")
   "The root directory of third packages. Must end with a slash.")
@@ -159,9 +160,6 @@ If it is `nil', Not use fuzzy match."
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
 ;; (setq file-name-handler-alist nil)
-(push lye-library-dir load-path)
-(require 'lib-autoload)
-;; (require 'lib-load)
 
 (setq lib-autoload-save-directory (lib-f-join lye-emacs-cache-dir "autoloads"))
 (lib-autoload-generate-file-list '((lye-core-dir . "core")
