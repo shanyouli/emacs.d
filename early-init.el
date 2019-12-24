@@ -29,8 +29,7 @@
 ;; (setq package-enable-at-startup nil)
 
 ;; Defer garbage collection further back in the startup process
-(setq gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.6)
+(setq gc-cons-threshold most-positive-fixnum)
 
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. Doom handles package
@@ -40,10 +39,9 @@
 ;; Prevent the glimpse of un-styled Emacs by setting these early.
 (unless (and (display-graphic-p) (eq system-type 'darwin))
   (push '(menu-bar-lines . 0) default-frame-alist))
-(add-to-list 'default-frame-alist '(tool-bar-lines . 0))
-(add-to-list 'default-frame-alist '(menu-bar-lines . 0))
-(add-to-list 'default-frame-alist '(vertical-scroll-bars))
-(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
+(push '(tool-bar-lines . 0) default-frame-alist)
+(push '(menu-bar-lines . 0) default-frame-alist)
+(push '(vertical-scroll-bars) default-frame-alist)
 
 ;; modeline
 (setq mode-line-format '())
