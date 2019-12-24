@@ -27,7 +27,6 @@
 ;; Enforce rules for popups
 ;; @see https://github.com/seagle0128/.emacs.d/blob/f8a53fbc60414c98142e0fb9d33c8e6353db9347/lisp/md-window.el#L127
 (use-package shackle
-  :ensure t
   :commands shackle-display-mode
   :hook (after-init . shackle-mode)
   :config

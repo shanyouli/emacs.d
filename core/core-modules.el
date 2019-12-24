@@ -42,40 +42,40 @@
 (setq lye-modules-package-list
       '(
         ;; iex-avy
-        (avy)
-        (ace-pinyin)
+        avy
+        ace-pinyin
         ;; iex-elfeed
         elfeed
         ;; iex-exec-path.el
-        (exec-path-from-shell)
+        exec-path-from-shell
         (cache-path-from-shell :repo "manateelazycat/cache-path-from-shell"
                                :host github
                                :type git)
         ;; iex-flycheck
-        (flycheck)
-        (flycheck-posframe)
+        flycheck
+        flycheck-posframe
         ;; iex-fuz
         fuz
         ;; iex-git
-        (magit)
+        magit
         ;; iex-ivy.el
-        (amx)
-        (ivy)
-        (counsel)
-        (swiper)
-        ivy-fuz
-        (flx)
-        (ivy-yasnippet)
+        amx
+        ivy
+        counsel
+        swiper
+        ;; ivy-fuz
+        flx
+        ivy-yasnippet
         ;; iex-lsp
-        (lsp-mode)
-        (lsp-ui)
-        (company-lsp)
+        lsp-mode
+        lsp-ui
+        company-lsp
         ;; iex-paradox
         paradox
         ;; iex-pomidor
         pomidor
         ;; iex-pretty-hydra
-        (pretty-hydra)
+        pretty-hydra
         ;; iex-smart-align
         (smart-align :type git :host github :repo "manateelazycat/smart-align"
                      :no-byte-compile t)
@@ -89,31 +89,31 @@
                                :repo "shanyouli/snails-backend"
                                :no-byte-compile t)
         ;;iex-treemacs
-        (treemacs)
-        (treemacs-projectile)
-        (treemacs-magit)
+        treemacs
+        treemacs-projectile
+        treemacs-magit
         ;; lex-hydra
-        (hydra)
+        hydra
         ;; lex-ido
-        (ido-completing-read+)
-        (smex)
-        (flx-ido)
-        (ido-sort-mtime)
+        ido-completing-read+
+        smex
+        flx-ido
+        ido-sort-mtime
         ;; md-company
-        (company)
-        (company-tabnine)
-        (company-posframe)
+        company
+        company-tabnine
+        company-posframe
         ;; md-dired
-        (async)
-        (diff-hl)
-        (diredfl)
-        (all-the-icons-dired)
+        async
+        diff-hl
+        diredfl
+        all-the-icons-dired
         ;; md-edit
-        (rainbow-delimiters)
-        (hungry-delete)
-        (highlight-indent-guides)
-        (rainbow-mode)
-        (page-break-lines)
+        rainbow-delimiters
+        hungry-delete
+        highlight-indent-guides
+        rainbow-mode
+        page-break-lines
         ;; md-elisp
         macrostep
         elisp-refs
@@ -125,21 +125,22 @@
                        :files (:defaults "lib")
                        :no-byte-compile t)
         ;; md-hugo
-        (ox-hugo)
+        ox-hugo
+        easy-hugo
         ;;md-lua
         (lua-mode :type git :host github
                   :repo "immerrr/lua-mode")
-        (company-lua)
+        company-lua
         ;;
-        (link-hint)
-        (org-cliplink)
+        link-hint
+        org-cliplink
         ;;
-        (yasnippet)
-        (yasnippet-snippets)
+        yasnippet
+        yasnippet-snippets
         ;; iex-winum
-        (winum)
+        winum
         ;;
-        (cnfonts)
+        cnfonts
         ;; iex-awetab
         (awesome-tab :type git
                      :host github
@@ -151,7 +152,14 @@
                       :repo "manateelazycat/awesome-tray"
                       :no-byte-compile t)
         ;; iex-doom-modeline
-        (doom-modeline)))
+        doom-modeline
+        ;; md-org
+        org-bullets
+        ob-go
+        ob-rust
+        ob-ipython
+        htmlize
+        ))
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))
 
@@ -210,13 +218,30 @@
 
 ;;
 ;;; md-lua
-(package+ '(lua-mode))
-(package+ '(company-lua))
+(package+ 'lua-mode)
+(package+ 'company-lua)
 (package+ '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy"
             :host github
             :type git))
 
-;; (run-with-idle-timer 5 nil (lambda () (md/autoload-create-and-load '(straight-build-dir . "straight"))))
+;;
+;; shackle
+(package+ 'shackle)
+
+;;
+;;;
+(package+ 'nov)
+(package+ 'web-mode)
+(package+ 'yaml-mode)
+(package+ 'json-mode)
+(package+ 'markdown-mode)
+(package+ 'pkgbuild-mode)
+(package+ 'plantuml-mode)
+(package+ 'powershell)
+(package+ 'vimrc-mode)
+
+(package+ 'cmuscheme)
+(package+ 'paredit)
 
 (provide 'core-modules)
 

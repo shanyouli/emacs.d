@@ -61,7 +61,6 @@
 
 ;; Prettify UI
 (use-package org-bullets
-  :ensure t
   :if (char-displayable-p ?◉)
 
   :hook (org-mode . org-bullets-mode)
@@ -110,22 +109,19 @@
     (cl-pushnew '(sh . t) load-language-list))
 
   (use-package ob-go
-    :ensure t
     :init (cl-pushnew '(go . t) load-language-list))
 
   (use-package ob-rust
-    :ensure t
     :init (cl-pushnew '(rust . t) load-language-list))
 
   (use-package ob-ipython
-    :ensure t
     :if (executable-find "jupyter")     ; DO NOT remove
     :init (cl-pushnew '(ipython . t) load-language-list))
 
   (org-babel-do-load-languages 'org-babel-load-languages
                                load-language-list))
 
-(use-package htmlize :ensure t)
+(use-package htmlize)
 
 (provide 'md-org)
 ;;; md-org.el ends here

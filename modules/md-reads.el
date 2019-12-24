@@ -64,7 +64,6 @@
 
   ;; Epub reader
   (use-package nov
-    :ensure t
     :mode ("\\.[eE][pP][uU][bB]" . nov-mode)
     :preface
     ;; (defun my-nov-setup ()

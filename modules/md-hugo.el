@@ -33,7 +33,7 @@
   (require 'ox-hugo)
   (setq org-hugo-section "post"))
 
-(use-package easy-hugo :ensure t)
+(use-package easy-hugo)
 
 
 (provide 'md-hugo)

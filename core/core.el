@@ -94,11 +94,11 @@ decrease this. If you experience stuttering, increase this.")
 (defconst lye-library-dir (concat lye-emacs-dir "lib/")
   "The root directory of libray directory. Must end with a slash.")
 
-(defconst lye-emacs-site-lisp-dir (concat lye-emacs-dir"site-lisp/")
+(defconst lye-emacs-site-lisp-dir (concat lye-emacs-dir "site-lisp/")
   "The root directory of third packages. Must end with a slash.")
 
-(defconst lye-core-modules-dir (concat lye-core-dir "modules/")
-  "modules dir in `lye-core-dir', Must end with a slash.")
+(defconst lye-packags-dir (concat lye-emacs-dir "packages/")
+  "The root directory of package-manager, Must end with a slash.")
 
 (defconst lye-modules-dir (concat lye-emacs-dir "modules/")
   "You don't need to load directly but use the extended key to load the package
@@ -170,7 +170,6 @@ If it is `nil', Not use fuzzy match."
                                    (lye-etc-dir . "etc")
                                    (lye-library-dir . "lib")))
 
-(lib-load-add-load-path lye-core-modules-dir)
 (lib-load-add-load-path lye-etc-dir t)
 (lib-load-add-load-path lye-emacs-site-lisp-dir t)
 (lib-load-add-load-path lye-modules-dir)

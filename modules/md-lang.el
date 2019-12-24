@@ -61,11 +61,10 @@
 ;;; Program Languages
 
 ;; json
-(use-package json-mode  :ensure t :mode "\\.json\\'"   :defer t)
+(use-package json-mode :mode "\\.json\\'"   :defer t)
 
 ;; xml
 (use-package web-mode
-  :ensure t
   :mode (("\\.xml\\'" . web-mode)
          ("\\fonts.conf\\'" . web-mode)
          ("\\.html\\'" . web-mode))
@@ -73,7 +72,6 @@
 
 ;; yaml
 (use-package yaml-mode
-  :ensure t
   ;; :init
   ;; (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
   ;; (add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-mode))
@@ -89,7 +87,7 @@
 
 ;; markdown, md
 (use-package markdown-mode
-  :ensure t
+
   :mode (("\\.md\\'" . gfm-mode))
   :defer t
   :config
@@ -99,18 +97,16 @@
              ("C-c f" . markdownfmt-format-buffer)))))
 
 ;; vimrc-major mode
-(use-package vimrc-mode :ensure t :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))
+(use-package vimrc-mode :mode ("\\.vim\\(rc\\)?\\'" . vimrc-mode))
 
 ;; PKGBUILD-mode
 (use-package pkgbuild-mode
   :if (executable-find "pacman")
-  :ensure t
   :mode (("/PKGBUILD\\'" . pkgbuild-mode))
   :defer t)
 
 ;; plantuml
 (use-package plantuml-mode
-  :ensure t
   :init (setq plantuml-default-exec-mode 'jar)
   :config
   (setq plantuml-jar-path lye-emacs-plantuml-file)
@@ -124,7 +120,6 @@
 
   ;; powershell-mode
   (use-package powershell
-    :ensure t
     :mode ("\\.ps1\\'" . powershell-mode)
     :defer t
     :init
@@ -135,7 +130,7 @@
 
 ;; ebuild-mode
 (when (executable-find "emerge")
-  (package+ '(ebuild-mode))
+  (package+ 'ebuild-mode)
 
   (use-package ebuild-mode
     :mode ("\\.ebuild\\'" . ebuild-mode)

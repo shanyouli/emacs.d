@@ -50,7 +50,7 @@
 
 ;; Use asynchronous file management
 (use-package dired-async
-  :ensure async
+  ;; :ensure async
   :bind (:map dired-mode-map
          ("C" . dired-async-do-copy)
          ("R" . dired-async-do-rename))
