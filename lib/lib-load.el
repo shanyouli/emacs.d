@@ -70,7 +70,8 @@ LIB-LOAD-MESSAGE-P will not work.")
 (defun lib-load-relative (feature &rest args)
   "Load FILE relative to user-emacs-directory. ARGS are applied to `load'."
   (let ((symbol (lib-load--feature-symbol feature)))
-    (unless (memq symbol lib-load--feature-enable-alist)
+    (if (memq symbol lib-load--feature-enable-alist)
+        t
       (let ((file (concat (symbol-name symbol) ".el")))
         (apply #'lib-load-or-create (expand-file-name file user-emacs-directory)
                args)

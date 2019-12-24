@@ -82,7 +82,7 @@ management for Emacs."
     (let ((parent-dir
            (cadr
             (split-string (expand-file-name
-                           (file-name-as-directory lye-emacs-site-lisp-dir))
+                           (file-name-as-directory lye-site-lisp-dir))
                           (expand-file-name (cdr (project-current)))))))
       (magit-submodule-add
        url

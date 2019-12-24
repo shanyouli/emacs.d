@@ -28,8 +28,7 @@
 (defconst IS-LINUX (eq system-type 'gnu/linux))
 (defconst IS-WINDOWS (memq system-type '(windows-nt ms-doc)))
 
-(defconst lye-emacs-dir
-  (eval-when-compile (expand-file-name user-emacs-directory))
+(defconst lye-emacs-dir (expand-file-name user-emacs-directory)
   "The path to the currently loaded .emacs.d directory. Must end with a slash.")
 
 (defconst lye-core-dir (concat lye-emacs-dir "core/")
@@ -59,6 +58,7 @@
 (autoload 'lib-load-relative "lib-load")
 (autoload 'lib-f-join "lib-f")
 (autoload 'lib-autoload-generate-file-list "lib-autoload")
+
 (lib-load-relative 'core/core-libs)
 
 ;; Do this on idle timer to defer a possible GC pause that could result; also
@@ -75,6 +75,7 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 
 (defvar lye--gc-timer (run-with-idle-timer 10 t #'garbage-collect)
   "Run garbarge collection when idle 10s.")
+
 (add-hook! 'emacs-startup-hook
     (setq gc-cons-threshold lye--gc-cons-threshold)
   ;; GC automatically while unfocusing the frame
@@ -95,7 +96,7 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 ;;
 ;;; Global variables
 
-(defconst lye-emacs-site-lisp-dir (concat lye-emacs-dir "site-lisp/")
+(defconst lye-site-lisp-dir (concat lye-emacs-dir "site-lisp/")
   "The root directory of third packages. Must end with a slash.")
 
 (defconst lye-packags-dir (concat lye-emacs-dir "packages/")
@@ -159,17 +160,15 @@ If it is `nil', Not use fuzzy match."
 
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
-;; (setq file-name-handler-alist nil)
-
 (setq lib-autoload-save-directory (lib-f-join lye-emacs-cache-dir "autoloads"))
 (lib-autoload-generate-file-list '((lye-core-dir . "core")
-                                   (lye-emacs-site-lisp-dir . "site-lisp")
+                                   (lye-site-lisp-dir . "site-lisp")
                                    (lye-modules-dir . "modules")
                                    (lye-etc-dir . "etc")
                                    (lye-library-dir . "lib")))
 
 (lib-load-add-load-path lye-etc-dir t)
-(lib-load-add-load-path lye-emacs-site-lisp-dir t)
+(lib-load-add-load-path lye-site-lisp-dir t)
 (lib-load-add-load-path lye-modules-dir)
 
 ;;; Load `custom-file'
