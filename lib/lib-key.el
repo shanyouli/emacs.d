@@ -33,16 +33,21 @@
   (define-key keymap key def))
 
 ;;
-(defun lib-key-unset-local (keymap &rest keybind)
+;;; 移除快捷按键.
+(defun lib-key-unset (&rest args)
   "This function is to little type when unset key binding.
-`KEYMAP' is add keymap for some binding, `KEYBIND' is list contain key."
-  (dolist (k keybind)
-    (lib-key-set keymap k nil)))
-
-(defmacro lib-key-unset-global (&rest keybind)
-  "`keybind' button is not binding. the key-map is `current-global-map'"
-  `(lib-key-unset-local (current-global-map) ,@keybind))
-
+ARGS format is: (keymaps key1 key2...) or (key1 key2 ...).
+`KEYMAPS' is add keymap for some binding, default is `current-global-map'."
+  (let ((keymaps (car args)))
+    (if (stringp keymaps)
+        (setq keymaps (current-global-map))
+      (setq args (cdr args)))
+    (mapc (lambda (key)
+            (cond ((stringp key) (setq key (read-kbd-macro key)))
+                  ((vectorp key) nil)
+                  (t (signal 'wrong-type-argument (list 'array key))))
+            (define-key keymaps key nil))
+          args)))
 ;;
 (defvar lib-key-prefix nil "lib-key-set-* 设置按键的前缀.")
 

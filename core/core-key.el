@@ -35,7 +35,7 @@
 
 (setq lib-key-prefix "C-,")
 
-(lib-key-unset-global "C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC")
+(lib-key-unset "C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC")
 
 ;; esup
 (lib-key-set-global "s e" #'esup t "esup")
