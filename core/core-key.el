@@ -38,86 +38,99 @@
 (lib-key-unset "C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC")
 
 ;; esup
-(lib-key-set-global "s e" #'esup t "esup")
+(lib-key-define :autoload "esup" "C-, s e" #'esup)
 
 ;; restart-emacs
-(lib-key-set-global "s r" #'restart-emacs t "restart-emacs")
+(lib-key-define "C-, s r" #'restart-emacs
+                :autoload "restart-emacs")
 
 ;; Chinese automatically translated as English
-(lib-key-set-globals
- '(("i o" . insert-translated-name-insert-original-translation)
-   ("i u" . insert-translated-name-insert-with-underline)
-   ("i l" . insert-translated-name-insert-with-line)
-   ("i c" . insert-translated-name-insert-with-camel))
- t "lex-insert-translated-name")
+(lib-key-define :autoload "lex-insert-translated-name"
+                :prefix "C-,"
+                "io" 'insert-translated-name-insert-original-translation
+                "iu" 'insert-translated-name-insert-with-underline
+                "il" 'insert-translated-name-insert-with-line
+                "ic" 'insert-translated-name-insert-with-camel)
 
 ;; English word completion with Chinese comments
-(lib-key-set-global "i t" #'toggle-company-english-helper t "company-english-helper")
+(lib-key-define :autoload "company-english-helper"
+                "C-, it" #'toggle-company-english-helper)
 
 ;; lex-one-key.el
-(lib-key-set-globals '(("u b" . hydra-ui-menu/body)
-                     ("o d" . hydra-open-dir-menu/body))
-                   t "lex-hydra")
+(lib-key-define :autoload "lex-hydra"
+                "C-, ub" 'hydra-ui-menu/body
+                "C-, od" 'hydra-open-dir-menu/body)
 
-;; lex-setup-font
-(when (and (display-graphic-p) (fboundp 'mdf/monospace-font-initialize+))
-  (lib-key-set-global "u F" 'one-key-change-fontsize/menu t "lex-setup-font"))
+;; font
+(when (display-graphic-p)
+  (lib-key-define :autoload "lib-font"
+                  :prefix "C-, uf"
+                  "=" 'lib-font/increase-font-size
+                  "-" 'lib-font/decrease-font-size
+                  "9" 'lib-font/display-font-size)
+  (setq cnfonts-directory (concat lye-emacs-cache-dir "cnfonts"))
+  (lib-key-define "C-, ufc" 'cnfonts-ui :autoload "cnfonts"))
 
 ;; lex-sdcv
 (if (executable-find "sdcv")
-    (lib-key-set-global "C-c y" 'sdcv-search-at-point++ nil "iex-sdcv")
-  (lib-key-set-global "C-c y" 'youdao-dictionary-search-at-point++ nil "iex-ydcv"))
+    (lib-key-define "C-c y" 'sdcv-search-at-point++ :autoload "iex-sdcv")
+  (lib-key-define "C-c y" 'youdao-dictionary-search-at-point++ :autoload "iex-ydcv"))
 
 ;; lex-search.el
-(lib-key-set-global "C-c s" 'one-key-color-rg-search/menu nil "lex-search")
+(lib-key-define "C-c s" 'one-key-color-rg-search/menu :autoload "lex-search")
 
 ;; lex-thing-edit.el
-(lib-key-set-global "M-e"  'one-key-thing-edit/menu nil "lex-thing-edit")
+(lib-key-define "M-e"  'one-key-thing-edit/menu :autoload "lex-thing-edit")
 
 ;; lex-pyim.el
-(lib-key-set-globals
- '(("<f9>"    . toggle-default-pyim-input-method)
-   ("C-<f9>"  . lye/toggle-pyim-punctuation-translate))
- nil "lex-pyim")
+(lib-key-define "<f9>" 'toggle-default-pyim-input-method
+                "C-<f9>" 'lye/toggle-pyim-punctuation-translate
+                :autoload "lex-pyim")
 
 ;; lex-funcs
-(lib-key-set-global "C-z f" 'hydra-functions-menu/body nil "lex-funcs")
+(lib-key-define "C-z f" 'hydra-functions-menu/body :autoload "lex-funcs")
 
 ;; md-tmp-ext
-(lib-key-set-global "o t" 'one-key-tmp-scratch/menu t "md-tmp-ext")
+(lib-key-define "C-, ot" 'one-key-tmp-scratch/menu :autoload "md-tmp-ext")
 
 ;; awesome-tab.el
-(lib-key-set-global "C-z j" 'awesome-tab-ace-jump nil "awesome-tab")
+(lib-key-define "C-z j" 'awesome-tab-ace-jump :autoload "awesome-tab")
 
 ;; lex-smex
-(lib-key-set-globals
- '(("M-x" . smex)
-   ("C-x M-x" . smex-major-mode-commands)) nil "lex-ido")
+(lib-key-define "M-x"     'smex
+                "C-x M-x" 'smex-major-mode-commands
+                :autoload "lex-ido")
 
 ;;; toolkit
-(lib-key-set-globals
- '(("C-x SPC" . set-mark-command)    ; Instead C-SPC for Chinese input method
-   ("C-x C-h" . rectangle-mark-mode) ; rectangle-mark-mode
-   ("C-z c"   . shell-command)       ; I don't know why the `M-!' in awesomewm can't be used.
-   ("C-z C-z" . suspend-frame)       ; Suspend-frame
-   ))
-
-
+(lib-key-define "C-x SPC" 'set-mark-command    ; Instead C-SPC for Chinese input method
+                "C-x C-h" 'rectangle-mark-mode ; rectangle-mark-mode
+                "C-z C-z" 'suspend-frame)    ; Suspend-frame
 
 ;; iex-ivy.el
-(lib-key-set-globals
- '(("M-x"     . counsel-M-x)
-   ("C-x C-f" . counsel-find-file)
-   ("C-x f"   . counsel-recentf)
-   ("C-s"     . swiper-isearch)
-   ("C-z s t" . counsel-load-theme)
-   ("M-y"     . counsel-yank-pop)
-   ("C-x b"   . ivy-switch-buffer)
-   ("C-x d"   . counsel-dired))
- nil "iex-ivy")
+(lib-key-define "M-x"     'counsel-M-x
+                "C-x C-f" 'counsel-find-file
+                "C-x f"   'counsel-recentf
+                "C-s"     'swiper-isearch
+                "C-z s t" 'counsel-load-theme
+                "M-y"     'counsel-yank-pop
+                "C-x b"   'ivy-switch-buffer
+                "C-x d"   'counsel-dired
+                :autoload "iex-ivy")
+
+(with-eval-after-load 'swiper
+  (lib-key-define :keymap swiper-map [escape] 'minibuffer-keyboard-quit))
+
+(with-eval-after-load 'ivy
+  (lib-key-define :keymap ivy-minibuffer-map
+                  "<C-return>" 'ivy-immediate-done
+                  [escape] 'minibuffer-keyboard-quit))
+(with-eval-after-load 'yasnippet
+  (lib-key-define "C-c iy" 'ivy-yasnippet
+                  :keymap yas-minor-mode-map
+                  :autoload "ivy-yasnippet"))
 
 ;; iex-elfeed
-(lib-key-set-globals '(("C-z w" . elfeed)) nil "iex-elfeed")
+(lib-key-define "C-z w" 'elfeed :autoload "iex-elfeed")
 
 ;; iex-git
 ;; transient file
@@ -127,48 +140,49 @@
       (concat lye-emacs-cache-dir "transient/values.el"))
 (setq transient-levels-file
       (concat lye-emacs-cache-dir "transient/levels.el"))
+
 ;; Forge configuration
 (setq forge-database-file
       (expand-file-name "forge-database.sqlite" lye-emacs-cache-dir))
-(lib-key-set-globals '(("C-x g" . one-key-magit/menu)) nil "iex-git")
+(lib-key-define "C-x g" 'one-key-magit/menu :autoload "iex-git")
 
 ;; iex-window
-(lib-key-set-globals '(("C-x 4 u" . winner-undo)
-                 ("C-x 4 r" . winner-redo)) nil "iex-window")
+(lib-key-define "C-x 4 u" 'winner-undo
+                "C-x 4 r" 'winner-redo
+                :autoload "iex-window")
 
 ;; iex-avy
-(lib-key-set-globals '(("M-s" . one-key-avy/menu)) nil "iex-avy")
+(lib-key-define "M-s" 'one-key-avy/menu :autoload "iex-avy")
 
 ;; iex-vterm
-(lib-key-set-globals '(("<f5>" . shell-pop)) nil "iex-term")
+(lib-key-define "<f5>" 'shell-pop :autoload "iex-term")
 
 ;; iex-pomidor.el
-(lib-key-set-globals '(("C-z s c" . pomidor)) nil "iex-pomidor")
+(lib-key-define "C-z s c" 'pomidor :autoload "iex-pomidor")
 
 ;; open line in browser
 ;; see @https://github.com/noctuid/link-hint.el/
-(lib-key-set-globals
- '(("C-x p o" . link-hint-open-link)
-   ("C-x p c" . link-hint-copy-link))
- nil "link-hint")
+(lib-key-define "C-x p o" 'link-hint-open-link
+                "C-x p c" 'link-hint-copy-link
+                :autoload "link-hint")
 
 (with-eval-after-load 'org
-  (lib-key-set-locals '(("C-x p i" . org-cliplink)) org-mode-map :file "org-cliplink"))
+  (lib-key-define "C-x p i" 'org-cliplink
+                  :keymap org-mode-map :autoload "org-cliplink"))
 
 ;; lex-snails
 (when (and (not IS-WINDOWS) (display-graphic-p))
-  (lib-key-set-globals '(("C-x b" . snails)
-                        ("C-z C-s" . snails-load-theme))  nil "iex-snails"))
+  (lib-key-define "C-x b" 'snails
+                  "C-z C-s" 'snails-load-theme
+                  :autoload "iex-snails"))
 ;; iex-tldr
 (unless IS-WINDOWS
-  (lib-key-set-globals '(("C-z s h" . tldr))  nil "iex-tldr"))
+  (lib-key-define "C-z s h" 'tldr :autoload "iex-tldr"))
 
 ;; iex-smart-align
-(lib-key-set-globals '(("C-z s m" . smart-align)) nil "iex-smart-align")
-
-;; cnfonts
-(setq cnfonts-directory (concat lye-emacs-cache-dir "cnfonts"))
-(lib-key-set-global "C-, u f" 'cnfonts-ui nil "cnfonts")
+(lib-key-define "C-z s m" 'smart-align
+                :autoload "smart-align"
+                :keymap prog-mode-map)
 
 (provide 'core-key)
 

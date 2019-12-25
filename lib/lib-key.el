@@ -21,18 +21,16 @@
 ;;; Commentary:
 
 ;; define-key extensions
+;; see @https://github.com/manateelazycat/lazy-load/blob/master/lazy-load.el
+;; see @http://caiorss.github.io/Emacs-Elisp-Programming/Elisp_Programming.html#sec-6-1-2
+
+;;; dependences
+
+(require 'lib-var)
+(require 'subr-x)
 
 ;;; Code:
 
-;; 为一个交换函数绑定一个快捷键
-(defun lib-key-set (keymap key def)
-  "Binding DEF shortcut function is KEY, the Key-map is KEYMAP."
-  (cond ((stringp key) (setq key (read-kbd-macro (concat key))))
-        ((vectorp key) (setq key key))
-        (t (signal 'wrong-type-argument (list 'array key))))
-  (define-key keymap key def))
-
-;;
 ;;; 移除快捷按键.
 (defun lib-key-unset (&rest args)
   "This function is to little type when unset key binding.
@@ -48,50 +46,40 @@ ARGS format is: (keymaps key1 key2...) or (key1 key2 ...).
                   (t (signal 'wrong-type-argument (list 'array key))))
             (define-key keymaps key nil))
           args)))
-;;
-(defvar lib-key-prefix nil "lib-key-set-* 设置按键的前缀.")
 
-(defun lib-key-set-local (key-str def keymap &optional key-prefix filename)
-  "`KEYSTR' 是需要绑定的函数 `DEF' 的快捷键. 可选项 `KEYMAP' 是按键对应的 KEYMAP,
-如果 KEYMAP 为 nil, 则 KEYMAP 为 全局的 map.
-`KEY-PREFIX' 为当 KEY-STR 类型为 STRING 时的前缀.
-`filename' 为当对应函数为被加载时, 确定函数对应的文件,并加载它."
-  (let* ((key-prefix (cond ((and lib-key-prefix key-prefix (booleanp key-prefix))
-                            (concat lib-key-prefix " "))
-                           ((and key-prefix (stringp key-prefix))
-                            (concat key-prefix " "))
-                           (t nil)))
-         (key (if key-prefix (concat key-prefix key-str) key-str)))
-    (lib-key-set keymap key def))
-  (and filename (autoload def filename)))
+(defmacro lib-key-define (&rest args)
+  "为一个可交互函数绑定一个快捷按键.
+ARGS 可以存在的 key 有 prefix, keymaps, autoload.
+:PREFIX 后接一个 string 的 key.
+:KEYMAP 后接一个 keymap 默认为 `(current-global-map)'.
+:AUTOLOAD 后接一个文件名, 如 :autoload \"test\", 将被展开为 (autoload def \"test\").
 
-(defmacro lib-key-set-global (key-str def &optional key-prefix filename)
-  `(lib-key-set-local ,key-str ,def (current-global-map) ,key-prefix ,filename))
+ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
+  (let ((key-def (lib-var-plist-to-alist args))
+        keymap autoload prefix)
+    (when-let ((tlist (assoc :keymap key-def)))
+      (setq keymap (cadr tlist)
+            key-def (delete tlist key-def)))
+    (if-let ((tlist (assoc :prefix key-def)))
+        (setq prefix (concat (cadr tlist) " ")
+              key-def (delete tlist key-def))
+      (setq prefix ""))
+    (when-let ((tlist (assoc :autoload key-def)))
+      (setq autoload (cadr tlist)
+            key-def (delete tlist key-def)))
+    `(progn
+       ,@(lib-key--map-apply
+          (lambda (key fun)
+            (cond ((stringp key) (setq key (read-kbd-macro (concat prefix key))))
+                  ((vectorp key) nil)
+                  (t (signal 'wrong-type-argument (list 'array key))))
+            `(progn
+               (define-key (or ,keymap (current-global-map)) ,key ,fun)
+               (and ,autoload (autoload ,fun ,autoload))))
+          key-def))))
 
-;;
-(defun lib-key-set-locals (key-alist keymap &rest rest)
-  "
-`KEY-ALIST' 是对应函数 `lib-key-set-local' 中的 key-str 和 def
-`REST' 一般包含 `lib-key-set-local' 中的 KEY-PREFIX 或 FILENAME 中的一个."
-  (let ((rest (copy-tree rest))
-        (len (length rest))
-        key-prefix
-        filename)
-
-    (when rest
-      (setq  key-prefix (plist-get rest :prefix)
-             filename (plist-get rest :file))
-      (unless (and key-prefix filename)
-        (setq key-prefix (car rest)
-              filename (if (= 2 len) (cadr rest) nil))))
-
-    (let (key def)
-      (dolist (element key-alist)
-        (setq key (car element)
-              def (cdr element))
-        (lib-key-set-local key def keymap key-prefix filename)))))
-(defmacro lib-key-set-globals (key-alist &rest rest)
-  `(lib-key-set-locals ,key-alist (current-global-map) ,@rest))
+(defun lib-key--map-apply (fun xss)
+  (mapcar (lambda (xs) (apply fun xs)) xss))
 
 (provide 'lib-key)
 
