@@ -212,7 +212,7 @@
 ;;
 ;;; windows
 (package+ 'ace-window)
-(run-with-idle-timer! :defer 2
+(run-with-idle-timer! :defer 0.5
   ;; window-move
   (lye/modules-require 'iex-ace-window))
 

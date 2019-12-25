@@ -32,6 +32,8 @@
 ;;; Code:
 
 ;;; 移除快捷按键.
+
+;;;###autoload
 (defun lib-key-unset (&rest args)
   "This function is to little type when unset key binding.
 ARGS format is: (keymaps key1 key2...) or (key1 key2 ...).
@@ -47,6 +49,10 @@ ARGS format is: (keymaps key1 key2...) or (key1 key2 ...).
             (define-key keymaps key nil))
           args)))
 
+;;
+;;; 为交互函数设定快捷按键.
+
+;;;###autoload
 (defmacro lib-key-define (&rest args)
   "为一个可交互函数绑定一个快捷按键.
 ARGS 可以存在的 key 有 prefix, keymaps, autoload.

@@ -131,6 +131,10 @@
 
 ;; iex-elfeed
 (lib-key-define "C-z w" 'elfeed :autoload "iex-elfeed")
+(with-eval-after-load 'elfeed
+  (lib-key-define "?" 'toggle-hydra-elfeed/body
+                  :keymap elfeed-search-mode-map
+                  :autoload "iex-elfeed"))
 
 ;; iex-git
 ;; transient file
@@ -183,6 +187,40 @@
 (lib-key-define "C-z s m" 'smart-align
                 :autoload "smart-align"
                 :keymap prog-mode-map)
+
+;; iex-winum
+(with-eval-after-load 'winum
+  (lib-key-define :keymap winum-keymap
+                  "M-0" 'winum-select-window-0-or-10
+                  "M-1" 'winum-select-window-1
+                  "M-2" 'winum-select-window-1
+                  "M-3" 'winum-select-window-1
+                  "M-4" 'winum-select-window-1
+                  "M-5" 'winum-select-window-1
+                  "M-6" 'winum-select-window-1
+                  "M-7" 'winum-select-window-1
+                  "M-8" 'winum-select-window-1
+                  "M-9" 'winum-select-window-1))
+
+;; iex-ace-window
+(with-eval-after-load 'ace-window
+;; Select widnow via `M-1'...`M-9'
+  (defun aw--select-window (number)
+    "Slecet the specified window."
+    (when (numberp number)
+      (let ((found nil))
+        (dolist (win (aw-window-list))
+          (when (and (window-live-p win)
+                     (eq number
+                         (string-to-number (window-parameter win 'ace-window-path))))
+            (setq found t)
+            (aw-switch-to-window win)))
+        (unless found
+          (message "No specified window: %d" number)))))
+  (dotimes (n 9)
+    (define-key (current-global-map)
+        (kbd (format "M-%d" (1+ n)))
+      (lambda () (interactive) (aw--select-window (1+ n))))))
 
 (provide 'core-key)
 

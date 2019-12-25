@@ -182,6 +182,7 @@ If it is `nil', Not use fuzzy match."
 
 (defun lye-core-initialize ()
   "Load Lye's core files for an interactive session."
+  (lib-load-relative 'core/core-benchmark) ; benchmark
   (lib-load-relative 'core/core-generic)   ; generic and delete *scratch*
   (lib-load-relative 'core/core-straight)  ; staraight, package
   (lib-load-relative 'core/core-ui)        ; UI

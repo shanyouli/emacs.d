@@ -33,6 +33,8 @@
 ;;
 ;; 12/12/19
 
+(require 'lib-f)
+
 ;;; Code:
 
 (defvar lib-load--feature-enable-alist nil
@@ -92,6 +94,13 @@ if SUBDIR is non-nil, the subdirectory of PATH will add to `load-path'"
       (mapc (lambda (subpath) (push subpath load-path))
             (lib-f-list-directory path t))
     (push path load-path)))
+
+;;;###autoload
+(defun lib-load-all-files (dir)
+  "Load all files in the DIR."
+  (mapc (lambda (file) (load file nil t))
+        (lib-f-directory-el-files dir t t)))
+;; (lib-load-all-files "~/.emacs.d/.cache/autoloads")
 
 (provide 'lib-load)
 

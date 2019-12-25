@@ -50,8 +50,6 @@
          (error "Detected Emacs %s. Lye-emacs only supports Emacs 25.3 and higher."
                 emacs-version))))
 
-;; Start Time Test
-(load (concat user-emacs-directory "core/core-benchmark") nil 'nomessage)
 ;; Load the heart of Lye-Emacs
 (load (concat user-emacs-directory "core/core") nil 'nomessage)
 

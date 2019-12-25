@@ -88,13 +88,21 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
 
 ;;;###autoload
 (defun lib-autoload-generate-file-list (alist)
-  (mapc #'lib-autoload--generate-file alist))
+  (if (file-exists-p lib-autoload-save-directory)
+      (progn
+        (lib-load-all-files lib-autoload-save-directory)
+        (let ((path-list (mapcar #'car lib-autoload--directory-alist)))
+          (mapc (lambda (dir-target)
+                  (unless (member (car dir-target) path-list)
+                    (lib-autoload--generate-file dir-target)))
+                alist)))
+    (mapc #'lib-autoload--generate-file alist)))
 
 (defun lib-autoload/update-file (path)
   (interactive
    (list (intern
           (completing-read "Need generated-autoload PATH: "
-                            lib-autoload--directory-alist))))
+                           lib-autoload--directory-alist))))
   (if (symbolp path)
       (setq path (symbol-name path)))
   (let ((dir-target (assoc path lib-autoload--directory-alist)))

@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'seq)
+(require 'rx)
 
 (defun lib-delete-same-element-in-list (list)
   "Delete the same element in a list."
@@ -45,17 +46,38 @@
     (setq result (lib-delete-same-element-in-list strtolist))
     (mapconcat 'identity result sepr)))
 
+
+
+;; 列出特定的文件和文件夹
+(defun lib-f--seq-filter (target &optional select hidden file-ext)
+  "DIR 可以取 nil, dir, file. `nil' 表示选择文件和文件夹. `dir' 只取文件夹.
+`file' 只取文件.
+HIDDEN 为 t 时, 不显示隐藏文件.
+FILE-EXIT type is string, 只取对应的文件扩展名的文件."
+  (let ((select (cond ((eq select 'dir) (file-directory-p target))
+                      ((eq select 'file) (file-regular-p target))
+                      (t t)))
+        (hidden (if hidden
+                    (string-match (rx "/" (not (any "."))
+                                      (zero-or-more (not (any "/"))) eos)
+                                  target)
+                  t))
+        (file-ext (if file-ext
+                      (string-match (eval `(rx "." ,file-ext eos))
+                                    target)
+                    t)))
+    (and (not (string-match (rx "/" (** 1 2 ".") eol) target))
+         select
+         hidden
+         file-ext)))
+
 (defun lib-f-list-directory (dir &optional absolute)
   "Return a list of directories in DIR. Return absolute path if ABSOLUTE is t."
   ;; FULL argument in `directory-files' must be t,
   ;; otherwise 'file-directory-p' doesn't work.
   (mapcar (lambda (path)
-            (if absolute
-                path
-              (file-name-nondirectory path)))
-          (seq-filter (lambda (file)
-                        (and (not (string-match "/\\.\\{1,2\\}$" file))
-                             (file-directory-p file)))
+            (if absolute path (file-name-nondirectory path)))
+          (seq-filter (lambda (file) (lib-f--seq-filter file 'dir))
                       (directory-files dir t))))
 
 (defun lib-f-list-subdirectory (dir)
@@ -67,49 +89,35 @@
   "Return a list of directories in DIR. Return absolute path if ABSOLUTE is t."
   ;; FULL argument in `directory-files' must be t,
   ;; otherwise 'file-directory-p' doesn't work.
-  (mapcar (lambda (path)
-            (if absolute
-                path
-              (file-name-nondirectory path)))
-          (seq-filter (lambda (file)
-                        (and (not (string-match "/\\.\\{1,2\\}$" file))
-                             (file-regular-p file)))
+  (mapcar (lambda (path) (if absolute path (file-name-nondirectory path)))
+          (seq-filter (lambda (file) (lib-f--seq-filter file 'file))
                       (directory-files dir t))))
 
 (defun lib-f-list-file-or-dir (dir &optional absolute)
   "Retrun a list of directories or file in DIR. Return absolute path if ABSOLUTE is t."
-  (mapcar (lambda (path)
-            (if absolute
-                path
-              (file-name-nondirectory path)))
-          (seq-filter (lambda (file)
-                        (not (string-match "/\\.\\{1,2\\}$" file)))
-                      (directory-files dir t))))
+  (mapcar (lambda (path) (if absolute path (file-name-nondirectory path)))
+          (seq-filter #'lib-f--seq-filter (directory-files dir t))))
 
-(defun lib-f-directory-el-files (dir &optional absolute)
-  "Return a list of `*.el' in DIR. Return absolute path if ABSOLUTE is t."
+(defun lib-f-directory-el-files (dir &optional absolute nonext)
+  "Return a list of `*.el' in DIR. Return absolute path if ABSOLUTE is t.
+IF NONEXT is t, Returns a list of the file does not contain an extension."
   (mapcar (lambda (path)
-            (if absolute
-                path
-              (file-name-nondirectory path)))
-          (seq-filter (lambda (file)
-                        (and (not (string-match "/\\.\\{1,2\\}$" file))
-                             (not (string-match "^\\..*$"
-                                                (file-name-nondirectory file)))
-                             (file-regular-p file)
-                             (string= (file-name-extension file) "el")))
+            (let ((path (if absolute path (file-name-nondirectory path))))
+              (if nonext (file-name-sans-extension path) path)))
+          (seq-filter (lambda (file) (lib-f--seq-filter file 'file t "el"))
                       (directory-files dir t))))
+(lib-f-directory-el-files "~/.emacs.d" nil t)
 
 (defun lib-f-list-subfile (dir)
   "Return a list of absolute directory and subfiles in DIR."
   (let ((subdir (lib-f-list-file-or-dir dir t)))
-    (nconc (seq-filter (lambda (file)
-                         (and (file-regular-p file)
-                              (string= (file-name-extension file) "el")))
-                       subdir)
+    (nconc (seq-filter (lambda (file) (lib-f--seq-filter file 'file t "el")) subdir)
            (mapcan (lambda (dir)
                      (and (file-directory-p dir) (lib-f-directory-el-files dir t)))
                    subdir))))
+
+
+
 
 (defun lib-f-join (&rest path-list)
   "Join paths in PATH-LIST."
@@ -120,8 +128,7 @@
 
 (defun lib-f-make-dir (dir)
   "If the DIR isn't exists, create it."
-  (unless (file-exists-p dir)
-    (make-directory dir t)))
+  (unless (file-exists-p dir) (make-directory dir t)))
 
 (defun lib-f-make-parent-dir (dir)
   "If the parent-dir of DIR isn't exists, create it."
