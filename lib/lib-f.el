@@ -106,7 +106,6 @@ IF NONEXT is t, Returns a list of the file does not contain an extension."
               (if nonext (file-name-sans-extension path) path)))
           (seq-filter (lambda (file) (lib-f--seq-filter file 'file t "el"))
                       (directory-files dir t))))
-(lib-f-directory-el-files "~/.emacs.d" nil t)
 
 (defun lib-f-list-subfile (dir)
   "Return a list of absolute directory and subfiles in DIR."
