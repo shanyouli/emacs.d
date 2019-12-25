@@ -203,6 +203,7 @@
                   "M-9" 'winum-select-window-1))
 
 ;; iex-ace-window
+(lib-key-define [remap other-window] 'ace-window)
 (with-eval-after-load 'ace-window
 ;; Select widnow via `M-1'...`M-9'
   (defun aw--select-window (number)
@@ -221,6 +222,12 @@
     (define-key (current-global-map)
         (kbd (format "M-%d" (1+ n)))
       (lambda () (interactive) (aw--select-window (1+ n))))))
+
+;; adjust-opacity
+(lib-key-define :prefix "C-, u"
+                "-" (lambda () (interactive) (lye//adjust-opacity nil -2))
+                "=" (lambda () (interactive) (lye//adjust-opacity nil 2))
+                "0" (lambda () (interactive) (modify-frame-parameters nil `((alpha . 100)))))
 
 (provide 'core-key)
 
