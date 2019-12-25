@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'lib-f)
+(require 'lib-var)
 
 (defcustom lib-env-from-shell-list '("PATH" "MANPATH")
   "To determine the need to cache environment varialbes!"
@@ -62,7 +63,8 @@
                    "'\n"))
           (while path-list
             (let ((env-element (car path-list))
-                  (env-var (lib-delete-same-element-in-string (car path-var-list))))
+                  (env-var (lib-var-delete-same-element-in-string (car path-var-list)
+                                                                  ":")))
               (insert (concat "\n;;; This is `" env-element "' environment variable.\n"
                               "(setenv \"" env-element  "\" \"" env-var "\")\n"))
               (when (string= "PATH" env-element)

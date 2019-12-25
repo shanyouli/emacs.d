@@ -27,27 +27,6 @@
 (require 'seq)
 (require 'rx)
 
-(defun lib-delete-same-element-in-list (list)
-  "Delete the same element in a list."
-  (let ((old-list list)
-        new-list)
-    (while old-list
-      (let ((element (car old-list)))
-        (unless (member element new-list)
-          (setq new-list (cons element new-list))))
-      (setq old-list (cdr old-list)))
-    (nreverse new-list)))
-
-(defun lib-delete-same-element-in-string (string &optional separator)
-  "Delete the same element in a STRING,"
-  (let* ((sepr (or separator ":"))
-         (strtolist (split-string string sepr))
-         result)
-    (setq result (lib-delete-same-element-in-list strtolist))
-    (mapconcat 'identity result sepr)))
-
-
-
 ;; 列出特定的文件和文件夹
 (defun lib-f--seq-filter (target &optional select hidden file-ext)
   "DIR 可以取 nil, dir, file. `nil' 表示选择文件和文件夹. `dir' 只取文件夹.
@@ -63,13 +42,10 @@ FILE-EXIT type is string, 只取对应的文件扩展名的文件."
                                   target)
                   t))
         (file-ext (if file-ext
-                      (string-match (eval `(rx "." ,file-ext eos))
-                                    target)
-                    t)))
-    (and (not (string-match (rx "/" (** 1 2 ".") eol) target))
-         select
-         hidden
-         file-ext)))
+                      (string-match (eval `(rx "." ,file-ext eos)) target)
+                    t))
+        (default (not (string-match (rx "/" (** 1 2 ".") eol) target))))
+    (and default select hidden file-ext)))
 
 (defun lib-f-list-directory (dir &optional absolute)
   "Return a list of directories in DIR. Return absolute path if ABSOLUTE is t."
@@ -114,9 +90,7 @@ IF NONEXT is t, Returns a list of the file does not contain an extension."
            (mapcan (lambda (dir)
                      (and (file-directory-p dir) (lib-f-directory-el-files dir t)))
                    subdir))))
-
 
-
 
 (defun lib-f-join (&rest path-list)
   "Join paths in PATH-LIST."

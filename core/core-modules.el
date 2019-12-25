@@ -127,10 +127,6 @@
         ;; md-hugo
         ox-hugo
         easy-hugo
-        ;;md-lua
-        (lua-mode :type git :host github
-                  :repo "immerrr/lua-mode")
-        company-lua
         ;;
         link-hint
         org-cliplink
@@ -179,9 +175,9 @@
 ;;; lpm-install, vterm,
 (defvar lye-package--use-vterm  nil)
 (if (and module-file-suffix
-           (executable-find "make")
-           (executable-find "libtool")
-           (executable-find "cmake"))
+         (executable-find "make")
+         (executable-find "libtool")
+         (executable-find "cmake"))
     (progn
       (package+ 'vterm)
       (setq lye-package--use-vterm t))
@@ -220,9 +216,7 @@
 ;;; md-lua
 (package+ 'lua-mode)
 (package+ 'company-lua)
-(package+ '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy"
-            :host github
-            :type git))
+(package+ '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy"))
 
 ;;
 ;; shackle

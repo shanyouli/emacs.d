@@ -31,7 +31,7 @@
 ;;; Code:
 
 ;;
-;;; straight.el
+;;; straight.
 (defvar straight-core-package-sources
   '((org-elpa :local-repo nil)
     (melpa :type git

@@ -91,5 +91,14 @@
       (cons elem
             (lib-var-delete-same-element-in-list (delete elem lists))))))
 
+(defun lib-var-list-to-str (lists &optional sper)
+  "LISTS --> string."
+  (mapconcat 'identity lists (or sper " ")))
+
+(defun lib-var-delete-same-element-in-string (str &optional sepr)
+  "Delete same element in a string."
+  (let* ((strtolist (split-string str sepr)))
+    (lib-var-list-to-str (lib-var-delete-same-element-in-list strtolist) sepr)))
+
 (provide 'lib-var)
 ;;; lib-list.el ends here
