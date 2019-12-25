@@ -35,20 +35,3 @@
              (format "gzip -c -d %s > %s" old-file (file-truename new-file)))
             (message "Decompression is complete."))
         (message "%s is not a file compressed with gzip." old-file)))))
-
-;;;###autoload
-(defun load-all-module-file ()
-  "Import all el files in lye-modules-dir."
-  (dolist (f (directory-files lye-modules-dir t "\\.el\\'"))
-    (load f :no-error :no-message)))
-
-;;;###autoload
-(defun delete-same-element-in-list (list)
-  "Delete the same element in a list."
-  (let ((old-list list)
-        (new-list nil))
-    (while old-list
-      (when (and (car old-list) (not (member (car old-list) new-list)))
-        (setq new-list (cons (car old-list) new-list)))
-      (setq old-list (cdr old-list)))
-    (nreverse new-list)))
