@@ -24,8 +24,7 @@
 
 ;;; Code:
 
-(require 'lib-f)
-(require 'lib-var)
+(autoload 'lib-var-delete-same-element-in-string "lib-var")
 
 (defcustom lib-env-from-shell-list '("PATH" "MANPATH")
   "To determine the need to cache environment varialbes!"

@@ -25,8 +25,10 @@
 ;;; Code:
 
 (require 'lib-f)
-(require 'subr-x)
-(require 'cl-lib)
+;; (require 'subr-x)
+
+(autoload 'cl-pushnew "cl-lib")
+(autoload 'string-join "subr-x")
 
 (defcustom lib-autoload-save-directory (lib-f-join user-emacs-directory "autoloads")
   "Autoload Save Directory."

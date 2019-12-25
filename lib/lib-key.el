@@ -27,7 +27,7 @@
 ;;; dependences
 
 (require 'lib-var)
-(require 'subr-x)
+(autoload 'when-let "subr-x")
 
 ;;; Code:
 

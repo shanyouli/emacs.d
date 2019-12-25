@@ -115,6 +115,9 @@
                 "M-y"     'counsel-yank-pop
                 "C-x b"   'ivy-switch-buffer
                 "C-x d"   'counsel-dired
+                "C-h k"   'describe-key
+                "C-h f"   'counsel-describe-function
+                "C-h v"   'counsel-describe-variable
                 :autoload "iex-ivy")
 
 (with-eval-after-load 'swiper
@@ -205,7 +208,8 @@
 ;; iex-ace-window
 (lib-key-define [remap other-window] 'ace-window)
 (with-eval-after-load 'ace-window
-;; Select widnow via `M-1'...`M-9'
+
+  ;; Select widnow via `M-1'...`M-9'
   (defun aw--select-window (number)
     "Slecet the specified window."
     (when (numberp number)
@@ -221,13 +225,27 @@
   (dotimes (n 9)
     (define-key (current-global-map)
         (kbd (format "M-%d" (1+ n)))
-      (lambda () (interactive) (aw--select-window (1+ n))))))
+      (lambda () (interactive) (aw--select-window (1+ n)))))
+  (with-eval-after-load 'super-save
+    (advice-add 'aw--select-window :before #'super-save-command-advice)
+    (advice-add 'ace-window :before #'super-save-command-advice)
+    (push 'aw--select-window super-save-triggers)
+    (push 'ace-window super-save-triggers)))
 
 ;; adjust-opacity
 (lib-key-define :prefix "C-, u"
                 "-" (lambda () (interactive) (lye//adjust-opacity nil -2))
                 "=" (lambda () (interactive) (lye//adjust-opacity nil 2))
                 "0" (lambda () (interactive) (modify-frame-parameters nil `((alpha . 100)))))
+
+(lib-key-define "C-x C-s" 'lye/super-save-all-buffer)
+
+;; lsp
+(with-eval-after-load 'lsp-ui
+  (lib-key-define [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
+                  [remap xref-find-references] 'lsp-ui-peek-find-references
+                  "C-c u" 'lsp-ui-imenu
+                  :keymap lsp-ui-mode-map))
 
 (provide 'core-key)
 

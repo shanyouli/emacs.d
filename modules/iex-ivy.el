@@ -92,7 +92,8 @@
 (setq swiper-action-recenter t)
 
 ;; helpful
-(when (locate-library "helpful")
+(require 'helpful)
+(with-eval-after-load 'helpful
   (setq counsel-describe-function-function #'helpful-callable)
   (setq counsel-describe-variable-function #'helpful-variable))
 

@@ -23,9 +23,9 @@
 ;; File List etc.
 
 ;;; Code:
-
-(require 'seq)
 (require 'rx)
+
+(autoload 'seq-filter "seq")
 
 ;; 列出特定的文件和文件夹
 (defun lib-f--seq-filter (target &optional select hidden file-ext)

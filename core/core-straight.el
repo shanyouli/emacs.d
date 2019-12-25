@@ -44,10 +44,21 @@
                         :host github
                         :repo "emacs-straight/emacsmirror-mirror")))
 
+(defvar lye-core-packages
+  '(straight (org :type built-in) async use-package)
+  "A list of packages that must be installed (and will be auto-installed if
+missing) and shouldn't be deleted.")
+
 ;; straight
 (setq straight-base-dir lye-emacs-cache-dir
       straight-repository-branch "develop"
       straight-cache-autoloads nil  ; use-autoload
+      ;; Doom doesn't encourage you to modify packages in place. Disabling this
+      ;; makes 'doom refresh' instant (once everything set up), which is much
+      ;; nicer UX than the several seconds modification checks.
+      ;; straight-check-for-modifications nil
+      ;; We handle package.el ourselves (and a little more comprehensively)
+      ;; straight-enable-package-integration nil
       ;; straight-disable-autoloads t
       straight-vc-git-default-clone-depth 1
       straight-recipes-emacsmirror-use-mirror t
@@ -55,7 +66,7 @@
       straight-check-for-modifications nil
       straight-build-dir (concat straight-base-dir "straight/build"))
 
-(defun doom-ensure-straight ()
+(defun lye-ensure-straight ()
   "Ensure `straight' is installed and was compiled with this version of Emacs."
   (defvar bootstrap-version)
   (let* (;; Force straight to install into ~/.emacs.d/package/straight instead of
@@ -91,9 +102,20 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
               (pdf-tools . (:repo "politza/pdf-tools")))))
   (unless straight-init-notp
     (message "Initializing straight...")
-    (doom-ensure-straight)
-    (require 'straight)
-    (mapc #'straight-use-recipes straight-core-package-sources)))
+    (unless (fboundp 'straight--reset-caches)
+      (lye-ensure-straight)
+      (require 'straight))
+    ;; (straight--reset-caches)
+    ;; (setq straight-recipe-repositories nil
+          ;; straight-recipe-overrides nil)
+    (mapc #'straight-use-recipes straight-core-package-sources)
+    ;; (straight-register-package
+    ;;  `(straight :type git :host github
+    ;;             :repo ,(format "%s/straight.el" straight-repository-user)
+    ;;             :files ("straight*.el")
+    ;;             :branch ,straight-repository-branch
+    ;;             :no-byte-compile t))
+    (mapc #'straight-use-package lye-core-packages)))
 
 (defun switch-to-straight-buffer ()
   "Open the `*straight-process*'."
@@ -107,21 +129,7 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
 
 (straight-initialize-packages)
 
-
 ;; use package
-
-;; 安装一些必须的packages
-(defvar core--base-package
-  '(use-package
-    bind-key
-    s
-    async
-    f
-    (org :type built-in) ;Org avoid installation package again.
-    dash))
-(dolist (pkg core--base-package)
-  (package+ pkg))
-
 (eval-when-compile (require 'use-package))
 
 (provide 'core-straight)

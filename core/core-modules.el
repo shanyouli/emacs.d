@@ -63,6 +63,7 @@
         ivy
         counsel
         swiper
+        helpful
         ;; ivy-fuz
         flx
         ivy-yasnippet

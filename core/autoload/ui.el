@@ -23,7 +23,7 @@
 (defun lye|frame-default-size-with-frame (frame)
   (lib-frame/default-size frame))
 
-;; adjust-opacity
+;; adjust-opacity https://emacs-china.org/t/topic/2405/22
 ;;;###autoload
 (defun lye//adjust-opacity (frame incr)
   "Adjust the background opacity of FRAME by increment INCR."
