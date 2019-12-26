@@ -74,19 +74,12 @@ Conversely use pyim-bigdict as the lexical backend for the pyim input method.")
   (setq pyim-fuzzy-pinyin-alist
         '(("en" "eng") ("in" "ing") ("l" "n") ("z" "zh") ("c" "ch")
           ("s" "sh") ("an" "ang")))
-
-  (if (and (display-graphic-p) (featurep 'posframe))
-      (progn
-        (setq pyim-page-tooltip 'posframe)
-        (setq pyim-posfram-min-width 0))
-    (setq pyim-page-tooltip 'minibuffer))
   ;; Set 9 candidate words
-  (setq pyim-page-length 9))
-
-(setq-default pyim-punctuation-translate-p '(no yes auto))
-;;(setq-default pyim-punctuation-translate-p '(auto yes no ))
-(setq-default pyim-english-input-switch-functions
-              '(pyim-probe-isearch-mode))
+  (setq pyim-page-length 9)
+  (if (and (display-graphic-p) (featurep 'posframe))
+        (setq pyim-page-tooltip 'posframe
+              pyim-posfram-min-width 0)
+    (setq pyim-page-tooltip 'minibuffer)))
 
 ;; No Chinese company
 (defun lye/company-dabbrev--prefix (orig-fun)

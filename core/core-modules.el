@@ -238,6 +238,8 @@
 (package+ 'cmuscheme)
 (package+ 'paredit)
 
+(and IS-LINUX (package+ 'theme-magic))
+
 (provide 'core-modules)
 
 ;;; core-modules.el ends here
