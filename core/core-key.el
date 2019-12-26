@@ -115,10 +115,11 @@
                 "M-y"     'counsel-yank-pop
                 "C-x b"   'ivy-switch-buffer
                 "C-x d"   'counsel-dired
-                "C-h k"   'describe-key
                 "C-h f"   'counsel-describe-function
                 "C-h v"   'counsel-describe-variable
                 :autoload "iex-ivy")
+
+(lib-key-define "C-h k" 'helpful-key :autoload "helpful")
 
 (with-eval-after-load 'swiper
   (lib-key-define :keymap swiper-map [escape] 'minibuffer-keyboard-quit))
@@ -141,8 +142,8 @@
 
 ;; iex-git
 ;; transient file
-(setq-default transient-history-file
-              (concat lye-emacs-cache-dir "transient/history.el"))
+(setq transient-history-file
+      (concat lye-emacs-cache-dir "transient/history.el"))
 (setq transient-values-file
       (concat lye-emacs-cache-dir "transient/values.el"))
 (setq transient-levels-file

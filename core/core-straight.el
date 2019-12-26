@@ -92,14 +92,13 @@ missing) and shouldn't be deleted.")
   "Initialize `package' and `straight',
 If PACKAGE-INIT-NOTP are non-nil, then `package.el' is not initialized.
 If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
-  (unless package-init-notp
-    (message "Initializing package...")
-      (setq lpm-package-dir (concat lye-emacs-cache-dir "lpm/"))
-      (setq lpm-recipe-alist
-            '((vterm . (:type git :host github :repo "akermu/emacs-libvterm"))
-              (fuz . (:type git :host github :repo "cireu/fuz.el"))
-              (ivy-fuz . (:pseudo fuz))
-              (pdf-tools . (:repo "politza/pdf-tools")))))
+  ;; (unless package-init-notp
+  ;;   (message "Initializing package...")
+  ;;     (setq lpm-recipe-alist
+  ;;           '((vterm . (:type git :host github :repo "akermu/emacs-libvterm"))
+  ;;             (fuz . (:type git :host github :repo "cireu/fuz.el"))
+  ;;             (ivy-fuz . (:pseudo fuz))
+  ;;             (pdf-tools . (:repo "politza/pdf-tools")))))
   (unless straight-init-notp
     (message "Initializing straight...")
     (unless (fboundp 'straight--reset-caches)
