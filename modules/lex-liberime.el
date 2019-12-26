@@ -45,7 +45,7 @@
 
 (defcustom liberime-user-dir
   (if pyim-dcache-directory
-      (expand-file-name "rime" (file-name-directory pyim-dcache-directory))
+      (expand-file-name "rime" pyim-dcache-directory)
     (expand-file-name "pyim/rime" lye-emacs-cache-dir))
   "一个目录, 用于保存 rime配置目录."
   :type 'directory)

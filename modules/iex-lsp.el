@@ -53,13 +53,6 @@
       lsp-ui-sideline-enable nil
       lsp-ui-sideline-ignore-duplicate t)
 
-;; shotcut key
-(lib-key-set-locals
- '(([remap xref-find-definitions] . lsp-ui-peek-find-definitions)
-   ([remap xref-find-references]  . lsp-ui-peek-find-references)
-   ("C-c u" . lsp-ui-imenu))
- lsp-ui-mode-map)
-
 (provide 'iex-lsp)
 
 ;;; iex-lsp.el ends here
