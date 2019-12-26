@@ -1,6 +1,3 @@
-[submodule "pyim"]
-	path = site-lisp/pyim
-	url = https://github.com/tumashu/pyim.git
 [submodule "company-english-helper"]
 	path = site-lisp/company-english-helper
 	url = https://github.com/manateelazycat/company-english-helper.git
@@ -34,9 +31,6 @@
 [submodule "disable-mouse"]
 	path = site-lisp/disable-mouse
 	url = https://github.com/purcell/disable-mouse.git
-[submodule "xr"]
-	path = site-lisp/xr
-	url = https://github.com/mattiase/xr.git
 [submodule "liberime"]
 	path = site-lisp/liberime
 	url = https://github.com/merrickluo/liberime.git
