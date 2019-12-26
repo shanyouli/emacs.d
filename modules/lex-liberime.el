@@ -89,8 +89,7 @@
                   (let ((liberime-user-data-dir (or user-dir
                                                     liberime-user-dir)))
                     (liberime-start librime-share-dir liberime-user-data-dir)
-                    ;; (liberime-select-schema "luna_pinyin_simp")
-                    (liberime-select-schema "pinyin_simp")
+                    (liberime-select-schema "luna_pinyin_simp")
                     (setq pyim-default-scheme 'rime-quanpin)
                     (setq use-liberime-p t))
                 (message "liberime does not exist."))
