@@ -44,8 +44,7 @@
                         :host github
                         :repo "emacs-straight/emacsmirror-mirror")))
 
-(defvar lye-core-packages
-  '(straight (org :type built-in) async use-package)
+(defvar lye-core-packages '(straight (org :type built-in) async use-package)
   "A list of packages that must be installed (and will be auto-installed if
 missing) and shouldn't be deleted.")
 
