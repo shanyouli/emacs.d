@@ -69,7 +69,7 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
   (if (boundp 'after-focus-change-function)
       (add-function :after after-focus-change-function
                     (lambda () (unless (frame-focus-state) (garbage-collect))))
-    (add-hook 'focus-out-hook #'garbage-collect))
+    (add-hook! 'focus-out-hook #'garbage-collect))
   ;; Avoid GCs while using `ivy'/`counsel'/`swiper' and `helm', etc.
   ;; @see http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
   (defun lye-minibuffer-setup-h ()
