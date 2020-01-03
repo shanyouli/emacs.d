@@ -144,9 +144,19 @@ If it is `nil', Not use fuzzy match."
 (unless (file-directory-p lye-emacs-cache-dir)
   (make-directory lye-emacs-cache-dir t))
 
+;;; Load `custom-file'
+(setq custom-file (concat lye-emacs-cache-dir "custom.el"))
+
+(if (and (file-exists-p lye-emacs-custom-temp-file)
+         (not (file-exists-p custom-file)))
+    (copy-file lye-emacs-custom-temp-file custom-file))
+
+(if (file-exists-p custom-file) (load custom-file :no-error :no-message))
+
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
 (setq lib-autoload-save-directory (lib-f-join lye-emacs-cache-dir "autoloads"))
+(setq lib-autoload-save-with-custom t)
 (lib-autoload-generate-file-list '((lye-core-dir . "core")
                                    (lye-site-lisp-dir . "site-lisp")
                                    (lye-modules-dir . "modules")
@@ -156,15 +166,6 @@ If it is `nil', Not use fuzzy match."
 (lib-load-add-load-path lye-etc-dir t)
 (lib-load-add-load-path lye-site-lisp-dir t)
 (lib-load-add-load-path lye-modules-dir)
-
-;;; Load `custom-file'
-(setq custom-file (concat lye-emacs-cache-dir "custom.el"))
-
-(if (and (file-exists-p lye-emacs-custom-temp-file)
-         (not (file-exists-p custom-file)))
-    (copy-file lye-emacs-custom-temp-file custom-file))
-
-(if (file-exists-p custom-file) (load custom-file :no-error :no-message))
 
 (defun lye-core-initialize ()
   "Load Lye's core files for an interactive session."

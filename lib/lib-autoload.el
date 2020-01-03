@@ -25,6 +25,7 @@
 ;;; Code:
 
 (require 'lib-f)
+(require 'lib-var)
 ;; (require 'subr-x)
 
 (autoload 'cl-pushnew "cl-lib")
@@ -33,6 +34,11 @@
 (defcustom lib-autoload-save-directory (lib-f-join user-emacs-directory "autoloads")
   "Autoload Save Directory."
   :type 'directory)
+
+(defcustom lib-autoload-save-with-custom nil
+  "If it is t, use custom-file save `lib-autoload--directory-alist'.
+Otherwise, use *-loadfs.el save"
+  :type 'boolean)
 
 
 
@@ -82,11 +88,17 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
     (lib-f-make-parent-dir fname)
     fname))
 
-(defun lib-autoload--generate-file (dir-target &optional forcep)
-  (let ((dir (car dir-target))
-        (target (lib-autoload--get-true-file (cdr dir-target))))
-    (and (symbolp dir) (setq dir (symbol-value dir)))
-    (lib-autoload-create-and-update-file dir target forcep t)))
+(defun lib-autoload--generate-file (dir-target &optional forcep no-customp)
+
+  (let ((dir (let ((dir-symb (car dir-target)))
+               (if (symbolp dir-symb) (symbol-value dir-symb) dir-symb)))
+        (target (lib-autoload--get-true-file (cdr dir-target)))
+        (save-alist-p (not lib-autoload-save-with-custom)))
+    (unless (and save-alist-p no-customp)
+      (push `(,dir .  ,target) lib-autoload--directory-alist)
+      (customize-save-variable 'lib-autoload--directory-alist
+                              (lib-var-delete-same-element-in-list lib-autoload--directory-alist)))
+    (lib-autoload-create-and-update-file dir target forcep save-alist-p)))
 
 ;;;###autoload
 (defun lib-autoload-generate-file-list (alist)
@@ -102,17 +114,18 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
 
 (defun lib-autoload/update-file (path)
   (interactive
-   (list (intern
-          (completing-read "Need generated-autoload PATH: "
-                           lib-autoload--directory-alist))))
+   (list
+    (intern (completing-read
+             "Need generated-autoload PATH: "
+             (mapcar #'car lib-autoload--directory-alist)))))
   (if (symbolp path)
       (setq path (symbol-name path)))
   (let ((dir-target (assoc path lib-autoload--directory-alist)))
-    (lib-autoload--generate-file dir-target t)))
+    (lib-autoload--generate-file dir-target t t)))
 
 (defun lib-autoload/update-all-file ()
   (interactive)
-  (mapc (lambda (dir-target) (lib-autoload--generate-file dir-target t))
+  (mapc (lambda (dir-target) (lib-autoload--generate-file dir-target t t))
         lib-autoload--directory-alist))
 
 (provide 'lib-autoload)
