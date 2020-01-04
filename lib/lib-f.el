@@ -33,26 +33,26 @@
 `file' 只取文件.
 HIDDEN 为 t 时, 不显示隐藏文件.
 FILE-EXIT type is string, 只取对应的文件扩展名的文件."
-  (let ((select (cond ((eq select 'dir) (file-directory-p target))
-                      ((eq select 'file) (file-regular-p target))
-                      (t t)))
+  (let ((select (pcase select
+                  ('dir (file-directory-p target))
+                  ('file (file-regular-p target))
+                  (_ t)))
         (hidden (if hidden
-                    (string-match (rx "/" (not (any "."))
-                                      (zero-or-more (not (any "/"))) eos)
-                                  target)
+                    (string-match
+                     (rx "/" (not (any ".")) (zero-or-more (not (any "/"))) eos)
+                     target)
                   t))
         (file-ext (if file-ext
                       (string-match (eval `(rx "." ,file-ext eos)) target)
                     t))
-        (default (not (string-match (rx "/" (** 1 2 ".") eol) target))))
+        (default (not (string-match (rx "/" (** 1 2 ".") eos) target))))
     (and default select hidden file-ext)))
 
 (defun lib-f-list-directory (dir &optional absolute)
   "Return a list of directories in DIR. Return absolute path if ABSOLUTE is t."
   ;; FULL argument in `directory-files' must be t,
   ;; otherwise 'file-directory-p' doesn't work.
-  (mapcar (lambda (path)
-            (if absolute path (file-name-nondirectory path)))
+  (mapcar (lambda (path) (if absolute path (file-name-nondirectory path)))
           (seq-filter (lambda (file) (lib-f--seq-filter file 'dir))
                       (directory-files dir t))))
 

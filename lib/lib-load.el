@@ -75,7 +75,7 @@ LIB-LOAD-MESSAGE-P will not work.")
     (if (memq symbol lib-load--feature-enable-alist)
         t
       (let ((file (concat (symbol-name symbol) ".el")))
-        (apply #'lib-load-or-create (expand-file-name file user-emacs-directory)
+        (apply #'lib-load-or-create (lib-f-join user-emacs-directory file)
                args)
         (push symbol lib-load--feature-enable-alist)))))
 
@@ -90,17 +90,15 @@ LIB-LOAD-MESSAGE-P will not work.")
 (defun lib-load-add-load-path (path &optional subdirp)
   "add PATH to `load-path',
 if SUBDIR is non-nil, the subdirectory of PATH will add to `load-path'"
-  (if subdirp
-      (mapc (lambda (subpath) (push subpath load-path))
-            (lib-f-list-directory path t))
-    (push path load-path)))
+  (when subdirp
+    (mapc (lambda (subpath) (push subpath load-path))
+          (lib-f-list-directory path t)))
+  (push path load-path))
 
 ;;;###autoload
-(defun lib-load-all-files (dir)
+(defun lib-load-all-files (dir &rest args)
   "Load all files in the DIR."
-  (mapc (lambda (file) (load file nil t))
-        (lib-f-directory-el-files dir t t)))
-;; (lib-load-all-files "~/.emacs.d/.cache/autoloads")
+  (mapc (lambda (file) (lib-safe-load file args)) (lib-f-directory-el-files dir t t)))
 
 (provide 'lib-load)
 

@@ -96,7 +96,7 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
         (save-alist-p (not lib-autoload-save-with-custom)))
     (unless (and save-alist-p no-customp)
       (push `(,dir .  ,target) lib-autoload--directory-alist)
-      (customize-save-variable 'lib-autoload--directory-alist
+      (customize-set-variable 'lib-autoload--directory-alist
                               (lib-var-delete-same-element-in-list lib-autoload--directory-alist)))
     (lib-autoload-create-and-update-file dir target forcep save-alist-p)))
 
