@@ -54,6 +54,8 @@
 (with-eval-after-load "magit-files"
   ;; (define-key magit-file-mode-map (kbd "C-x g") nil)
   (lib-key-unset magit-file-mode-map "C-x g"))
+(with-eval-after-load "magit-mode"
+  (lib-key-unset magit-mode-map "M-1" "M-2" "M-3"))
 
 (defonekey magit nil
   "Magit keybindings"
