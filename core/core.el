@@ -43,7 +43,7 @@
 
 (autoload 'lib-load-relative "lib-load")
 (autoload 'lib-f-join "lib-f")
-(autoload 'lib-autoload-generate-file-list "lib-autoload")
+(autoload 'lib-autoload-initialize "lib-autoload")
 
 (lib-load-relative 'core/core-libs)
 
@@ -155,13 +155,14 @@ If it is `nil', Not use fuzzy match."
 
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
-(setq lib-autoload-save-directory (lib-f-join lye-emacs-cache-dir "autoloads"))
+(setq lib-autoload-sans-extentsion-file (lib-f-join lye-emacs-cache-dir "core.pkg"))
 (setq lib-autoload-save-with-custom t)
-(lib-autoload-generate-file-list '((lye-core-dir . "core")
-                                   (lye-site-lisp-dir . "site-lisp")
-                                   (lye-modules-dir . "modules")
-                                   (lye-etc-dir . "etc")
-                                   (lye-library-dir . "lib")))
+(setq lib-autoload-initialize-list '(lye-core-dir
+                                     lye-site-lisp-dir
+                                     lye-modules-dir
+                                     lye-etc-dir
+                                     lye-library-dir))
+(lib-autoload-initialize)
 
 (lib-load-add-load-path lye-etc-dir t)
 (lib-load-add-load-path lye-site-lisp-dir t)

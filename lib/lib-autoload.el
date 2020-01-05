@@ -26,28 +26,97 @@
 
 (require 'lib-f)
 (require 'lib-var)
-;; (require 'subr-x)
+(require 'lib-load)
 
-(autoload 'cl-pushnew "cl-lib")
 (autoload 'string-join "subr-x")
-
-(defcustom lib-autoload-save-directory (lib-f-join user-emacs-directory "autoloads")
-  "Autoload Save Directory."
-  :type 'directory)
 
 (defcustom lib-autoload-save-with-custom nil
   "If it is t, use custom-file save `lib-autoload--directory-alist'.
 Otherwise, use *-loadfs.el save"
   :type 'boolean)
 
+(defcustom lib-autoload-sans-extenstion-file (lib-f-join user-emacs-directory "core.pkg")
+  "Save all generate autoload files."
+  :type 'file)
+
+(defcustom lib-autoload-initialize-list '()
+  "Autoload files need to generate a list of file folders."
+  :type 'list)
+
 
 
-(defvar lib-autoload--directory-alist nil
-  "Need to generate a list of all files stored autoload, the corresponding file.
-The default format is '((dir . target))")
+(defvar lib-autoload--initialized-list nil)
+
+(defun lib-autoload--generate-update-file (lists target &optional forcep)
+  (when (or forcep (not (file-exists-p target)))
+    (require 'autoload)
+    (let ((generated-autoload-file (file-name-nondirectory target)))
+      (with-temp-buffer
+        (dolist (l lib-autoload-initialize-list)
+          (setq l (pcase l
+                    ((pred symbolp) (symbol-value l))
+                    ((pred stringp) l)
+                    (_ (error "Don't know the `%S' symbol." l))))
+          (dolist (f (lib-f-list-subfile l))
+          (let ((generated-autoload-load-name (file-name-sans-extension f)))
+            (autoload-generate-file-autoloads f (current-buffer)))))
+        (unless lib-autoload-save-with-custom
+        (prin1 `(setq lib-autoload--initialized-list ,lib-autoload-initialize-list)
+               (current-buffer)))
+        (insert (string-join `("\n"
+                             ,(char-to-string ?\C-l)
+                             ";; Local Varibles:"
+                             ";; version-control: never"
+                             ";; no-byte-compile: t"
+                             ";; no-update-autoloads: t"
+                             ";; coding: utf-8"
+                             ";; End:"
+                             ,(format ";;; %s ends here"
+                                      (file-name-nondirectory target)))
+                             "\n"))
+        (let ((fname (concat target ".el")))
+          (write-file fname)
+          (byte-compile-file fname)))
+      (lib-safe-load target t t))))
 
 ;;;###autoload
-(defun lib-autoload-create-and-update-file (dir target &optional forcep save-to-alist-p)
+(defun lib-autoload-initialize (&optional forcep)
+  (unless forcep
+      (if lib-autoload-save-with-custom
+      (unless (and lib-autoload-initialize-list
+                   (lib-var-list-eql lib-autoload-initialize-list
+                                     lib-autoload--initialized-list)
+                   (lib-safe-load lib-autoload-sans-extentsion-file t t))
+        (setq forcep t)
+        (lib-autoload--save-loaded-dirs))
+    (unless (and (file-exists-p lib-autoload-sans-extentsion-file)
+                 (lib-safe-load lib-autoload-snas-extentsions-file t t)
+                 (lib-var-list-eql lib-autoload--initialized-list
+                                   lib-autoload-initialize-list))
+      (setq forcep t))))
+  (when forcep
+    (lib-autoload--generate-update-file lib-autoload-initialize-list
+                                        lib-autoload-sans-extentsion-file
+                                        t)))
+
+(defun lib-autoload--save-loaded-dirs ()
+  "Set and save `lib-autoload--initialized-list'."
+  (when lib-autoload-save-with-custom
+    (if after-init-time
+        (let ((save-silently inhibit-message))
+          (customize-save-variable 'lib-autoload--initialized-list
+                                   lib-autoload-initialize-list))
+      (add-hook 'after-init-hook #'lib-autoload--save-loaded-dirs))))
+
+(defun lib-autoload/update ()
+  (interactive)
+  (lib-autoload--generate-update-file lib-autoload-initialize-list
+                                      lib-autoload-cache-file
+                                      t)
+  (lib-autoload--save-loaded-dirs))
+
+;;;###autoload
+(defun lib-autoload-create-and-update-file (dir target &optional forcep)
   "Autoload directory DIR generated for a file named TARGET in.
 If the FORCEP is non-nil, forcibly regenerate a new DIR file autoload it.
 If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-alist)"
@@ -60,10 +129,6 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
         (dolist (f (lib-f-list-subfile dir))
           (let ((generated-autoload-load-name (file-name-sans-extension f)))
             (autoload-generate-file-autoloads f (current-buffer))))
-        (when save-to-alist-p
-          (prin1 `(cl-pushnew '(,dir . ,target) lib-autoload--directory-alist
-                              :test #'equal)
-                 (current-buffer)))
         (insert (string-join `("\n"
                                ,(char-to-string ?\C-l)
                                ";; Local Varibles:"
@@ -75,58 +140,7 @@ If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-al
                                ,(format ";;; %s ends here"
                                         (file-name-nondirectory target)))
                              "\n")))
-      (byte-compile-file target))
-    (load target :no-error :no-message)))
-
-(defun lib-autoload--get-true-file (fname)
-  "Get true-file-path."
-  (if (string= fname (file-name-nondirectory fname))
-      (lib-f-join lib-autoload-save-directory
-                  (if (file-name-extension fname)
-                      fname
-                    (concat fname "-loadfs.el")))
-    (lib-f-make-parent-dir fname)
-    fname))
-
-(defun lib-autoload--generate-file (dir-target &optional forcep no-customp)
-
-  (let ((dir (let ((dir-symb (car dir-target)))
-               (if (symbolp dir-symb) (symbol-value dir-symb) dir-symb)))
-        (target (lib-autoload--get-true-file (cdr dir-target)))
-        (save-alist-p (not lib-autoload-save-with-custom)))
-    (unless (and save-alist-p no-customp)
-      (push `(,dir .  ,target) lib-autoload--directory-alist)
-      (customize-set-variable 'lib-autoload--directory-alist
-                              (lib-var-delete-same-element-in-list lib-autoload--directory-alist)))
-    (lib-autoload-create-and-update-file dir target forcep save-alist-p)))
-
-;;;###autoload
-(defun lib-autoload-generate-file-list (alist)
-  (if (file-exists-p lib-autoload-save-directory)
-      (progn
-        (lib-load-all-files lib-autoload-save-directory)
-        (let ((path-list (mapcar #'car lib-autoload--directory-alist)))
-          (mapc (lambda (dir-target)
-                  (unless (member (car dir-target) path-list)
-                    (lib-autoload--generate-file dir-target)))
-                alist)))
-    (mapc #'lib-autoload--generate-file alist)))
-
-(defun lib-autoload/update-file (path)
-  (interactive
-   (list
-    (intern (completing-read
-             "Need generated-autoload PATH: "
-             (mapcar #'car lib-autoload--directory-alist)))))
-  (if (symbolp path)
-      (setq path (symbol-name path)))
-  (let ((dir-target (assoc path lib-autoload--directory-alist)))
-    (lib-autoload--generate-file dir-target t t)))
-
-(defun lib-autoload/update-all-file ()
-  (interactive)
-  (mapc (lambda (dir-target) (lib-autoload--generate-file dir-target t t))
-        lib-autoload--directory-alist))
+      (byte-compile-file target))))
 
 (provide 'lib-autoload)
 ;;; lib-autoload.el ends here

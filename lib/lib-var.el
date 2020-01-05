@@ -100,5 +100,18 @@
   (let* ((strtolist (split-string str sepr)))
     (lib-var-list-to-str (lib-var-delete-same-element-in-list strtolist) sepr)))
 
+(defun lib-var-list-eql (list1 list2)
+  "Compare the two lists are the same."
+  (if (null list1)
+      (if list2 nil t)
+    (let ((e (car list1))
+          result)
+      (cond ((null list2) (setq result nil))
+            ((member e list2)
+             (setq result t
+                   list2 (delete e list2)))
+            (t (setq result nil)))
+      (if result (lib-var-list-eql (cdr list1) list2) nil))))
+
 (provide 'lib-var)
 ;;; lib-list.el ends here

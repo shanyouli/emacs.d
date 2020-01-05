@@ -83,17 +83,17 @@ LIB-LOAD-MESSAGE-P will not work.")
   "FEATURE can be a symbol, a string. Return symbol."
   (pcase feature
     ((pred symbolp) feature)
-    ((pred stringp) (file-name-sans-extension feature))
+    ((pred stringp) (intern (file-name-sans-extension feature)))
     (_ (error "Cannot make into package symbol: %s." feature))))
 
 ;;;###autoload
 (defun lib-load-add-load-path (path &optional subdirp)
   "add PATH to `load-path',
 if SUBDIR is non-nil, the subdirectory of PATH will add to `load-path'"
+  (push path load-path)
   (when subdirp
     (mapc (lambda (subpath) (push subpath load-path))
-          (lib-f-list-directory path t)))
-  (push path load-path))
+          (lib-f-list-directory path t))))
 
 ;;;###autoload
 (defun lib-load-all-files (dir &rest args)
