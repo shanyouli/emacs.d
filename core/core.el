@@ -155,7 +155,7 @@ If it is `nil', Not use fuzzy match."
 
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
-(setq lib-autoload-sans-extentsion-file (lib-f-join lye-emacs-cache-dir "core.pkg"))
+(setq lib-autoload-sans-extension-file (lib-f-join lye-emacs-cache-dir "core.pkg"))
 (setq lib-autoload-save-with-custom t)
 (setq lib-autoload-initialize-list '(lye-core-dir
                                      lye-site-lisp-dir
