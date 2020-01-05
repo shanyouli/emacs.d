@@ -239,7 +239,7 @@
                 "=" (lambda () (interactive) (lye//adjust-opacity nil 2))
                 "0" (lambda () (interactive) (modify-frame-parameters nil `((alpha . 100)))))
 
-(lib-key-define "C-x C-s" 'lye/super-save-all-buffer)
+(lib-key-define "C-x C-s" #'super-save-all-buffer)
 
 ;; lsp
 (with-eval-after-load 'lsp-ui

@@ -160,14 +160,26 @@ When a buffer-file-name matches any of the regexps it is ignored."
   (super-save-advise-trigger-commands)
   (super-save-initialize-idle-timer)
   (dolist (hook super-save-hook-triggers)
-    (add-hook hook #'super-save-command)))
+    (add-hook hook #'super-save-command))
+  (advice-add 'save-buffer-kill-emacs :before #'super-save-all-buffer-a))
 
 (defun super-save-stop ()
   "Cleanup super-save's advices and hooks."
   (super-save-remove-advice-from-trigger-commands)
   (super-save-stop-idle-timer)
   (dolist (hook super-save-hook-triggers)
-    (remove-hook hook #'super-save-command)))
+    (remove-hook hook #'super-save-command))
+  (advice-remove 'save-buffers-kill-emacs #'super-save-all-buffer-a))
+
+;;;###autoload
+(defun super-save-all-buffer ()
+  (interactive)
+  (let ((super-save-all-files t)
+        (super-save-silent-p t))
+    (super-save-command)))
+
+(defun super-save-all-buffer-a (&rest _)
+  (super-save-all-buffer))
 
 ;;;###autoload
 (define-minor-mode super-save-mode
@@ -176,9 +188,9 @@ When a buffer-file-name matches any of the regexps it is ignored."
   :keymap super-save-mode-map
   :group 'super-save
   :global t
-  (cond
-   (super-save-mode (super-save-initialize))
-   (t (super-save-stop))))
+  (if super-save-mode
+      (super-save-initialize)
+    (super-save-stop)))
 
 (provide 'super-save)
 ;;; super-save.el ends here

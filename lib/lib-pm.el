@@ -91,6 +91,7 @@ in lisp/* dir."
 
 (defvar lib-pm-error-func (lambda (err) (message (error-message-string err)))
   "The default error handling function used by `lib--handle-error'.")
+
 (defmacro lib-pm-handle-error (&rest form)
   "Return t if success, nil if fail.
 
@@ -171,7 +172,6 @@ Eval FORM. Handle error with `lib-pm-error-func'."
                             (when-let ((path (plist-get recipe :load-path)))
                               "/" path))))
                 lib-pm--save-package-alist)))
-
 
 ;;
 ;;; initialize

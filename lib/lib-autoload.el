@@ -109,7 +109,7 @@ Otherwise, use *-loadfs.el save"
 (defun lib-autoload/update ()
   (interactive)
   (lib-autoload--generate-update-file lib-autoload-initialize-list
-                                      lib-autoload-sans-extentsion-file)
+                                      lib-autoload-sans-extension-file)
   (lib-autoload--save-loaded-dirs))
 
 ;;;###autoload

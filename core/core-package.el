@@ -82,7 +82,6 @@
       (push 'split-window-below super-save-triggers)
       (push 'split-window-right super-save-triggers))
   (super-save-mode +1)
-  (advice-add 'save-buffers-kill-emacs :before #'lye/super-save-all-buffer-a)
   ;; Displays the key bindings following your currently entered
   ;; incomplete command
   (setq which-key-idle-delay 0.5

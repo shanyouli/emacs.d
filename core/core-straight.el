@@ -43,11 +43,16 @@
     (emacsmirror-mirror :type git
                         :host github
                         :repo "emacs-straight/emacsmirror-mirror")))
+
 (defvar lye-build-in-packags '((org :type built-in)
                                (pyim :type built-in)
                                (async :type built-in)
                                (xr :type built-in)
-                               (pyim-basedict :type built-in)))
+                               (pyim-basedict :type built-in)
+                               (doom-themes :type built-in)
+                               (noflet :type built-in)
+                               (super-save :type built-in)))
+
 (defvar lye-core-packages '(straight use-package)
   "A list of packages that must be installed (and will be auto-installed if
 missing) and shouldn't be deleted.")

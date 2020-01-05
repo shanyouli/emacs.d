@@ -35,15 +35,3 @@
              (format "gzip -c -d %s > %s" old-file (file-truename new-file)))
             (message "Decompression is complete."))
         (message "%s is not a file compressed with gzip." old-file)))))
-
-;;;###autoload
-(defun lye/super-save-all-buffer ()
-  (interactive)
-  (require 'super-save)
-  (let ((super-save-all-files t)
-        (super-save-silent-p t))
-    (super-save-command)))
-
-;;;###autoload
-(defun lye/super-save-all-buffer-a (&rest _)
-  (lye/super-save-all-buffer))

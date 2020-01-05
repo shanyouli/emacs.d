@@ -67,7 +67,6 @@
               (kill-buffer x))
             buf-list))))
 
-;;;###autoload
 (defun tmp-scratch--initialize (extname)
   "Create a temporary buffer to replace *scratch*. Use `scratch.xx' save it.
 xx is EXTNAME."
@@ -84,6 +83,7 @@ xx is EXTNAME."
              (rename-buffer buf-name)))
     (setq default-directory (concat (getenv "HOME") "/"))))
 
+;;;###autoload
 (defmacro tmp-scratch-create-fun! (prog-lang &optional ext-name)
   (declare (indent 1))
   (let* ((prog-lang (tmp-scratch--lang-symbol prog-lang))

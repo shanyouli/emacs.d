@@ -41,14 +41,8 @@
 
 (let (file-name-handler-alist)
   ;; Ensure Lye-Emacs is running out of this file's directory
-  (and load-file-name
-       (setq user-emacs-directory (file-name-directory load-file-name)))
-
-  (cond ((version< emacs-version "27.0")
-         (load (concat user-emacs-directory "early-init") nil 'nomessage))
-        ((version< emacs-version "26.1")
-         (error "Detected Emacs %s. Lye-emacs only supports Emacs 26.1 and higher."
-                emacs-version))))
+  (when load-file-name
+    (setq user-emacs-directory (file-name-directory load-file-name))))
 
 ;; Load the heart of Lye-Emacs
 (load (concat user-emacs-directory "core/core") nil 'nomessage)

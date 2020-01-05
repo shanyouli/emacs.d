@@ -90,10 +90,9 @@ LIB-LOAD-MESSAGE-P will not work.")
 (defun lib-load-add-load-path (path &optional subdirp)
   "add PATH to `load-path',
 if SUBDIR is non-nil, the subdirectory of PATH will add to `load-path'"
-  (push path load-path)
+  (setq load-path (append (list path) load-path))
   (when subdirp
-    (mapc (lambda (subpath) (push subpath load-path))
-          (lib-f-list-directory path t))))
+    (setq load-path (append (lib-f-list-directory path t) load-path))))
 
 ;;;###autoload
 (defun lib-load-all-files (dir &rest args)

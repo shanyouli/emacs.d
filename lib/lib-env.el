@@ -23,8 +23,7 @@
 ;; Initialize the system environment variables.
 
 ;;; Code:
-
-(autoload 'lib-var-delete-same-element-in-string "lib-var")
+(require 'lib-var)
 
 (defcustom lib-env-from-shell-list '("PATH" "MANPATH")
   "To determine the need to cache environment varialbes!"
@@ -85,12 +84,11 @@
             "\n")))))
     (load env-file :no-error :no-message)))
 
-
 ;;;###autoload
 (defalias 'lib-env-from-shell-initialize 'lib-env-path-from-shell-save)
 
 ;;;###autoload
-(defun lib-env/create-or-update ()
+(defun lib-env/update ()
   "Env-file Update!"
   (interactive)
   (lib-env-path-from-shell-save t))
