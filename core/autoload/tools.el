@@ -45,6 +45,15 @@
         (error (buffer-string))))))
 
 ;;;###autoload
+(defun lye//run-command-with-buf (command buffer &optional dir &rest args)
+  (let ((buf (get-buffer-create buffer))
+        status)
+    (pop-to-buffer buffer)
+    (let ((default-directory (or dir default-directory)))
+      (setq status (apply #'call-process command nil buf t args)))
+    (if (eq status 0) t (error "Run %s failed!" command))))
+
+;;;###autoload
 (defun lye//move-file (old new)
   (lib-f-make-parent-dir new)
   (lye//run-command "mv" nil "-vf" old new))

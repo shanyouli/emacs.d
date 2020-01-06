@@ -34,13 +34,13 @@
   "This function compiles the vterm-module."
   (if (file-exists-p "/usr/lib64/libvterm.a")
       (let ((dir (file-name-directory (locate-library "vterm"))))
-        (lye//run-command "sh" dir "-c"
-                          "mkdir -p build;                            \
-                           cd build;                                  \
-                           cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo    \
-                                 -DUSE_SYSTEM_LIBVTERM=/usr/lib64 ..; \
-                           make")
-        t)
+        (lye//run-command-with-buf
+         "sh" "vterm-compile-buffer" dir "-c"
+         "mkdir -p build;                            \
+          cd build;                                  \
+          cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo    \
+               -DUSE_SYSTEM_LIBVTERM=/usr/lib64 ..;  \
+          make"))
     (vterm-module-compile)))
 
 (defun lye//vterm-run ()
