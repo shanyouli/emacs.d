@@ -72,7 +72,8 @@ missing) and shouldn't be deleted.")
       straight-recipes-emacsmirror-use-mirror t
       straight-process-buffer " *straight-process*" ; hide *straight-process*
       straight-check-for-modifications nil
-      straight-build-dir (concat straight-base-dir "straight/build"))
+      straight-build-dir (concat straight-base-dir "straight/build")
+      straight-dynamic-modules-dir (concat straight-base-dir "dynamic-modules/"))
 
 (defun lye-ensure-straight ()
   "Ensure `straight' is installed and was compiled with this version of Emacs."
@@ -83,7 +84,9 @@ missing) and shouldn't be deleted.")
          (bootstrap-file (lib-f-join straight-base-dir "straight"
                                      "repos" "straight.el" "bootstrap.el"))
          (bootstrap-version 5))
-    (lib-f-make-dir (lib-f-join straight-base-dir "straight/build"))
+    (lib-f-make-dir straight-build-dir)
+    (lib-f-make-dir straight-dynamic-modules-dir)
+    (lib-load-add-load-path straight-dynamic-modules-dir)
     (unless (featurep 'straight)
       (unless (or (require 'straight nil t)
                   (file-readable-p bootstrap-file))
@@ -96,17 +99,9 @@ missing) and shouldn't be deleted.")
           (eval-print-last-sexp)))
       (load bootstrap-file nil t))))
 
-(defun straight-initialize-packages (&optional package-init-notp straight-init-notp)
+(defun straight-initialize-packages (&optional straight-init-notp)
   "Initialize `package' and `straight',
-If PACKAGE-INIT-NOTP are non-nil, then `package.el' is not initialized.
 If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
-  ;; (unless package-init-notp
-  ;;   (message "Initializing package...")
-  ;;     (setq lpm-recipe-alist
-  ;;           '((vterm . (:type git :host github :repo "akermu/emacs-libvterm"))
-  ;;             (fuz . (:type git :host github :repo "cireu/fuz.el"))
-  ;;             (ivy-fuz . (:pseudo fuz))
-  ;;             (pdf-tools . (:repo "politza/pdf-tools")))))
   (unless straight-init-notp
     (message "Initializing straight...")
     (unless (fboundp 'straight--reset-caches)

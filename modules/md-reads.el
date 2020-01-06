@@ -34,6 +34,22 @@
 ;; 11/20/19
 
 ;;; Code:
+(defun lye//pdf-tools-check ()
+  (let ((epdfinfo-file (locate-library "epdfinfo"))
+        (lye--pdf-tools (lib-f-join straight-dynamic-modules-dir "epdfinfo")))
+    (cond ((file-exists-p lye--pdf-tools)
+           (setq pdf-info-epdfinfo-program lye--pdf-tools))
+          ((and epdfinfo-file (not (string= lye--pdf-tools epdfinfo-file)))
+           (lye//move-file pdf-info-epdfinfo-program lye--pdf-tools)
+           (setq pdf-info-epdfinfo-program lye--pdf-tools))
+          (t
+           (pdf-tools-install t nil t t)
+           (advice-add 'save-buffer-kill-emacs
+                       :before
+                       (lambda (&rest _)
+                         (when (file-exists-p pdf-info-epdfinfo-program)
+                           (lye//move-file pdf-info-epdfinfo-program
+                                           lye--pdf-tools))))))))
 
 (when (display-graphic-p)
   ;; PDF View
@@ -53,6 +69,7 @@
     (when IS-MAC
       (setenv "PKG_CONFIG_PATH"
               "/usr/local/lib/pkgconfig:/usr/local/opt/libffi/lib/pkgconfig"))
+    (lye//pdf-tools-check)
     ;; (pdf-tools-install t nil t t)
 
     ;; Recover last viewed position

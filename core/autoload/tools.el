@@ -35,3 +35,16 @@
              (format "gzip -c -d %s > %s" old-file (file-truename new-file)))
             (message "Decompression is complete."))
         (message "%s is not a file compressed with gzip." old-file)))))
+
+;;;###autoload
+(defun lye//run-command (command &optional dir &rest args)
+  "Call Process with COMMAND and ARGS in DIR."
+  (let ((default-directory (or dir default-directory)))
+    (with-temp-buffer
+      (unless (eq 0 (apply #'call-process command nil t nil args))
+        (error (buffer-string))))))
+
+;;;###autoload
+(defun lye//move-file (old new)
+  (lib-f-make-parent-dir new)
+  (lye//run-command "mv" nil "-vf" old new))
