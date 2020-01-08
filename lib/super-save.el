@@ -92,6 +92,12 @@ When a buffer-file-name matches any of the regexps it is ignored."
   :type 'boolean
   :package-version '(super-save . "0.4.0"))
 
+(defcustom super-save-all-buffer-p t
+  "Save all buffer before exiting emacs when t, ignore theme otherwise,"
+  :group 'super-save
+  :type 'boolean
+  :package-version '(super-save . "0.4.0"))
+
 (defun super-save-include-p (filename)
   "Return non-nil if FILENAME doesn't match any of the `super-save-exclude'."
   (let ((checks super-save-exclude)
@@ -161,7 +167,8 @@ When a buffer-file-name matches any of the regexps it is ignored."
   (super-save-initialize-idle-timer)
   (dolist (hook super-save-hook-triggers)
     (add-hook hook #'super-save-command))
-  (advice-add 'save-buffers-kill-emacs :before #'super-save-all-buffer-a))
+  (when super-save-all-buffer-p
+    (advice-add 'save-buffers-kill-emacs :before #'super-save-all-buffer-a)))
 
 (defun super-save-stop ()
   "Cleanup super-save's advices and hooks."
@@ -169,7 +176,8 @@ When a buffer-file-name matches any of the regexps it is ignored."
   (super-save-stop-idle-timer)
   (dolist (hook super-save-hook-triggers)
     (remove-hook hook #'super-save-command))
-  (advice-remove 'save-buffers-kill-emacs #'super-save-all-buffer-a))
+  (when super-save-all-buffer-p
+    (advice-remove 'save-buffers-kill-emacs #'super-save-all-buffer-a)))
 
 ;;;###autoload
 (defun super-save-all-buffer ()
