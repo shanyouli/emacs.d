@@ -30,12 +30,6 @@
 
 ;;; Code:
 
-(lye/modules-require 'lex-pyim)
-
-(when pyim-load-liberime-or-pyim-bigdict-p
-  (pyim-load-liberime-or-pyim-bigdict)
-  (setq pyim-load-liberime-or-pyim-bigdict-p nil))
-
 (require 'insert-translated-name)
 
 (provide 'lex-insert-translated-name)
