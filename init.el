@@ -41,8 +41,8 @@
 
 (let (file-name-handler-alist)
   ;; Ensure Lye-Emacs is running out of this file's directory
-  (when load-file-name
-    (setq user-emacs-directory (file-name-directory load-file-name))))
+  (setq user-emacs-directory
+        (file-name-directory (or load-file-name buffer-file-name))))
 
 ;; Load the heart of Lye-Emacs
 (load (concat user-emacs-directory "core/core") nil 'nomessage)

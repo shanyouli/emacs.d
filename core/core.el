@@ -178,7 +178,9 @@ If it is `nil', Not use fuzzy match."
   (lib-load-relative 'core/core-ui)        ; UI
   (lib-load-relative 'core/core-package)   ; packages initialization
   (lib-load-relative 'core/core-modules)   ; Modeuls manager
+  (lib-load-relative 'core/core-bundle)
   (lib-load-relative 'core/core-key)       ; Keybindings
+
   )
 
 (provide 'core)
