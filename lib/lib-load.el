@@ -69,7 +69,7 @@ LIB-LOAD-MESSAGE-P will not work.")
       (kill-buffer))))
 
 ;;;###autoload
-(defun lib-load-relative (feature &rest args)
+(defun lib-load-absolute (feature &rest args)
   "Load FILE relative to user-emacs-directory. ARGS are applied to `load'."
   (let ((symbol (lib-load--feature-symbol feature)))
     (if (memq symbol lib-load--feature-enable-alist)
@@ -85,6 +85,11 @@ LIB-LOAD-MESSAGE-P will not work.")
     ((pred symbolp) feature)
     ((pred stringp) (intern (file-name-sans-extension feature)))
     (_ (error "Cannot make into package symbol: %s." feature))))
+
+;;;###autoload
+(defun lib-load-relative (feature &rest args)
+  (let ((parent (file-name-directory (or load-file-name buffer-file-name))))
+    (apply #'lib-safe-load (concat parent feature ".el") args)))
 
 ;;;###autoload
 (defun lib-load-add-load-path (path &optional subdirp)

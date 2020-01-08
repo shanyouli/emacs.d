@@ -41,11 +41,11 @@
 
 ;; Load the bare necessities
 
-(autoload 'lib-load-relative "lib-load")
+(autoload 'lib-load-absolute "lib-load")
 (autoload 'lib-f-join "lib-f")
 (autoload 'lib-autoload-initialize "lib-autoload")
 
-(lib-load-relative 'core/core-libs)
+(lib-load-absolute 'core/core-libs)
 
 ;; Do this on idle timer to defer a possible GC pause that could result; also
 ;; allows deferred packages to take advantage of these optimizations.
@@ -172,15 +172,14 @@ If it is `nil', Not use fuzzy match."
 
 (defun lye-core-initialize ()
   "Load Lye's core files for an interactive session."
-  (lib-load-relative 'core/core-benchmark) ; benchmark
-  (lib-load-relative 'core/core-generic)   ; generic and delete *scratch*
-  (lib-load-relative 'core/core-straight)  ; staraight, package
-  (lib-load-relative 'core/core-ui)        ; UI
-  (lib-load-relative 'core/core-package)   ; packages initialization
-  (lib-load-relative 'core/core-modules)   ; Modeuls manager
-  (lib-load-relative 'core/core-bundle)
-  (lib-load-relative 'core/core-key)       ; Keybindings
-
+  (lib-load-absolute 'core/core-benchmark) ; benchmark
+  (lib-load-absolute 'core/core-generic)   ; generic and delete *scratch*
+  (lib-load-absolute 'core/core-straight)  ; staraight, package
+  (lib-load-absolute 'core/core-ui)        ; UI
+  (lib-load-absolute 'core/core-package)   ; packages initialization
+  (lib-load-absolute 'core/core-modules)   ; Modeuls manager
+  (lib-load-absolute 'core/core-bundle)
+  (lib-load-absolute 'core/core-key)       ; Keybinding
   )
 
 (provide 'core)

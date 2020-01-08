@@ -83,9 +83,8 @@
 (lib-key-define "M-e"  'one-key-thing-edit/menu :autoload "lex-thing-edit")
 
 ;; lex-pyim.el
-(lib-key-define "<f9>" 'toggle-default-pyim-input-method
-                "C-<f9>" 'lye/toggle-pyim-punctuation-translate
-                :autoload "lex-pyim")
+(lib-key-define "<f9>" 'toggle-input-method
+                "C-<f9>" 'lye/toggle-pyim-punctuation-translate)
 
 ;; lex-funcs
 (lib-key-define "C-z f" 'hydra-functions-menu/body :autoload "lex-funcs")
