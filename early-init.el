@@ -34,7 +34,8 @@
 ;; Package initialize occurs automatically, before `user-init-file' is
 ;; loaded, but after `early-init-file'. Doom handles package
 ;; initialization, so we must prevent Emacs from doing it early!
-(setq package-enable-at-startup nil)
+;; (setq package-enable-at-startup nil)
+;; (advice-add #'package--ensure-init-file :override #'ignore)
 
 ;; Prevent the glimpse of un-styled Emacs by setting these early.
 (unless (and (display-graphic-p) (eq system-type 'darwin))

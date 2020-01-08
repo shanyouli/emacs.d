@@ -161,7 +161,7 @@ When a buffer-file-name matches any of the regexps it is ignored."
   (super-save-initialize-idle-timer)
   (dolist (hook super-save-hook-triggers)
     (add-hook hook #'super-save-command))
-  (advice-add 'save-buffer-kill-emacs :before #'super-save-all-buffer-a))
+  (advice-add 'save-buffers-kill-emacs :before #'super-save-all-buffer-a))
 
 (defun super-save-stop ()
   "Cleanup super-save's advices and hooks."

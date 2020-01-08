@@ -117,8 +117,7 @@ Otherwise, use *-loadfs.el save"
   "Autoload directory DIR generated for a file named TARGET in.
 If the FORCEP is non-nil, forcibly regenerate a new DIR file autoload it.
 If th savep is non-nil, will run (push '(dir . target) lib-autoload-directory-alist)"
-  (let ((generated-autoload-file (file-name-sans-extension
-                                  (file-name-nondirectory target))))
+  (let ((generated-autoload-file (file-name-base  target)))
     (when (or forcep (not (file-exists-p target)))
       (require 'autoload)
       (lib-f-make-parent-dir target)
