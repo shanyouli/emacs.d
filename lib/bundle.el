@@ -40,8 +40,7 @@
   "Get the path of BUNDLE."
   (cl-some (lambda (parent)
              (let ((path (concat (file-name-directory parent) bundle)))
-               (when (file-directory-p path)
-                 (file-name-as-directory path))))
+               (when (file-directory-p path) (file-name-as-directory path))))
            bundle-directories))
 
 ;;;###autoload

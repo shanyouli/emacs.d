@@ -99,11 +99,7 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
   "Is the cache directory this?")
 
 (defconst lye-emacs-share-dir (concat lye-emacs-dir "share/")
-  "Store files in non-el format, such as `plantuml.jar', `pyim-bigdict.pyim.gz'.")
-
-(defconst lye-emacs-pyim-big-file
-  (concat lye-emacs-share-dir "pyim-dict/pyim-bigdict.pyim.gz")
-  "Store the location of the pyim-dictionary.")
+  "Store files in non-el format, such as `plantuml.jar'.")
 
 (defconst lye-emacs-plantuml-file
   (concat lye-emacs-share-dir "plantuml/plantuml.jar")
@@ -133,9 +129,10 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
   "If it is `flx', use fuzzy match with `flx' package.
 If it is `fuz', use fuzzy match with `fuz' package.
 If it is `nil', Not use fuzzy match."
-  :type '(choice (const :tag "fuzzy match" 'flx)
-                 (const :tag "fuzzy" 'fuz)
-                 (const :tag "Null" nil)))
+  :type '(choice
+          (const :tag "fuzzy match" 'flx)
+          (const :tag "fuzzy" 'fuz)
+          (const :tag "Null" nil)))
 
 (defcustom lye-company-enable-yas nil
   "Enable yasnippet for company backends or not."
@@ -173,6 +170,7 @@ If it is `nil', Not use fuzzy match."
 (defun lye-core-initialize ()
   "Load Lye's core files for an interactive session."
   (lib-load-absolute 'core/core-benchmark) ; benchmark
+  (lib-load-absolute 'core/core-custom)    ; Custom-Varliable
   (lib-load-absolute 'core/core-generic)   ; generic and delete *scratch*
   (lib-load-absolute 'core/core-straight)  ; staraight, package
   (lib-load-absolute 'core/core-ui)        ; UI

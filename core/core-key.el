@@ -162,7 +162,7 @@
 (lib-key-define "M-s" 'one-key-avy/menu :autoload "iex-avy")
 
 ;; iex-vterm
-(lib-key-define "<f5>" 'shell-pop :autoload "iex-term")
+(lib-key-define "<f5>" 'shell-pop)
 
 ;; iex-pomidor.el
 (lib-key-define "C-z s c" 'pomidor :autoload "iex-pomidor")

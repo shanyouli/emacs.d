@@ -173,19 +173,6 @@
 (package+ 'pdf-tools)
 
 ;;
-;;; lpm-install, vterm,
-(defvar lye-package--use-vterm  nil)
-(if (and module-file-suffix
-         (executable-find "make")
-         (executable-find "libtool")
-         (executable-find "cmake"))
-    (progn
-      (package+ 'vterm)
-      (setq lye-package--use-vterm t))
-  (package+ 'multi-term))
-(package+ 'shell-pop)
-
-;;
 ;;; python-mode
 (defvar lye-lsp-python-ms-p nil
   "当为 t 时, 使用 `lsp-python-ms-p'.")

@@ -1,4 +1,4 @@
-;;; modules/pyim/config.el -*- lexical-binding: t -*-
+;;; bundles/pyim/config.el -*- lexical-binding: t -*-
 
 (require 'pyim)
 
@@ -23,7 +23,7 @@
     (setq pyim-page-tooltip 'minibuffer
           pyim-page-style 'one-line))
   (setq pyim-default-scheme 'quanpin)
-  (pcase modules-pyim-use-dict
+  (pcase lye-use-pyim-dictionary
     ('base (pyim-basedict-enable))
     ('big (pyim-bigdict-enable))
     ('librime (lib-load-relative "liberime" t t)
