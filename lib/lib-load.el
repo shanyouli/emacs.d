@@ -77,7 +77,8 @@ LIB-LOAD-MESSAGE-P will not work.")
       (let ((file (concat (symbol-name symbol) ".el")))
         (apply #'lib-load-or-create (lib-f-join user-emacs-directory file)
                args)
-        (push symbol lib-load--feature-enable-alist)))))
+        (setq lib-load--feature-enable-alist
+              (append (list symbol) lib-load--feature-enable-alist))))))
 
 (defun lib-load--feature-symbol (feature)
   "FEATURE can be a symbol, a string. Return symbol."

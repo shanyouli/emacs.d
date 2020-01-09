@@ -13,7 +13,6 @@
   ;; Specify font for all unicode characters
   (add-hook 'after-init-hook
             (lambda ()
-
               (catch 'loop
                 (dolist (font '("Symbola" "Apple Symbols" "Symbol"))
                   (when (member font (font-family-list))
