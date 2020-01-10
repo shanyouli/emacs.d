@@ -1,9 +1,10 @@
 ;;; bundles/fcitx/config.el -*- lexical-binding: t -*-
 
-(require 'fcitx)
+(when (lye-is-running-p "fcitx")
+  (require 'fcitx)
 
-;; (fcitx-prefix-keys-add "C-h")
-(fcitx-aggressive-setup)
+  ;; (fcitx-prefix-keys-add "C-h")
+  (fcitx-aggressive-setup)
 
-(with-eval-after-load 'pyim
-  (add-hook! 'pyim-active-hook #'fcitx--deactivate))
+  (with-eval-after-load 'pyim
+    (add-hook! 'pyim-active-hook #'fcitx--deactivate)))
