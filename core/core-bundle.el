@@ -7,4 +7,4 @@
 
 (bundle! fcitx :defer t :if (and IS-LINUX (executable-find "fcitx-remote")))
 
-(bundle! dict :defer t)
+(bundle! dict :command lye/dict-point)

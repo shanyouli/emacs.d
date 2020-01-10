@@ -33,8 +33,6 @@
 ;; Global uninstall button
 (require 'lib-key)
 
-(setq lib-key-prefix "C-,")
-
 (lib-key-unset "C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC")
 
 ;; esup
@@ -45,7 +43,7 @@
                 :autoload "restart-emacs")
 
 ;; Chinese automatically translated as English
-(lib-key-define :autoload "lex-insert-translated-name"
+(lib-key-define :autoload "insert-translated-name"
                 :prefix "C-,"
                 "io" 'insert-translated-name-insert-original-translation
                 "iu" 'insert-translated-name-insert-with-underline

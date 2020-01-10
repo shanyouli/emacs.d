@@ -79,10 +79,12 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
             (cond ((stringp key) (setq key (read-kbd-macro (concat prefix key))))
                   ((vectorp key) nil)
                   (t (signal 'wrong-type-argument (list 'array key))))
-            `(progn
-               (define-key (or ,keymap (current-global-map)) ,key ,fun)
-               (and ,autoload (autoload ,fun ,autoload))))
-          key-def))))
+               `(define-key ,(or keymap `(current-global-map)) ,key ,fun))
+          key-def)
+       (when ,autoload
+         ,@(lib-key--map-apply
+            (lambda (fun) `(autoload ,fun ,autoload))
+            (mapcar #'cdr key-def))))))
 
 (defun lib-key--map-apply (fun xss)
   (mapcar (lambda (xs) (apply fun xs)) xss))

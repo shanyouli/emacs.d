@@ -56,7 +56,8 @@ Usage:
 :defer x   If X is t, Will run BUNDLE config after 0.1s.
            If the type of X is number, Will run BUNDLE Config after X seconds.
            If it is nil, Will run immediately.
-:disabled  Don't run when t."
+:disabled  Don't run when t.
+:command   run config.el when call COMMAND."
   (declare (indent 1))
   (unless (memq :disabled args)
     (let* ((-name (symbol-name bundle))
@@ -65,17 +66,23 @@ Usage:
            (-config (concat -dir "config"))
            (-defer (let ((x (plist-get args :defer)))
                     (if x (if (numberp x) x 0.1) nil)))
-           (-if (or (plist-get args :if) t)))
-      `(unless (bundle-active-p ',bundle)
+           (-if (or (plist-get args :if) t))
+           (-command (plist-get args :command)))
+      `(when (and (not (bundle-active-p ',bundle))
+                  ,-if)
          (cl-pushnew ',bundle bundle--active-list)
          (load ,-package t t)
-         (when ,-if
-           (if ,-defer
-               (run-with-idle-timer
-                ,-defer nil
-                (lambda () (load ,-config t t)))
-             (load ,-config t t)))))))
-;; (bundle! pyim :defer 1)
+         ,(bundle-config--command -command -defer -config)))))
+
+(defun bundle-config--defer (time file)
+  (if time
+      `(run-with-idle-timer ,time nil (lambda () (load ,file t t)))
+    `(load ,file t t)))
+
+(defun bundle-config--command (command time file)
+  (if command
+      `(autoload ',command (concat ,file ".el"))
+    (bundle-config--defer time file)))
 
 (provide 'bundle)
 ;;; bundle.el ends here
