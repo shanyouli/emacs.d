@@ -116,7 +116,7 @@
 ;; Only suitable for Windows Languages-Packages major-mode
 (when  IS-WINDOWS
   ;; ahk-mode
-  (use-package ahk-mode :ensure t :mode "\\.ahk\\'"  :defer t)
+  (use-package ahk-mode  :mode "\\.ahk\\'"  :defer t)
 
   ;; powershell-mode
   (use-package powershell

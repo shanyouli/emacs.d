@@ -204,7 +204,7 @@
 ;;; md-lua
 (package+ 'lua-mode)
 (package+ 'company-lua)
-(package+ '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy"))
+(package+ '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy" :host github))
 
 ;;
 ;; shackle
@@ -226,6 +226,8 @@
 (package+ 'paredit)
 
 (and IS-LINUX (package+ 'theme-magic))
+
+(and IS-WINDOWS (package+ 'ahk-mode))
 
 (provide 'core-modules)
 
