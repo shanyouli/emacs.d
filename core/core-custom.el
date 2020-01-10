@@ -34,3 +34,16 @@ If value is nil, use eshell."
           (const :tag "vterm" 'vterm)
           (const :tag "Multi-term" 'multi-term)
           (const :tag "eshell" 'eshell)))
+
+(defcustom lye-use-dict-package
+  (cond ((executable-find "sdcv")
+         'sdcv)
+        (t 'ydcv))
+  "The value is sdcv, ydcv, gdcv.
+If value is 'sdcv, use sdcv packge.
+If value is 'ydcv, use youdao-dictionary.
+If value is 'gdcv, use google-translate."
+  :type '(choice
+          (const :tag "sdcv" 'sdcv)
+          (const :tag "Youdao-dirctionary" 'ydcv)
+          (const :tag "Google-translate" 'gdcv)))

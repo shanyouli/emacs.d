@@ -71,10 +71,8 @@
   (setq cnfonts-directory (concat lye-emacs-cache-dir "cnfonts"))
   (lib-key-define "C-, ufc" 'cnfonts-ui :autoload "cnfonts"))
 
-;; lex-sdcv
-(if (executable-find "sdcv")
-    (lib-key-define "C-c y" 'sdcv-search-at-point++ :autoload "iex-sdcv")
-  (lib-key-define "C-c y" 'youdao-dictionary-search-at-point++ :autoload "iex-ydcv"))
+
+(lib-key-define "C-c y" 'lye/dict-point)
 
 ;; lex-search.el
 (lib-key-define "C-c s" 'one-key-color-rg-search/menu :autoload "lex-search")
