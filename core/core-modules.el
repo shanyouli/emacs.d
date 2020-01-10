@@ -160,16 +160,6 @@
 (dolist (md-package lye-modules-package-list)
   (package+ md-package))
 
-;;
-;;; iex-fcitx
-(when (and IS-LINUX
-           (or (executable-find "fcitx-remote")
-               (executable-find "fcitx5-remote")))
-  (package+ 'fcitx)
-  (run-with-idle-timer! :defer 2
-    (if (lye-is-running-p "fcitx")
-        (lye/modules-require 'iex-fcitx))))
-
 (package+ 'pdf-tools)
 
 ;;
