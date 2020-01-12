@@ -42,9 +42,6 @@
   :hook (after-init . delete-selection-mode))
 
 ;; Pair Automatic completion
-;; (use-package autopair
-;;   :diminish autopair-mode
-;;   :hook (after-init . autopair-global-mode))
 (use-package elec-pair
   :ensure nil
   :hook (after-init . electric-pair-mode)

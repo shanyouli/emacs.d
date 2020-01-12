@@ -37,7 +37,7 @@
 
 ;; esup
 (lib-key-define :autoload "esup" "C-, s e" #'esup)
-
+(lib-key-define "C-, s b" #'core-benchmark/require-times)
 ;; restart-emacs
 (lib-key-define "C-, s r" #'restart-emacs
                 :autoload "restart-emacs")

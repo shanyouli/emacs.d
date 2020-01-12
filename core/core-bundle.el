@@ -5,6 +5,6 @@
 
 (bundle! term :defer t)
 
-(bundle! fcitx :defer t :if (and IS-LINUX (executable-find "fcitx-remote")))
+;; (bundle! fcitx :defer t :if (and IS-LINUX (executable-find "fcitx-remote")))
 
-(bundle! dict :command lye/dict-point)
+(bundle! dict :commands lye/dict-point)

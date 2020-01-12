@@ -157,9 +157,9 @@
         ob-ipython
         htmlize
         ))
-(dolist (md-package lye-modules-package-list)
-  (package+ md-package))
-
+ ;; (dolist (md-package lye-modules-package-list)
+ ;;  (package+ md-package))
+(mapc #'package+ lye-modules-package-list)
 (package+ 'pdf-tools)
 
 ;;
@@ -176,12 +176,6 @@
 
 (when lye-lsp-python-ms-p
   (package+ 'lsp-python-ms))
-
-(if (executable-find "sdcv")
-    (package+ '(sdcv :repo "manateelazycat/sdcv"
-                :host github
-                :type git))
-  (package+ 'youdao-dictionary))
 
 ;;
 ;;; windows

@@ -14,10 +14,13 @@
 (defconst IS-LINUX (eq system-type 'gnu/linux))
 (defconst IS-WINDOWS (memq system-type '(windows-nt ms-doc)))
 
+(defvar lye--initial-file-name-handler-alist file-name-handler-alist)
+(defvar lye--initial-exec-path exec-path)
+
 (defconst lye-emacs-dir (expand-file-name user-emacs-directory)
   "The path to the currently loaded .emacs.d directory. Must end with a slash.")
 
-(defconst lye-core-dir (concat lye-emacs-dir "core/")
+(defconst lye-core-dir (file-name-directory (or load-file-name buffer-file-name))
   "The root directory of Lye-Emacs's core files. Must end with a slash.")
 
 (defconst lye-library-dir (concat lye-emacs-dir "lib/")
@@ -26,8 +29,6 @@
 ;; Ensure `lye-core-dir' and `lye-library-dir'  in `load-path'
 (push lye-core-dir load-path)
 (push lye-library-dir load-path)
-
-(defvar lye--initial-file-name-handler-alist file-name-handler-alist)
 
 ;; This is consulted on every `require', `load' and various path/io handling
 ;; encrypted or compressed files, among other things.
@@ -179,6 +180,7 @@ If it is `nil', Not use fuzzy match."
   (lib-load-absolute 'core/core-bundle)
   (lib-load-absolute 'core/core-key)       ; Keybinding
   )
+;; (add-hook 'emacs-startup-hook #'core-benchmark/require-times)
 
 (provide 'core)
 

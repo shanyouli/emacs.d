@@ -102,6 +102,7 @@
 (defun run-after-load-theme-hook (&rest _)
   "Run `after-load-theme-hook'."
   (run-hooks 'after-load-theme-hook))
+
 (advice-add #'load-theme :after #'run-after-load-theme-hook)
 
 ;; 判断程序是否运行

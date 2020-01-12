@@ -57,7 +57,7 @@ Usage:
            If the type of X is number, Will run BUNDLE Config after X seconds.
            If it is nil, Will run immediately.
 :disabled  Don't run when t.
-:command   run config.el when call COMMAND."
+:commands  Run config.el when call COMMAND."
   (declare (indent 1))
   (unless (memq :disabled args)
     (let* ((-name (symbol-name bundle))
@@ -67,12 +67,12 @@ Usage:
            (-defer (let ((x (plist-get args :defer)))
                     (if x (if (numberp x) x 0.1) nil)))
            (-if (or (plist-get args :if) t))
-           (-command (plist-get args :command)))
+           (-commands (plist-get args :commands)))
       `(when (and (not (bundle-active-p ',bundle))
                   ,-if)
          (cl-pushnew ',bundle bundle--active-list)
          (load ,-package t t)
-         ,(bundle-config--command -command -defer -config)))))
+         ,(bundle-config--command -commands -defer -config)))))
 
 (defun bundle-config--defer (time file)
   (if time
@@ -81,7 +81,11 @@ Usage:
 
 (defun bundle-config--command (command time file)
   (if command
-      `(autoload ',command (concat ,file ".el"))
+      `(progn
+         ,@(mapcar (lambda (cmd) `(autoload ',cmd ,(concat file ".el")))
+                (if (listp command)
+                    command
+                  (list command))))
     (bundle-config--defer time file)))
 
 (provide 'bundle)
