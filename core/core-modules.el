@@ -71,8 +71,6 @@
         lsp-mode
         lsp-ui
         company-lsp
-        ;; iex-paradox
-        paradox
         ;; iex-pomidor
         pomidor
         ;; iex-pretty-hydra
@@ -108,7 +106,6 @@
         async
         diff-hl
         diredfl
-        all-the-icons-dired
         ;; md-edit
         rainbow-delimiters
         hungry-delete

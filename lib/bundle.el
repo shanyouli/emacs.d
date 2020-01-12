@@ -81,12 +81,13 @@ Usage:
 
 (defun bundle-config--command (command time file)
   (if command
-      `(progn
-         ,@(mapcar (lambda (cmd) `(autoload ',cmd ,(concat file ".el")))
+      `(let ((absolute-file-path ,(concat file ".el")))
+         ,@(mapcar (lambda (cmd) `(autoload ',cmd absolute-file-path))
                 (if (listp command)
                     command
                   (list command))))
     (bundle-config--defer time file)))
+
 
 (provide 'bundle)
 ;;; bundle.el ends here

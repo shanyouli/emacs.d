@@ -49,6 +49,8 @@
   ("p" lib-scratch/python   "Python")
   ("s" lib-scratch/shell   "Bash/zsh"))
 
+;; (defhydra tmp-scratch (:color blue))
+
 (provide 'md-tmp-ext)
 
 ;;; md-tmp-ext.el ends here

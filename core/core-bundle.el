@@ -9,3 +9,5 @@
 (bundle! icons :if (and (display-graphic-p) (not IS-WINDOWS)))
 
 (bundle! dict :commands lye/dict-point)
+
+(bundle! hydra :commands pretty-hydra-title)

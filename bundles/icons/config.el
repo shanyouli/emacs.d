@@ -32,5 +32,4 @@
   (push '("Work" all-the-icons-material "work") all-the-icons-dir-icon-alist))
 
 ;; all-the-icons-dired
-(add-hook! 'dired-mode-hook :if (and (display-graphic-p) (not IS-WINDOWS))
-  #'all-the-icons-dired-mode)
+(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
