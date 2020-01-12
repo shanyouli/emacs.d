@@ -188,7 +188,7 @@
 ;;; md-lua
 (package+ 'lua-mode)
 (package+ 'company-lua)
-(package+ '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy" :host github))
+(package! '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy" :host github))
 
 ;;
 ;; shackle
@@ -205,6 +205,8 @@
 (package+ 'plantuml-mode)
 (package+ 'powershell)
 (package+ 'vimrc-mode)
+(when (executable-find "emerge")
+  (package+ 'ebuild-mode))
 
 (package+ 'cmuscheme)
 (package+ 'paredit)

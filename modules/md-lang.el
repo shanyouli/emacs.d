@@ -87,7 +87,6 @@
 
 ;; markdown, md
 (use-package markdown-mode
-
   :mode (("\\.md\\'" . gfm-mode))
   :defer t
   :config
@@ -116,7 +115,7 @@
 ;; Only suitable for Windows Languages-Packages major-mode
 (when  IS-WINDOWS
   ;; ahk-mode
-  (use-package ahk-mode  :mode "\\.ahk\\'"  :defer t)
+  (use-package ahk-mode :mode "\\.ahk\\'"  :defer t)
 
   ;; powershell-mode
   (use-package powershell
@@ -130,8 +129,6 @@
 
 ;; ebuild-mode
 (when (executable-find "emerge")
-  (package+ 'ebuild-mode)
-
   (use-package ebuild-mode
     :mode ("\\.ebuild\\'" . ebuild-mode)
     :defer t))

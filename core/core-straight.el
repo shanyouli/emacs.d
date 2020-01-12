@@ -130,6 +130,29 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
 
 (defalias 'package+ 'straight-use-package)
 
+(defmacro package! (name &rest args)
+  "Install a package-name.
+
+Usage:
+
+    (package! NAME
+        [:keyword [option]])
+:if EXPR   Initialize and load only if EXPR evaluates to a non-nil value.
+:commands  Define autoloads for commands that that will be defined by the
+           package. This is useful if the package is being lazily loaded."
+  (declare (indent 1))
+  (unless (memq :disabled args)
+    (let ((-if (or (plist-get args :if) t))
+          (-commands (plist-get args :commands)))
+      `(when ,-if
+         (straight-use-package ,name)
+         ,(when -commands
+            `(let ((name-string ,(symbol-name (let ((a (cadr name)))
+                                              (if (listp a) (car a) a)))))
+                 ,@(mapcar (lambda (cmd)
+                             `(unless (fboundp ',cmd) (autoload ',cmd name-string)))
+                           (if (listp -commands) -commands (list -commands)))))))))
+
 (straight-initialize-packages)
 
 ;; use package

@@ -31,10 +31,10 @@
 (eval-when-compile
   (if (version< emacs-version "27.0")
       (require 'cl)
-    (require 'cl-macs)))
-(if (version< emacs-version "24.4.1")
-    (load-library "cl-indent")
-    (require 'cl-indent))
+    (require 'cl-macs))
+  (if (version< emacs-version "24.4.1")
+      (load-library "cl-indent")
+    (require 'cl-indent)))
 
 (defun noflet|base ()
   "A base function."
