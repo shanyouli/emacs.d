@@ -175,13 +175,6 @@
   (package+ 'lsp-python-ms))
 
 ;;
-;;; windows
-(package+ 'ace-window)
-(run-with-idle-timer! :defer 0.1
-  ;; window-move
-  (lye/modules-require 'iex-ace-window))
-
-;;
 ;;; md-lua
 (package+ 'lua-mode)
 (package+ 'company-lua)

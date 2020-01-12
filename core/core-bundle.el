@@ -11,3 +11,5 @@
 (bundle! dict :commands lye/dict-point)
 
 (bundle! hydra :commands pretty-hydra-title)
+
+(bundle! window)

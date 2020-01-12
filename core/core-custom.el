@@ -47,3 +47,9 @@ If value is 'gdcv, use google-translate."
           (const :tag "sdcv" 'sdcv)
           (const :tag "Youdao-dirctionary" 'ydcv)
           (const :tag "Google-translate" 'gdcv)))
+
+(defcustom lye-use-switch-windows-package 'ace-window
+  "The value is ace-window or winum."
+  :type '(choice
+          (const :tag "Ace-Window" 'ace-window)
+          (const :tag "Winum" 'winum)))
