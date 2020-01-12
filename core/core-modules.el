@@ -181,10 +181,6 @@
 (package! '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy" :host github))
 
 ;;
-;; shackle
-(package+ 'shackle)
-
-;;
 ;;;
 (package+ 'nov)
 (package+ 'web-mode)

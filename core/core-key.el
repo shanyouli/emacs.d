@@ -187,45 +187,32 @@
                 :autoload "smart-align"
                 :keymap prog-mode-map)
 
-;; iex-winum
-(with-eval-after-load 'winum
-  (lib-key-define :keymap winum-keymap
-                  "M-0" 'winum-select-window-0-or-10
-                  "M-1" 'winum-select-window-1
-                  "M-2" 'winum-select-window-2
-                  "M-3" 'winum-select-window-3
-                  "M-4" 'winum-select-window-4
-                  "M-5" 'winum-select-window-5
-                  "M-6" 'winum-select-window-6
-                  "M-7" 'winum-select-window-7
-                  "M-8" 'winum-select-window-8
-                  "M-9" 'winum-select-window-9))
-
-;; iex-ace-window
-(lib-key-define [remap other-window] 'ace-window)
-(with-eval-after-load 'ace-window
-  ;; Select widnow via `M-1'...`M-9'
-  (defun aw--select-window (number)
-    "Slecet the specified window."
-    (when (numberp number)
-      (let ((found nil))
-        (dolist (win (aw-window-list))
-          (when (and (window-live-p win)
-                     (eq number
-                         (string-to-number (window-parameter win 'ace-window-path))))
-            (setq found t)
-            (aw-switch-to-window win)))
-        (unless found
-          (message "No specified window: %d" number)))))
-  (dotimes (n 9)
-    (define-key (current-global-map)
-        (kbd (format "M-%d" (1+ n)))
-      (lambda () (interactive) (aw--select-window (1+ n)))))
-  (with-eval-after-load 'super-save
-    (advice-add 'aw--select-window :before #'super-save-command-advice)
-    (advice-add 'ace-window :before #'super-save-command-advice)
-    (push 'aw--select-window super-save-triggers)
-    (push 'ace-window super-save-triggers)))
+;; window-key
+(lib-key-define "C-h z" 'shackle-last-popup-buffer)
+(pcase lye-use-switch-windows-package
+  ('ace-window
+   (lib-key-define [remap other-window] 'ace-window
+                   "M-0" 'aw-select-window-0
+                   "M-1" 'aw-select-window-1
+                   "M-2" 'aw-select-window-2
+                   "M-3" 'aw-select-window-3
+                   "M-4" 'aw-select-window-4
+                   "M-5" 'aw-select-window-5
+                   "M-6" 'aw-select-window-6
+                   "M-7" 'aw-select-window-7
+                   "M-8" 'aw-select-window-8
+                   "M-9" 'aw-select-window-9))
+  ('winum
+   (lib-key-define "M-0" 'winum-select-window-0-or-10
+                   "M-1" 'winum-select-window-1
+                   "M-2" 'winum-select-window-2
+                   "M-3" 'winum-select-window-3
+                   "M-4" 'winum-select-window-4
+                   "M-5" 'winum-select-window-5
+                   "M-6" 'winum-select-window-6
+                   "M-7" 'winum-select-window-7
+                   "M-8" 'winum-select-window-8
+                   "M-9" 'winum-select-window-9)))
 
 ;; adjust-opacity
 (lib-key-define :prefix "C-, u"

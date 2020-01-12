@@ -51,7 +51,6 @@
 (lye-core-initialize)
 
 (lye/modules-require 'md-edit)          ; better edit
-(lye/modules-require 'md-shackle)       ; Window rule
 (lye/modules-require 'md-dired)         ; Dired
 (lye/modules-require 'md-reads)         ; Reader tools
 (lye/modules-require 'md-company)       ; company
