@@ -139,13 +139,16 @@ Usage:
         [:keyword [option]])
 :if EXPR   Initialize and load only if EXPR evaluates to a non-nil value.
 :commands  Define autoloads for commands that that will be defined by the
-           package. This is useful if the package is being lazily loaded."
+           package. This is useful if the package is being lazily loaded.
+:noinstall If noinstall is t, not run (straight-use-package NAME)."
   (declare (indent 1))
   (unless (memq :disabled args)
     (let ((-if (or (plist-get args :if) t))
-          (-commands (plist-get args :commands)))
+          (-commands (plist-get args :commands))
+          (-noinstall (plist-get args :noinstall)))
       `(when ,-if
-         (straight-use-package ,name)
+         ,(unless -noinstall
+            `(straight-use-package ,name))
          ,(when -commands
             `(let ((name-string ,(symbol-name (let ((a (cadr name)))
                                               (if (listp a) (car a) a)))))

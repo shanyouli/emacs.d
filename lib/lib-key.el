@@ -27,7 +27,6 @@
 ;;; dependences
 
 (require 'lib-var)
-(autoload 'when-let "subr-x")
 
 ;;; Code:
 
@@ -56,14 +55,15 @@ ARGS format is: (keymaps key1 key2...) or (key1 key2 ...).
 (defmacro lib-key-define (&rest args)
   "为一个可交互函数绑定一个快捷按键.
 ARGS 可以存在的 key 有 prefix, keymaps, autoload.
-:PREFIX 后接一个 string 的 key.
-:KEYMAP 后接一个 keymap 默认为 `(current-global-map)'.
-:AUTOLOAD 后接一个文件名, 如 :autoload \"test\", 将被展开为 (autoload def \"test\").
+:PREFIX         后接一个 string 的 key.
+:KEYMAP or :map 后接一个 keymap 默认为 `(current-global-map)'.
+:AUTOLOAD       后接一个文件名, 如 :autoload \"test\", 将被展开为 (autoload def \"test\").
 
 ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
   (let ((key-def (lib-var-plist-to-alist args))
         keymap autoload prefix)
-    (when-let ((tlist (assoc :keymap key-def)))
+    (when-let ((tlist (or (assoc :keymap key-def)
+                          (assoc :map key-def))))
       (setq keymap (cadr tlist)
             key-def (delete tlist key-def)))
     (if-let ((tlist (assoc :prefix key-def)))

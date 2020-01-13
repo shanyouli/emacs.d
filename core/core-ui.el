@@ -79,10 +79,6 @@
   :if (display-graphic-p)
   'lye|frame-default-size-with-frame)
 
-(add-hook! 'emacs-startup-hook
-  (autoload 'winner-mode "winner")
-  (winner-mode +1))
-
 ;;
 ;;; font
 (defcustom lye-en-font nil "Customize English font." :type 'string)

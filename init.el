@@ -58,7 +58,6 @@
 (run-with-idle-timer! :defer 0.5
   ;; Program language common tool
   (lye/modules-require 'md-lang)
-  (lye/modules-require 'md-elisp)
   (lye/modules-require 'md-scheme)
   (lye/modules-require 'md-sh)
   (lye/modules-require 'md-python)

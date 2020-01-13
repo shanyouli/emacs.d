@@ -58,12 +58,6 @@
         fuz
         ;; iex-git
         magit
-        ;; iex-ivy.el
-        amx
-        ivy
-        counsel
-        swiper
-        helpful
         ;; ivy-fuz
         flx
         ivy-yasnippet
@@ -103,7 +97,6 @@
         company-tabnine
         company-posframe
         ;; md-dired
-        async
         diff-hl
         diredfl
         ;; md-edit
@@ -112,16 +105,6 @@
         highlight-indent-guides
         rainbow-mode
         page-break-lines
-        ;; md-elisp
-        macrostep
-        elisp-refs
-        (elispfl :type git :host github
-                 :repo "cireu/elispfl")
-        (sly-el-indent :type git
-                       :host github
-                       :repo "cireu/sly-el-indent"
-                       :files (:defaults "lib")
-                       :no-byte-compile t)
         ;; md-hugo
         ox-hugo
         easy-hugo
@@ -131,8 +114,6 @@
         ;;
         yasnippet
         yasnippet-snippets
-        ;; iex-winum
-        winum
         ;;
         cnfonts
         ;; iex-awetab

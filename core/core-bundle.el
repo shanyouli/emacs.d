@@ -13,3 +13,7 @@
 (bundle! hydra :commands pretty-hydra-title)
 
 (bundle! window)
+
+(bundle! elisp :defer t)
+
+(bundle! ivy)

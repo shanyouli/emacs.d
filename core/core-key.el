@@ -92,39 +92,88 @@
 (lib-key-define "C-z j" 'awesome-tab-ace-jump :autoload "awesome-tab")
 
 ;; lex-smex
-(lib-key-define "M-x"     'smex
-                "C-x M-x" 'smex-major-mode-commands
-                :autoload "lex-ido")
+;; (lib-key-define "M-x"     'smex
+;;                 "C-x M-x" 'smex-major-mode-commands
+;;                 :autoload "lex-ido")
 
 ;;; toolkit
 (lib-key-define "C-x SPC" 'set-mark-command    ; Instead C-SPC for Chinese input method
                 "C-x C-h" 'rectangle-mark-mode ; rectangle-mark-mode
                 "C-z C-z" 'suspend-frame)    ; Suspend-frame
+;; iv-bundle
+(lib-key-define ;; swiper
+                "C-s" 'swiper-isearch
+                "C-r" 'swiper-isearch-backward
+                "s-f" 'swiper
+                "C-S-s" 'swiper-all
+                ;; ivy
+                "C-c C-r" 'ivy-resume
+                "C-c v p" 'ivy-push-view
+                "C-c v ." 'ivy-switch-view
+                ;; counsel
+                "C-x C-r" 'counsel-buffer-or-recentf
+                "C-x j" 'counsel-mark-ring
+                "C-h F" 'counsel-faces
+                "C-c B" 'counsel-bookmarked-directory
+                "C-c O" 'counsel-find-file-extern
+                "C-c f" 'counsel-find-library
+                "C-c i" 'counsel-git
+                "C-c j" 'counsel-git-grep
+                "C-c l" 'counsel-locate
+                "C-c r" 'counsel-rg
+                "C-c z" 'counsel-fzf
+                "C-c c B" 'counsel-bookmarked-directory
+                "C-c c F" 'counsel-faces
+                "C-c c F" 'counsel-faces
+                "C-c c L" 'counsel-load-library
+                "C-c c O" 'counsel-find-file-extern
+                "C-c c P" 'counsel-package
+                "C-c c a" 'counsel-apropos
+                "C-c c e" 'counsel-colors-emacs
+                "C-c c f" 'counsel-find-library
+                "C-c c g" 'counsel-grep
+                "C-c c h" 'counsel-command-history
+                "C-c c i" 'counsel-git
+                "C-c c j" 'counsel-git-grep
+                "C-c c l" 'counsel-locate
+                "C-c c m" 'counsel-minibuffer-history
+                "C-c c o" 'counsel-outline
+                "C-c c p" 'counsel-pt
+                "C-c c r" 'counsel-rg
+                "C-c c s" 'counsel-ag
+                "C-c c t" 'counsel-load-theme
+                "C-c c u" 'counsel-unicode-char
+                "C-c c w" 'counsel-colors-web
+                "C-c c v" 'counsel-set-variable
+                "C-c c z" 'counsel-fzf)
 
-;; iex-ivy.el
-(lib-key-define "M-x"     'counsel-M-x
-                "C-x C-f" 'counsel-find-file
-                "C-x f"   'counsel-recentf
-                "C-s"     'swiper-isearch
-                "C-z s t" 'counsel-load-theme
-                "M-y"     'counsel-yank-pop
-                "C-x b"   'ivy-switch-buffer
-                "C-x d"   'counsel-dired
-                "C-h f"   'counsel-describe-function
-                "C-h v"   'counsel-describe-variable
-                :autoload "iex-ivy")
-
-(lib-key-define "C-h k" 'helpful-key :autoload "helpful")
+(with-eval-after-load 'counsel
+  (lib-key-define :keymap counsel-mode-map
+                  [remap swiper]          'counsel-grep-or-swiper
+                  [remap swiper-backward] 'counsel-gre-or-swiper-backward
+                  [remap dired]           'counsel-dired
+                  [remap set-variable]    'counsel-set-variable
+                  [remap insert-char]     'counsel-unicode-char)
+  (lib-key-define :map counsel-find-file-map
+                  "C-h" 'counsel-up-directory)
+  (lib-key-define :map counsel-ag-map
+                  "<C-return>" 'my-swiper-toggle-counsel-rg))
 
 (with-eval-after-load 'swiper
-  (lib-key-define :keymap swiper-map [escape] 'minibuffer-keyboard-quit))
+  (lib-key-define :keymap swiper-map
+                  [escape] 'minibuffer-keyboard-quit
+                  "M-s" 'swiper-isearch-toggle
+                  "M-%" 'swiper-query-replace
+                  ))
 
 (with-eval-after-load 'ivy
   (lib-key-define :keymap ivy-minibuffer-map
                   "<C-return>" 'ivy-immediate-done
-                  [escape] 'minibuffer-keyboard-quit))
+                  [escape] 'minibuffer-keyboard-quit
+                  "C-w" 'ivy-yank-word))
+
 (with-eval-after-load 'yasnippet
-  (lib-key-define "C-c iy" 'ivy-yasnippet
+  (lib-key-define "C-c i y" 'ivy-yasnippet
                   :keymap yas-minor-mode-map
                   :autoload "ivy-yasnippet"))
 
@@ -178,6 +227,7 @@
   (lib-key-define "C-x b" 'snails
                   "C-z C-s" 'snails-load-theme
                   :autoload "iex-snails"))
+
 ;; iex-tldr
 (unless IS-WINDOWS
   (lib-key-define "C-z s h" 'tldr :autoload "iex-tldr"))
@@ -228,6 +278,19 @@
                   [remap xref-find-references] 'lsp-ui-peek-find-references
                   "C-c u" 'lsp-ui-imenu
                   :keymap lsp-ui-mode-map))
+
+;; elisp-bundles
+(lib-key-define :keymap emacs-lisp-mode-map
+                :prefix "C-c"
+                "C-x" 'ielm
+                "C-c" 'eval-defun
+                "C-b" 'eval-buffer
+                "e" 'macrostep-expand)
+(lib-key-define :keymap help-mode-map "r" 'remove-hook-at-point)
+(lib-key-define [remap describe-key] 'helpful-key
+                [remap describe-symbol] 'helpful-symbol)
+(with-eval-after-load 'helpful
+  (lib-key-define :keymap helpful-mode-map "r" 'remove-hook-at-point))
 
 (provide 'core-key)
 

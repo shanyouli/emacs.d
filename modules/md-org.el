@@ -34,7 +34,7 @@
   :commands org-mode
   :bind (("C-c a" . org-agenda)
          ("C-c l" . org-store-link)
-         ("C-c c" . org-capture)
+         ;; ("C-c c" . org-capture)
          ("C-c b" . org-switchb))
   :mode ("\\.org$\\'" . org-mode)
   :hook (org-mode .
