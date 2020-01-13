@@ -188,6 +188,23 @@
      (lib-key-define :map elfeed-show-mode-map "o" 'link-hint-open-link))
     ((fboundp 'ace-link)
      (lib-key-define :map elfeed-show-mode-map "o" 'ace-link))))
+;; company-bundle
+  (lib-key-define "M-/" 'company-complete
+                  "<backtab>" 'company-yasnippet
+                  "C-c t" 'company-backend-with-tabnine
+                  "C-c T" 'company-backend-remove-tabnine)
+
+(with-eval-after-load 'company
+  (lib-key-define :map company-active-map
+                  "C-p" 'company-select-previous
+                  "C-n" 'company-select-next
+                  "<tab>" 'company-complete-common-or-cycle
+                  "<backtab>" 'lye-company-yasnippet)
+  (lib-key-define "C-p" 'company-select-previous
+                  "C-n" 'company-select-next
+                  :map company-search-map)
+  (dotimes (i 10)
+    (lib-key-unset company-active-map (format "M-%d" i))))
 
 ;; iex-git
 ;; transient file

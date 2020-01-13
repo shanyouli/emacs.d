@@ -19,3 +19,5 @@
 (bundle! ivy)
 
 (bundle! rss :key elfeed-hydra/body)
+
+(bundle! company)

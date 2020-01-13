@@ -53,7 +53,6 @@
 (lye/modules-require 'md-edit)          ; better edit
 (lye/modules-require 'md-dired)         ; Dired
 (lye/modules-require 'md-reads)         ; Reader tools
-(lye/modules-require 'md-company)       ; company
 
 (run-with-idle-timer! :defer 0.5
   ;; Program language common tool

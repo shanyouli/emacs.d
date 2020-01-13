@@ -85,10 +85,6 @@
         smex
         flx-ido
         ido-sort-mtime
-        ;; md-company
-        company
-        company-tabnine
-        company-posframe
         ;; md-dired
         diff-hl
         diredfl
