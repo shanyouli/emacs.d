@@ -44,8 +44,6 @@
         ;; iex-avy
         avy
         ace-pinyin
-        ;; iex-elfeed
-        elfeed
         ;; iex-exec-path.el
         exec-path-from-shell
         (cache-path-from-shell :repo "manateelazycat/cache-path-from-shell"
