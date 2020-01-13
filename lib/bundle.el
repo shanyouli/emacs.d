@@ -57,7 +57,8 @@ Usage:
            If the type of X is number, Will run BUNDLE Config after X seconds.
            If it is nil, Will run immediately.
 :disabled  Don't run when t.
-:commands  Run config.el when call COMMAND."
+:commands  Run config.el when call COMMAND.
+:key CMD   Delay load hydra menu."
   (declare (indent 1))
   (unless (memq :disabled args)
     (let* ((-name (symbol-name bundle))
@@ -67,28 +68,30 @@ Usage:
            (-defer (let ((x (plist-get args :defer)))
                     (if x (if (numberp x) x 0.1) nil)))
            (-if (or (plist-get args :if) t))
-           (-commands (plist-get args :commands)))
+           (-commands (plist-get args :commands))
+           (-key (plist-get args :key)))
       `(when (and (not (bundle-active-p ',bundle))
                   ,-if)
          (cl-pushnew ',bundle bundle--active-list)
          (load ,-package t t)
-         ,(bundle-config--command -commands -defer -config)))))
-
-(defun bundle-config--defer (time file)
-  (if time
-      `(run-with-idle-timer ,time nil (lambda () (load ,file t t)))
-    `(load ,file t t)))
+         ,(bundle-config--command -commands -defer -config)
+         ,(bundle-config--menu -key (concat -dir "key"))))))
 
 (defun bundle-config--command (command time file)
   (if command
       `(let ((absolute-file-path ,(concat file ".el")))
          ,@(mapcar (lambda (cmd) `(autoload ',cmd absolute-file-path))
-                (if (listp command)
-                    command
-                  (list command))))
-    (bundle-config--defer time file)))
+                   (if (listp command) command (list command))))
+    (if time
+        `(run-with-idle-timer ,time nil (lambda () (load ,file t t)))
+      `(load ,file t t))))
 
-
-
+(defun bundle-config--menu (key-menu file)
+  (if key-menu
+      `(let ((absolute-file-path ,(concat file ".el")))
+         ,@(mapcar (lambda (cmd) `(autoload ',cmd absolute-file-path))
+                   (if (listp key-menu)
+                       key-menu
+                     (list key-menu))))))
 (provide 'bundle)
 ;;; bundle.el ends here

@@ -163,8 +163,7 @@
   (lib-key-define :keymap swiper-map
                   [escape] 'minibuffer-keyboard-quit
                   "M-s" 'swiper-isearch-toggle
-                  "M-%" 'swiper-query-replace
-                  ))
+                  "M-%" 'swiper-query-replace))
 
 (with-eval-after-load 'ivy
   (lib-key-define :keymap ivy-minibuffer-map
@@ -177,12 +176,18 @@
                   :keymap yas-minor-mode-map
                   :autoload "ivy-yasnippet"))
 
-;; iex-elfeed
-(lib-key-define "C-z w" 'elfeed :autoload "iex-elfeed")
+;; Rss-bundles
+(lib-key-define "C-x W" 'newsticker-show-news
+                "C-x w" 'elfeed)
 (with-eval-after-load 'elfeed
-  (lib-key-define "?" 'toggle-hydra-elfeed/body
-                  :keymap elfeed-search-mode-map
-                  :autoload "iex-elfeed"))
+  (lib-key-define "?" 'elfeed-hydra/body
+                  :keymap elfeed-search-mode-map)
+  (lib-key-define :map elfeed-show-mode-map "q" 'delete-window)
+  (cond
+    ((fboundp 'link-hint-open-link)
+     (lib-key-define :map elfeed-show-mode-map "o" 'link-hint-open-link))
+    ((fboundp 'ace-link)
+     (lib-key-define :map elfeed-show-mode-map "o" 'ace-link))))
 
 ;; iex-git
 ;; transient file

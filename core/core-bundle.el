@@ -17,3 +17,5 @@
 (bundle! elisp :defer t)
 
 (bundle! ivy)
+
+(bundle! rss :key elfeed-hydra/body)
