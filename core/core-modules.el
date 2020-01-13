@@ -44,11 +44,6 @@
         ;; iex-avy
         avy
         ace-pinyin
-        ;; iex-exec-path.el
-        exec-path-from-shell
-        (cache-path-from-shell :repo "manateelazycat/cache-path-from-shell"
-                               :host github
-                               :type git)
         ;; iex-flycheck
         flycheck
         flycheck-posframe
@@ -131,11 +126,9 @@
         ob-go
         ob-rust
         ob-ipython
-        htmlize
-        ))
- ;; (dolist (md-package lye-modules-package-list)
- ;;  (package+ md-package))
+        htmlize))
 (mapc #'package+ lye-modules-package-list)
+
 (package+ 'pdf-tools)
 
 ;;
