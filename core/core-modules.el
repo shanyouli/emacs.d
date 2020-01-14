@@ -85,9 +85,6 @@
         smex
         flx-ido
         ido-sort-mtime
-        ;; md-dired
-        diff-hl
-        diredfl
         ;; md-edit
         rainbow-delimiters
         hungry-delete

@@ -30,6 +30,3 @@
   ;;; dir-icons
   (push '("Videos?" all-the-icons-faicon "film") all-the-icons-dir-icon-alist)
   (push '("Work" all-the-icons-material "work") all-the-icons-dir-icon-alist))
-
-;; all-the-icons-dired
-(add-hook 'dired-mode-hook 'all-the-icons-dired-mode)

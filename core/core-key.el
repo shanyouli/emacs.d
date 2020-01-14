@@ -188,11 +188,12 @@
      (lib-key-define :map elfeed-show-mode-map "o" 'link-hint-open-link))
     ((fboundp 'ace-link)
      (lib-key-define :map elfeed-show-mode-map "o" 'ace-link))))
+
 ;; company-bundle
-  (lib-key-define "M-/" 'company-complete
-                  "<backtab>" 'company-yasnippet
-                  "C-c t" 'company-backend-with-tabnine
-                  "C-c T" 'company-backend-remove-tabnine)
+(lib-key-define "M-/" 'company-complete
+                "<backtab>" 'company-yasnippet
+                "C-c t" 'company-backend-with-tabnine
+                "C-c T" 'company-backend-remove-tabnine)
 
 (with-eval-after-load 'company
   (lib-key-define :map company-active-map
@@ -205,6 +206,17 @@
                   :map company-search-map)
   (dotimes (i 10)
     (lib-key-unset company-active-map (format "M-%d" i))))
+
+;; dired-bundle
+(with-eval-after-load 'dired
+  (lib-key-define :map dired-mode-map
+                  "C-c C-p" 'wdired-change-to-wdired-mode
+                  ")" 'dired-git-info-mode
+                  "C-c C-r" 'dired-rsync)
+  (when (and (or (and IS-MAC (executable-find "gls"))
+                 (and (not IS-MAC) (executable-find "ls")))
+             (bundle-active-p 'hydra))
+    (lib-key-define :map dired-mode-map "S" 'hydra-dired-quick-sort/body)))
 
 ;; iex-git
 ;; transient file

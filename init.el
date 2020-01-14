@@ -51,7 +51,6 @@
 (lye-core-initialize)
 
 (lye/modules-require 'md-edit)          ; better edit
-(lye/modules-require 'md-dired)         ; Dired
 (lye/modules-require 'md-reads)         ; Reader tools
 
 (run-with-idle-timer! :defer 0.5

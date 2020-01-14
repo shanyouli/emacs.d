@@ -21,3 +21,5 @@
 (bundle! rss :key elfeed-hydra/body)
 
 (bundle! company)
+
+(bundle! dired)
