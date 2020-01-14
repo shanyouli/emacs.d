@@ -125,5 +125,27 @@
 
 (add-hook 'after-init-hook #'global-page-break-lines-mode)
 
+
+;;; prettify-mode
+(setq-default prettify-symbols-alist
+              '(("<-" . "←")
+                ("->" . ?→)
+                ("->>" . ?↠)
+                ("=>" . ?⇒)
+                ("map" . ?↦)
+                ("/=" . ?≠)
+                ("!=" . ?≠)
+                ("==" . ?≡)
+                ("<=" . ?≤)
+                (">=" . ?≥)
+                ("=<<" . (?= (Br . Bl) ?≪))
+                (">>=" . (?≫ (Br . Bl) ?=))
+                ("<=<" . ?↢)
+                (">=>" . ?↣)
+                ("&&" . ?∧)
+                ("||" . ?∨)))
+(setq prettify-symbols-unprettify-at-point 'right-edge)
+(add-hook! 'prog-mode-hook (prettify-symbols-mode +1))
+
 (provide 'md-edit)
 ;;; md-edit.el ends here

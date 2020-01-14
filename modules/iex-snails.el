@@ -51,10 +51,12 @@
               " *flycheck-posframe-buffer*"
               " *company-posframe-buffer*"
               "*company"
+              " *company"
               "*esup"
               " *pyim"
               " *server"
-              " *sdcv"))
+              " *sdcv"
+              " *diff-hl*"))
   (push buf snails-backend-buffer-blacklist))
 
 ;;; snails-backend-themes

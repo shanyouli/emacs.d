@@ -44,12 +44,12 @@
 
 ;; Display the bare minimum at startup. We don't need all that noise. The
 ;; dashboard/empty scratch buffer is good enough.
-(setq inhibit-startup-message t
+(setq initial-buffer-choice t
+      inhibit-startup-message t
       inhibit-startup-echo-area-message user-login-name
       inhibit-default-init t
       initial-major-mode 'fundamental-mode
-      initial-scratch-message nil
-      )
+      initial-scratch-message nil)
 (fset #'display-startup-echo-area-message #'ignore)
 
 ;; Emacs "updates" its ui more often than it needs to, so we slow it down
@@ -191,8 +191,6 @@
 (add-hook! 'after-change-major-mode-hook
     (let ((buf "*scratch*"))
       ;; Avoid emacsclient opening *scratch* buffer and getting an error
-      (unless initial-buffer-choice
-        (setq initial-buffer-choice '(lambda () (switch-to-next-buffer))))
       (when (get-buffer buf) (kill-buffer buf))))
 
 ;;当在windows上运行时,确定 Msys2是否安装

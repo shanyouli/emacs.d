@@ -1,7 +1,0 @@
-# -*- mode: snippet -*-
-# name: sh-mode
-# key: sh
-# --
-# -*- mode: sh -*-
-
-$1

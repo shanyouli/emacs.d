@@ -23,3 +23,7 @@
 (bundle! company)
 
 (bundle! dired)
+
+(bundle! mode :defer t)
+
+(bundle! yasnippet)

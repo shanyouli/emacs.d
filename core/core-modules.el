@@ -60,8 +60,6 @@
         company-lsp
         ;; iex-pomidor
         pomidor
-        ;; iex-pretty-hydra
-        pretty-hydra
         ;; iex-smart-align
         (smart-align :type git :host github :repo "manateelazycat/smart-align"
                      :no-byte-compile t)
@@ -78,8 +76,6 @@
         treemacs
         treemacs-projectile
         treemacs-magit
-        ;; lex-hydra
-        hydra
         ;; lex-ido
         ido-completing-read+
         smex
@@ -148,16 +144,6 @@
 ;;
 ;;;
 (package+ 'nov)
-(package+ 'web-mode)
-(package+ 'yaml-mode)
-(package+ 'json-mode)
-(package+ 'markdown-mode)
-(package+ 'pkgbuild-mode)
-(package+ 'plantuml-mode)
-(package+ 'powershell)
-(package+ 'vimrc-mode)
-(when (executable-find "emerge")
-  (package+ 'ebuild-mode))
 
 (package+ 'cmuscheme)
 (package+ 'paredit)

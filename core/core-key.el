@@ -218,6 +218,11 @@
              (bundle-active-p 'hydra))
     (lib-key-define :map dired-mode-map "S" 'hydra-dired-quick-sort/body)))
 
+;; mode-bundle
+(when (executable-find "markdownfmt")
+  (with-eval-after-load 'markdown-mode
+    (lib-key-define :map markdown-mode-map
+                    "C-c f" 'markdownfmt-format-buffer)))
 ;; iex-git
 ;; transient file
 (setq transient-history-file
