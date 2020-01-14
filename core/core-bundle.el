@@ -27,3 +27,5 @@
 (bundle! mode :defer t)
 
 (bundle! yasnippet)
+
+(bundle! lsp :defer t)

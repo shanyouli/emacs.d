@@ -54,10 +54,6 @@
         ;; ivy-fuz
         flx
         ivy-yasnippet
-        ;; iex-lsp
-        lsp-mode
-        lsp-ui
-        company-lsp
         ;; iex-pomidor
         pomidor
         ;; iex-smart-align
@@ -149,8 +145,6 @@
 (package+ 'paredit)
 
 (and IS-LINUX (package+ 'theme-magic))
-
-(and IS-WINDOWS (package+ 'ahk-mode))
 
 (provide 'core-modules)
 

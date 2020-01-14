@@ -53,8 +53,8 @@
              ;; run lsp
              (when (and (string= sh-shell "bash")
                         (executable-find "bash-language-server"))
-               (lye/modules-require 'iex-lsp)
-               (lsp)
+               ;; (lye/modules-require 'iex-lsp)
+               ;; (lsp)
                ;; (setq-local company-backends
                ;;             (cons '(company-tabnine company-lsp)
                ;;                   company-backends))

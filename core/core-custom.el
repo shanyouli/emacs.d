@@ -53,3 +53,9 @@ If value is 'gdcv, use google-translate."
   :type '(choice
           (const :tag "Ace-Window" 'ace-window)
           (const :tag "Winum" 'winum)))
+
+(defcustom lye-use-lsp-manager 'lsp-mode
+  "The value is lsp-mode or eglot."
+  :type '(choice
+          (const :tag "Eglot" 'eglot)
+          (const :tag "Emacs-lsp" 'lsp-mode)))
