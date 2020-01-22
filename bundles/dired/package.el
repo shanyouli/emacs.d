@@ -10,4 +10,4 @@
   :commands all-the-icons-dired-mode)
 (package! 'diff-hl :commands diff-hl-dired-mode)
 (package! 'fd-dired :if (executable-find "fd"))
-(package! 'dired-x :noinstall t :commands dired-omit-mode)
+(package! 'dired-x :local t :commands dired-omit-mode)

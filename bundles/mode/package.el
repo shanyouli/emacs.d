@@ -40,3 +40,16 @@
 
 ;; PLANTUML
 (package! 'plantuml-mode :if (executable-find "java"))
+
+;; sh
+(package! 'sh-script :local t
+          :mode (("\\.zsh\\'" . sh-mode)
+                 (".zshrc" . sh-mode)))
+
+;; LUA
+(package! 'lua-mode :mode (("\\.lua\\'" . lua-mode)
+                           (".luacheckrc" . lua-mode)
+                           ("rc.lua.template" . lua-mode)))
+(package! 'company-lua)
+(package! '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy" :host github)
+  :if (executable-find "java"))

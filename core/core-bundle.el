@@ -29,3 +29,4 @@
 (bundle! yasnippet)
 
 (bundle! lsp :defer t)
+(bundle! flycheck :defer t)

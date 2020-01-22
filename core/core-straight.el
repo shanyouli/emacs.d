@@ -140,32 +140,33 @@ Usage:
 :if EXPR   Initialize and load only if EXPR evaluates to a non-nil value.
 :commands  Define autoloads for commands that that will be defined by the
            package. This is useful if the package is being lazily loaded.
-:noinstall If noinstall is t, not run (straight-use-package NAME).
+:local     If noinstall is t, not run (straight-use-package NAME).
 :mode EXPR run (add-to-list 'auto-mode-alist EXPR)"
   (declare (indent 1))
   (unless (memq :disabled args)
     (let ((-if (or (plist-get args :if) t))
           (-commands (plist-get args :commands))
-          (-noinstall (plist-get args :noinstall))
           (-mode (plist-get args :mode)))
       `(when ,-if
-         ,(unless -noinstall
+         ,(unless (memq :local args)
             `(straight-use-package ,name))
          ,(when -commands
-            `(let ((name-string ,(symbol-name (let ((a (cadr name)))
-                                                (if (listp a) (car a) a)))))
+            `(let ((name-string ,(package--get-name name)))
                ,@(mapcar (lambda (cmd)
                            `(unless (fboundp ',cmd) (autoload ',cmd name-string)))
                          (if (listp -commands) -commands (list -commands)))))
          ,(when -mode
-            (let ((name-string (symbol-name (let ((a (cadr name)))
-                                              (if (listp a) (car a) a)))))
+            (let ((name-string (package--get-name name)))
               (package--add-mode-key-ext -mode name-string)))))))
+
+(defun package--get-name (recipe)
+  (let ((a (cadr recipe)))
+    (symbol-name (if (listp a) (car a) a))))
 
 (defun package--add-mode-key-ext (mode-alist file)
   `(progn ,@(mapcar
              (lambda (alist)
-               `(let ((cmd (cdr ',alist)))
+               `(let ((cmd ',(cdr alist)))
                   (unless (fboundp cmd) (autoload cmd ,file))
                   (add-to-list 'auto-mode-alist ',alist)))
              (if (listp (car mode-alist)) mode-alist (list mode-alist)))))

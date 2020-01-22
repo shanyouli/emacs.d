@@ -3,7 +3,7 @@
 (pcase lye-use-lsp-manager
   ('eglot (package! 'eglot :commands eglot-ensure))
   ('lsp-mode
-   (package! 'lsp-mode :commands lsp-deferred)
+   (package! 'lsp-mode :commands lsp)
    (package! 'lsp-ui)
    ;; (package! 'lsp-ivy)
    ;; (package! 'dap-mode)

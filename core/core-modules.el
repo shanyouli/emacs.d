@@ -44,9 +44,6 @@
         ;; iex-avy
         avy
         ace-pinyin
-        ;; iex-flycheck
-        flycheck
-        flycheck-posframe
         ;; iex-fuz
         fuz
         ;; iex-git

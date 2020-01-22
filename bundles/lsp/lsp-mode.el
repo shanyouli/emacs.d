@@ -1,13 +1,14 @@
 ;;; bundles/lsp/lsp-mode.el.el -*- lexical-binding: t -*-
 
-(add-hook! 'prog-mode-hook
-    (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode)
-      (lsp-deferred)))
+;; (add-hook! 'prog-mode-hook
+;;     (unless (derived-mode-p 'emacs-lisp-mode 'lisp-mode)
+;;       (lsp-deferred)))
 
-(setq lsp-auto-guess-root t        ; Detect project root
+(setq lsp-auto-guess-root nil        ; Detect project root
       lsp-keep-workspace-alive nil ; Auto-kill LSP server
       lsp-prefer-flymake nil       ; Use lsp-ui and flycheck
-      flymake-fringe-indicator-position 'right-fringe)
+      flymake-fringe-indicator-position 'right-fringe
+      lsp-session-file (concat lye-emacs-cache-dir "lsp-session"))
 
 (with-eval-after-load 'lsp-mode
   ;; lsp-clients Configure LSP clients

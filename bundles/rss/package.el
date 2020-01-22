@@ -2,4 +2,4 @@
 
 (package! 'elfeed :commands elfeed)
 
-(package! 'newsticker :noinstall t :commands newsticker-show-news)
+(package! 'newsticker :local t :commands newsticker-show-news)
