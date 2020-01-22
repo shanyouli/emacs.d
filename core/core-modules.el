@@ -85,7 +85,6 @@
         easy-hugo
         ;;
         link-hint
-        org-cliplink
         ;;
         yasnippet
         yasnippet-snippets
@@ -108,7 +107,8 @@
         ob-go
         ob-rust
         ob-ipython
-        htmlize))
+        htmlize
+        org-cliplink))
 (mapc #'package+ lye-modules-package-list)
 
 (package+ 'pdf-tools)

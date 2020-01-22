@@ -264,8 +264,7 @@
 ;; lex-snails
 (when (and (not IS-WINDOWS) (display-graphic-p))
   (lib-key-define "C-x b" 'snails
-                  "C-z C-s" 'snails-load-theme
-                  :autoload "iex-snails"))
+                  "C-z C-s" 'snails-load-theme))
 
 ;; iex-tldr
 (unless IS-WINDOWS

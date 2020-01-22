@@ -30,3 +30,5 @@
 
 (bundle! lsp :defer t)
 (bundle! flycheck :defer t)
+
+(bundle! snails :commands (snails snails-load-theme))
