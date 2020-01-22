@@ -129,12 +129,6 @@
   (package+ 'lsp-python-ms))
 
 ;;
-;;; md-lua
-(package+ 'lua-mode)
-(package+ 'company-lua)
-(package! '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy" :host github))
-
-;;
 ;;;
 (package+ 'nov)
 
