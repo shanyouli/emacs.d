@@ -74,12 +74,6 @@
         smex
         flx-ido
         ido-sort-mtime
-        ;; md-edit
-        rainbow-delimiters
-        hungry-delete
-        highlight-indent-guides
-        rainbow-mode
-        page-break-lines
         ;; md-hugo
         ox-hugo
         easy-hugo

@@ -94,6 +94,11 @@
 (defvar lye--default-modeline-format mode-line-format)
 (require 'lib-modeline)
 
+;;
+;;; Line-Number
+(when (> (lib-frame-get-screen-width) 86)
+  (add-hook! 'prog-mode-hook (display-line-numbers-mode +1)))
+
 (provide 'core-ui)
 
 ;;; core-ui.el ends here

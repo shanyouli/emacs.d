@@ -32,3 +32,5 @@
 (bundle! flycheck :defer t)
 
 (bundle! snails :commands (snails snails-load-theme))
+
+(bundle! editor)
