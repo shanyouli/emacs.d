@@ -36,16 +36,27 @@
 ;;        * Initialize
 ;;; Code:
 
-(defun one-key--make-defun (cmd-name cmd-doc name menu-list &optional recursion-p)
+(defun one-key--make-defun (cmd-name cmd-doc name menu-list &optional args)
   "Create a `one-menu-*' functions."
+  (let ((miss-match-exit-p (nth 0 args))
+        (recursion-p (nth 1 args))
+        (protect-function (nth 2 args))
+        (alternate-function (nth 3 args))
+        (execute-last-command-when-miss-match (nth 4 args)))
   `(defun ,cmd-name ()
      ,cmd-doc
      (interactive)
      (require 'one-key)
-     (one-key-menu ,name ,menu-list t ,recursion-p)))
+     (one-key-menu ,name
+                   ,menu-list
+                   ,miss-match-exit-p
+                   ,recursion-p
+                   ,protect-function
+                   ,alternate-function
+                   ,execute-last-command-when-miss-match))))
 
 ;;;###autoload
-(defmacro defonekey (name recursion-p &optional docstring &rest heads)
+(defmacro defonekey (name args &optional docstring &rest heads)
   "A similar macro and defhydra. "
   (declare (indent defun) (doc-string 3))
   (setq heads (copy-tree heads))
@@ -77,7 +88,7 @@
                                  name-docstring
                                  name-upcase
                                  name-menu
-                                 recursion-p)))))
+                                 args)))))
 
 (provide 'onekey-ext)
 

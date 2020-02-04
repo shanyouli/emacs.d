@@ -33,4 +33,14 @@
 
 (bundle! snails :commands (snails snails-load-theme))
 
-(bundle! editor)
+(when
+    (and
+     (not
+      (bundle-active-p 'editor))
+     t)
+  (cl-pushnew 'editor bundle--active-list)
+  (load "/home/syl/.emacs.d/bundles/editor/package" t t)
+  (load "/home/syl/.emacs.d/bundles/editor/config" t t)
+  (let
+      ((absolute-file-path "/home/syl/.emacs.d/bundles/editor/key.el"))
+    (autoload 'one-key-thing-edit/menu absolute-file-path)))

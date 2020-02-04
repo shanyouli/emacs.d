@@ -38,11 +38,11 @@
   ("0" default-setup-font-size "Default font size" :exit t)
   ("q" nil "quit"))
 
-(defonekey change-fontsize t
+(defonekey change-fontsize (nil t)
   "Font size."
-  ("=" mdf/increase-font-size "Inc font size")
-  ("-" mdf/decrease-font-size "Dec font size")
-  ("0" mdf/goto-default-size-font "Default font size"))
+  ("=" lib-font/increase-font-size "Inc font size")
+  ("-" lib-font/decrease-font-size "Dec font size")
+  ("0" lib-font/goto-default-size-font "Default font size"))
 
 (provide 'lex-setup-font)
 

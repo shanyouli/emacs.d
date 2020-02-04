@@ -19,3 +19,28 @@
 
 (package! '(smart-align :type git :host github :repo "manateelazycat/smart-align"
             :no-byte-compile t) :commands smart-align)
+
+(package! 'thing-edit :local t
+          :commands (thing-copy-word
+                     thing-copy-symbol
+                     thing-copy-filename
+                     thing-copy-sexp
+                     thing-copy-page
+                     thing-copy-list
+                     thing-copy-defun
+                     thing-copy-parentheses
+                     thing-copy-region-or-line
+                     thing-copy-to-line-beginning
+                     thing-copy-to-line-end
+
+                     thing-cut-word
+                     thing-cut-symbol
+                     thing-cut-filename
+                     thing-cut-sexp
+                     thing-cut-page
+                     thing-cut-list
+                     thing-cut-defun
+                     thing-cut-parentheses
+                     thing-cut-region-or-line
+                     thing-cut-to-line-beginning
+                     thing-cut-to-line-end))

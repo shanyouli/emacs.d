@@ -76,7 +76,7 @@
 (lib-key-define "C-c s" 'one-key-color-rg-search/menu :autoload "lex-search")
 
 ;; lex-thing-edit.el
-(lib-key-define "M-e"  'one-key-thing-edit/menu :autoload "lex-thing-edit")
+
 
 ;; lex-pyim.el
 (lib-key-define "<f9>" 'toggle-input-method
@@ -227,6 +227,10 @@
 
 (lib-key-define "C-z s m" 'smart-align
                 :keymap prog-mode-map)
+
+;; editor-bundle
+(lib-key-define "M-e"  'one-key-thing-edit/menu)
+
 ;; iex-git
 ;; transient file
 (setq transient-history-file
@@ -242,9 +246,7 @@
 (lib-key-define "C-x g" 'one-key-magit/menu :autoload "iex-git")
 
 ;; iex-window
-(lib-key-define "C-x 4 u" 'winner-undo
-                "C-x 4 r" 'winner-redo
-                :autoload "iex-window")
+
 
 ;; iex-avy
 (lib-key-define "M-s" 'one-key-avy/menu :autoload "iex-avy")
@@ -283,7 +285,7 @@
 
 
 
-;; window-key
+;; window-bundle
 (lib-key-define "C-h z" 'shackle-last-popup-buffer)
 (pcase lye-use-switch-windows-package
   ('ace-window
@@ -309,6 +311,9 @@
                    "M-7" 'winum-select-window-7
                    "M-8" 'winum-select-window-8
                    "M-9" 'winum-select-window-9)))
+
+(lib-key-define "C-x 4 u" 'winner-undo
+                "C-x 4 r" 'winner-redo)
 
 ;; adjust-opacity
 (lib-key-define :prefix "C-, u"
