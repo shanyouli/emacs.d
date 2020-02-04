@@ -31,25 +31,33 @@
           :if (executable-find "emerge"))
 
 ;; AHK
-(package! 'ahk-mode :mode ("\\.ahk\\'" . ahk-mode)
-          :if IS-WINDOWS)
+(package! 'ahk-mode :mode ("\\.ahk\\'" . ahk-mode) :if IS-WINDOWS)
 
 ;; POWERSHELL
-(package! 'powershell :mode ("\\.ps1\\'" . powershell-mode)
-          :if IS-WINDOWS)
+(package! 'powershell :mode ("\\.ps1\\'" . powershell-mode) :if IS-WINDOWS)
 
 ;; PLANTUML
-(package! 'plantuml-mode :if (executable-find "java"))
+(package! 'plantuml-mode
+  :if (executable-find "java"))
 
 ;; sh
-(package! 'sh-script :local t
-          :mode (("\\.zsh\\'" . sh-mode)
-                 (".zshrc" . sh-mode)))
+(package! 'sh-script
+  :local t
+  :mode (("\\.zsh\\'" . sh-mode)
+         (".zshrc" . sh-mode)))
 
 ;; LUA
-(package! 'lua-mode :mode (("\\.lua\\'" . lua-mode)
-                           (".luacheckrc" . lua-mode)
-                           ("rc.lua.template" . lua-mode)))
+(package! 'lua-mode
+  :mode (("\\.lua\\'" . lua-mode)
+         (".luacheckrc" . lua-mode)
+         ("rc.lua.template" . lua-mode)))
 (package! 'company-lua)
 (package! '(lsp-lua-emmy :repo "phenix3443/lsp-lua-emmy" :host github)
   :if (executable-find "java"))
+
+;; python
+(package! 'yapfify
+  :if (executable-find "yapf")
+  :commands yapf-mode)
+(package! 'pyenv-mode-auto :if (executable-find "pyenv"))
+(package! 'live-py-mode :commands live-py-mode)

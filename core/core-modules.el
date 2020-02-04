@@ -53,9 +53,6 @@
         ivy-yasnippet
         ;; iex-pomidor
         pomidor
-        ;; iex-smart-align
-        (smart-align :type git :host github :repo "manateelazycat/smart-align"
-                     :no-byte-compile t)
         ;;iex-treemacs
         treemacs
         treemacs-projectile
@@ -97,21 +94,6 @@
 (mapc #'package+ lye-modules-package-list)
 
 (package+ 'pdf-tools)
-
-;;
-;;; python-mode
-(defvar lye-lsp-python-ms-p nil
-  "当为 t 时, 使用 `lsp-python-ms-p'.")
-
-(if (executable-find "yapf")
-    (package+ 'yapf))
-(when (executable-find "pyenv")
-  (package+ 'pyenv-mode)
-  (package+ 'pyenv-mode-auto))
-(package+ 'live-py-mode)
-
-(when lye-lsp-python-ms-p
-  (package+ 'lsp-python-ms))
 
 ;;
 ;;;

@@ -47,3 +47,12 @@
   (setq-local company-backends
               (cons '(company-lsp company-lua company-yasnippet)
                     company-backends)))
+
+;; PYthon
+(with-eval-after-load 'python
+  (require 'pyenv-mode-auto nil t))
+(add-hook! 'python-mode-hook :if (require 'yapfify nil t)
+  (yapf-mode +1))
+(add-hook! 'python-mode-hook
+  :if (executable-find "pyls")
+  (lsp))

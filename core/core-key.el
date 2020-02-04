@@ -224,9 +224,8 @@
   (with-eval-after-load 'markdown-mode
     (lib-key-define :map markdown-mode-map
                     "C-c f" 'markdownfmt-format-buffer)))
-;; iex-smart-align
+
 (lib-key-define "C-z s m" 'smart-align
-                :autoload "smart-align"
                 :keymap prog-mode-map)
 ;; iex-git
 ;; transient file

@@ -54,9 +54,7 @@
 
 (run-with-idle-timer! :defer 0.5
   ;; Program language common tool
-  (lye/modules-require 'md-scheme)
-  (lye/modules-require 'md-python)
-  )
+  (lye/modules-require 'md-scheme))
 
 ;; Org mode
 (run-with-idle-timer! :defer 1

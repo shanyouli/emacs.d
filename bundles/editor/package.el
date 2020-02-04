@@ -16,3 +16,6 @@
 ;; (package! 'pangu-spacing :commands pagu-spacing-mode)
 
 (package! 'whitespace :commands witespace-mode :local t)
+
+(package! '(smart-align :type git :host github :repo "manateelazycat/smart-align"
+            :no-byte-compile t) :commands smart-align)
