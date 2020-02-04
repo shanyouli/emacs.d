@@ -56,15 +56,6 @@
         ;; iex-smart-align
         (smart-align :type git :host github :repo "manateelazycat/smart-align"
                      :no-byte-compile t)
-        ;; iex-snails
-        (snails :type git
-                :host github
-                :repo "manateelazycat/snails"
-                :no-byte-compile t)
-        (snails-backend-themes :type git
-                               :host github
-                               :repo "shanyouli/snails-backend"
-                               :no-byte-compile t)
         ;;iex-treemacs
         treemacs
         treemacs-projectile

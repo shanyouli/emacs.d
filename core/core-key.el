@@ -212,7 +212,8 @@
   (lib-key-define :map dired-mode-map
                   "C-c C-p" 'wdired-change-to-wdired-mode
                   ")" 'dired-git-info-mode
-                  "C-c C-r" 'dired-rsync)
+                  "C-c C-r" 'dired-rsync
+                  "H" 'dired-omit-mode)
   (when (and (or (and IS-MAC (executable-find "gls"))
                  (and (not IS-MAC) (executable-find "ls")))
              (bundle-active-p 'hydra))
@@ -223,6 +224,10 @@
   (with-eval-after-load 'markdown-mode
     (lib-key-define :map markdown-mode-map
                     "C-c f" 'markdownfmt-format-buffer)))
+;; iex-smart-align
+(lib-key-define "C-z s m" 'smart-align
+                :autoload "smart-align"
+                :keymap prog-mode-map)
 ;; iex-git
 ;; transient file
 (setq transient-history-file
@@ -264,16 +269,20 @@
 ;; lex-snails
 (when (and (not IS-WINDOWS) (display-graphic-p))
   (lib-key-define "C-x b" 'snails
-                  "C-z C-s" 'snails-load-theme))
+                  "C-z C-s" 'snails-load-theme)
+  (with-eval-after-load 'snails
+    (lib-key-define :map snails-mode-map
+                    "<up>" 'snails-select-prev-item
+                    "<down>" 'snails-select-next-item
+                    "<left>" 'snails-select-prev-backend
+                    "<right>" 'snails-select-next-backend))
+  )
 
 ;; iex-tldr
 (unless IS-WINDOWS
   (lib-key-define "C-z s h" 'tldr :autoload "iex-tldr"))
 
-;; iex-smart-align
-(lib-key-define "C-z s m" 'smart-align
-                :autoload "smart-align"
-                :keymap prog-mode-map)
+
 
 ;; window-key
 (lib-key-define "C-h z" 'shackle-last-popup-buffer)

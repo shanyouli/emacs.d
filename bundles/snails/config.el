@@ -19,7 +19,8 @@
               " *pyim"
               " *server"
               " *sdcv"
-              " *diff-hl*"))
+              " *diff-hl*"
+              " *snails"))
   (push buf snails-backend-buffer-blacklist))
 
 ;;; snails-backend-themes
@@ -28,10 +29,3 @@
   (interactive)
   (require 'snails-backend-themes)
   (snails '(snails-backend-themes)))
-
-(with-eval-after-load 'snails
-  ;; UP, Down, Left, Right key bind
-  (define-key snails-mode-map (kbd "<up>") 'snails-select-prev-item)
-  (define-key snails-mode-map (kbd "<down>") 'snails-select-next-item)
-  (define-key snails-mode-map (kbd "<left>") 'snails-select-prev-backend)
-  (define-key snails-mode-map (kbd "<right>") 'snails-select-next-backend))
