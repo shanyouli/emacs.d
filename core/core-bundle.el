@@ -37,4 +37,4 @@
 
 (bundle! tools)
 
-(bundle! treemacs :defer t)
+(bundle! treemacs)

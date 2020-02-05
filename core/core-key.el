@@ -239,12 +239,12 @@
 ;; treemacs-bundle
 (lib-key-define [f8] 'treemacs
                 "M-0" 'treemacs-select-window
-                "C-x 1" 'treemacs-delete-other-windows
-                "C-x t 1" 'treemacs-delete-other-windows
                 "C-x t t" 'treemacs
                 "C-x t b" 'treemacs-bookmark
                 "C-x t M-t" 'treemacs-find-tag)
 (with-eval-after-load 'treemacs
+  (lib-key-define "C-x 1" 'treemacs-delete-other-windows
+                  "C-x t 1" 'treemacs-delete-other-windows)
   (with-eval-after-load 'projectile
     (lib-key-define :map projectile-command-map
                     "h" 'treemacs-projectile)))
