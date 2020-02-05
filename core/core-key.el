@@ -229,7 +229,12 @@
                 :keymap prog-mode-map)
 
 ;; editor-bundle
-(lib-key-define "M-e"  'one-key-thing-edit/menu)
+(lib-key-define "M-e"  'one-key-thing-edit/menu
+                "C-:" 'avy-goto-char
+                "C-'" 'avy-goto-char-2
+                "M-g f" 'avy-goto-line
+                "M-g w" 'avy-goto-word-1
+                "M-g e" 'avy-goto-word-0)
 
 ;; iex-git
 ;; transient file
@@ -244,12 +249,6 @@
 (setq forge-database-file
       (expand-file-name "forge-database.sqlite" lye-emacs-cache-dir))
 (lib-key-define "C-x g" 'one-key-magit/menu :autoload "iex-git")
-
-;; iex-window
-
-
-;; iex-avy
-(lib-key-define "M-s" 'one-key-avy/menu :autoload "iex-avy")
 
 ;; iex-vterm
 (lib-key-define "<f5>" 'shell-pop)
@@ -276,14 +275,11 @@
                     "<up>" 'snails-select-prev-item
                     "<down>" 'snails-select-next-item
                     "<left>" 'snails-select-prev-backend
-                    "<right>" 'snails-select-next-backend))
-  )
+                    "<right>" 'snails-select-next-backend)))
 
 ;; iex-tldr
 (unless IS-WINDOWS
   (lib-key-define "C-z s h" 'tldr :autoload "iex-tldr"))
-
-
 
 ;; window-bundle
 (lib-key-define "C-h z" 'shackle-last-popup-buffer)

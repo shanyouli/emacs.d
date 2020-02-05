@@ -41,9 +41,6 @@
 
 (setq lye-modules-package-list
       '(
-        ;; iex-avy
-        avy
-        ace-pinyin
         ;; iex-fuz
         fuz
         ;; iex-git

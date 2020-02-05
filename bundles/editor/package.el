@@ -44,3 +44,7 @@
                      thing-cut-region-or-line
                      thing-cut-to-line-beginning
                      thing-cut-to-line-end))
+
+;; avy
+(package! 'avy :commands avy-setup-default)
+(package! 'ace-pinyin :commands ace-pinyin-global-mode)

@@ -77,3 +77,12 @@
                 ("||" . ?∨)))
 (setq prettify-symbols-unprettify-at-point 'right-edge)
 (add-hook! 'prog-mode-hook (prettify-symbols-mode +1))
+
+;; avy
+(add-hook! 'after-init-hook (avy-setup-default))
+(with-eval-after-load 'avy
+  (ace-pinyin-global-mode +1)
+  (setq avy-all-windows nil
+        avy-all-windows-alt t
+        avy-background t
+        avy-style 'pre))
