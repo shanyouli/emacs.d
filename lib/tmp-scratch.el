@@ -39,7 +39,8 @@
                                     ("python" . "py")
                                     ("emacs-lisp" . "el")
                                     ("elisp" . "el")
-                                    ("txt" . "txt"))
+                                    ("txt" . "txt")
+                                    ("orign" . "txt"))
   "常用的语言和对应文件名后缀."
   :type 'alist
   :group 'tmp-scratch)

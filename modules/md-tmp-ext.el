@@ -37,7 +37,7 @@
 
 (require 'tmp-scratch)
 (setq tmp-scratch-directory (lib-f-join lye-emacs-cache-dir "tmp-scratchs"))
-(tmp-scratch-create-fun! 'orign "txt")
+(tmp-scratch-create-fun! 'orign)
 (tmp-scratch-create-fun! 'emacs-lisp)
 (tmp-scratch-create-fun! 'python)
 (tmp-scratch-create-fun! 'shell)
@@ -48,8 +48,6 @@
   ("e" lib-scratch/emacs-lisp   "Elisp")
   ("p" lib-scratch/python   "Python")
   ("s" lib-scratch/shell   "Bash/zsh"))
-
-;; (defhydra tmp-scratch (:color blue))
 
 (provide 'md-tmp-ext)
 

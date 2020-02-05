@@ -33,6 +33,7 @@
   (require 'ox-hugo)
   (setq org-hugo-section "post"))
 
+
 (use-package easy-hugo)
 
 

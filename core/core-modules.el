@@ -65,9 +65,6 @@
         ;;
         link-hint
         ;;
-        yasnippet
-        yasnippet-snippets
-        ;;
         cnfonts
         ;; iex-awetab
         (awesome-tab :type git
@@ -98,8 +95,6 @@
 
 (package+ 'cmuscheme)
 (package+ 'paredit)
-
-(and IS-LINUX (package+ 'theme-magic))
 
 (provide 'core-modules)
 

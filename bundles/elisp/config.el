@@ -111,7 +111,6 @@
   (setq counsel-describe-function-function #'helpful-callable
         counsel-describe-variable-function #'helpful-variable))
 
-
 (with-eval-after-load 'apropos
   ;; patch apropos buttons to call helpful instead of help
   (dolist (fun-bt '(apropos-function apropos-macro apropos-command))
