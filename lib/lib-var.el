@@ -51,6 +51,7 @@
       '()
     (cons (list (car plist) (cadr plist))
           (lib-var-plist-to-alist (cddr plist)))))
+
 (defun lib-var-alist-to-plist (alist)
   "ALIST --> plist."
   (if (null alist)
@@ -82,6 +83,20 @@
   "Separates a property list into two lists of Keys and Values."
   (let ((clist (lib-var-plist-to-clist plist)))
     (cons (mapcar #'car clist) (mapcar #'cdr clist))))
+
+;;
+;;; 删除 plist 的 key 和 其对应的 values
+(defun lib-var-delete-a-element-plist (key plist)
+  "Delete KEY and VALUES in PLIST."
+  (if (memq key plist)
+      (let (q)
+        (while plist
+          (let ((a (car plist)))
+            (when (and a (not (equal a key)))
+              (setq q (plist-put q a (nth 1 plist))))
+            (setq plist (cddr plist))))
+        q)
+      plist))
 
 (defun lib-var-delete-same-element-in-list (lists)
   "Delete the same elemnet in a list."

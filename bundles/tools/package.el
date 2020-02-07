@@ -4,3 +4,7 @@
 (package! 'theme-magic
   :if (and IS-LINUX (executable-find "wal"))
   :commands (theme-magic-export-theme-mode theme-magic-from-emacs))
+
+(package! 'pomidor :commands pomidor)
+
+(package! 'link-hint :commands (link-hint-copy-link link-hint-open-link))

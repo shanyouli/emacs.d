@@ -34,6 +34,7 @@
 ;; 11/20/19
 
 ;;; Code:
+
 (defun lye//pdf-tools-check ()
   (let ((epdfinfo-file (locate-library "epdfinfo"))
         (lye--pdf-tools (lib-f-join straight-dynamic-modules-dir "epdfinfo")))

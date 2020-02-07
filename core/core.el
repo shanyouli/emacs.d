@@ -180,7 +180,6 @@ If it is `nil', Not use fuzzy match."
   (lib-load-absolute 'core/core-bundle)
   (lib-load-absolute 'core/core-key)       ; Keybinding
   )
-;; (add-hook 'emacs-startup-hook #'core-benchmark/require-times)
 
 (provide 'core)
 

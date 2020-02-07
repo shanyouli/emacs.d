@@ -148,7 +148,7 @@
                 "C-c c z" 'counsel-fzf)
 
 (with-eval-after-load 'counsel
-  (lib-key-define :keymap counsel-mode-map
+  (lib-key-define :map counsel-mode-map
                   [remap swiper]          'counsel-grep-or-swiper
                   [remap swiper-backward] 'counsel-gre-or-swiper-backward
                   [remap dired]           'counsel-dired
@@ -160,20 +160,20 @@
                   "<C-return>" 'my-swiper-toggle-counsel-rg))
 
 (with-eval-after-load 'swiper
-  (lib-key-define :keymap swiper-map
+  (lib-key-define :map swiper-map
                   [escape] 'minibuffer-keyboard-quit
                   "M-s" 'swiper-isearch-toggle
                   "M-%" 'swiper-query-replace))
 
 (with-eval-after-load 'ivy
-  (lib-key-define :keymap ivy-minibuffer-map
+  (lib-key-define :map ivy-minibuffer-map
                   "<C-return>" 'ivy-immediate-done
                   [escape] 'minibuffer-keyboard-quit
                   "C-w" 'ivy-yank-word))
 
 (with-eval-after-load 'yasnippet
   (lib-key-define "C-c i y" 'ivy-yasnippet
-                  :keymap yas-minor-mode-map
+                  :map yas-minor-mode-map
                   :autoload "ivy-yasnippet"))
 
 ;; Rss-bundles
@@ -181,7 +181,7 @@
                 "C-x w" 'elfeed)
 (with-eval-after-load 'elfeed
   (lib-key-define "?" 'elfeed-hydra/body
-                  :keymap elfeed-search-mode-map)
+                  :map elfeed-search-mode-map)
   (lib-key-define :map elfeed-show-mode-map "q" 'delete-window)
   (cond
     ((fboundp 'link-hint-open-link)
@@ -226,7 +226,7 @@
                     "C-c f" 'markdownfmt-format-buffer)))
 
 (lib-key-define "C-z s m" 'smart-align
-                :keymap prog-mode-map)
+                :map prog-mode-map)
 
 ;; editor-bundle
 (lib-key-define "M-e"  'one-key-thing-edit/menu
@@ -249,35 +249,25 @@
     (lib-key-define :map projectile-command-map
                     "h" 'treemacs-projectile)))
 
-;; iex-git
-;; transient file
-(setq transient-history-file
-      (concat lye-emacs-cache-dir "transient/history.el"))
-(setq transient-values-file
-      (concat lye-emacs-cache-dir "transient/values.el"))
-(setq transient-levels-file
-      (concat lye-emacs-cache-dir "transient/levels.el"))
+;; Git-bundle
+(lib-key-define "C-x g" 'one-key-magit/menu
+  "C-x M-g" 'magit-dispatch
+  "C-c M-g" 'magit-file-popup)
 
-;; Forge configuration
-(setq forge-database-file
-      (expand-file-name "forge-database.sqlite" lye-emacs-cache-dir))
-(lib-key-define "C-x g" 'one-key-magit/menu :autoload "iex-git")
+;; unset C-x g
+;; @see https://github.com/magit/magit/issues/3522#issuecomment-407640436
+(with-eval-after-load "magit-files"
+  ;; (define-key magit-file-mode-map (kbd "C-x g") nil)
+  (lib-key-unset magit-file-mode-map "C-x g"))
+(with-eval-after-load "magit-mode"
+  (lib-key-unset magit-mode-map "M-1" "M-2" "M-3"))
 
 ;; iex-vterm
 (lib-key-define "<f5>" 'shell-pop)
 
-;; iex-pomidor.el
-(lib-key-define "C-z s c" 'pomidor :autoload "iex-pomidor")
-
-;; open line in browser
-;; see @https://github.com/noctuid/link-hint.el/
-(lib-key-define "C-x p o" 'link-hint-open-link
-                "C-x p c" 'link-hint-copy-link
-                :autoload "link-hint")
-
 (with-eval-after-load 'org
   (lib-key-define "C-x p i" 'org-cliplink
-                  :keymap org-mode-map :autoload "org-cliplink"))
+                  :map org-mode-map :autoload "org-cliplink"))
 
 ;; lex-snails
 (when (and (not IS-WINDOWS) (display-graphic-p))
@@ -322,7 +312,7 @@
                    "M-9" 'winum-select-window-9)))
 
 (lib-key-define "C-x 4 u" 'winner-undo
-                "C-x 4 r" 'winner-redo)
+  "C-x 4 r" 'winner-redo)
 
 ;; adjust-opacity
 (lib-key-define :prefix "C-, u"
@@ -336,21 +326,26 @@
 (with-eval-after-load 'lsp-ui
   (lib-key-define [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
                   [remap xref-find-references] 'lsp-ui-peek-find-references
-                  "C-c u" 'lsp-ui-imenu
-                  :keymap lsp-ui-mode-map))
+    "C-c u" 'lsp-ui-imenu
+    :map lsp-ui-mode-map))
 
 ;; elisp-bundles
-(lib-key-define :keymap emacs-lisp-mode-map
-                :prefix "C-c"
-                "C-x" 'ielm
-                "C-c" 'eval-defun
-                "C-b" 'eval-buffer
-                "e" 'macrostep-expand)
-(lib-key-define :keymap help-mode-map "r" 'remove-hook-at-point)
+(lib-key-define :map emacs-lisp-mode-map
+  :prefix "C-c"
+  "C-x" 'ielm
+  "C-c" 'eval-defun
+  "C-b" 'eval-buffer
+  "e" 'macrostep-expand)
+(lib-key-define :map help-mode-map "r" 'remove-hook-at-point)
 (lib-key-define [remap describe-key] 'helpful-key
-                [remap describe-symbol] 'helpful-symbol)
+  [remap describe-symbol] 'helpful-symbol)
 (with-eval-after-load 'helpful
-  (lib-key-define :keymap helpful-mode-map "r" 'remove-hook-at-point))
+  (lib-key-define :map helpful-mode-map "r" 'remove-hook-at-point))
+
+;; tools
+(lib-key-define "C-x p o" 'link-hint-open-link
+  "C-x p c" 'link-hint-copy-link
+  "C-, t p" 'pomidor)
 
 (provide 'core-key)
 

@@ -96,8 +96,24 @@
 
 ;;
 ;;; Line-Number
-(when (> (lib-frame-get-screen-width) 86)
-  (add-hook! 'prog-mode-hook (display-line-numbers-mode +1)))
+;; 文件超过10000行，不显示行号，只留4位吧
+(setq display-line-numbers-width-start 4)
+(defun lye-display-line-numbers ()
+  "当文件的列宽 <86 或者 文件的 Major－mode 为 org－mode 且行数大于 1000,
+不显示行号。"
+  (let* ((edges (frame-edges))
+         (width-start (nth 0 edges))
+         (width-end (nth 2 edges))
+         result)
+    (when (< 86 (truncate (/ (- width-end width-start) (frame-char-width))))
+      (setq result (or (not (eq major-mode 'org-mode))
+                       (< (line-number-at-pos (point-max) 1000)))))
+    (if result
+        (display-line-numbers-mode +1)
+      (display-line-numbers-mode -1))))
+
+(dolist (h '(prog-mode-hook org-mode-hook))
+  (add-hook! h (lye-display-line-numbers)))
 
 (provide 'core-ui)
 

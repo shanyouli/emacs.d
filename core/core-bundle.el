@@ -29,6 +29,7 @@
 (bundle! yasnippet)
 
 (bundle! lsp :defer t)
+
 (bundle! flycheck :defer t)
 
 (bundle! snails :commands (snails snails-load-theme))
@@ -38,3 +39,7 @@
 (bundle! tools)
 
 (bundle! treemacs)
+
+(bundle! git :defer t :key one-key-magit/menu)
+
+;; TODO: Use bundle replace modules

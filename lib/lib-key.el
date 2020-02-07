@@ -52,34 +52,29 @@ ARGS format is: (keymaps key1 key2...) or (key1 key2 ...).
 ;;; 为交互函数设定快捷按键.
 
 ;;;###autoload
-(defmacro lib-key-define (&rest args)
+(cl-defmacro lib-key-define (&rest plist &key prefix map autoload &allow-other-keys)
   "为一个可交互函数绑定一个快捷按键.
 ARGS 可以存在的 key 有 prefix, keymaps, autoload.
 :PREFIX         后接一个 string 的 key.
 :KEYMAP or :map 后接一个 keymap 默认为 `(current-global-map)'.
 :AUTOLOAD       后接一个文件名, 如 :autoload \"test\", 将被展开为 (autoload def \"test\").
-
+:AFTER
 ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
-  (let ((key-def (lib-var-plist-to-alist args))
-        keymap autoload prefix)
-    (when-let ((tlist (or (assoc :keymap key-def)
-                          (assoc :map key-def))))
-      (setq keymap (cadr tlist)
-            key-def (delete tlist key-def)))
-    (if-let ((tlist (assoc :prefix key-def)))
-        (setq prefix (concat (cadr tlist) " ")
-              key-def (delete tlist key-def))
-      (setq prefix ""))
-    (when-let ((tlist (assoc :autoload key-def)))
-      (setq autoload (cadr tlist)
-            key-def (delete tlist key-def)))
+  (declare (indent defun))
+  (let ((key-prefix (or (concat prefix " ") ""))
+        (keymap (or map `(current-global-map)))
+        (autofile autoload)
+        (key-def (copy-tree plist)))
+    (dolist (key (list :prefix :map :autoload))
+      (setq key-def (lib-var-delete-a-element-plist key key-def)))
+    (setq key-def (lib-var-plist-to-alist key-def))
     `(progn
        ,@(lib-key--map-apply
           (lambda (key fun)
-            (cond ((stringp key) (setq key (read-kbd-macro (concat prefix key))))
+            (cond ((stringp key) (setq key (read-kbd-macro (concat key-prefix key))))
                   ((vectorp key) nil)
                   (t (signal 'wrong-type-argument (list 'array key))))
-               `(define-key ,(or keymap `(current-global-map)) ,key ,fun))
+               `(define-key ,keymap ,key ,fun))
           key-def)
        (when ,autoload
          ,@(lib-key--map-apply

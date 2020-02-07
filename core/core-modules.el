@@ -48,12 +48,6 @@
         ;; ivy-fuz
         flx
         ivy-yasnippet
-        ;; iex-pomidor
-        pomidor
-        ;;iex-treemacs
-        treemacs
-        treemacs-projectile
-        treemacs-magit
         ;; lex-ido
         ido-completing-read+
         smex
@@ -62,8 +56,6 @@
         ;; md-hugo
         ox-hugo
         easy-hugo
-        ;;
-        link-hint
         ;;
         cnfonts
         ;; iex-awetab
