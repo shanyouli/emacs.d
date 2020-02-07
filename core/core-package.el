@@ -75,7 +75,7 @@
   (global-auto-revert-mode +1)
 
   ;; Use undo-tree
-  (global-undo-tree-mode +1)
+  ;;(global-undo-tree-mode +1)
 
   ;; Save Emacs buffers when they lose focus after 2s
   (with-eval-after-load 'super-save

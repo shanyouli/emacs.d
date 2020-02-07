@@ -8,3 +8,5 @@
 (package! 'pomidor :commands pomidor)
 
 (package! 'link-hint :commands (link-hint-copy-link link-hint-open-link))
+
+(package! 'tldr :commands tldr :if (not IS-WINDOWS))

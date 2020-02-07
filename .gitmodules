@@ -10,9 +10,6 @@
 [submodule "color-rg"]
 	path = site-lisp/color-rg
 	url = https://github.com/manateelazycat/color-rg.git
-[submodule "undo-tree"]
-	path = site-lisp/undo-tree
-	url = https://github.com/emacsmirror/undo-tree.git
 [submodule "emacs-which-key"]
 	path = site-lisp/emacs-which-key
 	url = https://github.com/justbur/emacs-which-key.git

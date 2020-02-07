@@ -262,7 +262,7 @@
 (with-eval-after-load "magit-mode"
   (lib-key-unset magit-mode-map "M-1" "M-2" "M-3"))
 
-;; iex-vterm
+;; term-bundle
 (lib-key-define "<f5>" 'shell-pop)
 
 (with-eval-after-load 'org
@@ -280,9 +280,7 @@
                     "<left>" 'snails-select-prev-backend
                     "<right>" 'snails-select-next-backend)))
 
-;; iex-tldr
-(unless IS-WINDOWS
-  (lib-key-define "C-z s h" 'tldr :autoload "iex-tldr"))
+
 
 ;; window-bundle
 (lib-key-define "C-h z" 'shackle-last-popup-buffer)
@@ -342,10 +340,12 @@
 (with-eval-after-load 'helpful
   (lib-key-define :map helpful-mode-map "r" 'remove-hook-at-point))
 
-;; tools
+;; tools-bundle
 (lib-key-define "C-x p o" 'link-hint-open-link
   "C-x p c" 'link-hint-copy-link
   "C-, t p" 'pomidor)
+(unless IS-WINDOWS
+  (lib-key-define "C-z s h" 'tldr))
 
 (provide 'core-key)
 

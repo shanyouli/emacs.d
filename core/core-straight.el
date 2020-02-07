@@ -141,7 +141,8 @@ Usage:
 :commands  Define autoloads for commands that that will be defined by the
            package. This is useful if the package is being lazily loaded.
 :local     If noinstall is t, not run (straight-use-package NAME).
-:mode EXPR run (add-to-list 'auto-mode-alist EXPR)"
+:mode EXPR run (add-to-list 'auto-mode-alist EXPR).
+:magic EXPR Run ."
   (declare (indent 1))
   (unless (memq :disabled args)
     (let ((-if (or (plist-get args :if) t))

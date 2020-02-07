@@ -43,8 +43,6 @@
       '(
         ;; iex-fuz
         fuz
-        ;; iex-git
-        magit
         ;; ivy-fuz
         flx
         ivy-yasnippet

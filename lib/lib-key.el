@@ -30,6 +30,11 @@
 
 ;;; Code:
 
+(defvar lib-key-personal-keybindings nil
+  "Save all bindings performed by `lib-key'.
+
+Elements have the form ((KEY . [MAP]) CMD ORIGINAL-CMD)")
+
 ;;; 移除快捷按键.
 
 ;;;###autoload
@@ -58,7 +63,7 @@ ARGS 可以存在的 key 有 prefix, keymaps, autoload.
 :PREFIX         后接一个 string 的 key.
 :KEYMAP or :map 后接一个 keymap 默认为 `(current-global-map)'.
 :AUTOLOAD       后接一个文件名, 如 :autoload \"test\", 将被展开为 (autoload def \"test\").
-:AFTER
+
 ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
   (declare (indent defun))
   (let ((key-prefix (or (concat prefix " ") ""))
@@ -69,17 +74,52 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
       (setq key-def (lib-var-delete-a-element-plist key key-def)))
     (setq key-def (lib-var-plist-to-alist key-def))
     `(progn
-       ,@(lib-key--map-apply
-          (lambda (key fun)
-            (cond ((stringp key) (setq key (read-kbd-macro (concat key-prefix key))))
-                  ((vectorp key) nil)
-                  (t (signal 'wrong-type-argument (list 'array key))))
-               `(define-key ,keymap ,key ,fun))
-          key-def)
        (when ,autoload
          ,@(lib-key--map-apply
             (lambda (fun) `(autoload ,fun ,autoload))
-            (mapcar #'cdr key-def))))))
+            (mapcar #'cdr key-def)))
+       ,@(lib-key--map-apply
+          (lambda (key fun)
+            (if (stringp key) (setq key (concat key-prefix key)))
+            `(lib-key ,key ,fun ,keymap))
+          key-def))))
+
+(defmacro lib-key (key-name command &optional keymap predicate)
+  "Bind KEY-NAME to COMMAND in KEYMA(`global-map' if not passed).
+
+KEY-NAME may be a vector or string.
+
+COMMAND must be an interactive function or lambda form.
+
+KEYMAP, if present, should be a keymap and not a quoted symbol.
+
+If PREDICATE is non-nil, it is a form evaluated to determine when a key should
+be bound. It must return non-nil in such cases.
+
+FROM: https://github.com/jwiegley/use-package/blob/master/bind-key.el."
+  (let ((namevar (make-symbol "name"))
+        (keyvar (make-symbol "key"))
+        (kdescvar (make-symbol "kdesc"))
+        (bindingvar (make-symbol "binding")))
+    `(let* ((,namevar ,key-name)
+            (,keyvar (if (vectorp ,namevar) ,namevar
+                       (read-kbd-macro ,namevar)))
+            (,kdescvar (cons (if (stringp ,namevar) ,namevar
+                               (key-description ,namevar))
+                             (quote ,keymap)))
+            (,bindingvar (lookup-key (or ,keymap global-map) ,keyvar)))
+       (let ((entry (assoc ,kdescvar lib-key-personal-keybindings))
+             (details (list ,command (unless (numberp ,bindingvar)
+                                       ,bindingvar))))
+         (if entry
+             (setcdr entry details)
+           (add-to-list 'lib-key-personal-keybindings (cons ,kdescvar details)))
+         ,(if predicate
+              `(define-key (or ,keymap global-map) ,keyvar
+                 '(menu-item "" nil :filter (lambda (&optional _)
+                                              (when ,predicate
+                                                ,command))))
+            `(define-key (or ,keymap global-map) ,keyvar ,command))))))
 
 (defun lib-key--map-apply (fun xss)
   (mapcar (lambda (xs) (apply fun xs)) xss))

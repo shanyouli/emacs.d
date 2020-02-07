@@ -22,3 +22,8 @@
 
   (if (executable-find "notify-send")
       (setq alert-default-style 'libnotify)))
+
+
+;; TLDR configurations
+(setq tldr-directory-path (lib-f-join lye-emacs-cache-dir "tldr")
+      request-storage-directory (lib-f-join lye-emacs-cache-dir "request"))
