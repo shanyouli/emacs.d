@@ -90,11 +90,6 @@
   (lye-font-initialize))
 
 ;;
-;;; mode-line
-(defvar lye--default-modeline-format mode-line-format)
-(require 'lib-modeline)
-
-;;
 ;;; Line-Number
 ;; 文件超过10000行，不显示行号，只留4位吧
 (setq display-line-numbers-width-start 4)

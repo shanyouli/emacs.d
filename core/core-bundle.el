@@ -10,7 +10,7 @@
 
 (bundle! dict :commands lye/dict-point)
 
-(bundle! hydra :commands pretty-hydra-title)
+(bundle! hydra :commands (pretty-hydra-title ui-menu/body open-dir-menu/body))
 
 (bundle! window)
 
@@ -43,3 +43,5 @@
 (bundle! git :defer t :key one-key-magit/menu)
 
 ;; TODO: Use bundle replace modules
+(setq lye-use-modeline 'awetray)
+(bundle! modeline)

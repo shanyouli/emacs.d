@@ -57,3 +57,11 @@
 (defun lye//move-file (old new)
   (lib-f-make-parent-dir new)
   (lye//run-command "mv" nil "-vf" old new))
+
+;;;###autoload
+(defun lye/open-a-dir (dir)
+  "Open DIR, if DIR exists."
+  (let ((fold-name (expand-file-name dir)))
+    (if (file-directory-p fold-name)
+        (dired-x-find-file fold-name)
+      (message "The `%s' is not exists." fold-name))))

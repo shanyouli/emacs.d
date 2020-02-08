@@ -54,10 +54,9 @@
 (lib-key-define :autoload "company-english-helper"
                 "C-, it" #'toggle-company-english-helper)
 
-;; lex-one-key.el
-(lib-key-define :autoload "lex-hydra"
-                "C-, ub" 'hydra-ui-menu/body
-                "C-, od" 'hydra-open-dir-menu/body)
+;; hydra-bundle
+(lib-key-define "C-, ub" 'ui-menu/body
+                "C-, od" 'open-dir-menu/body)
 
 ;; font
 (when (display-graphic-p)
@@ -87,9 +86,6 @@
 
 ;; md-tmp-ext
 (lib-key-define "C-, ot" 'one-key-tmp-scratch/menu :autoload "md-tmp-ext")
-
-;; awesome-tab.el
-(lib-key-define "C-z j" 'awesome-tab-ace-jump :autoload "awesome-tab")
 
 ;; lex-smex
 ;; (lib-key-define "M-x"     'smex

@@ -74,12 +74,7 @@
     (define-key scheme-mode-map (kbd "<f6>") 'scheme-send-definition-split-window)))
 
 (use-package paredit
-  :config
-  (autoload 'paredit-mode "paredit"
-    "Minor mode for pseudo-structurally editing Lisp code."
-    t)
-  (autoload 'enable-paredit-mode "paredit")
-  (add-hook 'scheme-mode-hook #'enable-paredit-mode))
+  :hook (scheme-mode . enable-paredit-mode))
 
 (provide 'md-scheme)
 ;;; md-scheme.el ends here

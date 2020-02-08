@@ -59,3 +59,13 @@ If value is 'gdcv, use google-translate."
   :type '(choice
           (const :tag "Eglot" 'eglot)
           (const :tag "Emacs-lsp" 'lsp-mode)))
+
+(defcustom lye-use-modeline 'base
+  "The value is base, doom, awetray.
+
+If value is 'base, use lib-modeline.
+If value is 'doom, use doom-modeline,
+If value is 'awetray, use awesome-tray."
+  :type '(choice (const :tag "Base" 'base)
+          (const :tag "doom Modeline" 'doom)
+          (const :tag "Awesome-tray" 'awetray)))

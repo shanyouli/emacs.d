@@ -106,7 +106,9 @@ Otherwise, use *-loadfs.el save"
                                    lib-autoload-initialize-list))
       (add-hook 'after-init-hook #'lib-autoload--save-loaded-dirs))))
 
+;;;###autoload
 (defun lib-autoload/update ()
+  "Update autoload file."
   (interactive)
   (lib-autoload--generate-update-file lib-autoload-initialize-list
                                       lib-autoload-sans-extension-file)

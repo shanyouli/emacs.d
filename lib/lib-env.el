@@ -53,35 +53,33 @@
             (path-var-list (lib-env-path-from-shell-getenv-string))
             exec-path-var)
         (with-temp-file env-file
-          (insert
-           (concat ";;; -*- mode: emacs-lisp;-*-\n\n"
-                   ";;; Here 's where all caches need to use environment variables.\n\n"
-                   ";;; Cache environmet variable names have `"
-                   (mapconcat 'identity lib-env-from-shell-list "' `")
-                   "'\n"))
+          (insert ";;; -*- mode: emacs-lisp;-*-\n\n"
+                  ";;; Here 's where all caches need to use environment variables.\n\n"
+                  ";;; Cache environmet variable names have `"
+                  (mapconcat 'identity lib-env-from-shell-list "' `")
+                  "'\n")
           (while path-list
             (let ((env-element (car path-list))
                   (env-var (lib-var-delete-same-element-in-string (car path-var-list)
                                                                   ":")))
-              (insert (concat "\n;;; This is `" env-element "' environment variable.\n"
-                              "(setenv \"" env-element  "\" \"" env-var "\")\n"))
+              (insert "\n;;; This is `" env-element "' environment variable.\n"
+                      "(setenv \"" env-element  "\" \"" env-var "\")\n")
               (when (string= "PATH" env-element)
                 (setq exec-path-var (split-string env-var ":"))))
             (setq path-list (cdr path-list)
                   path-var-list (cdr path-var-list)))
           (insert
-           (concat "\n;;; This is `exec-path' environment variable.\n"
-                   (format "(setq exec-path '%S)" exec-path-var)
-            "\n\n" (char-to-string ?\C-l) "\n"
-            ";; Local Varibles:\n"
-            ";; version-control: never\n"
-            ";; no-byte-compile: t\n"
-            ";; no-update-autoloads: t\n"
-            ";; coding: utf-8\n"
-            ";; End:\n"
-            (format ";;; %s ends here"
-                    (file-name-nondirectory env-file))
-            "\n")))))
+           "\n;;; This is `exec-path' environment variable.\n"
+           (format "(setq exec-path '%S)" exec-path-var)
+           "\n\n" (char-to-string ?\C-l) "\n"
+           ";; Local Varibles:\n"
+           ";; version-control: never\n"
+           ";; no-byte-compile: t\n"
+           ";; no-update-autoloads: t\n"
+           ";; coding: utf-8\n"
+           ";; End:\n"
+           (format ";;; %s ends here" (file-name-nondirectory env-file))
+           "\n"))))
     (load env-file :no-error :no-message)))
 
 ;;;###autoload

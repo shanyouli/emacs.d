@@ -33,27 +33,11 @@
 ;;; The hot key about tool-bar, menu-bar, scroll-bar
 (defhydra hydra-ui-menu (:exit nil)
   "GUI-Menu"
-  ("t" tool-bar-mode "Tool-Bar")
-  ("m" menu-bar-mode "Menu-Bar")
-  ("s" scroll-bar-mode "Scroll-Bar")
-  ("q" nil "quit"))
+  )
 
 ;;; Common file shortcuts
 (defhydra hydra-open-dir-menu (:exit t)
-  "Open the hot folder."
-  ("d" (lambda ()
-         (interactive)
-         (dired-x-find-file (expand-file-name "~/.dotfiles"))) "Dotfiles")
-  ("e" (lambda ()
-         (interactive)
-         (dired-x-find-file user-emacs-directory)) "Emacs.d")
-  ("g" (lambda ()
-         (interactive)
-         (dired-x-find-file (expand-file-name "~/Git"))) "Git Repo")
-  ("r" (lambda ()
-         (interactive)
-         (dired-x-find-file (expand-file-name "~/Dropbox"))) "Dropbox")
-  ("q" nil "quit"))
+  )
 
 (provide 'lex-hydra)
 
