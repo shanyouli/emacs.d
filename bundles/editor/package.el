@@ -48,3 +48,13 @@
 ;; avy
 (package! 'avy :commands avy-setup-default)
 (package! 'ace-pinyin :commands ace-pinyin-global-mode)
+
+;; lazy-search and color-rg
+(package! 'lazy-search :commands lazy-search :local t)
+(package! 'color-rg :local t :if (executable-find "rg")
+          :commands (color-rg-search-symbol
+                     color-rg-search-input
+                     color-rg-search-symbol-in-project
+                     color-rg-search-input-in-project
+                     color-rg-search-symbol-in-current-file
+                     color-rg-search-input-in-current-file))

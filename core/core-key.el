@@ -35,6 +35,8 @@
 
 (lib-key-unset "C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC")
 
+(lib-key "C-x C-s" #'super-save-all-buffer)
+
 ;; esup
 (lib-key-define :autoload "esup" "C-, s e" #'esup)
 (lib-key-define "C-, s b" #'core-benchmark/require-times)
@@ -55,49 +57,33 @@
                 "C-, it" #'toggle-company-english-helper)
 
 ;; hydra-bundle
-(lib-key-define "C-, ub" 'ui-menu/body
-                "C-, od" 'open-dir-menu/body)
+(lib-key-define "C-, ub" 'hydra-ui-menu/body
+  "C-, o d" 'hydra-open-dir-menu/body
+  "C-, f"   'one-key-functions/menu
+  "C-, o t" 'one-key-tmp-scratch/menu
+  "C-, u f" 'one-key-change-fontsize/menu
+  "C-, u a" 'one-key-adjust-opacity/menu)
 
 ;; font
-(when (display-graphic-p)
-  (lib-key-define :autoload "lib-font"
-                  :prefix "C-, uf"
-                  "=" 'lib-font/increase-font-size
-                  "-" 'lib-font/decrease-font-size
-                  "9" 'lib-font/display-font-size)
-  (setq cnfonts-directory (concat lye-emacs-cache-dir "cnfonts"))
-  (lib-key-define "C-, ufc" 'cnfonts-ui :autoload "cnfonts"))
+;; (when (display-graphic-p)
+;;   (setq cnfonts-directory (concat lye-emacs-cache-dir "cnfonts"))
+;;   (lib-key-define "C-, ufc" 'cnfonts-ui :autoload "cnfonts"))
 
-
+;; dict-bundle
 (lib-key-define "C-c y" 'lye/dict-point)
 
-;; lex-search.el
-(lib-key-define "C-c s" 'one-key-color-rg-search/menu :autoload "lex-search")
-
-;; lex-thing-edit.el
-
-
-;; lex-pyim.el
+;; pyim-bundle
 (lib-key-define "<f9>" 'toggle-input-method
                 "C-<f9>" 'lye/toggle-pyim-punctuation-translate)
-
-;; lex-funcs
-(lib-key-define "C-z f" 'hydra-functions-menu/body :autoload "lex-funcs")
-
-;; md-tmp-ext
-(lib-key-define "C-, ot" 'one-key-tmp-scratch/menu :autoload "md-tmp-ext")
-
-;; lex-smex
-;; (lib-key-define "M-x"     'smex
-;;                 "C-x M-x" 'smex-major-mode-commands
-;;                 :autoload "lex-ido")
 
 ;;; toolkit
 (lib-key-define "C-x SPC" 'set-mark-command    ; Instead C-SPC for Chinese input method
                 "C-x C-h" 'rectangle-mark-mode ; rectangle-mark-mode
                 "C-z C-z" 'suspend-frame)    ; Suspend-frame
-;; iv-bundle
-(lib-key-define ;; swiper
+;; ivy-bundle or snails-bundle
+(pcase lye-use-search-frame
+  ('ivy
+   (lib-key-define ;; swiper
                 "C-s" 'swiper-isearch
                 "C-r" 'swiper-isearch-backward
                 "s-f" 'swiper
@@ -141,36 +127,45 @@
                 "C-c c u" 'counsel-unicode-char
                 "C-c c w" 'counsel-colors-web
                 "C-c c v" 'counsel-set-variable
-                "C-c c z" 'counsel-fzf)
+     "C-c c z" 'counsel-fzf)
+   (with-eval-after-load 'counsel
+     (lib-key-define :map counsel-mode-map
+       [remap swiper]          'counsel-grep-or-swiper
+       [remap swiper-backward] 'counsel-gre-or-swiper-backward
+       [remap dired]           'counsel-dired
+       [remap set-variable]    'counsel-set-variable
+       [remap insert-char]     'counsel-unicode-char)
+     (lib-key-define :map counsel-find-file-map
+       "C-h" 'counsel-up-directory)
+     (lib-key-define :map counsel-ag-map
+       "<C-return>" 'my-swiper-toggle-counsel-rg))
+   (with-eval-after-load 'swiper
+     (lib-key-define :map swiper-map
+       [escape] 'minibuffer-keyboard-quit
+       "M-s" 'swiper-isearch-toggle
+       "M-%" 'swiper-query-replace))
+   (with-eval-after-load 'ivy
+     (lib-key-define :map ivy-minibuffer-map
+       "<C-return>" 'ivy-immediate-done
+       [escape] 'minibuffer-keyboard-quit
+       "C-w" 'ivy-yank-word))
+   (with-eval-after-load 'yasnippet
+     (lib-key "C-c i y" 'ivy-yasnippet
+              yas-minor-mode-map
+              (require 'ivy-yasnippet nil t))))
 
-(with-eval-after-load 'counsel
-  (lib-key-define :map counsel-mode-map
-                  [remap swiper]          'counsel-grep-or-swiper
-                  [remap swiper-backward] 'counsel-gre-or-swiper-backward
-                  [remap dired]           'counsel-dired
-                  [remap set-variable]    'counsel-set-variable
-                  [remap insert-char]     'counsel-unicode-char)
-  (lib-key-define :map counsel-find-file-map
-                  "C-h" 'counsel-up-directory)
-  (lib-key-define :map counsel-ag-map
-                  "<C-return>" 'my-swiper-toggle-counsel-rg))
-
-(with-eval-after-load 'swiper
-  (lib-key-define :map swiper-map
-                  [escape] 'minibuffer-keyboard-quit
-                  "M-s" 'swiper-isearch-toggle
-                  "M-%" 'swiper-query-replace))
-
-(with-eval-after-load 'ivy
-  (lib-key-define :map ivy-minibuffer-map
-                  "<C-return>" 'ivy-immediate-done
-                  [escape] 'minibuffer-keyboard-quit
-                  "C-w" 'ivy-yank-word))
-
-(with-eval-after-load 'yasnippet
-  (lib-key-define "C-c i y" 'ivy-yasnippet
-                  :map yas-minor-mode-map
-                  :autoload "ivy-yasnippet"))
+  ('snails
+   (when (and (not IS-WINDOWS) (display-graphic-p))
+     (lib-key-define "C-x b" 'snails
+       "C-c c t" 'snails-load-theme)
+     (with-eval-after-load 'snails
+       (lib-key-define :map snails-mode-map
+         "<up>" 'snails-select-prev-item
+         "<down>" 'snails-select-next-item
+         "<left>" 'snails-select-prev-backend
+         "<right>" 'snails-select-next-backend)))
+   (lib-key-define "M-x"     'smex
+     "C-x M-x" 'smex-major-mode-commands)))
 
 ;; Rss-bundles
 (lib-key-define "C-x W" 'newsticker-show-news
@@ -231,6 +226,7 @@
                 "M-g f" 'avy-goto-line
                 "M-g w" 'avy-goto-word-1
                 "M-g e" 'avy-goto-word-0)
+(lib-key "C-c s" 'one-key-color-rg-search/menu nil (fboundp 'color-rg-search-symbol))
 
 ;; treemacs-bundle
 (lib-key-define [f8] 'treemacs
@@ -265,17 +261,6 @@
   (lib-key-define "C-x p i" 'org-cliplink
                   :map org-mode-map :autoload "org-cliplink"))
 
-;; lex-snails
-(when (and (not IS-WINDOWS) (display-graphic-p))
-  (lib-key-define "C-x b" 'snails
-                  "C-z C-s" 'snails-load-theme)
-  (with-eval-after-load 'snails
-    (lib-key-define :map snails-mode-map
-                    "<up>" 'snails-select-prev-item
-                    "<down>" 'snails-select-next-item
-                    "<left>" 'snails-select-prev-backend
-                    "<right>" 'snails-select-next-backend)))
-
 
 
 ;; window-bundle
@@ -308,14 +293,6 @@
 (lib-key-define "C-x 4 u" 'winner-undo
   "C-x 4 r" 'winner-redo)
 
-;; adjust-opacity
-(lib-key-define :prefix "C-, u"
-                "-" (lambda () (interactive) (lye//adjust-opacity nil -2))
-                "=" (lambda () (interactive) (lye//adjust-opacity nil 2))
-                "0" (lambda () (interactive) (modify-frame-parameters nil `((alpha . 100)))))
-
-(lib-key-define "C-x C-s" #'super-save-all-buffer)
-
 ;; lsp
 (with-eval-after-load 'lsp-ui
   (lib-key-define [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
@@ -340,8 +317,8 @@
 (lib-key-define "C-x p o" 'link-hint-open-link
   "C-x p c" 'link-hint-copy-link
   "C-, t p" 'pomidor)
-(unless IS-WINDOWS
-  (lib-key-define "C-z s h" 'tldr))
+(lib-key "C-z s h" 'tldr nil (not IS-WINDOWS))
+(lib-key "C-, u c" 'cnfonts-ui nil (fboundp 'cnfonts-ui))
 
 (provide 'core-key)
 

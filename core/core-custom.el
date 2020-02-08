@@ -69,3 +69,11 @@ If value is 'awetray, use awesome-tray."
   :type '(choice (const :tag "Base" 'base)
           (const :tag "doom Modeline" 'doom)
           (const :tag "Awesome-tray" 'awetray)))
+
+(defcustom lye-use-search-frame 'snails
+  "The value is snails, ivy.
+
+If value is 'snails, use snails and smex.
+If value is 'ivy, use Ivy."
+  :type '(choice (const :tag "Snails" 'snails)
+          (const :tag "Ivy" 'ivy)))

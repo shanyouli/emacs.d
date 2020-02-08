@@ -49,14 +49,3 @@
 
 ;; Let 'er rip!
 (lye-core-initialize)
-
-(lye/modules-require 'md-reads)         ; Reader tools
-
-(run-with-idle-timer! :defer 0.5
-  ;; Program language common tool
-  (lye/modules-require 'md-scheme))
-
-;; Org mode
-(run-with-idle-timer! :defer 1
-  (lye/modules-require 'md-hugo)
-  (lye/modules-require 'md-org))

@@ -10,3 +10,5 @@
 (package! 'link-hint :commands (link-hint-copy-link link-hint-open-link))
 
 (package! 'tldr :commands tldr :if (not IS-WINDOWS))
+
+(package! 'cnfonts :commands cnfonts-ui :if (display-graphic-p))

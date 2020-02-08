@@ -10,13 +10,22 @@
 
 (bundle! dict :commands lye/dict-point)
 
-(bundle! hydra :commands (pretty-hydra-title ui-menu/body open-dir-menu/body))
+(bundle! hydra
+  :commands (pretty-hydra-title
+             hydra-ui-menu/body
+             hydra-open-dir-menu/body
+             one-key-functions/menu
+             one-key-tmp-scratch/menu
+             one-key-change-fontsize/menu
+             one-key-adjust-opacity/menu))
 
 (bundle! window)
 
 (bundle! elisp :defer t)
 
-(bundle! ivy)
+(pcase lye-use-search-frame
+  ('snails (bundle! snails))
+  ('ivy (bundle! ivy)))
 
 (bundle! rss :key elfeed-hydra/body)
 
@@ -32,8 +41,6 @@
 
 (bundle! flycheck :defer t)
 
-(bundle! snails :commands (snails snails-load-theme))
-
 (bundle! editor :key one-key-thing-edit/menu)
 
 (bundle! tools)
@@ -42,6 +49,10 @@
 
 (bundle! git :defer t :key one-key-magit/menu)
 
-;; TODO: Use bundle replace modules
+;; DONE: Use bundle replace modules
 (setq lye-use-modeline 'awetray)
 (bundle! modeline)
+
+(bundle! org :defer 0.5)
+
+(bundle! pdf :defer 0.5)

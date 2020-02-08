@@ -176,7 +176,6 @@ If it is `nil', Not use fuzzy match."
   (lib-load-absolute 'core/core-straight)  ; staraight, package
   (lib-load-absolute 'core/core-ui)        ; UI
   (lib-load-absolute 'core/core-package)   ; packages initialization
-  (lib-load-absolute 'core/core-modules)   ; Modeuls manager
   (lib-load-absolute 'core/core-bundle)
   (lib-load-absolute 'core/core-key)       ; Keybinding
   )

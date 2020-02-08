@@ -109,7 +109,7 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
       (require 'straight))
     ;; (straight--reset-caches)
     ;; (setq straight-recipe-repositories nil
-          ;; straight-recipe-overrides nil)
+    ;; straight-recipe-overrides nil)
     (mapc #'straight-use-recipes straight-core-package-sources)
     ;; (straight-register-package
     ;;  `(straight :type git :host github
@@ -124,7 +124,7 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
   "Open the `*straight-process*'."
   (interactive)
   (let* ((straight-buffer straight-process-buffer)
-        (blist (mapcar #'buffer-name (buffer-list))))
+         (blist (mapcar #'buffer-name (buffer-list))))
     (if (and straight-buffer (member straight-buffer blist))
         (switch-to-buffer straight-buffer))))
 
@@ -147,7 +147,8 @@ Usage:
   (unless (memq :disabled args)
     (let ((-if (or (plist-get args :if) t))
           (-commands (plist-get args :commands))
-          (-mode (plist-get args :mode)))
+          (-mode (plist-get args :mode))
+          (-defer (plist-get args :defer)))
       `(when ,-if
          ,(unless (memq :local args)
             `(straight-use-package ,name))
@@ -158,7 +159,11 @@ Usage:
                          (if (listp -commands) -commands (list -commands)))))
          ,(when -mode
             (let ((name-string (package--get-name name)))
-              (package--add-mode-key-ext -mode name-string)))))))
+              (package--add-mode-key-ext -mode name-string)))
+         ,(when -defer
+            `(run-with-idle-timer
+              0.5 nil
+              (lambda () (require (intern ,(package--get-name name)) nil t))))))))
 
 (defun package--get-name (recipe)
   (let ((a (cadr recipe)))

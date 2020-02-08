@@ -86,3 +86,25 @@
         avy-all-windows-alt t
         avy-background t
         avy-style 'pre))
+
+;; lazy-search
+(custom-set-faces
+ '(lazy-search-highlight-current
+   ((t :foreground "black" :background "orange" :bold t)))
+ '(lazy-search-highlight-background
+   ((t :foreground "gray" :background "black" :bold t))))
+
+(with-eval-after-load 'rainbow-mode
+  ;; Fix lazy-search and rainbow-mode conflicts
+  (defvar lye-rainbow-mode-active-p nil
+    "`rainbow-mode' is run or not.")
+  (defun lye/rainbow-turn-off ($rest _)
+    (when (and (featurep 'rainbow-mode) rainbow-mode)
+      (setq lye-rainbow-mode-active-p t)
+      (rainbow-mode -1)))
+  (defun lye/rainbow-turn-on (&rest _)
+    (when lye-rainbow-mode-active-p
+      (setq lye-rainbow-mode-active-p nil)
+      (rainbow-mode 1)))
+  (advice-add #'lazy-search-quit :after #'lye/rainbow-turn-on)
+  (advice-add #'lazy-search :after  #'lye/rainbow-turn-off))

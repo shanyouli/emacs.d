@@ -10,3 +10,10 @@
             :host github
             :repo "shanyouli/snails-backend"
             :no-byte-compile t))
+
+(package! 'fuz :commands fuz-build-and-load-dymod
+          :if (and (executable-find "cargo") (not IS-WINDOWS)))
+
+(package! 'smex :commands (smex-initialize smex smex-major-mode-commands))
+
+(package! 'ido-sort-mtime :commands ido-sort-mtime-mode)

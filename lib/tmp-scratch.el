@@ -34,8 +34,8 @@
   :group 'tmp-scratch)
 
 (defcustom tmp-scratch-lang-alist '(("zsh" . "sh")
-                                    ("bash" "sh")
-                                    ("shell" "sh")
+                                    ("bash" . "sh")
+                                    ("shell" . "sh")
                                     ("python" . "py")
                                     ("emacs-lisp" . "el")
                                     ("elisp" . "el")

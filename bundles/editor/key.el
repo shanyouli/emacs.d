@@ -26,3 +26,13 @@
   ("L" thing-cut-region-or-line "Cut line or region")
   ("A" thing-cut-to-line-beginning "Cut to Line begin")
   ("E" thing-cut-to-line-end "Cut to Line End"))
+
+;; one-key configurations
+(defonekey color-rg-search nil
+  "Search"
+  ("s" color-rg-search-symbol "symbol")
+  ("i" color-rg-search-input "input")
+  ("p" color-rg-search-symbol-in-project "symbol in proj")
+  ("j" color-rg-search-input-in-project "input in proj")
+  ("c" color-rg-search-symbol-in-current-file "symbol in file")
+  ("v" color-rg-search-input-in-current-file "input in file"))
