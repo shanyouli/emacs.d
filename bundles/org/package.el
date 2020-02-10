@@ -24,3 +24,5 @@
 
 (package! 'ox-hugo)
 (package! 'easy-hugo)
+
+(package! 'org-cliplink :commands org-cliplink)

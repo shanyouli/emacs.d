@@ -29,4 +29,7 @@
                 (when (and (boundp 'awesome-tray-active-p) awesome-tray-active-p)
                   (awesome-tray-mode))))))
 
-(add-hook! 'after-init-hook (awesome-tray-initialize+))
+(add-hook! 'after-init-hook
+    (if (display-graphic-p)
+        (awesome-tray-initialize+)
+      (require 'lib-modeline nil t)))
