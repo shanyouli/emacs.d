@@ -43,7 +43,7 @@
 
   ;; Show TODOs in magit
   (setq magit-todos-nice (if (executable-find "nice") t nil))
-  (magit-todos-mode +1)
+  ;; (magit-todos-mode +1)
 
   ;; use diff-hl
   (with-eval-after-load 'diff-hl
