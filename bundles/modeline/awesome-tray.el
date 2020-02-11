@@ -20,14 +20,14 @@
 
 (defun awesome-tray-initialize+ ()
   "Start `Awesome-tray'"
-  (if (fboundp 'theme-switch-light-or-dark-theme)
-      (advice-add #'theme-switch-light-or-dark-theme :after #'awesome-tray-mode)
+  (if (fboundp 'lib-theme-switch-theme)
+      (advice-add #'lib-theme-switch-theme
+                  :after (lambda (&rest _) (awesome-tray-mode +1)))
     (awesome-tray-mode +1))
   (when (boundp 'after-load-theme-hook)
-    (add-hook 'after-load-theme-hook
-              '(lambda ()
-                (when (and (boundp 'awesome-tray-active-p) awesome-tray-active-p)
-                  (awesome-tray-mode))))))
+    (add-hook! 'after-load-theme-hook
+        (when (and (boundp 'awesome-tray-active-p) awesome-tray-active-p)
+          (awesome-tray-mode)))))
 
 (add-hook! 'after-init-hook
     (if (display-graphic-p)

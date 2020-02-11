@@ -120,6 +120,7 @@ When result < 0, elapsed result seconds to reach the START-TIME."
         (- (+ (lib-theme--time-to-seconds start-time ctime)
               (* 24 60 60)))))))
 
+;;;###autoload
 (defun lib-theme-switch-theme (&optional forcep)
   "Change the light and dark themes over time.
 FORCEP is non-nil, Enforcement functions."
