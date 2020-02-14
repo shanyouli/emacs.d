@@ -1,8 +1,7 @@
 ;;; bundles/ui/awesome-tab.el.el -*- lexical-binding: t -*-
 
 (with-eval-after-load 'awesome-tab
-  ;; default modeline-format
-  (setq-default mode-line-format '())
+
   ;; awesome-tab style: slant, wave,alternate,bar,box,chamfer,rounded,zigzag
   (setq awesome-tab-style 'zigzag)
   (setq awesome-tab-hide-tab-function 'lye/awesome-tab-hide-tab+)
@@ -36,8 +35,4 @@
     "Refresh `awesome-tab-mode', especially after replacing themes."
     (when (awesome-tab-mode-on-p)
       (awesome-tab-mode -1)
-      (awesome-tab-mode +1)))
-  (advice-add 'awesome-tab-free-tabsets-store
-              :before
-              (lambda (&rest _)
-                (setq-default mode-line-format lye-default-modeline-format))))
+      (awesome-tab-mode +1))))

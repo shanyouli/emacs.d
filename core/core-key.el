@@ -74,7 +74,7 @@
 
 ;; pyim-bundle
 (lib-key-define "<f9>" 'toggle-input-method
-                "C-<f9>" 'lye/toggle-pyim-punctuation-translate)
+  "C-<f9>" 'bundle-pyim-punctuation-toggle)
 
 ;;; toolkit
 (lib-key-define "C-x SPC" 'set-mark-command    ; Instead C-SPC for Chinese input method

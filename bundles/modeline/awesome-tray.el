@@ -12,7 +12,13 @@
         "<IM>" ""))
 
   (push '("pyim" . (awesome-tray-module-pyim-info awesome-tray-module-pyim-face))
-      awesome-tray-module-alist))
+        awesome-tray-module-alist)
+  (advice-add 'awesome-tray-disable
+              :after (lambda (&rest _) (require 'lib-modeline nil t)))
+  (advice-add 'awesome-tray-enable
+              :before (lambda (&rest _)
+                        (if (string= " " (car mode-line-format))
+                            (setq-default mode-line-format '(" "))))))
 
 ;; active-modules
 (setq awesome-tray-active-modules

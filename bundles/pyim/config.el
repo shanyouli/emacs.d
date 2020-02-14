@@ -8,6 +8,7 @@
 (setq pyim-prefer-emacs-thread nil)
 (setq pyim-dcache-directory (lib-f-join lye-emacs-cache-dir "pyim/dcache"))
 (setq default-input-method "pyim")
+(setq pyim-punctuation-translate-p '(no yes auto))   ;使用半角标点。
 
 (with-eval-after-load 'pyim
 
@@ -28,3 +29,17 @@
     ('big (pyim-bigdict-enable))
     ('librime (lib-load-relative "liberime" t t)
               (pyim-liberime-enable))))
+
+(defun bundle-pyim-punctuation-toggle ()
+  (interactive)
+  (setq-default pyim-punctuation-translate-p
+                (pcase (car pyim-punctuation-translate-p)
+                  ;; 更改为中文全角，英文半角
+                  ('no  '(auto yes no))
+                  ;; 更改为全部半角
+                  ('auto '(no yes auto))
+                  ;; 全部全角改为全部半角
+                  ('yes '(no yes auto))))
+  (when (and current-input-method (string= current-input-method "pyim"))
+    (toggle-input-method)
+    (set-input-method "pyim")))
