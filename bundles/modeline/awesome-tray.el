@@ -20,7 +20,7 @@
                         (let ((first-mode-line (car mode-line-format)))
                           (unless (and (stringp first-mode-line)
                                        (string= " " first-mode-line))
-                            (setq-default mode-line-format '(" "))))))
+                            (setq-default mode-line-format '(" ")))))))
 
 ;; active-modules
 (setq awesome-tray-active-modules
