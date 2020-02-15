@@ -1,6 +1,5 @@
 ;;; /core/core-bundle.el -*- lexical-binding: t -*-
 
-
 (bundle! pyim :defer t)
 ;; (bundle! fcitx :defer t :if (and IS-LINUX (executable-find "fcitx-remote")))
 
@@ -50,7 +49,7 @@
 (bundle! git :defer t :key one-key-magit/menu)
 
 ;; DONE: Use bundle replace modules
-(setq lye-use-modeline 'awetray)
+;; (setq lye-use-modeline 'awetray)
 (bundle! modeline)
 
 (bundle! org :defer 0.5)

@@ -179,7 +179,3 @@ If it is `nil', Not use fuzzy match."
   (lib-load-absolute 'core/core-bundle)
   (lib-load-absolute 'core/core-key)       ; Keybinding
   )
-
-(provide 'core)
-
-;;; core.el ends here

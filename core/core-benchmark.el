@@ -1,36 +1,6 @@
-;;; core-benchmark.el --- Measure startup and requir times -*- lexical-binding: t -*-
-
-;; Author: shanyouli
-;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: ()
-;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: benchmark
-
-
-;; This file is not part of GNU Emacs
-
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; For a full copy of the GNU General Public License
-;; see <http://www.gnu.org/licenses/>.
-
-
-;;; Commentary:
-
-;; Measure startup and require times.
+;;; core/core-benchmark.el.el -*- lexical-binding: t -*-
 
 ;; Copy from: https://github.com/purcell/emacs.d/blob/master/lisp/init-benchmarking.el
-
-;;; Code:
 
 (defun core-benchmark/time-subtract-millis (b a)
   (* 1000.0 (float-time (time-subtract b a))))
@@ -103,7 +73,3 @@ LOAD-DURATION is the time taken in milliseconds to load FEATURE.")
            gcs-done))
 
 (add-hook 'emacs-startup-hook 'core-benchmark/show-init-time)
-
-(provide 'core-benchmark)
-
-;;; core-benchmark.el ends here

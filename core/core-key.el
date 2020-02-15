@@ -1,39 +1,11 @@
-;;; core-key.el --- Init some packages -*- lexical-binding: t -*-
-
-;; Author: shanyouli
-;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (eusp restart-emacs)
-;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: Keybindings
-
-
-;; This file is not part of GNU Emacs
-
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; For a full copy of the GNU General Public License
-;; see <http://www.gnu.org/licenses/>.
-
-
-;;; Commentary:
+;;; core/core-key.el.el -*- lexical-binding: t -*-
 
 ;; Mainly the shortcut keys for local and third-party packages
-
-;;; Code:
 
 ;; Global uninstall button
 (require 'lib-key)
 
-(lib-key-unset "C-z" "C-SPC" "C-\\" "C-x s" "C-r" "C-x C-SPC")
+(lib-key-unset "C-z" "C-SPC" "C-\\" "C-x s" "C-x C-SPC")
 
 (lib-key "C-x C-s" #'super-save-all-buffer)
 
@@ -319,7 +291,3 @@
   "C-, t p" 'pomidor)
 (lib-key "C-z s h" 'tldr nil (not IS-WINDOWS))
 (lib-key "C-, u c" 'cnfonts-ui nil (fboundp 'cnfonts-ui))
-
-(provide 'core-key)
-
-;;; core-key.el ends here

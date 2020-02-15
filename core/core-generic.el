@@ -1,35 +1,4 @@
-;;; core-generic.el --- Initialize the basic configuration -*- lexical-binding: t -*-
-
-;; Author: shanyouli
-;; Maintainer: shanyouli
-;; Version: v0.2
-;; Package-Requires: (dependencies)
-;; Homepage: https://github.com/shanyouli
-;; Keywords: keywords
-
-
-;; This file is not part of GNU Emacs
-
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; For a full copy of the GNU General Public License
-;; see <http://www.gnu.org/licenses/>.
-
-
-;;; Commentary:
-
-;;; remove global-subword-mode
-;; time: 2019.09.02 16:48
-
-;;; Code:
+;;; core/core-generic.el.el -*- lexical-binding: t -*-
 
 ;; Personal information
 (setq user-full-name    lye-full-name
@@ -207,7 +176,3 @@
               (let ((d (file-name-directory arg1)))
                 (unless (file-exists-p d)
                   (make-directory d t)))))
-
-(provide 'core-generic)
-
-;;; core-generic.el ends here

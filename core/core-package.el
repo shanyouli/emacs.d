@@ -1,33 +1,4 @@
-;;; core-package.el --- Initialize third-packages -*- lexical-binding: t -*-
-
-;; Author: shanyouli
-;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (dependencies)
-;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords:
-
-
-;; This file is not part of GNU Emacs
-
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; For a full copy of the GNU General Public License
-;; see <http://www.gnu.org/licenses/>.
-
-
-;;; Commentary:
-
-;;; Code:
-
+;;; core/core-package.el.el -*- lexical-binding: t -*-
 (add-hook! 'after-init-hook
   :defer 0.1
   :append t
@@ -104,7 +75,3 @@
   ;; Highlight diff
   (autoload 'global-diff-hl-mode "diff-hl")
   (global-diff-hl-mode +1))
-
-(provide 'core-package)
-
-;;; core-package.el ends here

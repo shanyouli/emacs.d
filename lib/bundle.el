@@ -83,7 +83,7 @@ Usage:
          ,@(mapcar (lambda (cmd) `(autoload ',cmd absolute-file-path))
                    (if (listp command) command (list command))))
     (if time
-        `(run-with-idle-timer ,time nil (lambda () (load ,file t t)))
+        `(run-with-idle-timer ,time nil (lambda (&rest _) (load ,file t t)))
       `(load ,file t t))))
 
 (defun bundle-config--menu (key-menu file)

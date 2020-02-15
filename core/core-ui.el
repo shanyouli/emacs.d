@@ -1,33 +1,4 @@
-;;; core-ui.el --- Initialize UI -*- lexical-binding: t -*-
-
-;; Author: shanyouli
-;; Maintainer: shanyouli
-;; Version: v0.1
-;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: UI
-
-
-;; This file is not part of GNU Emacs
-
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
-
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
-
-;; For a full copy of the GNU General Public License
-;; see <http://www.gnu.org/licenses/>.
-
-
-;;; Commentary:
-
-;; UI
-
-;;; Code:
+;;; core/core-ui.el.el -*- lexical-binding: t -*-
 
 ;; (setq facy-splash-image logo) ; Logo
 
@@ -102,14 +73,10 @@
          result)
     (when (< 86 (truncate (/ (- width-end width-start) (frame-char-width))))
       (setq result (or (not (eq major-mode 'org-mode))
-                       (< (line-number-at-pos (point-max) 1000)))))
+                       (< (line-number-at-pos (point-max)) 1000))))
     (if result
         (display-line-numbers-mode +1)
       (display-line-numbers-mode -1))))
 
 (dolist (h '(prog-mode-hook org-mode-hook))
   (add-hook! h (lye-display-line-numbers)))
-
-(provide 'core-ui)
-
-;;; core-ui.el ends here

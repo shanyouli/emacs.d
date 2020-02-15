@@ -21,7 +21,9 @@
 (with-eval-after-load 'highlight-indent-guides
   (setq highlight-indent-guides-method 'character)
   (setq highlight-indent-guides-responsive t))
-(add-hook! 'prog-mode-hook 'highlight-indent-guides-mode)
+(add-hook! 'prog-mode-hook
+    (if (< (line-number-at-pos (point-max)) 1000)
+        (highlight-indent-guides-mode)))
 
 ;; color display
 (add-hook! 'prog-mode-hook (rainbow-mode +1))
