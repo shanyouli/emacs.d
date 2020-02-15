@@ -40,7 +40,7 @@
 
 (bundle! flycheck :defer t)
 
-(bundle! editor :key one-key-thing-edit/menu)
+(bundle! editor :key (one-key-thing-edit/menu one-key-color-rg-search/menu))
 
 (bundle! tools)
 
@@ -49,7 +49,7 @@
 (bundle! git :defer t :key one-key-magit/menu)
 
 ;; DONE: Use bundle replace modules
-;; (setq lye-use-modeline 'awetray)
+(setq lye-use-modeline 'awetray)
 (bundle! modeline)
 
 (bundle! org :defer 0.5)

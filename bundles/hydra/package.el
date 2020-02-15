@@ -1,5 +1,5 @@
 ;;; bundles/hydra/package.el -*- lexical-binding: t -*-
 
-(package! 'pretty-hydra :commands pretty-hydra-define)
+(package! pretty-hydra :commands pretty-hydra-define)
 
-(package! 'hydra :commands defhydra)
+(package! hydra :commands defhydra)

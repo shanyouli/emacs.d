@@ -1,26 +1,26 @@
 ;;; bundles/editor/package.el.el -*- lexical-binding: t -*-
 
 
-(package! 'rainbow-delimiters :commands rainbow-delimiters-mode)
-(package! 'rainbow-mode :commands rainbow-mode)
+(package! rainbow-delimiters :commands rainbow-delimiters-mode)
+(package! rainbow-mode :commands rainbow-mode)
 
-(package! 'hungry-delete :commands global-hungry-delete-mode)
-(package! 'highlight-indent-guides :commands highlight-indent-guides-mode)
-(package! 'page-break-lines :commands global-page-break-lines-mode)
+(package! hungry-delete :commands global-hungry-delete-mode)
+(package! highlight-indent-guides :commands highlight-indent-guides-mode)
+(package! page-break-lines :commands global-page-break-lines-mode)
 
-(package! 'elec-pair :local t :commands electric-pair-mode)
+(package! elec-pair :build-in t :commands electric-pair-mode)
 
-(package! 'delsel :local t :commands delete-selection-mode)
+(package! delsel :build-in t :commands delete-selection-mode)
 
 ;; Chinese input automatically adds spaces in Chinese
-;; (package! 'pangu-spacing :commands pagu-spacing-mode)
+;; (package! pangu-spacing :commands pagu-spacing-mode)
 
-(package! 'whitespace :commands witespace-mode :local t)
+(package! whitespace :commands witespace-mode :build-in t)
 
-(package! '(smart-align :type git :host github :repo "manateelazycat/smart-align"
+(package! smart-align :recipe (:type git :host github :repo "manateelazycat/smart-align"
             :no-byte-compile t) :commands smart-align)
 
-(package! 'thing-edit :local t
+(package! thing-edit :build-in t
           :commands (thing-copy-word
                      thing-copy-symbol
                      thing-copy-filename
@@ -46,12 +46,12 @@
                      thing-cut-to-line-end))
 
 ;; avy
-(package! 'avy :commands avy-setup-default)
-(package! 'ace-pinyin :commands ace-pinyin-global-mode)
+(package! avy :commands avy-setup-default)
+(package! ace-pinyin :commands ace-pinyin-global-mode)
 
 ;; lazy-search and color-rg
-(package! 'lazy-search :commands lazy-search :local t)
-(package! 'color-rg :local t :if (executable-find "rg")
+(package! lazy-search :commands lazy-search :build-in t)
+(package! color-rg :build-in t :if (executable-find "rg")
           :commands (color-rg-search-symbol
                      color-rg-search-input
                      color-rg-search-symbol-in-project

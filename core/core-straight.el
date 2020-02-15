@@ -99,53 +99,63 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
         (switch-to-buffer straight-buffer))))
 
 (defalias 'package+ 'straight-use-package)
-
-(defmacro package! (name &rest args)
+(autoload 'cl-defmacro "cl-macs" nil t)
+(cl-defmacro package!
+    (name &key disabled if commands mode recipe build-in defer)
   "Install a package-name.
 
 Usage:
 
     (package! NAME
         [:keyword [option]])
-:if EXPR   Initialize and load only if EXPR evaluates to a non-nil value.
-:commands  Define autoloads for commands that that will be defined by the
-           package. This is useful if the package is being lazily loaded.
-:local     If noinstall is t, not run (straight-use-package NAME).
-:mode EXPR run (add-to-list 'auto-mode-alist EXPR).
-:magic EXPR Run ."
+:if EXPR     Initialize and load only if EXPR evaluates to a non-nil value.
+:build-in    If noinstall is t, not run (straight-use-package NAME).
+:recipe EXPR when use straight install package, need.
+:commands    Define autoloads for commands that that will be defined by the
+             package. This is useful if the package is being lazily loaded.
+:mode EXPR   run (add-to-list 'auto-mode-alist EXPR).
+"
   (declare (indent 1))
-  (unless (memq :disabled args)
-    (let ((-if (or (plist-get args :if) t))
-          (-commands (plist-get args :commands))
-          (-mode (plist-get args :mode))
-          (-defer (plist-get args :defer)))
-      `(when ,-if
-         ,(unless (memq :local args)
-            `(straight-use-package ,name))
-         ,(when -commands
-            `(let ((name-string ,(package--get-name name)))
-               ,@(mapcar (lambda (cmd)
-                           `(unless (fboundp ',cmd) (autoload ',cmd name-string)))
-                         (if (listp -commands) -commands (list -commands)))))
-         ,(when -mode
-            (let ((name-string (package--get-name name)))
-              (package--add-mode-key-ext -mode name-string)))
-         ,(when -defer
-            `(run-with-idle-timer
-              0.5 nil
-              (lambda () (require (intern ,(package--get-name name)) nil t))))))))
+  (unless disabled
+    (let ((-if (or if t))
+          (package (if recipe (cons name recipe) name))
+          (package-name (symbol-name name)))
+      (macroexp-progn
+       `((when ,-if
+           ,@(mapcar 'identity
+                     (core-package/concat
+                      (package-keys:install package build-in)
+                      (package-keys:commands commands package-name)
+                      (package-keys:mode mode package-name)
+                      (package-keys:defer defer name)))))))))
+(defun package-keys:install (package build-in)
+  (unless build-in
+    `((straight-use-package ',package))))
 
-(defun package--get-name (recipe)
-  (let ((a (cadr recipe)))
-    (symbol-name (if (listp a) (car a) a))))
+(defun package-keys:commands (commands package-name)
+  (when commands
+    (cl-mapcan
+     (lambda (cmd)
+       `((unless (fboundp ',cmd) (autoload ',cmd ,package-name))))
+     (if (listp commands) commands (list commands)))))
 
-(defun package--add-mode-key-ext (mode-alist file)
-  `(progn ,@(mapcar
-             (lambda (alist)
-               `(let ((cmd ',(cdr alist)))
-                  (unless (fboundp cmd) (autoload cmd ,file))
-                  (add-to-list 'auto-mode-alist ',alist)))
-             (if (listp (car mode-alist)) mode-alist (list mode-alist)))))
+(defun package-keys:mode (mode-alists file)
+  (when mode-alists
+    (cl-mapcan
+     (lambda (alist)
+       `((let ((cmd ',(cdr alist)))
+           (unless (fboundp cmd) (autoload cmd ,file))
+           (add-to-list 'auto-mode-alist ',alist))))
+     (if (listp (car mode-alists)) mode-alists (list mode-alists)))))
+(defun package-keys:defer (package defer)
+  (when defer
+    (let ((time (if (numberp defer) defer 0.5)))
+      `((run-with-idle-timer
+         ,time nil
+         (lambda (&rest _) (require ',package nil t)))))))
+
+(defsubst core-package/concat (&rest elem)
+  (apply #'append (delete nil (delete (list nil) elem))))
 
 (straight-initialize-packages)
 

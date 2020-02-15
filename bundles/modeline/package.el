@@ -2,14 +2,14 @@
 
 (pcase lye-use-modeline
   ('base t)
-  ('doom (package! 'doom-modeline :commands doom-modeline-mode))
+  ('doom (package! doom-modeline :commands doom-modeline-mode))
   ('awetray
-   (package! '(awesome-tray :type git
+   (package! awesome-tray :recipe (:type git
                :host github
                :repo "manateelazycat/awesome-tray"
                :no-byte-compile t)
      :commands awesome-tray-mode)
-   (package! '(awesome-tab :type git
+   (package! awesome-tab :recipe (:type git
             :host github
             :repo "manateelazycat/awesome-tab"
             :no-byte-compile t)
