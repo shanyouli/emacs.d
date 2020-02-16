@@ -39,7 +39,8 @@
 (defun bundle-get-path (bundle)
   "Get the path of BUNDLE."
   (cl-some (lambda (parent)
-             (let ((path (concat (file-name-directory parent) bundle)))
+             (let* ((bundle-name (if (stringp bundle) bundle (symbol-name bundle)))
+                    (path (concat (file-name-directory parent) bundle-name)))
                (when (file-directory-p path) (file-name-as-directory path))))
            bundle-directories))
 

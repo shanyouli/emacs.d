@@ -147,7 +147,7 @@ Usage:
            (unless (fboundp cmd) (autoload cmd ,file))
            (add-to-list 'auto-mode-alist ',alist))))
      (if (listp (car mode-alists)) mode-alists (list mode-alists)))))
-(defun package-keys:defer (package defer)
+(defun package-keys:defer (defer package)
   (when defer
     (let ((time (if (numberp defer) defer 0.5)))
       `((run-with-idle-timer

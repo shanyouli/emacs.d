@@ -14,6 +14,13 @@
 (package! fuz :commands fuz-build-and-load-dymod
           :if (and (executable-find "cargo") (not IS-WINDOWS)))
 
-(package! smex :commands (smex-initialize smex smex-major-mode-commands))
+(package! selectrum :recipe (:host github :repo "raxod502/selectrum")
+          :commands selectrum-mode)
+(package! selectrum-prescient
+          :recipe ( :host github
+                    :repo "raxod502/prescient.el"
+                    :files ("selectrum-prescient.el"))
+  :commands (selectrum-prescient-mode prescient-persist-mode))
+;; (package! smex :commands (smex-initialize smex smex-major-mode-commands))
 
-(package! ido-sort-mtime :commands ido-sort-mtime-mode)
+;; (package! ido-sort-mtime :commands ido-sort-mtime-mode)

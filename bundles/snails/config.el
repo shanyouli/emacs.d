@@ -7,21 +7,21 @@
 
   (dolist (buf (list
                 " *which-key*"
-              " *straight-process*"
-              "*straight-process*"
-              "*One-Key*"
-              "*Flycheck**"
-              "*flycheck-posframe-buffer*"
-              " *flycheck-posframe-buffer*"
-              " *company-posframe-buffer*"
-              "*company"
-              " *company"
-              "*esup"
-              " *pyim"
-              " *server"
-              " *sdcv"
-              " *diff-hl*"
-              " *snails"))
+                " *straight-process*"
+                "*straight-process*"
+                "*One-Key*"
+                "*Flycheck**"
+                "*flycheck-posframe-buffer*"
+                " *flycheck-posframe-buffer*"
+                " *company-posframe-buffer*"
+                "*company"
+                " *company"
+                "*esup"
+                " *pyim"
+                " *server"
+                " *sdcv"
+                " *diff-hl*"
+                " *snails"))
     (push buf snails-backend-buffer-blacklist)))
 
 ;;; snails-backend-themes
@@ -31,29 +31,9 @@
   (require 'snails-backend-themes)
   (snails '(snails-backend-themes)))
 
-;;; ido
-(setq ido-enable-flex-matching t)                   ;模糊匹配
-(setq ido-everywhere nil)                           ;禁用ido everyting, 拷贝操作不方便
-
-(setq ido-use-filename-at-point 'guess
-      ido-create-new-buffer     'always
-      ido-max-prospects         10
-      ido-save-directory-list-file (expand-file-name "ido.hist" lye-emacs-cache-dir)
-      ido-default-file-method 'selected-window
-      ido-auto-merge-work-directories-length -1)
-
-;; ido-sort-mtime
-;; (add-hook 'ido-make-file-list-hook 'ido-sort-mtime) ;文件的排序方法
-;; (add-hook 'ido-make-dir-list-hook 'ido-sort-mtime)  ;目录的排序方法
-;; smex
-;; smex, remember recently and most frequently ised commands
-(let ((amx-file (expand-file-name "amx-items" lye-emacs-cache-dir)))
-  (if (file-exists-p amx-file)
-      (setq smex-save-file amx-file)
-    (setq smex-save-file (expand-file-name "smex-items" lye-emacs-cache-dir))))
-(setq smex-history-length 10)
-
+;; selectrum
+(setq prescient-save-file (lib-f-join lye-emacs-cache-dir "var/prescient-save.el"))
 (add-hook! 'after-init-hook
-    (ido-mode +1)
-  (smex-initialize)
-  (ido-sort-mtime-mode +1))
+  (selectrum-mode +1)
+  (selectrum-prescient-mode +1)
+  (prescient-persist-mode +1))
