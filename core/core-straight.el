@@ -14,16 +14,20 @@
                         :host github
                         :repo "emacs-straight/emacsmirror-mirror")))
 
-(defvar lye-build-in-packags '((org :type built-in)
-                               (pyim :type built-in)
-                               (async :type built-in)
-                               (xr :type built-in)
-                               (pyim-basedict :type built-in)
-                               (doom-themes :type built-in)
-                               (noflet :type built-in)
-                               (super-save :type built-in)))
+(defvar lye-build-in-packags
+  '((org :type built-in)
+    (pyim :type built-in)
+    (async :type built-in)
+    (xr :type built-in)
+    (pyim-basedict :type built-in)
+    (doom-themes :type built-in)
+    (noflet :type built-in)
+    (super-save :type built-in)
+    (posframe :type built-in)
+    (restart-emacs :type built-in)
+    (which-key :type built-in)))
 
-(defvar lye-core-packages '(straight use-package)
+(defvar lye-core-packages '(straight)
   "A list of packages that must be installed (and will be auto-installed if
 missing) and shouldn't be deleted.")
 
@@ -161,6 +165,3 @@ Usage:
   (apply #'append (delete nil (delete (list nil) elem))))
 
 (straight-initialize-packages)
-
-;; use package
-(eval-when-compile (require 'use-package))

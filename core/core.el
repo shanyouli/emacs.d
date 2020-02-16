@@ -91,13 +91,6 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 (defconst lye-emacs-cache-dir (concat lye-emacs-dir ".cache/")
   "Is the cache directory this?")
 
-(defconst lye-emacs-share-dir (concat lye-emacs-dir "share/")
-  "Store files in non-el format, such as `plantuml.jar'.")
-
-(defconst lye-emacs-custom-temp-file
-  (concat lye-emacs-share-dir "custom-template.el")
-  "The custom template of `custom-file'.")
-
 ;;
 ;;; customization
 (defcustom lye-full-name "shanyouli" "Set user full name."
@@ -110,29 +103,11 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
 
-(defcustom lye-use-fuz-or-flx-in-ivy nil
-  "If it is `flx', use fuzzy match with `flx' package.
-If it is `fuz', use fuzzy match with `fuz' package.
-If it is `nil', Not use fuzzy match."
-  :type '(choice
-          (const :tag "fuzzy match" 'flx)
-          (const :tag "fuzzy" 'fuz)
-          (const :tag "Null" nil)))
-
-(defcustom lye-company-enable-yas nil
-  "Enable yasnippet for company backends or not."
-  :type  'boolean)
-
 (unless (file-directory-p lye-emacs-cache-dir)
   (make-directory lye-emacs-cache-dir t))
 
 ;;; Load `custom-file'
 (setq custom-file (concat lye-emacs-cache-dir "custom.el"))
-
-(if (and (file-exists-p lye-emacs-custom-temp-file)
-         (not (file-exists-p custom-file)))
-    (copy-file lye-emacs-custom-temp-file custom-file))
-
 (if (file-exists-p custom-file) (load custom-file :no-error :no-message))
 
 ;; This is consulted on every `require', `load' and various path/io functions.

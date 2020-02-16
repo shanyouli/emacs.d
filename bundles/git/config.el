@@ -13,8 +13,7 @@
       (concat lye-emacs-cache-dir "transient/levels.el"))
 
 ;; Forge configuration
-(setq forge-database-file
-      (expand-file-name "forge-database.sqlite" lye-emacs-cache-dir))
+(setq forge-database-file (lib-f-join lye-emacs-cache-dir "forge-database.sqlite"))
 
 ;; Make path column have enough space to display.
 (setq magit-submodule-list-columns

@@ -59,6 +59,10 @@
 (if (and (fboundp 'daemonp) (daemonp))
     (add-hook! 'after-make-frame-functions #'lye|font-initialize)
   (lye-font-initialize))
+(when (display-graphic-p)
+  (cl-loop for font in '("Symbola" "Apple Symbols" "Symbol" "icons-in-terminal")
+           when (lib-font-exist-p font)
+           return (set-fontset-font t 'unicode font nil 'prepend)))
 
 ;;
 ;;; Line-Number
