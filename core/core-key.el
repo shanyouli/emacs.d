@@ -29,17 +29,13 @@
   "C-, it" #'toggle-company-english-helper)
 
 ;; hydra-bundle
-(lib-key-define "C-, ub" 'hydra-ui-menu/body
-  "C-, o d" 'hydra-open-dir-menu/body
-  "C-, f"   'one-key-functions/menu
-  "C-, o t" 'one-key-tmp-scratch/menu
-  "C-, u f" 'one-key-change-fontsize/menu
-  "C-, u a" 'one-key-adjust-opacity/menu)
-
-;; font
-;; (when (display-graphic-p)
-;;   (setq cnfonts-directory (concat lye-emacs-cache-dir "cnfonts"))
-;;   (lib-key-define "C-, ufc" 'cnfonts-ui :autoload "cnfonts"))
+(lib-key-define :prefix "C-,"
+  "u b" 'hydra-ui-menu/body
+  "o d" 'hydra-open-dir-menu/body
+  "f"   'one-key-functions/menu
+  "o t" 'one-key-tmp-scratch/menu
+  "u f" 'one-key-change-fontsize/menu
+  "u a" 'one-key-adjust-opacity/menu)
 
 ;; dict-bundle
 (lib-key-define "C-c y" 'lye/dict-point)
@@ -229,8 +225,6 @@
 (with-eval-after-load 'org
   (lib-key-define "C-x p i" 'org-cliplink
     :map org-mode-map :autoload "org-cliplink"))
-
-
 
 ;; window-bundle
 (lib-key-define "C-h z" 'shackle-last-popup-buffer)

@@ -17,8 +17,11 @@
 
 (package! whitespace :commands witespace-mode :build-in t)
 
-(package! smart-align :recipe (:type git :host github :repo "manateelazycat/smart-align"
-            :no-byte-compile t) :commands smart-align)
+(package! smart-align :recipe (:type git
+                               :host github
+                               :repo "manateelazycat/smart-align"
+                               :no-byte-compile t)
+          :commands smart-align)
 
 (package! thing-edit :build-in t
           :commands (thing-copy-word
@@ -50,11 +53,19 @@
 (package! ace-pinyin :commands ace-pinyin-global-mode)
 
 ;; lazy-search and color-rg
-(package! lazy-search :commands lazy-search :build-in t)
-(package! color-rg :build-in t :if (executable-find "rg")
+(package! lazy-search :commands lazy-search
+          :recipe (:type git
+                   :host github
+                   :repo "manateelazycat/lazy-search"
+                   :no-byte-compile t))
+(package! color-rg :if (executable-find "rg")
           :commands (color-rg-search-symbol
                      color-rg-search-input
                      color-rg-search-symbol-in-project
                      color-rg-search-input-in-project
                      color-rg-search-symbol-in-current-file
-                     color-rg-search-input-in-current-file))
+                     color-rg-search-input-in-current-file)
+          :recipe (:type git
+                   :host github
+                   :repo "manateelazycat/color-rg"
+                   :no-byte-compile t))

@@ -4,9 +4,6 @@
 [submodule "insert-translated-name"]
 	path = site-lisp/insert-translated-name
 	url = https://github.com/manateelazycat/insert-translated-name.git
-[submodule "lazy-search"]
-	path = site-lisp/lazy-search
-	url = https://github.com/manateelazycat/lazy-search.git
 [submodule "color-rg"]
 	path = site-lisp/color-rg
 	url = https://github.com/manateelazycat/color-rg.git
@@ -19,9 +16,6 @@
 [submodule "esup"]
 	path = site-lisp/esup
 	url = https://github.com/jschaf/esup.git
-[submodule "thing-edit"]
-	path = site-lisp/thing-edit
-	url = https://github.com/manateelazycat/thing-edit.git
 [submodule "posframe"]
 	path = site-lisp/posframe
 	url = https://github.com/tumashu/posframe.git

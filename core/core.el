@@ -89,10 +89,6 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 (defconst lye-packags-dir (concat lye-emacs-dir "packages/")
   "The root directory of package-manager, Must end with a slash.")
 
-(defconst lye-modules-dir (concat lye-emacs-dir "modules/")
-  "You don't need to load directly but use the extended key to load the package
- configuration folder.")
-
 (defconst lye-etc-dir (concat lye-emacs-dir "etc/")
   "etc dir in `lye-emacs-dir', Must end with a slash.")
 
@@ -101,14 +97,6 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 
 (defconst lye-emacs-share-dir (concat lye-emacs-dir "share/")
   "Store files in non-el format, such as `plantuml.jar'.")
-
-(defconst lye-emacs-plantuml-file
-  (concat lye-emacs-share-dir "plantuml/plantuml.jar")
-  "Store the location of the plantuml.jar.")
-
-(defconst lye-emacs-yas-snippets-dir
-  (concat lye-emacs-share-dir "snippets")
-  "Store the location of the `Yas-snippets'.")
 
 (defconst lye-emacs-custom-temp-file
   (concat lye-emacs-share-dir "custom-template.el")
@@ -159,14 +147,12 @@ If it is `nil', Not use fuzzy match."
       (list
        (lib-f-join lye-core-dir "autoload")
        lye-site-lisp-dir
-       lye-modules-dir
        lye-etc-dir
        lye-library-dir))
 (lib-autoload-initialize)
 
 (lib-load-add-load-path lye-etc-dir t)
 (lib-load-add-load-path lye-site-lisp-dir t)
-(lib-load-add-load-path lye-modules-dir)
 
 (defun lye-core-initialize ()
   "Load Lye's core files for an interactive session."

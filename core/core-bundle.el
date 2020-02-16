@@ -26,7 +26,7 @@
   ('snails (bundle! snails))
   ('ivy (bundle! ivy)))
 
-(bundle! rss :key elfeed-hydra/body)
+(bundle! rss :menu elfeed-hydra/body)
 
 (bundle! company)
 
@@ -40,13 +40,13 @@
 
 (bundle! flycheck :defer t)
 
-(bundle! editor :key (one-key-thing-edit/menu one-key-color-rg-search/menu))
+(bundle! editor :menu (one-key-thing-edit/menu one-key-color-rg-search/menu))
 
 (bundle! tools)
 
 (bundle! treemacs)
 
-(bundle! git :defer t :key one-key-magit/menu)
+(bundle! git :defer t :menu one-key-magit/menu)
 
 ;; DONE: Use bundle replace modules
 (setq lye-use-modeline 'awetray)

@@ -23,6 +23,7 @@
 ;; Bundle-Framework Manager
 
 ;;; Code:
+(autoload 'cl-defmacro "cl-macs" nil t)
 
 (defvar bundle--active-list '())
 
@@ -34,7 +35,10 @@
           bundle-directories))
 
 (defun bundle-active-p (bundle)
-  (member bundle bundle--active-list))
+  (memq bundle bundle--active-list))
+
+(defun bundle-exist-p (bundle)
+  (memq bundle (display-all-bundles)))
 
 (defun bundle-get-path (bundle)
   "Get the path of BUNDLE."
@@ -44,8 +48,39 @@
                (when (file-directory-p path) (file-name-as-directory path))))
            bundle-directories))
 
+(defsubst bundle/concat (&rest elems)
+  "Delete all empty lists from ELEMS (nil or (list nil)), and append thems."
+  (apply #'append (delete nil (delete (list nil) elems))))
+
+(defun bundle-keys:package (bundle bundle-path)
+  `((cl-pushnew ',bundle bundle--active-list)
+    (load ,(concat bundle-path "package.el") t t)))
+
+(defun bundle-keys:config (defer commands bundle-path)
+  (let ((conf-path (concat bundle-path "config.el")))
+    (cond
+     (commands
+      (cl-mapcan
+       (lambda (cmd) `((autoload ',cmd ,conf-path)))
+       (if (listp commands) commands (listp commands))))
+     (defer
+       (let ((time (if (numberp defer) defer 0.1)))
+         `((run-with-idle-timer
+            ,time nil
+            (lambda (&rest _) (load ,conf-path t t))))))
+     (t
+      `((load ,conf-path t t))))))
+
+(defun bundle-keys:menu (menu bundle-path)
+  (when menu
+    (let ((key-path (concat bundle-path "key.el")))
+      (cl-mapcan
+       (lambda (cmd) `((autoload ',cmd ,key-path)))
+       (if (listp menu) menu (list menu))))))
+
 ;;;###autoload
-(defmacro bundle! (bundle &rest args)
+(cl-defmacro bundle!
+    (bundle &key disabled if defer commands menu)
   "Load a bundle.
 
 Usage:
@@ -59,41 +94,19 @@ Usage:
            If it is nil, Will run immediately.
 :disabled  Don't run when t.
 :commands  Run config.el when call COMMAND.
-:key CMD   Delay load hydra menu."
+:menu CMD   Delay load hydra menu."
   (declare (indent 1))
-  (unless (memq :disabled args)
-    (let* ((-name (symbol-name bundle))
-           (-dir (bundle-get-path -name))
-           (-package (concat -dir "package"))
-           (-config (concat -dir "config"))
-           (-defer (let ((x (plist-get args :defer)))
-                    (if x (if (numberp x) x 0.1) nil)))
-           (-if (or (plist-get args :if) t))
-           (-commands (plist-get args :commands))
-           (-key (plist-get args :key)))
-      `(when (and (not (bundle-active-p ',bundle))
-                  ,-if)
-         (cl-pushnew ',bundle bundle--active-list)
-         (load ,-package t t)
-         ,(bundle-config--command -commands -defer -config)
-         ,(bundle-config--menu -key (concat -dir "key"))))))
-
-(defun bundle-config--command (command time file)
-  (if command
-      `(let ((absolute-file-path ,(concat file ".el")))
-         ,@(mapcar (lambda (cmd) `(autoload ',cmd absolute-file-path))
-                   (if (listp command) command (list command))))
-    (if time
-        `(run-with-idle-timer ,time nil (lambda (&rest _) (load ,file t t)))
-      `(load ,file t t))))
-
-(defun bundle-config--menu (key-menu file)
-  (if key-menu
-      `(let ((absolute-file-path ,(concat file ".el")))
-         ,@(mapcar (lambda (cmd) `(autoload ',cmd absolute-file-path))
-                   (if (listp key-menu)
-                       key-menu
-                     (list key-menu))))))
+  (unless (or disabled (not (bundle-exist-p bundle)))
+    (let ((bundle-dir (bundle-get-path (symbol-name bundle)))
+          (-if (or if t)))
+      (macroexp-progn
+       `((when (and ,-if (not (bundle-active-p ',bundle)))
+           ,@(mapcar
+              'identity
+              (bundle/concat
+               (bundle-keys:package bundle bundle-dir)
+               (bundle-keys:config defer commands bundle-dir)
+               (bundle-keys:menu menu bundle-dir)))))))))
 
 (provide 'bundle)
 ;;; bundle.el ends here

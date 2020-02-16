@@ -1,10 +1,9 @@
 ;;; bundles/snails/config.el.el -*- lexical-binding: t -*-
-
 ;;; snails-backend-buffer-blacklist
 (with-eval-after-load 'snails
   (when (fboundp 'fuz-build-and-load-dymod)
-    (lib-load-absolute 'bundles/common/fuz-core))
-
+    (lib-load-absolute 'bundles/common/fuz-core t t)
+    (setq snails-fuz-library-load-status "load"))
   (dolist (buf (list
                 " *which-key*"
                 " *straight-process*"

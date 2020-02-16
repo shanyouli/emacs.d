@@ -100,6 +100,7 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
 
 (defalias 'package+ 'straight-use-package)
 (autoload 'cl-defmacro "cl-macs" nil t)
+
 (cl-defmacro package!
     (name &key disabled if commands mode recipe build-in defer)
   "Install a package-name.

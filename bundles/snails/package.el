@@ -21,6 +21,3 @@
                     :repo "raxod502/prescient.el"
                     :files ("selectrum-prescient.el"))
   :commands (selectrum-prescient-mode prescient-persist-mode))
-;; (package! smex :commands (smex-initialize smex smex-major-mode-commands))
-
-;; (package! ido-sort-mtime :commands ido-sort-mtime-mode)
