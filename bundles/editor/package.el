@@ -23,7 +23,7 @@
                                :no-byte-compile t)
           :commands smart-align)
 
-(package! thing-edit :build-in t
+(package! thing-edit
           :commands (thing-copy-word
                      thing-copy-symbol
                      thing-copy-filename
@@ -46,7 +46,10 @@
                      thing-cut-parentheses
                      thing-cut-region-or-line
                      thing-cut-to-line-beginning
-                     thing-cut-to-line-end))
+                     thing-cut-to-line-end)
+          :recipe (:type git
+                   :host github
+                   :repo "manateelazycat/thing-edit"))
 
 ;; avy
 (package! avy :commands avy-setup-default)
@@ -69,3 +72,12 @@
                    :host github
                    :repo "manateelazycat/color-rg"
                    :no-byte-compile t))
+
+(package! insert-translated-name
+          :recipe (:type git
+                   :host github
+                   :repo "manateelazycat/insert-translated-name")
+          :commands (insert-translated-name-insert-original-translation
+                     insert-translated-name-insert-with-underline
+                     insert-translated-name-insert-with-line
+                     insert-translated-name-insert-with-camel))

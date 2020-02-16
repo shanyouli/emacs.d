@@ -82,10 +82,6 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 
 ;;
 ;;; Global variables
-
-(defconst lye-site-lisp-dir (concat lye-emacs-dir "site-lisp/")
-  "The root directory of third packages. Must end with a slash.")
-
 (defconst lye-packags-dir (concat lye-emacs-dir "packages/")
   "The root directory of package-manager, Must end with a slash.")
 
@@ -146,13 +142,11 @@ If it is `nil', Not use fuzzy match."
 (setq lib-autoload-initialize-list
       (list
        (lib-f-join lye-core-dir "autoload")
-       lye-site-lisp-dir
        lye-etc-dir
        lye-library-dir))
 (lib-autoload-initialize)
 
 (lib-load-add-load-path lye-etc-dir t)
-(lib-load-add-load-path lye-site-lisp-dir t)
 
 (defun lye-core-initialize ()
   "Load Lye's core files for an interactive session."

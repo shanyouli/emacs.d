@@ -1,4 +1,4 @@
-;;; doom-laserwave-theme.el --- inspired by VS Code laserwave
+;;; doom-laserwave-theme.el --- inspired by VS Code laserwave -*- no-byte-compile: t; -*-
 (require 'doom-themes)
 
 ;;
@@ -120,10 +120,18 @@ determine the exact padding."
    (doom-modeline-urgent :inherit 'mode-line-emphasis)
    (doom-modeline-warning :inherit 'mode-line-emphasis)
    (doom-modeline-debug :inherit 'mode-line-emphasis)
+   (doom-modeline-buffer-minor-mode :inherit 'mode-line-emphasis :weight 'bold)
+   (doom-modeline-project-dir :inherit 'mode-line-emphasis :weight 'bold)
+   (doom-modeline-project-parent-dir :inherit 'mode-line-emphasis :weight 'bold)
+   (doom-modeline-persp-name :inherit 'mode-line-emphasis :weight 'bold)
    (doom-modeline-buffer-file :inherit 'mode-line-emphasis :weight 'bold)
    (doom-modeline-buffer-modified :inherit 'mode-line-emphasis :weight 'bold)
-   (doom-modeline-buffer-path :inherit 'mode-line-emphasis)
+   (doom-modeline-lsp-success :inherit 'mode-line-emphasis :weight 'bold)
+   (doom-modeline-buffer-path :inherit 'mode-line-emphasis :weight 'bold)
    (doom-modeline-buffer-project-root :inherit 'mode-line-emphasis)
+   (doom-modeline-evil-visual-state :foreground yellow)
+   (doom-modeline-evil-replace-state :foreground orange)
+   (doom-modeline-evil-operator-state :foreground teal)
 
    ;; --- major-mode faces -------------------
    ;; css-mode / scss-mode
@@ -158,9 +166,14 @@ determine the exact padding."
    (org-hide :foreground hidden)
    (solaire-org-hide-face :foreground hidden)
 
+   ;; org-pomodoro
+   (org-pomodoro-mode-line :inherit 'mode-line-emphasis :weight 'bold) ; unreadable otherwise
+   (org-pomodoro-mode-line-overtime :inherit 'org-pomodoro-mode-line)
+   (org-pomodoro-mode-line-break :inherit 'org-pomodoro-mode-line)
+
    ;; --- extra variables ---------------------
    (paren-face-match  :foreground yellow   :background (doom-darken bg 0.2) :weight 'ultra-bold)
-   (ivy-current-match :background base7 :distant-foreground nil)
+   (ivy-current-match :background base2 :distant-foreground nil)
    (tooltip           :background bg-alt :foreground fg)
    (company-box-background :foreground fg :background bg-alt))
 

@@ -10,23 +10,11 @@
 (lib-key "C-x C-s" #'super-save-all-buffer)
 
 ;; esup
-(lib-key-define :autoload "esup" "C-, s e" #'esup)
+(lib-key "C-, s e" #'esup)
 (lib-key-define "C-, s b" #'core-benchmark/require-times)
 ;; restart-emacs
 (lib-key-define "C-, s r" #'restart-emacs
   :autoload "restart-emacs")
-
-;; Chinese automatically translated as English
-(lib-key-define :autoload "insert-translated-name"
-  :prefix "C-,"
-  "io" 'insert-translated-name-insert-original-translation
-  "iu" 'insert-translated-name-insert-with-underline
-  "il" 'insert-translated-name-insert-with-line
-  "ic" 'insert-translated-name-insert-with-camel)
-
-;; English word completion with Chinese comments
-(lib-key-define :autoload "company-english-helper"
-  "C-, it" #'toggle-company-english-helper)
 
 ;; hydra-bundle
 (lib-key-define :prefix "C-,"
@@ -150,7 +138,8 @@
   "<backtab>" 'company-yasnippet
   "C-c t" 'company-backend-with-tabnine
   "C-c T" 'company-backend-remove-tabnine)
-
+;; English word completion with Chinese comments
+(lib-key "C-, it" #'toggle-company-english-helper)
 (with-eval-after-load 'company
   (lib-key-define :map company-active-map
     "C-p" 'company-select-previous
@@ -191,6 +180,12 @@
   "M-g f" 'avy-goto-line
   "M-g w" 'avy-goto-word-1
   "M-g e" 'avy-goto-word-0)
+;; Chinese automatically translated as English
+(lib-key-define :prefix "C-,"
+  "io" 'insert-translated-name-insert-original-translation
+  "iu" 'insert-translated-name-insert-with-underline
+  "il" 'insert-translated-name-insert-with-line
+  "ic" 'insert-translated-name-insert-with-camel)
 (lib-key "C-c s" 'one-key-color-rg-search/menu nil (fboundp 'color-rg-search-symbol))
 
 ;; treemacs-bundle

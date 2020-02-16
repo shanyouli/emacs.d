@@ -6,6 +6,7 @@
      :background (doom-darken red 0.25)
      :foreground base0
      :distant-foreground base0)
+    (doom-visual-bell :background error)
 
     ;; --- base faces -------------------------
     (bold        :weight 'bold :foreground (unless bold base8))
@@ -130,7 +131,7 @@
     (dired-flagged    :foreground red)
     (dired-header     :foreground blue :weight 'bold)
     (dired-mark       :foreground orange :weight 'bold)
-    (dired-marked     :foreground magenta :weight 'bold)
+    (dired-marked     :foreground magenta :weight 'bold :inverse-video t)
     (dired-perm-write :foreground fg :underline t)
     (dired-symlink    :foreground cyan :weight 'bold)
     (dired-warning    :foreground warning)
@@ -390,9 +391,9 @@
     (circe-my-message-face :weight 'bold)
 
     ;; diff-hl
-    (diff-hl-change :foreground vc-modified)
-    (diff-hl-delete :foreground vc-deleted)
-    (diff-hl-insert :foreground vc-added)
+    (diff-hl-change :foreground vc-modified :background vc-modified)
+    (diff-hl-delete :foreground vc-deleted :background vc-deleted)
+    (diff-hl-insert :foreground vc-added :background vc-added)
 
     ;; diff-mode
     (diff-added   :inherit 'hl-line :foreground green)
@@ -629,7 +630,7 @@
      (&dark  :distant-foreground highlight)
      (&light :distant-foreground base0))
     (helm-match :inherit 'bold :foreground highlight :distant-foreground base8)
-    (helm-source-header          :background base2 :foreground base5)
+    (helm-source-header          :background base2 :foreground keywords :weight 'bold)
     (helm-swoop-target-line-face :foreground highlight :inverse-video t)
     (helm-visible-mark           :inherit '(bold highlight))
     (helm-moccur-buffer          :inherit 'link)
@@ -698,7 +699,7 @@
     ((indent-guide-face &inherit highlight-indentation-face))
 
     ;; ivy
-    (ivy-current-match :background region :distant-foreground nil)
+    (ivy-current-match :background region :distant-foreground nil :extend t)
     (ivy-minibuffer-match-face-1
      :background nil
      :foreground (doom-lighten grey 0.14)
@@ -786,6 +787,7 @@
     (lsp-face-highlight-textual :background dark-blue :foreground base8 :distant-foreground base0 :weight 'bold)
     (lsp-face-highlight-read    :background dark-blue :foreground base8 :distant-foreground base0 :weight 'bold)
     (lsp-face-highlight-write   :background dark-blue :foreground base8 :distant-foreground base0 :weight 'bold)
+    (lsp-ui-doc-background :inherit 'tooltip)
     (lsp-ui-peek-filename :inherit 'mode-line-buffer-id)
     (lsp-ui-peek-header :foreground fg :background (doom-lighten bg 0.1) :bold bold)
     (lsp-ui-peek-selection :foreground bg :background blue :bold bold)
@@ -1252,7 +1254,7 @@
     (org-table           :foreground violet)
     (org-tag             :foreground doc-comments :weight 'normal)
     (org-ref-cite-face   :foreground yellow :weight 'light :underline t)
-    (org-latex-and-related :foreground magenta)
+    (org-latex-and-related :foreground base8 :weight 'bold)
     (org-todo            :foreground green :bold 'inherit)
     (org-verbatim        :foreground green)
     (org-warning         :foreground warning)
@@ -1282,6 +1284,15 @@
     (org-habit-alert-future-face   :weight 'bold :background (doom-blend yellow bg-alt 0.3))
     (org-habit-overdue-face        :weight 'bold :background (doom-blend red bg-alt 0.5))
     (org-habit-overdue-future-face :weight 'bold :background (doom-blend red bg-alt 0.3))
+
+    ;; org-journal
+    (org-journal-highlight :foreground highlight)
+    (org-journal-calendar-entry-face :foreground magenta :slant 'italic)
+    (org-journal-calendar-scheduled-face :foreground red :slant 'italic)
+
+    ;; org-pomodoro
+    (org-pomodoro-mode-line :foreground red)
+    (org-pomodoro-mode-line-overtime :foreground warning :weight 'bold)
 
     ;; pkgbuild-mode
     (pkgbuild-error-face :underline `(:style wave :color ,red))
@@ -1345,6 +1356,8 @@
 (defvar doom-themes-base-vars
   '((ansi-color-names-vector
      (vconcat (mapcar #'doom-color '(bg red green yellow blue magenta cyan fg))))
+    (rustic-ansi-faces
+     (vconcat (mapcar #'doom-color '(bg red green yellow blue magenta cyan fg))))
 
     (fci-rule-color (doom-color 'base5))
 
@@ -1354,7 +1367,7 @@
 
     (objed-cursor-color (doom-color 'red))
 
-    (pdf-view-midnight-colors `(cons ,(doom-color 'bg) ,(doom-color 'fg)))
+    (pdf-view-midnight-colors `(cons ,(doom-color 'fg) ,(doom-color 'bg)))
 
     (vc-annotate-color-map
      `(list (cons 20  ,(doom-color 'green))

@@ -1,4 +1,4 @@
-;;; doom-one-light-theme.el --- inspired by Atom One Light
+;;; doom-one-light-theme.el --- inspired by Atom One Light -*- no-byte-compile: t; -*-
 (require 'doom-themes)
 
 ;;
@@ -105,7 +105,8 @@ determine the exact padding."
    (modeline-bg-inactive-l `(,(doom-darken (car bg-alt) 0.05) ,@(cdr base1))))
 
   ;; --- extra faces ------------------------
-  ((font-lock-comment-face
+  ((centaur-tabs-unselected :background bg-alt :foreground base4)
+   (font-lock-comment-face
     :foreground comments
     :background (if doom-one-light-comment-bg base0))
    (font-lock-doc-face

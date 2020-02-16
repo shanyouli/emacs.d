@@ -1,4 +1,4 @@
-;;; doom-outrun-electric-theme.el --- inspired by VS Code Outrun Electric
+;;; doom-outrun-electric-theme.el --- inspired by VS Code Outrun Electric -*- no-byte-compile: t; -*-
 (require 'doom-themes)
 
 ;;
@@ -120,6 +120,15 @@ determine the exact padding."
    (font-lock-doc-face
     :inherit 'font-lock-comment-face
     :foreground doc-comments)
+   (font-lock-keyword-face
+    :weight 'bold
+    :foreground keywords)
+   (font-lock-constant-face
+    :weight 'bold
+    :foreground constants)
+   (font-lock-function-name-face
+    :weight 'bold
+    :foreground functions)
 
    ;; Centaur tabs
    (centaur-tabs-active-bar-face :background magenta)

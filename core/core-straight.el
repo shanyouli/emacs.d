@@ -129,6 +129,7 @@ Usage:
                       (package-keys:commands commands package-name)
                       (package-keys:mode mode package-name)
                       (package-keys:defer defer name)))))))))
+
 (defun package-keys:install (package build-in)
   (unless build-in
     `((straight-use-package ',package))))
@@ -148,6 +149,7 @@ Usage:
            (unless (fboundp cmd) (autoload cmd ,file))
            (add-to-list 'auto-mode-alist ',alist))))
      (if (listp (car mode-alists)) mode-alists (list mode-alists)))))
+
 (defun package-keys:defer (defer package)
   (when defer
     (let ((time (if (numberp defer) defer 0.5)))

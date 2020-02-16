@@ -1,0 +1,10 @@
+* 一些内置的第三方配置
+
+1. [[https://github.com/purcell/disable-mouse][disable-mouse]]
+2. [[https://github.com/mattiase/xr][xr]]
+3. [[https://github.com/hlissner/emacs-doom-themes][Doom-themes]]
+4. [[https://github.com/jwiegley/emacs-async][Async]]
+5. [[https://github.com/tumashu/pyim][Pyim]]
+6. [[https://github.com/tumashu/pyim-basedict][Pyim-basedict]]
+7. [[https://github.com/tumashu/posframe][Posframe]]
+8. [[https://github.com/iqbalansari/restart-emacs][Restart-Emacs]]

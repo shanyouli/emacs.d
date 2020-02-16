@@ -12,3 +12,5 @@
 (package! tldr :commands tldr :if (not IS-WINDOWS))
 
 (package! cnfonts :commands cnfonts-ui :if (display-graphic-p))
+
+(package! esup :commands esup :if (display-graphic-p))

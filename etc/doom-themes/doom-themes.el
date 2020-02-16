@@ -1,6 +1,6 @@
 ;;; doom-themes.el --- an opinionated pack of modern color-themes -*- lexical-binding: t; -*-
 ;;
-;; Copyright (C) 2016-2018 Henrik Lissner
+;; Copyright (C) 2016-2020 Henrik Lissner
 ;;
 ;; Author: Henrik Lissner <http://github/hlissner>
 ;; Maintainer: Henrik Lissner <henrik@lissner.net>
@@ -28,11 +28,15 @@
 ;;   [X] `doom-acario-light' (added by gagbo)
 ;;   [X] `doom-city-lights' (added by fuxialexnder)
 ;;   [X] `doom-challenger-deep' (added by fuxialexnder)
+;;   [X] `doom-dark+' (added by ema2159)
 ;;   [X] `doom-dracula' (added by fuxialexnder)
 ;;   [X] `doom-fairy-floss' (added by ema2159)
 ;;   [X] `doom-gruvbox' (added by JongW)
+;;   [X] `doom-horizon' (added by karetsu)
 ;;   [X] `doom-Iosvkem' (added by neutaaaaan)
 ;;   [X] `doom-laserwave' (added by hyakt)
+;;   [X] `doom-material' (added by tam5)
+;;   [X] `doom-manegarm' (added by kenranunderscore)
 ;;   [X] `doom-molokai'
 ;;   [X] `doom-moonlight' (added by Brettm12345)
 ;;   [X] `doom-nord' (added by fuxialexnder)
@@ -44,6 +48,7 @@
 ;;   [X] `doom-outrun' (added by ema2159)
 ;;   [X] `doom-palenight' (added by Brettm12345)
 ;;   [X] `doom-peacock' (added by teesloane)
+;;   [X] `doom-snazzy' (added by ar1a)
 ;;   [X] `doom-solarized-dark' (added by ema2159)
 ;;   [X] `doom-solarized-light' (added by fuxialexnder)
 ;;   [X] `doom-sourcerer' (added by defphil)
