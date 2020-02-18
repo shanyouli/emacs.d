@@ -117,6 +117,12 @@
   (let ((out (call-process "pgrep" nil nil t "-x" cmd)))
     (if (eq 0  out) t nil)))
 
+;; 判断字体是否安装好了。
+(defun lye-font-installed-p (fontname)
+  "Return t, THE FONTNAME font is installed."
+  (let ((font (if (stringp fontname) (font-spec :family fontname) fontname)))
+    (find-font font)))
+
 (provide 'core-libs)
 
 ;;; core-libs.el ends here

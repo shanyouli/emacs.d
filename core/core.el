@@ -106,6 +106,8 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 (unless (file-directory-p lye-emacs-cache-dir)
   (make-directory lye-emacs-cache-dir t))
 
+(define-error 'lye-error "Error in Lye Emacs core")
+
 ;;; Load `custom-file'
 (setq custom-file (concat lye-emacs-cache-dir "custom.el"))
 (if (file-exists-p custom-file) (load custom-file :no-error :no-message))

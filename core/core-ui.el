@@ -39,30 +39,162 @@
 (setq lye-autoload-switch-theme-and-time '((doom-one  doom-molokai) .
                                            (30.93 . 113.92)))
 (add-hook! 'after-init-hook
-    (eval-when-compile (require 'doom-themes))
+  (eval-when-compile (require 'doom-themes))
   (lye|initialize-theme))
 
 ;;
 ;;; Frame size
-(when (display-graphic-p) (lib-frame/default-size))
+(defcustom lye-frame-height-scale nil
+  "The height of window screen ratio accounted for emacs-frame."
+  :type 'float)
+(defcustom lye-frame-width-scale nil
+  "The Wedth of window screen ratio accounted for emacs-frame.")
+(defcustom lye-frame-use-fullframe (if IS-LINUX t nil)
+  "是否启动全屏。" :type 'boolean)
+
+;; 获得整 个frame 大致的行数，和列数
+(defun lye-get-columns-in-the-entire-frame ()
+  (if (display-graphic-p)
+      (let ((edges (frame-edges)))
+        (truncate (/ (- (nth 2 edges) (nth 0 edges)) (default-font-width))))))
+
+(defun lye-get-lines-in-the-entire-frame ()
+  (if (display-graphic-p)
+      (let ((edges (frame-edges)))
+        (truncate (/ (- (nth 3 edges) (nth 1 edges)) (default-font-height))))))
+(defun fullscreen-toggle ()
+  "Toggle fullscreen status."
+  (interactive)
+  (interactive)
+  (set-frame-parameter
+   nil 'fullscreen
+   (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
+
+(defun lye-frame/default-size (&optional frame)
+  (interactive)
+  (let* ((x-max (x-display-pixel-width))
+         (y-max (x-display-pixel-height))
+         (x-scale (or lye-frame-width-scale 0.5))
+         (y-scale (or lye-frame-height-scale 0.618))
+         (x-point (truncate (* x-max (/ (- 1 x-scale) 2))))
+         (y-point (truncate (* y-max (/ (- 1 y-scale) 2))))
+         (x-width (truncate (- (* x-max x-scale) 17)))
+         (y-height (truncate (* y-max y-scale)))
+         (frame (or frame (selected-frame))))
+    (set-frame-position frame x-point y-point)
+    (set-frame-size frame x-width y-height t)))
+
+(defun lye-frame-default-h ()
+  "When `lye-frame-use-fullframe' is t, use fullframe.
+When `lye-frame-use-fullfrmae' is nil, use default-frame."
+  (if lye-frame-use-fullframe
+      (if (not IS-MAC)
+          (set-frame-parameter nil 'fullscreen 'fullboth)
+        ;; 在Mac平台, Emacs不能进入Mac原生的全屏模式,否则会导致 `make-frame' 创建时也集成原生全屏属性后造成白屏和左右滑动现象.
+        ;; 所以先设置 `ns-use-native-fullscreen' 和 `ns-use-fullscreen-animation' 禁止Emacs使用Mac原生的全屏模式.
+        ;; 而是采用传统的全屏模式, 传统的全屏模式, 只会在当前工作区全屏,而不是切换到Mac那种单独的全屏工作区,
+        ;; 这样执行 `make-frame' 先关代码或插件时,就不会因为Mac单独工作区左右滑动产生的bug.
+        ;;
+        ;; Mac平台下,不能直接使用 `set-frame-parameter' 和 `fullboth' 来设置全屏,
+        ;; 那样也会导致Mac窗口管理器直接把Emacs窗口扔到单独的工作区, 从而对 `make-frame' 产生同样的Bug.
+        ;; 所以, 启动的时候通过 `set-frame-parameter' 和 `maximized' 先设置Emacs为最大化窗口状态, 启动5秒以后再设置成全屏状态,
+        ;; Mac就不会移动Emacs窗口到单独的工作区, 最终解决Mac平台下原生全屏窗口导致 `make-frame' 左右滑动闪烁的问题.
+        (setq ns-use-native-fullscreen nil)
+        (setq ns-use-fullscreen-animation nil)
+
+        ;; 默认先最大化。
+        (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
+
+        (run-at-time "2sec" nil (lambda () (toggle-frame-fullscreen))))
+    (lye-frame/default-size))
+  (if (display-graphic-p)
+      (run-at-time
+       "3sec" nil
+       (lambda ()
+         (setf (alist-get 'width default-frame-alist)
+               (truncate (/ (* (x-display-pixel-width)
+                               (or lye-frame-width-scale 0.5))
+                            (frame-char-width))))
+         (setf (alist-get 'height default-frame-alist)
+               (truncate (/ (* (x-display-pixel-height)
+                               (or lye-frame-height-scale 0.618))
+                            (frame-char-height))))))))
+(lye-frame-default-h)
 ;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-(add-hook! 'after-make-frame-functions
-  :if (display-graphic-p)
-  'lye|frame-default-size-with-frame)
 
 ;;
 ;;; font
-(defcustom lye-en-font nil "Customize English font." :type 'string)
-(defcustom lye-zh-font nil "Customize Chinese font." :type 'string)
+(defcustom lye-en-font (cl-loop for font in '("Fantasque Sans Mono"
+                                              "FantasqueSansMono NF"
+                                              "Hasklig"
+                                              "Fira Code"
+                                              "Source Code Pro")
+                                when (lye-font-installed-p font)
+                                return font)
+  "Customize English font." :type 'string)
+(defcustom lye-zh-font (cl-loop for font in '("Adobe Heiti Std"
+                                              "WenQuanYi Micro Hei Mono"
+                                              "Sarasa Mono SC"
+                                              "Microsoft Yahei")
+                                when (lye-font-installed-p font)
+                                return font)
+  "Customize Chinese font." :type 'string)
 (defcustom lye-default-font-size nil "Customize font size." :type 'integer)
+(defcustom lye-unicode-font (cl-loop for font in
+                                     '("DejaVu Sans Mono"
+                                       "Symbola"
+                                       "Apple Symbols"
+                                       "Symbol"
+                                       "icons-in-terminal")
+                                     when (lye-font-installed-p font)
+                                     return font)
+  "Customize unicode font."
+  :type 'string)
+(defvar lye-init--font nil "记录 emacs 初始化使用的字体格式。")
+(defvar lye-init-font-hook nil "当设置字体后的配置。")
+(defun lye-init-fonts-h ()
+  "Loads `lye-en-font'."
+  (cond
+   (lye-en-font
+    (setq lye-init--font (font-spec :family lye-en-font
+                                    :size (or lye-default-font-size 14)))
+    (cl-pushnew
+     ;; Avoiding `set-frame-font' because it does a lot of extra, expensive
+     ;; work we can avoid by setting the font frame parameter instead.
+     (cons 'font (font-xlfd-name lye-init--font))
+     initial-frame-alist :key #'car :test #'eq)
+    (cl-pushnew
+     ;; Avoiding `set-frame-font' because it does a lot of extra, expensive
+     ;; work we can avoid by setting the font frame parameter instead.
+     (cons 'font (font-xlfd-name lye-init--font))
+     default-frame-alist :key #'car :test #'eq))
+   ((display-graphic-p)
+    ;; We try our best to record your system font,
+    ;; can still use it to compute a larger font size with.
+    (setq font-use-system-font t
+          lye-init--font (face-attribute 'default :font))
+    (set-face-attribute 'default nil :height 100)))
+  (run-hooks 'lye-init-font-hook))
 
-(if (and (fboundp 'daemonp) (daemonp))
-    (add-hook! 'after-make-frame-functions #'lye|font-initialize)
-  (lye-font-initialize))
-(when (display-graphic-p)
-  (cl-loop for font in '("Symbola" "Apple Symbols" "Symbol" "icons-in-terminal")
-           when (lib-font-exist-p font)
-           return (set-fontset-font t 'unicode font nil 'prepend)))
+(defun lye-init-extra-fonts-h (&optional frame)
+  "Loads `lye-unicode-font' `lye-zh-font'."
+  (condition-case e
+      (with-selected-frame (or frame (selected-frame))
+        (when (and lye-zh-font (fboundp 'set-fontset-font))
+          (set-fontset-font t '(#x4e00 . #x9fff)
+                            (font-spec :family lye-zh-font :size 14)))
+        (when (and lye-unicode-font (fboundp 'set-fontset-font))
+          (set-fontset-font t unicode
+                            (font-spec :family lye-unicode-font)
+                            nil 'prepend)))
+    ((debug error)
+     (if (string-prefix-p "Font not available: " (error-message-string e))
+         (lwarn 'lye-core-ui :warning
+                "Could not find the '%s' font on your system, falling back to system font"
+                (font-get (caddr e) :family))
+       (signal 'lye-error e)))))
+
+(add-hook! 'after-init-hook 'lye-init-fonts-h)
 
 ;;
 ;;; Line-Number
@@ -75,7 +207,7 @@
          (width-start (nth 0 edges))
          (width-end (nth 2 edges))
          result)
-    (when (< 86 (truncate (/ (- width-end width-start) (frame-char-width))))
+    (when (< 86 (lye-get-columns-in-the-entire-frame))
       (setq result (or (not (eq major-mode 'org-mode))
                        (< (line-number-at-pos (point-max)) 1000))))
     (if result

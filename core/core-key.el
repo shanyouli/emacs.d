@@ -11,7 +11,7 @@
 
 ;; esup
 (lib-key "C-, s e" #'esup)
-(lib-key-define "C-, s b" #'core-benchmark/require-times)
+(lib-key "C-, s b" #'core-benchmark/require-times)
 ;; restart-emacs
 (lib-key-define "C-, s r" #'restart-emacs
   :autoload "restart-emacs")
@@ -269,7 +269,7 @@
 (lib-key-define [remap describe-key] 'helpful-key
   [remap describe-symbol] 'helpful-symbol)
 (with-eval-after-load 'helpful
-  (lib-key-define :map helpful-mode-map "r" 'remove-hook-at-point))
+  (lib-key "r" 'remove-hook-at-point helpful-mode-hook))
 
 ;; tools-bundle
 (lib-key-define "C-x p o" 'link-hint-open-link
@@ -277,3 +277,6 @@
   "C-, t p" 'pomidor)
 (lib-key "C-z s h" 'tldr nil (not IS-WINDOWS))
 (lib-key "C-, u c" 'cnfonts-ui nil (fboundp 'cnfonts-ui))
+
+;; other
+(lib-key "C-z s b" 'backup-file-log nil (not IS-WINDOWS))

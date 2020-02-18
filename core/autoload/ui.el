@@ -19,10 +19,6 @@
 (defun lye|font-initialize (frame)
   (with-selected-frame frame (lye-font-initialize)))
 
-;;;###autoload
-(defun lye|frame-default-size-with-frame (frame)
-  (lib-frame/default-size frame))
-
 ;; adjust-opacity https://emacs-china.org/t/topic/2405/22
 ;;;###autoload
 (defun lye//adjust-opacity (frame incr)

@@ -65,12 +65,12 @@
 
   ;; Backup-file
   (unless IS-WINDOWS
-    (package+ '(backup-file :type git :host github
-                :repo "shanyouli/emacs-backup-file"))
-    (setq backup-file-location (expand-file-name "backup"
-                                                 lye-emacs-cache-dir))
-    (add-hook! 'after-save-hook 'backup-file)
-    (lib-key-define "C-z s b" 'backup-file-log :autoload "backup-file"))
+    (package! backup-file
+              :recipe (:type git :host github
+                       :repo "shanyouli/emacs-backup-file")
+              :commands (backup-file backup-file-log))
+    (setq backup-file-location (lib-f-join  lye-emacs-cache-dir "backup"))
+    (add-hook! 'after-save-hook 'backup-file))
 
   ;; Highlight diff
   (autoload 'global-diff-hl-mode "diff-hl")

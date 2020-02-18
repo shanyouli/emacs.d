@@ -1,5 +1,9 @@
 ;;; /core/core-bundle.el -*- lexical-binding: t -*-
 
+;; (dolist (b '((pyim :defer t)
+;;              (term :defer t)
+;;              ))
+;;   (bundle! b))
 (bundle! pyim :defer t)
 ;; (bundle! fcitx :defer t :if (and IS-LINUX (executable-find "fcitx-remote")))
 
