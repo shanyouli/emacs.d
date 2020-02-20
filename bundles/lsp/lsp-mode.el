@@ -51,11 +51,10 @@
   (advice-add #'keyboard-quit :before #'lsp-ui-doc-hide)
 
   ;; Reset `lsp-ui-doc-background' after loading theme
-  (add-hook 'after-load-theme-hook
-            (lambda ()
-              (setq lsp-ui-doc-border (face-foreground 'default))
-              (set-face-background 'lsp-ui-doc-background
-                                   (face-background 'tooltip))))
+  (add-hook! 'lye-load-theme-hook
+    (setq lsp-ui-doc-border (face-foreground 'default))
+    (set-face-background 'lsp-ui-doc-background
+                         (face-background 'tooltip)))
 
   ;; WORKAROUND Hide mode-line of the lsp-ui-imenu buffer
   ;; @see https://github.com/emacs-lsp/lsp-ui/issues/243

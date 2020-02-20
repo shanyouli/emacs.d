@@ -68,6 +68,9 @@
         (-local (plist-get+ args :local))
         (-defer (plist-get+ args :defer))
         (-append (plist-get+ args :append))
+        (hooks (if (cdr-safe (cadr hook))
+                   (cadr hook)
+                 (list (cadr hook))))
         (funcs (let ((val (car args)))
                  (if (memq (car-safe val) '(quote function))
                      (if (cdr-safe (cadr val)) (cadr val)
@@ -80,7 +83,8 @@
                       (run-with-idle-timer ,-defer nil
                                            (function ,fn)))
                  `(function ,fn)))
-      (push `(add-hook ,hook  ,fn ,-append ,-local) forms))
+      (dolist (h hooks)
+        (push `(add-hook ',h  ,fn ,-append ,-local) forms)))
     `(when ,-if ,@forms)))
 
 (defmacro add-hook-once (hook f &optional append local)
@@ -122,6 +126,17 @@
   "Return t, THE FONTNAME font is installed."
   (let ((font (if (stringp fontname) (font-spec :family fontname) fontname)))
     (find-font font)))
+
+(defun lye-try-run-hook (hook)
+  "Run HOOK (a hook function) with better error handling.
+Meant to be used with `run-hook-wrapped'."
+  (message "Running lye hook: %s" hook)
+  (condition-case err
+      (funcall hook)
+    ((debug error)
+     (signal 'lye-hook-error (list hook e))))
+  ;; Return nil so `run-hook-wrapped' won't short circuit
+  nil)
 
 (provide 'core-libs)
 

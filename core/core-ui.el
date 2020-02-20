@@ -2,6 +2,56 @@
 
 ;; (setq facy-splash-image logo) ; Logo
 
+;;
+;;; Variables
+
+;; Frame variables
+(defcustom lye-frame-height-scale nil
+  "The height of window screen ratio accounted for emacs-frame."
+  :type 'float)
+(defcustom lye-frame-width-scale nil
+  "The Wedth of window screen ratio accounted for emacs-frame.")
+(defcustom lye-frame-use-fullframe (not IS-WINDOWS)
+  "是否启动全屏。" :type 'boolean)
+
+;; Font variables
+(defcustom lye-en-font (cl-loop for font in '("Fantasque Sans Mono"
+                                              "FantasqueSansMono NF"
+                                              "Hasklig"
+                                              "Fira Code"
+                                              "Source Code Pro")
+                                when (lye-font-installed-p font)
+                                return font)
+  "Customize English font." :type 'string)
+(defcustom lye-zh-font (cl-loop for font in '("Adobe Heiti Std"
+                                              "WenQuanYi Micro Hei Mono"
+                                              "Sarasa Mono SC"
+                                              "Microsoft Yahei")
+                                when (lye-font-installed-p font)
+                                return font)
+  "Customize Chinese font." :type 'string)
+(defcustom lye-unicode-font (cl-loop for font in
+                                     '("DejaVu Sans Mono"
+                                       "Symbola"
+                                       "Apple Symbols"
+                                       "Symbol"
+                                       "icons-in-terminal")
+                                     when (lye-font-installed-p font)
+                                     return font)
+  "Customize unicode font."
+  :type 'string)
+(defcustom lye-default-font-size nil "Customize font size." :type 'integer)
+
+;; Theme variables
+(defcustom lye-theme-default  nil "Lye Default themes." :type '(symbol list))
+(defcustom lye-theme-use-list nil "Custom Switches list." :type 'list)
+(defcustom lye-theme-set-Lat-and-lon nil
+  "With sunrise and sunset to set different themes.
+
+ Format: Use latitude and longitude: (30.93 . 113.92)
+         Use custom time:            (\"08:30\" . \"18:30\")"
+  :type 'list)
+
 ;; Title
 (when (display-graphic-p)
   (setq frame-title-format
@@ -24,34 +74,10 @@
       ;;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
       frame-resize-pixelwise t)
 
-;;
-;;; THEME
-(defcustom lye-autoload-switch-dark-or-light-p nil
-  "If it is non-nil, Not use `lib-theme-switch-theme'."
-  :type 'boolean)
-(defcustom lye-autoload-switch-theme-and-time nil
-  "Default dark or light theme"
-  :type 'list)
-(defcustom lye-theme-list nil "Using theme list." :type 'list)
-(defcustom lye-default-theme nil "Lye Default theme." :type 'list)
-
-(defvar lye--current-theme nil)
-(setq lye-autoload-switch-theme-and-time '((doom-one  doom-molokai) .
-                                           (30.93 . 113.92)))
-(add-hook! 'after-init-hook
-  (eval-when-compile (require 'doom-themes))
-  (lye|initialize-theme))
 
 ;;
 ;;; Frame size
-(defcustom lye-frame-height-scale nil
-  "The height of window screen ratio accounted for emacs-frame."
-  :type 'float)
-(defcustom lye-frame-width-scale nil
-  "The Wedth of window screen ratio accounted for emacs-frame.")
-(defcustom lye-frame-use-fullframe (if IS-LINUX t nil)
-  "是否启动全屏。" :type 'boolean)
-
+;; FIX: see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
 ;; 获得整 个frame 大致的行数，和列数
 (defun lye-get-columns-in-the-entire-frame ()
   (if (display-graphic-p)
@@ -65,26 +91,23 @@
 (defun fullscreen-toggle ()
   "Toggle fullscreen status."
   (interactive)
-  (interactive)
   (set-frame-parameter
    nil 'fullscreen
    (when (not (frame-parameter nil 'fullscreen)) 'fullboth)))
 
-(defun lye-frame/default-size (&optional frame)
+(defun lye-init-default-size (&optional frame)
   (interactive)
-  (let* ((x-max (x-display-pixel-width))
-         (y-max (x-display-pixel-height))
-         (x-scale (or lye-frame-width-scale 0.5))
-         (y-scale (or lye-frame-height-scale 0.618))
-         (x-point (truncate (* x-max (/ (- 1 x-scale) 2))))
-         (y-point (truncate (* y-max (/ (- 1 y-scale) 2))))
-         (x-width (truncate (- (* x-max x-scale) 17)))
-         (y-height (truncate (* y-max y-scale)))
-         (frame (or frame (selected-frame))))
-    (set-frame-position frame x-point y-point)
-    (set-frame-size frame x-width y-height t)))
+  (let ((x-width (or (alist-get 'width default-frame-alist)
+                     (truncate (/ (- (* (x-display-pixel-width)
+                                        (or lye-frame-width-scale 0.5)) 24)
+                                  (frame-char-width)))))
+        (y-height (or (alist-get 'height default-frame-alist)
+                      (truncate (/ (* (x-display-pixel-height)
+                                      (or lye-frame-height-scale 0.618))
+                                   (frame-char-height))))))
+    (set-frame-size (or frame (selected-frame)) x-width y-height)))
 
-(defun lye-frame-default-h ()
+(defun lye-init-frame-size ()
   "When `lye-frame-use-fullframe' is t, use fullframe.
 When `lye-frame-use-fullfrmae' is nil, use default-frame."
   (if lye-frame-use-fullframe
@@ -106,52 +129,65 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
         (set-frame-parameter (selected-frame) 'fullscreen 'maximized)
 
         (run-at-time "2sec" nil (lambda () (toggle-frame-fullscreen))))
-    (lye-frame/default-size))
+    (when (display-graphic-p)
+      (let* ((x-max (x-display-pixel-width))
+             (y-max (x-display-pixel-height))
+             (x-scale (or lye-frame-width-scale 0.5))
+             (y-scale (or lye-frame-height-scale 0.618))
+             (x-point (truncate (* x-max (/ (- 1 x-scale) 2))))
+             (y-point (truncate (* y-max (/ (- 1 y-scale) 2))))
+             (x-width (truncate (- (* x-max x-scale) 24)))
+             (y-height (truncate (* y-max y-scale)))
+             (frame (selected-frame)))
+        (set-frame-position frame x-point y-point)
+        (set-frame-size frame x-width y-height t))))
   (if (display-graphic-p)
       (run-at-time
        "3sec" nil
        (lambda ()
          (setf (alist-get 'width default-frame-alist)
-               (truncate (/ (* (x-display-pixel-width)
-                               (or lye-frame-width-scale 0.5))
+               (truncate (/ (- (* (x-display-pixel-width)
+                                  (or lye-frame-width-scale 0.5)) 24)
                             (frame-char-width))))
          (setf (alist-get 'height default-frame-alist)
                (truncate (/ (* (x-display-pixel-height)
                                (or lye-frame-height-scale 0.618))
                             (frame-char-height))))))))
-(lye-frame-default-h)
-;; see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
+
+;;
+;;; THEME
+(defvar lye-load-theme-hook nil)
+(defun lye--run-load-theme-hooks-a (theme &optional _no-confirm no-enable)
+  "Set up `lye-load-theme-hook' to run after `load-theme' is called."
+  (unless no-enable
+    (setq lye--current-theme theme)
+    (run-hooks 'lye-load-theme-hook)))
+(advice-add #'load-theme :after-while #'lye--run-load-theme-hooks-a)
+
+;; 每次执行 `load-theme' 之前自动执行 disabled-theme.
+(defun lye--run-load-theme-before-a (&rest _)
+  (when custom-enabled-themes
+    (mapc #'disable-theme custom-enabled-themes)))
+(advice-add #'load-theme :before #'lye--run-load-theme-before-a)
+
+(push (lib-f-join lye-etc-dir "doom-themes/themes/") custom-theme-load-path)
+
+(defcustom lye-autoload-switch-dark-or-light-p nil
+  "If it is non-nil, Not use `lib-theme-switch-theme'."
+  :type 'boolean)
+(defcustom lye-autoload-switch-theme-and-time nil
+  "Default dark or light theme"
+  :type 'list)
+(defcustom lye-theme-list nil "Using theme list." :type 'list)
+(defcustom lye-default-theme nil "Lye Default theme." :type 'list)
+
+(defvar lye--current-theme nil)
+(setq lye-autoload-switch-theme-and-time
+      '((doom-one  doom-molokai) . (30.93 . 113.92)))
 
 ;;
 ;;; font
-(defcustom lye-en-font (cl-loop for font in '("Fantasque Sans Mono"
-                                              "FantasqueSansMono NF"
-                                              "Hasklig"
-                                              "Fira Code"
-                                              "Source Code Pro")
-                                when (lye-font-installed-p font)
-                                return font)
-  "Customize English font." :type 'string)
-(defcustom lye-zh-font (cl-loop for font in '("Adobe Heiti Std"
-                                              "WenQuanYi Micro Hei Mono"
-                                              "Sarasa Mono SC"
-                                              "Microsoft Yahei")
-                                when (lye-font-installed-p font)
-                                return font)
-  "Customize Chinese font." :type 'string)
-(defcustom lye-default-font-size nil "Customize font size." :type 'integer)
-(defcustom lye-unicode-font (cl-loop for font in
-                                     '("DejaVu Sans Mono"
-                                       "Symbola"
-                                       "Apple Symbols"
-                                       "Symbol"
-                                       "icons-in-terminal")
-                                     when (lye-font-installed-p font)
-                                     return font)
-  "Customize unicode font."
-  :type 'string)
 (defvar lye-init--font nil "记录 emacs 初始化使用的字体格式。")
-(defvar lye-init-font-hook nil "当设置字体后的配置。")
 (defun lye-init-fonts-h ()
   "Loads `lye-en-font'."
   (cond
@@ -173,8 +209,14 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
     ;; can still use it to compute a larger font size with.
     (setq font-use-system-font t
           lye-init--font (face-attribute 'default :font))
-    (set-face-attribute 'default nil :height 100)))
-  (run-hooks 'lye-init-font-hook))
+    (set-face-attribute 'default nil :height 100))))
+
+(defun lye-init-fonts-with-daemon-h (&optional frame)
+  (with-selected-frame (or frame (selected-frame))
+    (unless lye-init--font (lye-init-fonts-h))
+    (unless (alist-get 'width default-frame-alist)
+      ;; (lye-init-default-size)
+      )))
 
 (defun lye-init-extra-fonts-h (&optional frame)
   "Loads `lye-unicode-font' `lye-zh-font'."
@@ -184,7 +226,7 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
           (set-fontset-font t '(#x4e00 . #x9fff)
                             (font-spec :family lye-zh-font :size 14)))
         (when (and lye-unicode-font (fboundp 'set-fontset-font))
-          (set-fontset-font t unicode
+          (set-fontset-font t 'unicode
                             (font-spec :family lye-unicode-font)
                             nil 'prepend)))
     ((debug error)
@@ -197,22 +239,40 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
 (add-hook! 'after-init-hook 'lye-init-fonts-h)
 
 ;;
+;;; Initialize UI
+(defvar lye-init-ui-hook nil
+  "List of hooks to run when the UI has been initialized.")
+
+(defun lye-init-ui-h ()
+  "Initialize Lye's user interface by applying all its advice and hooks."
+  (run-hook-wrapped 'lye-init-ui-hook #'lye-try-run-hook)
+  (lye-init-frame-size))
+
+(add-hook! 'lye-load-theme-hook
+  (lye-init-extra-fonts-h)
+  (doom-themes-org-config)
+  (doom-themes-neotree-config)
+  (doom-themes-treemacs-config))
+(add-hook! 'window-setup-hook #'lye-init-ui-h)
+(add-hook (if (daemonp) 'after-make-frame-functions 'lye-init-ui-hook)
+          #'lye|initialize-theme)
+(add-hook (if (daemonp) 'after-make-frame-functions 'lye-init-ui-hook)
+          #'lye-init-fonts-with-daemon-h)
+;; (when (daemonp)
+;;   (add-hook! 'after-make-frame-functions (unless lye-init--font (lye-init-fonts-h))))
+
+;;
 ;;; Line-Number
 ;; 文件超过10000行，不显示行号，只留4位吧
 (setq display-line-numbers-width-start 4)
 (defun lye-display-line-numbers ()
-  "当文件的列宽 <86 或者 文件的 Major－mode 为 org－mode 且行数大于 1000,
+  "当文件的列宽 <86 或者文件的 Major－mode 为 org－mode 且行数大于 1000,
 不显示行号。"
-  (let* ((edges (frame-edges))
-         (width-start (nth 0 edges))
-         (width-end (nth 2 edges))
-         result)
-    (when (< 86 (lye-get-columns-in-the-entire-frame))
-      (setq result (or (not (eq major-mode 'org-mode))
-                       (< (line-number-at-pos (point-max)) 1000))))
-    (if result
-        (display-line-numbers-mode +1)
-      (display-line-numbers-mode -1))))
+  (if (and (> (lye-get-columns-in-the-entire-frame) 86)
+           (or (not (eq major-mode 'org-mode))
+               (< (line-number-at-pos (point-max) 1000))))
+      (display-line-numbers-mode +1)
+    (display-line-numbers-mode -1)))
 
-(dolist (h '(prog-mode-hook org-mode-hook))
-  (add-hook! h (lye-display-line-numbers)))
+(add-hook! '(prog-mode-hook org-mode-hook conf-mode-hook nxml-mode-hook)
+  #'lye-display-line-numbers)

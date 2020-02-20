@@ -5,8 +5,7 @@
   ;; awesome-tab style: slant, wave,alternate,bar,box,chamfer,rounded,zigzag
   (setq awesome-tab-style 'zigzag)
   (setq awesome-tab-hide-tab-function 'lye/awesome-tab-hide-tab+)
-  (if (boundp 'after-load-theme-hook)
-      (add-hook 'after-load-theme-hook #'lye/refresh-awesome-tab-mode+))
+  (add-hook 'lye-load-theme-hook #'lye/refresh-awesome-tab-mode+)
 
   (defun lye/awesome-tab-hide-tab+ (x)
     (let ((name (format "%s" x)))

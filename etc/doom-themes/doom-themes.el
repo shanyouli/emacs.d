@@ -405,9 +405,12 @@ theme face specs. These is a simplified spec. For example:
 (when (and (boundp 'custom-theme-load-path) load-file-name)
   (let* ((base (file-name-directory load-file-name))
          (dir (expand-file-name "themes/" base)))
-    (add-to-list 'custom-theme-load-path
-                 (or (and (file-directory-p dir) dir)
-                     base))))
+    ;; (add-to-list 'custom-theme-load-path
+    ;;              (or (and (file-directory-p dir) dir)
+    ;;                  base))
+    (cl-pushnew (or (and (file-directory-p dir) dir)
+                    base)
+                custom-theme-load-path :test 'equal)))
 
 (provide 'doom-themes)
 ;;; doom-themes.el ends here

@@ -107,7 +107,7 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
   (make-directory lye-emacs-cache-dir t))
 
 (define-error 'lye-error "Error in Lye Emacs core")
-
+(define-error 'lye-hook-error "Error in a Doom startup hook" 'doom-error)
 ;;; Load `custom-file'
 (setq custom-file (concat lye-emacs-cache-dir "custom.el"))
 (if (file-exists-p custom-file) (load custom-file :no-error :no-message))

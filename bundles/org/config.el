@@ -1,15 +1,4 @@
 ;;; bundles/org/config.el.el -*- lexical-binding: t -*-
-
-
-(when (and custom-enabled-themes
-           (string-prefix-p "doom-" (symbol-name (car custom-enabled-themes))))
-  (require 'doom-themes-ext-org nil t))
-
-(add-hook! 'after-load-theme-hook
-    (if (string-prefix-p "doom-" (symbol-name (car custom-enabled-themes)))
-        (require 'doom-themes-ext-org)))
-
-
 (add-hook! 'org-mode-hook
     ;; (auto-fill-mode nil) ; 不自动换行
     (setq truncate-lines nil) ; 不自动换行

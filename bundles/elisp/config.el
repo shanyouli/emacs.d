@@ -176,7 +176,7 @@ Lisp function does not specify a special indentation."
 (face-spec-set 'macrostep-expansion-highlight-face
                `((t (:background ,(face-background 'tooltip) :extend t))))
 
-(add-hook! 'after-load-theme-hook
+(add-hook! 'lye-load-theme-hook
   (set-face-background 'macrostep-expansion-highlight-face
                        (face-background 'tooltip)))
 
