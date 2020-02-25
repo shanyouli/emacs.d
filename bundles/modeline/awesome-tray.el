@@ -14,7 +14,7 @@
   (push '("pyim" . (awesome-tray-module-pyim-info awesome-tray-module-pyim-face))
         awesome-tray-module-alist)
   (advice-add 'awesome-tray-disable
-              :after (lambda (&rest _) (require 'lib-modeline nil t)))
+              :before (lambda (&rest _) (lib-load-relative "base-modeline" t t)))
   (advice-add 'awesome-tray-enable
               :before (lambda (&rest _)
                         (let ((first-mode-line (car mode-line-format)))

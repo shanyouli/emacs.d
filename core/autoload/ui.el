@@ -46,3 +46,15 @@
                 lib-theme-switch-time (cdr lye-autoload-switch-theme-and-time))
           (lib-theme-switch-theme))
       (when lye-default-theme (load-theme lye-default-theme t)))))
+
+
+;;;###autoload
+(defun lye-theme::time-nuber-to-string (timer-number)
+  "Conver TIME-NUMBER hours to HH:MM. eg: Cover 16.8 hours to 16:48"
+  (let* ((time-integer (truncate timer-number))
+         (time-decimal (truncate (* 60 (- timer-number time-integer)))))
+    (concat (and (< time-integer 10) "0")
+            (number-to-string time-integer)
+            ":"
+            (and (< time-decimal 10) "0")
+            (number-to-string time-decimal))))

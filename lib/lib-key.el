@@ -121,7 +121,6 @@ FROM: https://github.com/jwiegley/use-package/blob/master/bind-key.el."
                                                 ,command))))
             `(define-key (or ,keymap global-map) ,keyvar ,command))))))
 
-
 (defun lib-key--map-apply (fun xss)
   (mapcar (lambda (xs) (apply fun xs)) xss))
 

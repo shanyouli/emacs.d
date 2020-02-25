@@ -39,7 +39,6 @@
 ;;使用字体缓存，避免卡顿
 (setq inhibit-compacting-font-caches t)
 
-
 ;; Environment Variable Configuration
 (defvar msys2-root  nil "The root directory of msys2.")
 

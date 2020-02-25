@@ -15,18 +15,11 @@
   "是否启动全屏。" :type 'boolean)
 
 ;; Font variables
-(defcustom lye-en-font (cl-loop for font in '("Fantasque Sans Mono"
-                                              "FantasqueSansMono NF"
-                                              "Hasklig"
-                                              "Fira Code"
-                                              "Source Code Pro")
-                                when (lye-font-installed-p font)
-                                return font)
-  "Customize English font." :type 'string)
+(defcustom lye-en-font nil "Customize English font." :type 'string)
 (defcustom lye-zh-font (cl-loop for font in '("Adobe Heiti Std"
                                               "WenQuanYi Micro Hei Mono"
-                                              "Sarasa Mono SC"
-                                              "Microsoft Yahei")
+                                              "Microsoft Yahei"
+                                              "Sarasa Mono SC")
                                 when (lye-font-installed-p font)
                                 return font)
   "Customize Chinese font." :type 'string)
@@ -61,12 +54,6 @@
                    (buffer-name)))))
   (setq icon-title-format frame-title-format))
 
-;; Not scroll-bar, tool-bar and menu-bar-mode
-(run-with-idle-timer! :defer 3
-  (setq tool-bar-mode nil scroll-bar-mode nil)
-  (unless IS-MAC
-    (setq menu-bar-mode nil)))
-
 ;; Suppress GUI features
 (setq use-file-dialog nil
       use-dialog-box nil
@@ -97,7 +84,7 @@
 
 (defun lye-init-default-size (&optional frame)
   (interactive)
-  (let ((x-width (or (alist-get 'width default-frame-alist)
+  (let ((x-width (or (assq 'width default-frame-alist)
                      (truncate (/ (- (* (x-display-pixel-width)
                                         (or lye-frame-width-scale 0.5)) 24)
                                   (frame-char-width)))))
@@ -208,15 +195,11 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
     ;; We try our best to record your system font,
     ;; can still use it to compute a larger font size with.
     (setq font-use-system-font t
-          lye-init--font (face-attribute 'default :font))
-    (set-face-attribute 'default nil :height 100))))
+          lye-init--font (face-attribute 'default :font)))))
 
 (defun lye-init-fonts-with-daemon-h (&optional frame)
   (with-selected-frame (or frame (selected-frame))
-    (unless lye-init--font (lye-init-fonts-h))
-    (unless (alist-get 'width default-frame-alist)
-      ;; (lye-init-default-size)
-      )))
+    (unless lye-init--font (lye-init-fonts-h))))
 
 (defun lye-init-extra-fonts-h (&optional frame)
   "Loads `lye-unicode-font' `lye-zh-font'."
@@ -245,6 +228,10 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
 
 (defun lye-init-ui-h ()
   "Initialize Lye's user interface by applying all its advice and hooks."
+  ;; Not scroll-bar, tool-bar and menu-bar-mode
+  (setq tool-bar-mode nil scroll-bar-mode nil)
+  (unless IS-MAC (setq menu-bar-mode nil))
+
   (run-hook-wrapped 'lye-init-ui-hook #'lye-try-run-hook)
   (lye-init-frame-size))
 
@@ -258,8 +245,6 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
           #'lye|initialize-theme)
 (add-hook (if (daemonp) 'after-make-frame-functions 'lye-init-ui-hook)
           #'lye-init-fonts-with-daemon-h)
-;; (when (daemonp)
-;;   (add-hook! 'after-make-frame-functions (unless lye-init--font (lye-init-fonts-h))))
 
 ;;
 ;;; Line-Number
