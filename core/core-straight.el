@@ -122,17 +122,18 @@ Usage:
 "
   (declare (indent 1))
   (unless disabled
-    (let ((-if (or if t))
-          (package (if recipe (cons name recipe) name))
-          (package-name (symbol-name name)))
-      (macroexp-progn
-       `((when ,-if
-           ,@(mapcar 'identity
-                     (core-package/concat
-                      (package-keys:install package build-in)
-                      (package-keys:commands commands package-name)
-                      (package-keys:mode mode package-name)
-                      (package-keys:defer defer name)))))))))
+    (let* ((package (if recipe (cons name recipe) name))
+           (package-name (symbol-name name))
+           (body-lists `,(core-package/concat
+                         (package-keys:install package build-in)
+                         (package-keys:commands commands package-name)
+                         (package-keys:mode mode package-name)
+                         (package-keys:defer defer name))))
+      (if if
+          (macroexp-progn
+           `((when ,if
+               ,@(mapcar 'identity body-lists))))
+        (macroexp-progn body-lists)))))
 
 (defun package-keys:install (package build-in)
   (unless build-in
@@ -142,7 +143,7 @@ Usage:
   (when commands
     (cl-mapcan
      (lambda (cmd)
-       `((unless (fboundp ',cmd) (autoload ',cmd ,package-name))))
+       `((unless (fboundp ',cmd) (autoload ',cmd ,package-name nil t))))
      (if (listp commands) commands (list commands)))))
 
 (defun package-keys:mode (mode-alists file)

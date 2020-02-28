@@ -53,7 +53,7 @@
   (apply #'append (delete nil (delete (list nil) elems))))
 
 (defun bundle-keys:package (bundle bundle-path)
-  `((cl-pushnew ',bundle bundle--active-list)
+  `((push ',bundle bundle--active-list)
     (load ,(concat bundle-path "package.el") t t)))
 
 (defun bundle-keys:config (defer commands bundle-path)
@@ -75,7 +75,7 @@
   (when menu
     (let ((key-path (concat bundle-path "key.el")))
       (cl-mapcan
-       (lambda (cmd) `((autoload ',cmd ,key-path)))
+       (lambda (cmd) `((autoload ',cmd ,key-path nil t)))
        (if (listp menu) menu (list menu))))))
 
 ;;;###autoload

@@ -31,30 +31,25 @@
     (when (and (<= frame-alpha-lower-limit newalpha) (>= 100 newalpha))
       (modify-frame-parameters frame (list (cons 'alpha newalpha))))))
 
-;;
-;;; theme
+
+;;; Themes
+;;;###autoload
+(defun lye-theme-list-load (theme)
+  "Loading theme."
+  (interactive
+   (list
+    (intern (completing-read "Load custom theme: "
+                             (or lye-theme-use-list (custom-available-themes))))))
+  (load-theme theme t))
+
+(defun lib-theme--random-load (themes)
+  "Pickup random color theme from themes."
+  (let ((theme (nth (random (length themes)) themes)))
+    (message "Load `%s' theme..." theme)
+    (load-theme theme t)))
 
 ;;;###autoload
-(defun lye|initialize-theme (&optional frame)
-  (with-selected-frame (or frame (selected-frame))
-    (setq lib-theme-list lye-theme-list)
-    (if (or lye-autoload-switch-dark-or-light-p
-            lye-autoload-switch-theme-and-time)
-        (progn
-          (require 'lib-themes)
-          (setq lib-theme-switch (car lye-autoload-switch-theme-and-time)
-                lib-theme-switch-time (cdr lye-autoload-switch-theme-and-time))
-          (lib-theme-switch-theme))
-      (when lye-default-theme (load-theme lye-default-theme t)))))
-
-
-;;;###autoload
-(defun lye-theme::time-nuber-to-string (timer-number)
-  "Conver TIME-NUMBER hours to HH:MM. eg: Cover 16.8 hours to 16:48"
-  (let* ((time-integer (truncate timer-number))
-         (time-decimal (truncate (* 60 (- timer-number time-integer)))))
-    (concat (and (< time-integer 10) "0")
-            (number-to-string time-integer)
-            ":"
-            (and (< time-decimal 10) "0")
-            (number-to-string time-decimal))))
+(defun lye-theme-random-load-color ()
+  "Random color themes."
+  (interactive)
+  (lib-theme--random-load (or lye-theme-use-list (custom-available-themes))))

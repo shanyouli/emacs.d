@@ -14,10 +14,10 @@
 (package! fuz :commands fuz-build-and-load-dymod
           :if (and (executable-find "cargo") (not IS-WINDOWS)))
 
-(package! selectrum :recipe (:host github :repo "raxod502/selectrum")
-          :commands selectrum-mode)
-(package! selectrum-prescient
-          :recipe ( :host github
-                    :repo "raxod502/prescient.el"
-                    :files ("selectrum-prescient.el"))
-  :commands (selectrum-prescient-mode prescient-persist-mode))
+;; (package! selectrum :recipe (:host github :repo "raxod502/selectrum")
+;;           :commands selectrum-mode)
+;; (package! selectrum-prescient
+;;           :recipe ( :host github
+;;                     :repo "raxod502/prescient.el"
+;;                     :files ("selectrum-prescient.el"))
+;;   :commands (selectrum-prescient-mode prescient-persist-mode))

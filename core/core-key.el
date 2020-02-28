@@ -37,88 +37,85 @@
   "C-x C-h" 'rectangle-mark-mode ; rectangle-mark-mode
   "C-z C-z" 'suspend-frame)    ; Suspend-frame
 ;; ivy-bundle or snails-bundle
-(pcase lye-use-search-frame
-  ('ivy
-   (lib-key-define ;; swiper
-     "C-s" 'swiper-isearch
-     "C-r" 'swiper-isearch-backward
-     "s-f" 'swiper
-     "C-S-s" 'swiper-all
-     ;; ivy
-     "C-c C-r" 'ivy-resume
-     "C-c v p" 'ivy-push-view
-     "C-c v ." 'ivy-switch-view
-     ;; counsel
-     "C-x C-r" 'counsel-buffer-or-recentf
-     "C-x j" 'counsel-mark-ring
-     "C-h F" 'counsel-faces
-     "C-c B" 'counsel-bookmarked-directory
-     "C-c O" 'counsel-find-file-extern
-     "C-c f" 'counsel-find-library
-     "C-c i" 'counsel-git
-     "C-c j" 'counsel-git-grep
-     "C-c l" 'counsel-locate
-     "C-c r" 'counsel-rg
-     "C-c z" 'counsel-fzf
-     "C-c c B" 'counsel-bookmarked-directory
-     "C-c c F" 'counsel-faces
-     "C-c c F" 'counsel-faces
-     "C-c c L" 'counsel-load-library
-     "C-c c O" 'counsel-find-file-extern
-     "C-c c P" 'counsel-package
-     "C-c c a" 'counsel-apropos
-     "C-c c e" 'counsel-colors-emacs
-     "C-c c f" 'counsel-find-library
-     "C-c c g" 'counsel-grep
-     "C-c c h" 'counsel-command-history
-     "C-c c i" 'counsel-git
-     "C-c c j" 'counsel-git-grep
-     "C-c c l" 'counsel-locate
-     "C-c c m" 'counsel-minibuffer-history
-     "C-c c o" 'counsel-outline
-     "C-c c p" 'counsel-pt
-     "C-c c r" 'counsel-rg
-     "C-c c s" 'counsel-ag
-     "C-c c t" 'counsel-load-theme
-     "C-c c u" 'counsel-unicode-char
-     "C-c c w" 'counsel-colors-web
-     "C-c c v" 'counsel-set-variable
-     "C-c c z" 'counsel-fzf)
-   (with-eval-after-load 'counsel
-     (lib-key-define :map counsel-mode-map
-       [remap swiper]          'counsel-grep-or-swiper
-       [remap swiper-backward] 'counsel-gre-or-swiper-backward
-       [remap dired]           'counsel-dired
-       [remap set-variable]    'counsel-set-variable
-       [remap insert-char]     'counsel-unicode-char)
-     (lib-key-define :map counsel-find-file-map
-       "C-h" 'counsel-up-directory)
-     (lib-key-define :map counsel-ag-map
-       "<C-return>" 'my-swiper-toggle-counsel-rg))
-   (with-eval-after-load 'swiper
-     (lib-key-define :map swiper-map
-       [escape] 'minibuffer-keyboard-quit
-       "M-s" 'swiper-isearch-toggle
-       "M-%" 'swiper-query-replace))
-   (with-eval-after-load 'ivy
-     (lib-key-define :map ivy-minibuffer-map
-       "<C-return>" 'ivy-immediate-done
-       [escape] 'minibuffer-keyboard-quit
-       "C-w" 'ivy-yank-word))
-   (with-eval-after-load 'yasnippet
-     (lib-key "C-c i y" 'ivy-yasnippet
-              yas-minor-mode-map
-              (require 'ivy-yasnippet nil t))))
-  ('snails
-   (when (and (not IS-WINDOWS) (display-graphic-p))
-     (lib-key-define "C-x b" 'snails
-       "C-c c t" 'snails-load-theme)
-     (with-eval-after-load 'snails
-       (lib-key-define :map snails-mode-map
-         "<up>" 'snails-select-prev-item
-         "<down>" 'snails-select-next-item
-         "<left>" 'snails-select-prev-backend
-         "<right>" 'snails-select-next-backend)))))
+(lib-key-define ;; swiper
+  "C-s" 'swiper-isearch
+  "C-r" 'swiper-isearch-backward
+  "s-f" 'swiper
+  "C-S-s" 'swiper-all
+  ;; ivy
+  "C-c C-r" 'ivy-resume
+  "C-c v p" 'ivy-push-view
+  "C-c v ." 'ivy-switch-view
+  ;; counsel
+  "C-x C-r" 'counsel-buffer-or-recentf
+  "C-x j" 'counsel-mark-ring
+  "C-h F" 'counsel-faces
+  "C-c B" 'counsel-bookmarked-directory
+  "C-c O" 'counsel-find-file-extern
+  "C-c f" 'counsel-find-library
+  "C-c i" 'counsel-git
+  "C-c j" 'counsel-git-grep
+  "C-c l" 'counsel-locate
+  "C-c r" 'counsel-rg
+  "C-c z" 'counsel-fzf
+  "C-c c B" 'counsel-bookmarked-directory
+  "C-c c F" 'counsel-faces
+  "C-c c F" 'counsel-faces
+  "C-c c L" 'counsel-load-library
+  "C-c c O" 'counsel-find-file-extern
+  "C-c c P" 'counsel-package
+  "C-c c a" 'counsel-apropos
+  "C-c c e" 'counsel-colors-emacs
+  "C-c c f" 'counsel-find-library
+  "C-c c g" 'counsel-grep
+  "C-c c h" 'counsel-command-history
+  "C-c c i" 'counsel-git
+  "C-c c j" 'counsel-git-grep
+  "C-c c l" 'counsel-locate
+  "C-c c m" 'counsel-minibuffer-history
+  "C-c c o" 'counsel-outline
+  "C-c c p" 'counsel-pt
+  "C-c c r" 'counsel-rg
+  "C-c c s" 'counsel-ag
+  "C-c c t" 'counsel-load-theme
+  "C-c c u" 'counsel-unicode-char
+  "C-c c w" 'counsel-colors-web
+  "C-c c v" 'counsel-set-variable
+  "C-c c z" 'counsel-fzf)
+(with-eval-after-load 'counsel
+  (lib-key-define :map counsel-mode-map
+    [remap swiper]          'counsel-grep-or-swiper
+    [remap swiper-backward] 'counsel-gre-or-swiper-backward
+    [remap dired]           'counsel-dired
+    [remap set-variable]    'counsel-set-variable
+    [remap insert-char]     'counsel-unicode-char)
+  (lib-key-define :map counsel-find-file-map
+    "C-h" 'counsel-up-directory)
+  (lib-key-define :map counsel-ag-map
+    "<C-return>" 'my-swiper-toggle-counsel-rg))
+(with-eval-after-load 'swiper
+  (lib-key-define :map swiper-map
+    [escape] 'minibuffer-keyboard-quit
+    "M-s" 'swiper-isearch-toggle
+    "M-%" 'swiper-query-replace))
+(with-eval-after-load 'ivy
+  (lib-key-define :map ivy-minibuffer-map
+    "<C-return>" 'ivy-immediate-done
+    [escape] 'minibuffer-keyboard-quit
+    "C-w" 'ivy-yank-word))
+(with-eval-after-load 'yasnippet
+  (lib-key "C-c i y" 'ivy-yasnippet
+           yas-minor-mode-map
+           (require 'ivy-yasnippet nil t)))
+(when (and (not IS-WINDOWS) (display-graphic-p))
+  (lib-key-define "C-x b" 'snails
+    "C-c c t" 'snails-load-theme)
+  (with-eval-after-load 'snails
+    (lib-key-define :map snails-mode-map
+      "<up>" 'snails-select-prev-item
+      "<down>" 'snails-select-next-item
+      "<left>" 'snails-select-prev-backend
+      "<right>" 'snails-select-next-backend)))
 
 ;; Rss-bundles
 (lib-key-define "C-x W" 'newsticker-show-news
@@ -269,7 +266,7 @@
 (lib-key-define [remap describe-key] 'helpful-key
   [remap describe-symbol] 'helpful-symbol)
 (with-eval-after-load 'helpful
-  (lib-key "r" 'remove-hook-at-point helpful-mode-hook))
+  (lib-key "r" 'remove-hook-at-point helpful-mode-map))
 
 ;; tools-bundle
 (lib-key-define "C-x p o" 'link-hint-open-link

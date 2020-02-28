@@ -13,8 +13,7 @@
           make"))
     (vterm-module-compile)))
 
-(defun lye//vterm-run ()
-  (require 'vterm)
+(with-eval-after-load 'vterm
   (let ((vterm-module-file (locate-library "vterm-module"))
         result)
     (if vterm-module-file
@@ -24,5 +23,4 @@
       (setq result (lye//vterm-module-compile)))
     (when result
       (lye//move-file (locate-library "vterm-module")
-                      straight-dynamic-modules-dir)))
-  (vterm))
+                      straight-dynamic-modules-dir))))

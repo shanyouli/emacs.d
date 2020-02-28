@@ -14,7 +14,7 @@
   (push '("pyim" . (awesome-tray-module-pyim-info awesome-tray-module-pyim-face))
         awesome-tray-module-alist)
   (advice-add 'awesome-tray-disable
-              :before (lambda (&rest _) (lib-load-relative "base-modeline" t t)))
+              :before (lambda (&rest _) (setq-default mode-line-format lye-init--modeline-format)))
   (advice-add 'awesome-tray-enable
               :before (lambda (&rest _)
                         (let ((first-mode-line (car mode-line-format)))
@@ -23,7 +23,9 @@
                             (setq-default mode-line-format '(" "))))))
 
   (add-hook! 'lye-load-theme-hook
-    (when awesome-tray-active-p (awesome-tray-mode +1))))
+    (when awesome-tray-active-p
+      (awesome-tray-mode -1)
+      (awesome-tray-mode +1))))
 
 ;; active-modules
 (setq awesome-tray-active-modules

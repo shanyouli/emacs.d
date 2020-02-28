@@ -99,23 +99,6 @@
          (fmakunbound ',func))
        (add-hook ,hook ',func ,append ,local))))
 
-(defmacro autoload! (fun name &rest args)
-  (declare (indent 1))
-  `(condition-case err
-       (unless (fboundp ,fun)
-         (apply #'autoload ,fun ,name ,args))
-     (error (message (format "Error occured:\n%s\n" (error-message-string err))))))
-
-;; Add after-load-theme-hook
-(defvar after-load-theme-hook nil
-  "Hook run after a color theme is loaded using `load-theme'.")
-
-(defun run-after-load-theme-hook (&rest _)
-  "Run `after-load-theme-hook'."
-  (run-hooks 'after-load-theme-hook))
-
-(advice-add #'load-theme :after #'run-after-load-theme-hook)
-
 ;; 判断程序是否运行
 (defun lye-is-running-p (cmd)
   (let ((out (call-process "pgrep" nil nil t "-x" cmd)))

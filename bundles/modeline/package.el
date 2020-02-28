@@ -1,7 +1,6 @@
 ;;; bundles/ui/package.el.el -*- lexical-binding: t -*-
 
 (pcase lye-use-modeline
-  ('base t)
   ('doom (package! doom-modeline :commands doom-modeline-mode))
   ('awetray
    (package! awesome-tray :recipe (:type git

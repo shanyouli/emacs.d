@@ -36,14 +36,16 @@
 (defcustom lye-default-font-size nil "Customize font size." :type 'integer)
 
 ;; Theme variables
-(defcustom lye-theme-default  nil "Lye Default themes." :type '(symbol list))
-(defcustom lye-theme-use-list nil "Custom Switches list." :type 'list)
-(defcustom lye-theme-set-Lat-and-lon nil
-  "With sunrise and sunset to set different themes.
+(defcustom lye-default-theme  nil
+  "Lye Default themes. The format is:
+THEME, or
+`((LIGHT-THEME DARK-THEME) (\"08:30\" \"18:30\"))'
+or
+`((LIGHT-THEME DARK-THEME) (LAT LONG))'
+"
+  :type '(symbol list))
 
- Format: Use latitude and longitude: (30.93 . 113.92)
-         Use custom time:            (\"08:30\" . \"18:30\")"
-  :type 'list)
+(defcustom lye-theme-use-list nil "Custom Switches list." :type 'list)
 
 ;; Title
 (when (display-graphic-p)
@@ -143,6 +145,10 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
 
 ;;
 ;;; THEME
+(push (lib-f-join lye-etc-dir "doom-themes/themes/") custom-theme-load-path)
+
+(defvar lye--current-theme nil)
+
 (defvar lye-load-theme-hook nil)
 (defun lye--run-load-theme-hooks-a (theme &optional _no-confirm no-enable)
   "Set up `lye-load-theme-hook' to run after `load-theme' is called."
@@ -157,21 +163,69 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
     (mapc #'disable-theme custom-enabled-themes)))
 (advice-add #'load-theme :before #'lye--run-load-theme-before-a)
 
-(push (lib-f-join lye-etc-dir "doom-themes/themes/") custom-theme-load-path)
+(defun core-ui::time-number-to-string (timer-number)
+  "Conver TIME-NUMBER hours to HH:MM. eg: Cover 16.8 hours to 16:48"
+  (let* ((time-integer (truncate timer-number))
+         (time-decimal (truncate (* 60 (- timer-number time-integer)))))
+    (concat (and (< time-integer 10) "0")
+            (number-to-string time-integer)
+            ":"
+            (and (< time-decimal 10) "0")
+            (number-to-string time-decimal))))
 
-(defcustom lye-autoload-switch-dark-or-light-p nil
-  "If it is non-nil, Not use `lib-theme-switch-theme'."
-  :type 'boolean)
-(defcustom lye-autoload-switch-theme-and-time nil
-  "Default dark or light theme"
-  :type 'list)
-(defcustom lye-theme-list nil "Using theme list." :type 'list)
-(defcustom lye-default-theme nil "Lye Default theme." :type 'list)
+(defun core-ui::get-sunrise-sunset-time (lat lon)
+  "Returns the sunrise and sunset times."
+  (require 'solar)
+  (let* ((calendar-latitude lat)
+        (calendar-longitude lon)
+        (result (solar-sunrise-sunset (calendar-current-date))))
+    (cons (core-ui::time-number-to-string (caar result))
+          (cons (core-ui::time-number-to-string (caadr result))
+                nil))))
+(defun lib-theme--string-time-to-list (time-list)
+  "Convert HH:MM:SS to (HH MM SS).")
+(defun core-ui::time-to-second (time-string)
+  (let ((time-list (mapcar #'string-to-number (split-string time-string ":"))))
+    (+ (or (nth 2 time-list) 0)
+       (* 60 (+ (* 60 (nth 0 time-list))
+                (nth 1 time-list))))))
 
-(defvar lye--current-theme nil)
-(setq lye-autoload-switch-theme-and-time
-      '((doom-one  doom-molokai) . (30.93 . 113.92)))
+(defun core-ui::switch-themes ()
+  "Change the light and dark themes over time."
+  (let ((themes (nth 0 lye-default-theme))
+        (times (let ((time-or-lat (nth 1 lye-default-theme)))
+                 (if (stringp (car time-or-lat))
+                     time-or-lat
+                   (core-ui::get-sunrise-sunset-time (nth 0 time-or-lat)
+                                                     (nth 1 time-or-lat)))))
+        (ctime (substring (current-time-string) 11 19)))
+    (if (or (not lye--current-theme) (memq lye--current-theme themes))
+        (let ((sunrise (nth 0 times))
+              (sunset (nth 1 times))
+              next-theme
+              next-time)
+          (cond ((string> sunrise ctime) (setq next-theme (nth 1 themes)
+                                               next-time sunrise))
+                ((string> sunset ctime) (setq next-theme (nth 0 themes)
+                                              next-time sunset))
+                (t (setq next-theme (nth 1 themes)
+                         next-time (+ (core-ui::time-to-second sunrise)
+                                      (- 86400
+                                         (core-ui::time-to-second ctime))))))
+          (load-theme next-theme t)
+          ;; (cancel-function-timers #'core-ui::switch-themes)
+          (run-at-time next-time nil #'core-ui::switch-themes))
+      (cancel-function-timers #'core-ui::switch-themes))))
 
+(defun core-ui::initialize-theme-h  (&optional frame)
+  "Change themes."
+  (with-selected-frame (or frame (selected-frame))
+    (unless (null lye-default-theme)
+      (pcase lye-default-theme
+        ((pred listp) (core-ui::switch-themes))
+        ((pred symbolp) (load-theme lye-default-theme t))))))
+(setq lye-default-theme
+      '((doom-one doom-molokai) (30.93  113.92)))
 ;;
 ;;; font
 (defvar lye-init--font nil "记录 emacs 初始化使用的字体格式。")
@@ -242,7 +296,7 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
   (doom-themes-treemacs-config))
 (add-hook! 'window-setup-hook #'lye-init-ui-h)
 (add-hook (if (daemonp) 'after-make-frame-functions 'lye-init-ui-hook)
-          #'lye|initialize-theme)
+          #'core-ui::initialize-theme-h)
 (add-hook (if (daemonp) 'after-make-frame-functions 'lye-init-ui-hook)
           #'lye-init-fonts-with-daemon-h)
 

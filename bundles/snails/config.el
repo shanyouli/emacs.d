@@ -33,8 +33,8 @@
   (snails '(snails-backend-themes)))
 
 ;; selectrum
-(setq prescient-save-file (lib-f-join lye-emacs-cache-dir "var/prescient-save.el"))
-(add-hook! 'after-init-hook
-  (selectrum-mode +1)
-  (selectrum-prescient-mode +1)
-  (prescient-persist-mode +1))
+;; (setq prescient-save-file (lib-f-join lye-emacs-cache-dir "var/prescient-save.el"))
+;; (add-hook! 'after-init-hook
+;;   (selectrum-mode +1)
+;;   (selectrum-prescient-mode +1)
+;;   (prescient-persist-mode +1))

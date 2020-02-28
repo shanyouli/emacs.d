@@ -5,9 +5,6 @@
           :if (bundle-active-p 'hydra))
 (package! dired-rsync :commands dired-rsync)
 (package! diredfl :commands diredfl-global-mode)
-(package! all-the-icons-dired
-  :if (bundle-active-p 'icons)
-  :commands all-the-icons-dired-mode)
 (package! diff-hl :commands diff-hl-dired-mode)
 (package! fd-dired :if (executable-find "fd"))
 (package! dired-x :build-in t :commands (dired-omit-mode dired-x-find-file))

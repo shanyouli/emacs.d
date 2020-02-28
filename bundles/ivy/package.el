@@ -5,4 +5,8 @@
 (package! swiper)
 (package! amx)
 
-(package! ivy-rich :if (and (display-graphic-p) (not IS-WINDOWS)))
+(package! ivy-rich :commands ivy-rich-mode)
+
+(package! prescient :commands prescient-persist-mode)
+(package! ivy-prescient :commands ivy-prescient-re-builder)
+(require 'prescient)

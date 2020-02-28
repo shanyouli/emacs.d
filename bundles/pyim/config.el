@@ -8,10 +8,9 @@
 (setq pyim-prefer-emacs-thread nil)
 (setq pyim-dcache-directory (lib-f-join lye-emacs-cache-dir "pyim/dcache"))
 (setq default-input-method "pyim")
-(setq pyim-punctuation-translate-p '(no yes auto))   ;使用半角标点。
+(setq-default pyim-punctuation-translate-p '(no yes auto))   ;使用半角标点。
 
 (with-eval-after-load 'pyim
-
   ;; Fuzzy pinyin
   ;; (setq pyim-fuzzy-pinyin-alist
   ;;       '(("en" "eng") ("in" "ing") ("l" "n") ("z" "zh") ("c" "ch")

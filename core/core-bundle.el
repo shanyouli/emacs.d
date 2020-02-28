@@ -26,9 +26,8 @@
 
 (bundle! elisp :defer t)
 
-(pcase lye-use-search-frame
-  ('snails (bundle! snails))
-  ('ivy (bundle! ivy)))
+(bundle! snails :defer t)
+(bundle! ivy)
 
 (bundle! rss :menu elfeed-hydra/body)
 

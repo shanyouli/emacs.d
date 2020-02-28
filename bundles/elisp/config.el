@@ -180,9 +180,6 @@ Lisp function does not specify a special indentation."
   (set-face-background 'macrostep-expansion-highlight-face
                        (face-background 'tooltip)))
 
-;; helpful
-(add-hook! 'helpful-mode-hook (cursor-sensor-mode +1))
-
 (with-eval-after-load 'counsel
   (setq counsel-describe-function-function #'helpful-callable
         counsel-describe-variable-function #'helpful-variable))
@@ -200,11 +197,12 @@ Lisp function does not specify a special indentation."
      (lambda (button)
        (helpful-variable (button-get button 'apropos-symbol))))))
 
-;; Add remove buttons for advices
-(define-advice helpful-callable (:after (function) advice-remove-button)
-  (add-button-to-remove-advice (helpful--buffer function t) function))
-
 (with-eval-after-load 'helpful
+  ;; helpful
+  (add-hook! 'helpful-mode-hook #'cursor-sensor-mode)
+  ;; Add remove buttons for advices
+  (define-advice helpful-callable (:after (function) advice-remove-button)
+    (add-button-to-remove-advice (helpful--buffer function t) function))
   (with-no-warnings
     (defun my-helpful--navigate (button)
       "Navigate to the path this BUTTON represents."
