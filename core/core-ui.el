@@ -202,11 +202,12 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
 
 (defun core-ui::initialize-theme-h  (&optional frame)
   "Change themes."
-  (with-selected-frame (or frame (selected-frame))
-    (unless (null lye-default-theme)
-      (pcase lye-default-theme
-        ((pred listp) (core-ui::switch-themes))
-        ((pred symbolp) (load-theme lye-default-theme t))))))
+  (when (display-graphic-p)
+    (with-selected-frame (or frame (selected-frame))
+      (unless (null lye-default-theme)
+        (pcase lye-default-theme
+          ((pred listp) (core-ui::switch-themes))
+          ((pred symbolp) (load-theme lye-default-theme t)))))))
 (setq lye-default-theme
       '((doom-one doom-molokai) (30.93  113.92)))
 ;;

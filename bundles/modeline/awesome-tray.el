@@ -21,10 +21,14 @@
                           (unless (and (stringp first-mode-line)
                                        (string= " " first-mode-line))
                             (setq-default mode-line-format '(" "))))))
-
   (add-hook! 'lye-load-theme-hook
     (when awesome-tray-active-p
       (awesome-tray-mode -1)
+      (awesome-tray-mode +1))))
+
+(defun bundle-modeline::init-awesome-tray (&optional frame)
+  (when (display-graphic-p)
+    (with-selected-frame (or frame (selected-frame))
       (awesome-tray-mode +1))))
 
 ;; active-modules
@@ -32,4 +36,4 @@
       '("pyim" "location" "parent-dir" "mode-name" "awesome-tab" "date"))
 
 (add-hook (if (daemonp) 'after-make-frame-functions 'lye-init-ui-hook)
-          #'awesome-tray-mode 'append)
+          #'bundle-modeline::init-awesome-tray 'append)

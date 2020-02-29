@@ -41,7 +41,8 @@
 
 
   ;; Icons and quickhelp
-  (add-hook! 'company-mode-hook (company-box-mode +1))
+  (when (bundle-active-p 'icons)
+    (add-hook! 'company-mode-hook (company-box-mode +1)))
   (setq company-box-backends-colors nil
         company-box-show-single-candidate t
         company-box-max-candidates 50
