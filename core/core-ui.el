@@ -47,23 +47,6 @@ or
 
 (defcustom lye-theme-use-list nil "Custom Switches list." :type 'list)
 
-;; Title
-(when (display-graphic-p)
-  (setq frame-title-format
-        '("Lye Emacs - "
-          (:eval (if (buffer-file-name)
-                     (abbreviate-file-name (buffer-file-name))
-                   (buffer-name)))))
-  (setq icon-title-format frame-title-format))
-
-;; Suppress GUI features
-(setq use-file-dialog nil
-      use-dialog-box nil
-      initial-buffer-choice nil
-      ;;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
-      frame-resize-pixelwise t)
-
-
 ;;
 ;;; Frame size
 ;; FIX: see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
@@ -86,7 +69,7 @@ or
 
 (defun lye-init-default-size (&optional frame)
   (interactive)
-  (let ((x-width (or (assq 'width default-frame-alist)
+  (let ((x-width (or (alist-get 'width default-frame-alist)
                      (truncate (/ (- (* (x-display-pixel-width)
                                         (or lye-frame-width-scale 0.5)) 24)
                                   (frame-char-width)))))
@@ -276,6 +259,39 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
 (add-hook! 'after-init-hook 'lye-init-fonts-h)
 
 ;;
+;;; Line-Number
+;; 文件超过10000行，不显示行号，只留4位吧
+(setq display-line-numbers-width-start 4)
+(defun lye-display-line-numbers ()
+  "当文件的列宽 <86 或者文件的 Major－mode 为 org－mode 且行数大于 1000,
+不显示行号。"
+  (if (and (or (not (display-graphic-p))
+               (> (lye-get-columns-in-the-entire-frame) 86))
+           (or (not (eq major-mode 'org-mode))
+               (< (line-number-at-pos (point-max) 1000))))
+      (display-line-numbers-mode +1)
+    (display-line-numbers-mode -1)))
+
+(add-hook! '(prog-mode-hook org-mode-hook conf-mode-hook nxml-mode-hook)
+  #'lye-display-line-numbers)
+
+;; Title
+(when (display-graphic-p)
+  (setq frame-title-format
+        '("Lye Emacs - "
+          (:eval (if (buffer-file-name)
+                     (abbreviate-file-name (buffer-file-name))
+                   (buffer-name)))))
+  (setq icon-title-format frame-title-format))
+
+;; Suppress GUI features
+(setq use-file-dialog nil
+      use-dialog-box nil
+      initial-buffer-choice nil
+      ;;设置缩放的模式,避免Mac平台最大化窗口以后右边和下边有空隙
+      frame-resize-pixelwise t)
+
+;;
 ;;; Initialize UI
 (defvar lye-init-ui-hook nil
   "List of hooks to run when the UI has been initialized.")
@@ -299,19 +315,3 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
           #'core-ui::initialize-theme-h)
 (add-hook (if (daemonp) 'after-make-frame-functions 'lye-init-ui-hook)
           #'lye-init-fonts-with-daemon-h)
-
-;;
-;;; Line-Number
-;; 文件超过10000行，不显示行号，只留4位吧
-(setq display-line-numbers-width-start 4)
-(defun lye-display-line-numbers ()
-  "当文件的列宽 <86 或者文件的 Major－mode 为 org－mode 且行数大于 1000,
-不显示行号。"
-  (if (and (> (lye-get-columns-in-the-entire-frame) 86)
-           (or (not (eq major-mode 'org-mode))
-               (< (line-number-at-pos (point-max) 1000))))
-      (display-line-numbers-mode +1)
-    (display-line-numbers-mode -1)))
-
-(add-hook! '(prog-mode-hook org-mode-hook conf-mode-hook nxml-mode-hook)
-  #'lye-display-line-numbers)

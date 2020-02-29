@@ -184,7 +184,7 @@
   "il" 'insert-translated-name-insert-with-line
   "ic" 'insert-translated-name-insert-with-camel)
 (lib-key "C-c s" 'one-key-color-rg-search/menu nil (fboundp 'color-rg-search-symbol))
-
+(lib-key "C-z s b" 'backup-file-log nil (fboundp 'backup-file))
 ;; treemacs-bundle
 (lib-key-define [f8] 'treemacs
   "M-0" 'treemacs-select-window
@@ -274,6 +274,3 @@
   "C-, t p" 'pomidor)
 (lib-key "C-z s h" 'tldr nil (not IS-WINDOWS))
 (lib-key "C-, u c" 'cnfonts-ui nil (fboundp 'cnfonts-ui))
-
-;; other
-(lib-key "C-z s b" 'backup-file-log nil (not IS-WINDOWS))

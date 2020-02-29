@@ -110,3 +110,8 @@
       (rainbow-mode 1)))
   (advice-add #'lazy-search-quit :after #'lye/rainbow-turn-on)
   (advice-add #'lazy-search :after  #'lye/rainbow-turn-off))
+
+;; backup-file
+(when (fboundp 'backup-file)
+  (setq backup-file-location (lib-f-join  lye-emacs-cache-dir "backup"))
+  (add-hook! 'after-save-hook 'backup-file))

@@ -81,3 +81,10 @@
                      insert-translated-name-insert-with-underline
                      insert-translated-name-insert-with-line
                      insert-translated-name-insert-with-camel))
+
+;; backup-file
+(package! backup-file
+          :recipe (:type git :host github
+                   :repo "shanyouli/emacs-backup-file")
+          :commands (backup-file backup-file-log)
+          :if (and (not IS-WINDOWS) (executable-find "git")))

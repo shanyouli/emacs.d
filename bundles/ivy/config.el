@@ -133,7 +133,7 @@
             (lib-f-join lye-emacs-cache-dir "amx-items"))))
 
   ;; prescient
-  (setq prescient-save-file (lib-f-join lye-emacs-cache-dir "var/pescient-save.el"))
+  (setq prescient-save-file (lib-f-join lye-emacs-cache-dir "var/prescient-save.el"))
   (prescient-persist-mode +1)
 
   (custom-set-faces '(ivy-minibuffer-match-face-1 ((t (:inherit font-lock-doc-face

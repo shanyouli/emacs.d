@@ -63,15 +63,6 @@
   ;; not use mouse
   (when (display-graphic-p) (global-disable-mouse-mode +1))
 
-  ;; Backup-file
-  (unless IS-WINDOWS
-    (package! backup-file
-              :recipe (:type git :host github
-                       :repo "shanyouli/emacs-backup-file")
-              :commands (backup-file backup-file-log))
-    (setq backup-file-location (lib-f-join  lye-emacs-cache-dir "backup"))
-    (add-hook! 'after-save-hook 'backup-file))
-
   ;; Highlight diff
   (autoload 'global-diff-hl-mode "diff-hl")
   (global-diff-hl-mode +1))

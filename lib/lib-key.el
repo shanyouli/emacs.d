@@ -67,7 +67,7 @@ ARGS 可以存在的 key 有 prefix, keymaps, autoload.
 ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
   (declare (indent defun))
   (let ((key-prefix (or (concat prefix " ") ""))
-        (keymap (or map `(current-global-map)))
+        ;; (keymap (or map `(current-global-map)))
         (autofile autoload)
         (key-def (copy-tree plist)))
     (dolist (key (list :prefix :map :autoload))
@@ -81,7 +81,7 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
        ,@(lib-key--map-apply
           (lambda (key fun)
             (if (stringp key) (setq key (concat key-prefix key)))
-            `(lib-key ,key ,fun ,keymap))
+            `(lib-key ,key ,fun ,map))
           key-def))))
 
 (defmacro lib-key (key-name command &optional keymap predicate)
