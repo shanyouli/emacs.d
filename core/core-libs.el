@@ -123,6 +123,17 @@ Meant to be used with `run-hook-wrapped'."
   ;; Return nil so `run-hook-wrapped' won't short circuit
   nil)
 
+(defvar lye-buffer--warnings nil
+  "List of errors during startup.")
+
+(defun lye-buffer/warning (msg &rest args)
+  "Display MSG as a warning message but in buffer `*Messages*'.
+ARGS: format string arguments"
+  (let ((msg (apply 'format msg args)))
+    (message "(Lye-emacs) Warning: %s" msg)
+    (when message-log-max
+      (add-to-list 'lye-buffer--warnings msg 'append))))
+
 (provide 'core-libs)
 
 ;;; core-libs.el ends here

@@ -162,13 +162,12 @@
       ;; Avoid emacsclient opening *scratch* buffer and getting an error
       (when (get-buffer buf) (kill-buffer buf))))
 
-;;当在windows上运行时,确定 Msys2是否安装
-(when IS-WINDOWS
-  (require 'lib-winos))
-(when (memq window-system '(x ns))
-  (require 'lib-env)
-  (setq lib-env-path-save-file (concat lye-emacs-cache-dir "env"))
-  (lib-env-from-shell-initialize))
+(when (display-graphic-p)
+  (lib-load-absolute 'core/core-env)
+  (lye/load-lye-env))
+
+;;当在windows上运行时, 且 Msys2安装, 添加 msys 路径
+(when IS-WINDOWS (require 'lib-winos))
 
 (advice-add 'find-file
             :before
