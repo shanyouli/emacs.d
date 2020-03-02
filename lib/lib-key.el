@@ -35,6 +35,9 @@
 
 Elements have the form ((KEY . [MAP]) CMD ORIGINAL-CMD)")
 
+(defsubst lib-key::concat (&rest elems)
+  "Delete all empty lists from ELEMS (nil or (list nil)), and append thems."
+  (apply #'append (delete nil (delete (list nil) elems))))
 ;;; 移除快捷按键.
 
 ;;;###autoload
@@ -73,17 +76,21 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
     (dolist (key (list :prefix :map :autoload))
       (setq key-def (lib-var-delete-a-element-plist key key-def)))
     (setq key-def (lib-var-plist-to-alist key-def))
-    `(progn
-       (when ,autoload
-         ,@(lib-key--map-apply
-            (lambda (fun) `(autoload ,fun ,autoload))
-            (mapcar #'cdr key-def)))
-       ,@(lib-key--map-apply
-          (lambda (key fun)
-            (if (stringp key) (setq key (concat key-prefix key)))
-            `(lib-key ,key ,fun ,map))
-          key-def))))
+    (macroexp-progn
+     (lib-key::concat
+      (when autoload
+        (cl-mapcan (lambda (fun) `((autoload ,(car fun) ,autoload)))
+                   (mapcar #'cdr key-def)))
+      (cl-mapcan (lambda (def-key)
+                   (let ((key (let ((test-key (nth 0 def-key)))
+                                (if (stringp test-key)
+                                    (concat key-prefix test-key)
+                                  test-key)))
+                         (fun (nth 1 def-key)))
+                     `((lib-key ,key ,fun ,map))))
+                 key-def)))))
 
+;;;###autoload
 (defmacro lib-key (key-name command &optional keymap predicate)
   "Bind KEY-NAME to COMMAND in KEYMA(`global-map' if not passed).
 

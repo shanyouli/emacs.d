@@ -155,17 +155,17 @@
     ;; The free version of TabNine is good enough,
     ;; and below code is recommended that TabNine not always
     ;; prompt me to purchase a paid version in a large project.
-    ;; (defun company-disable-tabnine-upgrade-message (orig args &rest _)
-    ;;   (when (and args
-    ;;              (stringp (funcall args)))
-    ;;     (unless (string-match "The free version of TabNine only indexes up to"
-    ;;                           (funcall args))
-    ;;       (apply orig args))))
-    ;; (advice-add 'company-echo-show :around 'company-disable-tabnine-upgrade-message)
-    (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-      (let ((company-message-func (ad-get-arg 0)))
+    (defun company-disable-tabnine-upgrade-message (orig &rest args)
+      (let ((company-message-func (nth 0 args)))
         (when (and company-message-func
                    (stringp (funcall company-message-func)))
           (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
-            ad-do-it))))
-    ))
+            (apply orig args)))))
+    (advice-add 'company-echo-show :around 'company-disable-tabnine-upgrade-message)
+    ;; (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
+    ;;   (let ((company-message-func (ad-get-arg 0)))
+    ;;     (when (and company-message-func
+    ;;                (stringp (funcall company-message-func)))
+    ;;       (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+    ;;         ad-do-it))))))
+))

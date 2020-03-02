@@ -4,17 +4,16 @@
   :append t
   ;; Start server
   ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
-  (when (and (display-graphic-p) (not IS-WINDOWS))
-    (autoload 'server-running-p "server")
-    (unless (server-running-p) (server-start)))
+  ;; @see https://emacs-china.org/t/use-package/12051/4?u=shanyouli
+  (when (and (boundp 'server-process) server-process
+             (not IS-WINDOWS))
+    (ignore-errors (server-start)))
 
   ;; Save cursor position for everyfile you opened. So,  next time you open
   ;; the file, the cursor will be at the position you last opened it.
-  (autoload 'save-place-mode "saveplace")
   (save-place-mode +1)
 
   ;; Miantain a history of past actions and a resonable number of lists
-  (autoload 'savehist-mode "savehist")
   (setq-default history-length 1000)
   (setq enable-recursive-minibuffers t
         history-delete-duplicates t
@@ -27,7 +26,6 @@
   (savehist-mode +1)
 
   ;; Save recentf file and open them
-  (autoload 'recentf-mode "recentf")
   (setq recentf-max-saved-items 200
         ;;Do not add these files to the recently opened text
         recentf-exclude '((expand-file-name package-user-dir)
@@ -51,8 +49,8 @@
 
   ;; Save Emacs buffers when they lose focus after 2s
   (with-eval-after-load 'super-save
-      (push 'split-window-below super-save-triggers)
-      (push 'split-window-right super-save-triggers))
+      (cl-pushnew 'split-window-below super-save-triggers)
+      (cl-pushnew 'split-window-right super-save-triggers))
   (super-save-mode +1)
   ;; Displays the key bindings following your currently entered
   ;; incomplete command

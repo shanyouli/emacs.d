@@ -58,13 +58,13 @@
       (setq -secs 0.5))
     (dolist (fn funcs)
       (push `(run-with-idle-timer ,-secs ,-repeats (function ,fn)) forms))
-    `(when ,-if ,@forms)))
+    (if -if `(when ,-if ,@forms) (macroexp-progn forms))))
 
 ;; add-hook 扩展
 (defmacro add-hook! (hook &rest args)
   "Custom hook with HOOK and ARGS no need lambda."
   (declare (indent defun))
-  (let ((-if (plist-get+ args :if t))
+  (let ((-if (plist-get+ args :if))
         (-local (plist-get+ args :local))
         (-defer (plist-get+ args :defer))
         (-append (plist-get+ args :append))
@@ -78,14 +78,15 @@
                    (list `(lambda (&rest _) ,@args)))))
         forms)
     (dolist (fn funcs)
-      (setq fn (if (numberp -defer)
-                   `(lambda (&rest _)
-                      (run-with-idle-timer ,-defer nil
-                                           (function ,fn)))
-                 `(function ,fn)))
+      (setq fn
+            (if (numberp -defer)
+                `(lambda (&rest _) (run-with-idle-timer ,-defer nil (function ,fn)))
+              `(function ,fn)))
       (dolist (h hooks)
         (push `(add-hook ',h  ,fn ,-append ,-local) forms)))
-    `(when ,-if ,@forms)))
+    (if -if
+        `(when ,-if ,@forms)
+      (macroexp-progn forms))))
 
 (defmacro add-hook-once (hook f &optional append local)
   "Like `add-hook', remove after call with HOOK F &OPTIONAL APPEND LOCAL."
@@ -96,7 +97,8 @@
        (defun ,func ()
          (remove-hook ,hook ',func ,local)
          (funcall ,f)
-         (fmakunbound ',func))
+         ;; (fmakunbound ',func)
+         )
        (add-hook ,hook ',func ,append ,local))))
 
 ;; 判断程序是否运行
@@ -117,7 +119,7 @@ Meant to be used with `run-hook-wrapped'."
   (condition-case err
       (funcall hook)
     ((debug error)
-     (signal 'lye-hook-error (list hook e))))
+     (signal 'lye-hook-error (list hook err))))
   ;; Return nil so `run-hook-wrapped' won't short circuit
   nil)
 

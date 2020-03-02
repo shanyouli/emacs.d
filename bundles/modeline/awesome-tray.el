@@ -9,7 +9,7 @@
   (defun awesome-tray-module-pyim-info ()
   "`Pyim' display information in the awesome-tray."
     (if (and (featurep 'pyim) (string= current-input-method "pyim"))
-        "<IM>" ""))
+        "ㄓ" ""))
 
   (push '("pyim" . (awesome-tray-module-pyim-info awesome-tray-module-pyim-face))
         awesome-tray-module-alist)

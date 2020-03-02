@@ -4,9 +4,7 @@
 (package! json-mode :mode ("\\.json\\'" . json-mode))
 
 ;; Web
-(package! web-mode :mode (("\\.xml\\'" . web-mode)
-                           ("\\fonts.conf\\'" . web-mode)
-                           ("\\.html\\'" . web-mode)))
+(package! web-mode :mode (("\\.html\\'" . web-mode)))
 
 ;; Yaml
 (package! yaml-mode :mode (("\\.yml\\'" . yaml-mode)

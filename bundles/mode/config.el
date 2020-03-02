@@ -20,13 +20,14 @@
 ;; SH-MODE
 (add-hook! 'sh-mode-hook
   ;; Determine if the shell using the running script is zsh or bash
-    (let*  ((f (buffer-file-name))
-            (f (if f (file-name-nondirectory f) nil)))
-      (if (and f (or (string-match "^\\.zsh\\(\\rc\\|\\env\\|func\\)$" f)
-                     (string-match "\\.zsh$" f)
-                     (string-match "^\\.zlogin$" f)))
-          (sh-set-shell "zsh")
-        (sh-set-shell "bash")))
+  (let ((f (if buffer-file-name
+               (file-name-nondirectory buffer-file-name)
+             nil)))
+    (if (and f (or (string-match "^\\.zsh\\(\\rc\\|\\env\\|func\\)$" f)
+                   (string-match "\\.zsh$" f)
+                   (string-match "^\\.zlogin$" f)))
+        (sh-set-shell "zsh")
+      (sh-set-shell "bash")))
   ;; Run LSP
   (when (and (string= sh-shell "bash")
              (executable-find "bash-language-server")
