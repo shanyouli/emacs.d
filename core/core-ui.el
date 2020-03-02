@@ -160,8 +160,8 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
   "Returns the sunrise and sunset times."
   (require 'solar)
   (let* ((calendar-latitude lat)
-        (calendar-longitude lon)
-        (result (solar-sunrise-sunset (calendar-current-date))))
+         (calendar-longitude lon)
+         (result (solar-sunrise-sunset (calendar-current-date))))
     (cons (core-ui::time-number-to-string (caar result))
           (cons (core-ui::time-number-to-string (caadr result))
                 nil))))

@@ -41,12 +41,11 @@
 (add-hook 'emacs-startup-hook #'lye--reset-file-handler-alist-h)
 
 ;; Load the bare necessities
-
-(autoload 'lib-load-absolute "lib-load")
 (autoload 'lib-f-join "lib-f")
 (autoload 'lib-autoload-initialize "lib-autoload")
+(autoload 'lye-load! "core-loads")
 
-(lib-load-absolute 'core/core-libs)
+(lye-load! 'core/core-libs)
 
 ;; Do this on idle timer to defer a possible GC pause that could result; also
 ;; allows deferred packages to take advantage of these optimizations.
@@ -107,7 +106,7 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
   (make-directory lye-emacs-cache-dir t))
 
 (define-error 'lye-error "Error in Lye Emacs core")
-(define-error 'lye-hook-error "Error in a Doom startup hook" 'doom-error)
+(define-error 'lye-hook-error "Error in a Doom startup hook" 'lye-error)
 ;;; Load `custom-file'
 (setq custom-file (concat lye-emacs-cache-dir "custom.el"))
 (if (file-exists-p custom-file) (load custom-file :no-error :no-message))
@@ -123,16 +122,15 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
        lye-library-dir))
 (lib-autoload-initialize)
 
-(lib-load-add-load-path lye-etc-dir t)
-
+(lye-add-load-path! lye-etc-dir t)
 (defun lye-core-initialize ()
   "Load Lye's core files for an interactive session."
-  (lib-load-absolute 'core/core-benchmark) ; benchmark
-  (lib-load-absolute 'core/core-custom)    ; Custom-Varliable
-  (lib-load-absolute 'core/core-generic)   ; generic and delete *scratch*
-  (lib-load-absolute 'core/core-straight)  ; staraight, package
-  (lib-load-absolute 'core/core-ui)        ; UI
-  (lib-load-absolute 'core/core-package)   ; packages initialization
-  (lib-load-absolute 'core/core-bundle)
-  (lib-load-absolute 'core/core-key)       ; Keybinding
+  (lye-load! 'core/core-benchmark) ; benchmark
+  (lye-load! 'core/core-custom)    ; Custom-Varliable
+  (lye-load! 'core/core-generic)   ; generic and delete *scratch*
+  (lye-load! 'core/core-straight)  ; staraight, package
+  (lye-load! 'core/core-ui)        ; UI
+  (lye-load! 'core/core-package)   ; packages initialization
+  (lye-load! 'core/core-bundle)
+  (lye-load! 'core/core-key)       ; Keybinding
   )

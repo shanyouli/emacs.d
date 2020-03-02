@@ -3,7 +3,7 @@
 
 (defalias 'lye/dict-point
     (pcase lye-use-dict-package
-      ('sdcv (lib-load-relative "sdcv" t t)
+      ('sdcv (lye-load! "sdcv" nil t t)
              #'sdcv-search-at-point++)
-      ('ydcv (lib-load-relative "ydcv" t t)
+      ('ydcv (lye-load! "ydcv" nil t t)
              #'youdao-dictionary-search-at-pinit++)))

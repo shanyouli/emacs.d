@@ -26,7 +26,7 @@
   (pcase lye-use-pyim-dictionary
     ('base (pyim-basedict-enable))
     ('big (pyim-bigdict-enable))
-    ('librime (lib-load-relative "liberime" t t)
+    ('librime (lye-load! "liberime" nil t t)
               (pyim-liberime-enable))))
 
 (defun bundle-pyim-punctuation-toggle ()

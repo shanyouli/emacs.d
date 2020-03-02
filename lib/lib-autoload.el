@@ -26,7 +26,6 @@
 
 (require 'lib-f)
 (require 'lib-var)
-(require 'lib-load)
 
 (autoload 'string-join "subr-x")
 
@@ -76,7 +75,7 @@ Otherwise, use *-loadfs.el save"
         (let ((fname (concat target ".el")))
           (write-file fname)
           (byte-compile-file fname))))
-  (lib-safe-load target t t))
+  (load  target t t))
 
 ;;;###autoload
 (defun lib-autoload-initialize (&optional forcep)
@@ -85,11 +84,11 @@ Otherwise, use *-loadfs.el save"
       (unless (and lib-autoload-initialize-list
                    (lib-var-list-eql lib-autoload-initialize-list
                                      lib-autoload--initialized-list)
-                   (lib-safe-load lib-autoload-sans-extension-file t t))
+                   (load lib-autoload-sans-extension-file t t))
         (setq forcep t)
         (lib-autoload--save-loaded-dirs))
     (unless (and (file-exists-p (concat lib-autoload-sans-extension-file ".el"))
-                 (lib-safe-load lib-autoload-sans-extension-file t t)
+                 (load lib-autoload-sans-extension-file t t)
                  (lib-var-list-eql lib-autoload--initialized-list
                                    lib-autoload-initialize-list))
       (setq forcep t))))

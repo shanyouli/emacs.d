@@ -3,7 +3,7 @@
 (with-eval-after-load 'snails
   (if (fboundp 'fuz-build-and-load-dymod)
       (progn
-        (lib-load-absolute 'bundles/common/fuz-core t t)
+        (lye-load! 'bundles/common/fuz-core nil t t)
         (setq snails-fuz-library-load-status "load"))
     (setq snails-fuz-library-load-status "unload"))
   (dolist (buf (list

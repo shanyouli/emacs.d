@@ -43,7 +43,7 @@
           (if this-win-2nd (other-window 1))))))
 
 (pcase lye-use-switch-windows-package
-  ('ace-window (lib-load-relative "ace-window" t t))
+  ('ace-window (lye-load! "ace-window" nil t t))
   ('winum (add-hook! 'emacs-startup-hook (winum-mode +1))))
 
 

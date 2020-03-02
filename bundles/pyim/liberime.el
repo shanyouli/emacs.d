@@ -42,8 +42,8 @@
       (unless (file-exists-p liberime--module)
         (liberime--build))
       (lye//move-file liberime--module straight-dynamic-modules-dir)
-      (lib-safe-load (concat straight-dynamic-modules-dir
-                             "liberime.so") nil t))))
+      (lye//safe-load (concat straight-dynamic-modules-dir
+                              "liberime.so") nil t))))
 
 (defun liberime--check-shared-data-p ()
   (if (and liberime-shared-data-dir

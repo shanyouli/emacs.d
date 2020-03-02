@@ -44,4 +44,4 @@
 
 (pcase lye-use-lsp-manager
   ('eglot (add-hook! 'prog-mode-hook (eglot-ensure)))
-  ('lsp-mode (lib-load-relative "lsp-mode" t t)))
+  ('lsp-mode (lye-load! "lsp-mode" nil t t)))

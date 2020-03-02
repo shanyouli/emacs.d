@@ -1,6 +1,6 @@
 ;;; core/core-env.el.el -*- lexical-binding: t -*-
 
-
+;; copy from https://github.com/syl20bnr/spacemacs/blob/debug_circle_ci/core/core-env.el
 (require 'load-env-vars)
 
 (defvar lye-env-vars-file

@@ -163,7 +163,7 @@
       (when (get-buffer buf) (kill-buffer buf))))
 
 (when (display-graphic-p)
-  (lib-load-absolute 'core/core-env)
+  (lye-load! 'core/core-env)
   (lye/load-lye-env))
 
 ;;当在windows上运行时, 且 Msys2安装, 添加 msys 路径
