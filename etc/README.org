@@ -8,3 +8,4 @@
 7. [[https://github.com/tumashu/posframe][Posframe]]
 8. [[https://github.com/iqbalansari/restart-emacs][Restart-Emacs]]
 9. [[https://github.com/diasjorge/emacs-load-env-vars][emacs-load-env-vars]]
+10. [[https://github.com/emacsmirror/noflet][GitHub - emacsmirror/noflet: Locally override functions]]

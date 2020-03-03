@@ -17,18 +17,29 @@
 (defvar lye--initial-file-name-handler-alist file-name-handler-alist)
 (defvar lye--initial-exec-path exec-path)
 
+;;
+;;; Global variables
 (defconst lye-emacs-dir (expand-file-name user-emacs-directory)
   "The path to the currently loaded .emacs.d directory. Must end with a slash.")
 
 (defconst lye-core-dir (file-name-directory (or load-file-name buffer-file-name))
   "The root directory of Lye-Emacs's core files. Must end with a slash.")
 
-(defconst lye-library-dir (concat lye-emacs-dir "lib/")
+(defconst lye-core-library-dir (concat lye-core-dir "lib/")
   "The root directory of libray directory. Must end with a slash.")
+
+(defconst lye-packags-dir (concat lye-emacs-dir "packages/")
+  "The root directory of package-manager, Must end with a slash.")
+
+(defconst lye-etc-dir (concat lye-emacs-dir "etc/")
+  "etc dir in `lye-emacs-dir', Must end with a slash.")
+
+(defconst lye-emacs-cache-dir (concat lye-emacs-dir ".cache/")
+  "Is the cache directory this?")
 
 ;; Ensure `lye-core-dir' and `lye-library-dir'  in `load-path'
 (push lye-core-dir load-path)
-(push lye-library-dir load-path)
+(push lye-core-library-dir load-path)
 
 ;; This is consulted on every `require', `load' and various path/io handling
 ;; encrypted or compressed files, among other things.
@@ -44,6 +55,7 @@
 (autoload 'lib-f-join "lib-f")
 (autoload 'lib-autoload-initialize "lib-autoload")
 (autoload 'lye-load! "core-loads")
+(autoload 'lye-initialize-base-autoload! "core-loads")
 
 (lye-load! 'core/core-libs)
 
@@ -80,24 +92,16 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
   (add-hook! 'minibuffer-exit-hook #'lye-minibuffer-exit-h))
 
 ;;
-;;; Global variables
-(defconst lye-packags-dir (concat lye-emacs-dir "packages/")
-  "The root directory of package-manager, Must end with a slash.")
-
-(defconst lye-etc-dir (concat lye-emacs-dir "etc/")
-  "etc dir in `lye-emacs-dir', Must end with a slash.")
-
-(defconst lye-emacs-cache-dir (concat lye-emacs-dir ".cache/")
-  "Is the cache directory this?")
-
-;;
 ;;; customization
+(defgroup lye nil "Lye-emacs group" :group 'lye)
 (defcustom lye-full-name "shanyouli" "Set user full name."
-  :type 'string)
+  :type 'string
+  :group 'lye)
 
 (defcustom lye-mail-address "shanyouli6@gmail.com"
   "Set user mail address."
-  :type 'string)
+  :type 'string
+  :group 'lye)
 
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
@@ -107,22 +111,18 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 
 (define-error 'lye-error "Error in Lye Emacs core")
 (define-error 'lye-hook-error "Error in a Doom startup hook" 'lye-error)
+
 ;;; Load `custom-file'
 (setq custom-file (concat lye-emacs-cache-dir "custom.el"))
 (if (file-exists-p custom-file) (load custom-file :no-error :no-message))
 
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
-(setq lib-autoload-sans-extension-file (lib-f-join lye-emacs-cache-dir "core.pkg"))
-(setq lib-autoload-save-with-custom t)
-(setq lib-autoload-initialize-list
-      (list
-       (lib-f-join lye-core-dir "autoload")
-       lye-etc-dir
-       lye-library-dir))
-(lib-autoload-initialize)
-
+(lye-initialize-base-autoload! lye-core-dir
+                               lye-etc-dir)
 (lye-add-load-path! lye-etc-dir t)
+
+
 (defun lye-core-initialize ()
   "Load Lye's core files for an interactive session."
   (lye-load! 'core/core-benchmark) ; benchmark
