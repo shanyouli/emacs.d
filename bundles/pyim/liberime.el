@@ -14,7 +14,16 @@
   "Data directory on the system."
   :type 'directory)
 
-(defcustom liberime-user-data-dir (lib-f-join lye-emacs-cache-dir "rime/")
+(defcustom liberime-user-data-dir
+  (or (cl-some (lambda (parent)
+                 (let ((dir (lib-f-join parent "rime")))
+                   (when (file-directory-p dir)
+                     dir)))
+               (list (concat (getenv "XDG_CONFIG_HOME") "/fcitx")
+                     (concat (getenv "HOME") "/.config/fcitx")
+                     (concat (getenv "XDG_CONFIG_HOME") "/ibus")
+                     (concat (getenv "HOME") "/.config/ibus")))
+      (lib-f-join lye-emacs-cache-dir "rime/"))
   "Data directory on the user home directory."
   :type 'directory)
 

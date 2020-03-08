@@ -118,9 +118,9 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
+(lye-add-load-path! lye-etc-dir t)
 (lye-initialize-base-autoload! lye-core-dir
                                lye-etc-dir)
-(lye-add-load-path! lye-etc-dir t)
 
 
 (defun lye-core-initialize ()

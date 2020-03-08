@@ -23,7 +23,8 @@
 ;; Bundle-Framework Manager
 
 ;;; Code:
-(autoload 'cl-defmacro "cl-macs" nil t)
+(eval-when-compile
+  (autoload 'cl-defmacro "cl-macs" nil t))
 
 (defvar bundle--active-list '())
 
