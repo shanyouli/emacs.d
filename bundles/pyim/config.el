@@ -1,5 +1,6 @@
 ;;; bundles/pyim/config.el -*- lexical-binding: t -*-
 
+
 (require 'pyim)
 
 ;; using pyim-dregcache, not use pyim-dhashcache

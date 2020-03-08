@@ -9,4 +9,4 @@
                         :repo "merrickluo/liberime"
                         :host github
                         :files ("CMakeLists.txt" "Makefile"
-                                "src" "liberime-config.el")))))
+                                "src" "liberime.el")))))

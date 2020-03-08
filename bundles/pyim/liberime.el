@@ -37,22 +37,22 @@
 
 (defun liberime--build ()
   (let ((liberime--root (file-name-directory
-                          (locate-library "liberime-config")))
+                          (locate-library "liberime")))
          (buf-name "*Liberime Build*"))
     (lye//run-command-with-buf
      "make" buf-name liberime--root)))
 
 (defun liberime--check ()
-  (unless (require 'liberime nil t)
+  (unless (require 'liberime-core nil t)
     (let ((liberime--module (lib-f-join
                              (file-name-directory
-                              (locate-library "liberime-config"))
-                             (concat "build/liberime" module-file-suffix))))
+                              (locate-library "liberime"))
+                             (concat "build/liberime-core" module-file-suffix))))
       (unless (file-exists-p liberime--module)
         (liberime--build))
       (lye//move-file liberime--module straight-dynamic-modules-dir)
       (lye//safe-load (concat straight-dynamic-modules-dir
-                              "liberime.so") nil t))))
+                              "liberime-core.so") nil t))))
 
 (defun liberime--check-shared-data-p ()
   (if (and liberime-shared-data-dir
