@@ -38,6 +38,17 @@ Elements have the form ((KEY . [MAP]) CMD ORIGINAL-CMD)")
 (defsubst lib-key::concat (&rest elems)
   "Delete all empty lists from ELEMS (nil or (list nil)), and append thems."
   (apply #'append (delete nil (delete (list nil) elems))))
+
+(defsubst lib-key--list2alist (lists)
+  "A list to alist, But The first element can not be a list."
+  (if (null lists)
+      '()
+    (let ((hd (car lists)))
+      (if (listp hd)
+          (cons hd (lib-key--list2alist (cdr lists)))
+        (cons (list hd (cadr lists))
+              (lib-key--list2alist (cddr lists)))))))
+
 ;;; 移除快捷按键.
 
 ;;;###autoload
@@ -58,37 +69,6 @@ ARGS format is: (keymaps key1 key2...) or (key1 key2 ...).
 
 ;;
 ;;; 为交互函数设定快捷按键.
-
-;;;###autoload
-(cl-defmacro lib-key-define (&rest plist &key prefix map autoload &allow-other-keys)
-  "为一个可交互函数绑定一个快捷按键.
-ARGS 可以存在的 key 有 prefix, keymaps, autoload.
-:PREFIX         后接一个 string 的 key.
-:KEYMAP or :map 后接一个 keymap 默认为 `(current-global-map)'.
-:AUTOLOAD       后接一个文件名, 如 :autoload \"test\", 将被展开为 (autoload def \"test\").
-
-ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
-  (declare (indent defun))
-  (let ((key-prefix (or (concat prefix " ") ""))
-        ;; (keymap (or map `(current-global-map)))
-        (autofile autoload)
-        (key-def (copy-tree plist)))
-    (dolist (key (list :prefix :map :autoload))
-      (setq key-def (lib-var-delete-a-element-plist key key-def)))
-    (setq key-def (lib-var-plist-to-alist key-def))
-    (macroexp-progn
-     (lib-key::concat
-      (when autoload
-        (cl-mapcan (lambda (fun) `((autoload ,(car fun) ,autoload)))
-                   (mapcar #'cdr key-def)))
-      (cl-mapcan (lambda (def-key)
-                   (let ((key (let ((test-key (nth 0 def-key)))
-                                (if (stringp test-key)
-                                    (concat key-prefix test-key)
-                                  test-key)))
-                         (fun (nth 1 def-key)))
-                     `((lib-key ,key ,fun ,map))))
-                 key-def)))))
 
 ;;;###autoload
 (defmacro lib-key (key-name command &optional keymap predicate)
@@ -128,8 +108,89 @@ FROM: https://github.com/jwiegley/use-package/blob/master/bind-key.el."
                                                 ,command))))
             `(define-key (or ,keymap global-map) ,keyvar ,command))))))
 
-(defun lib-key--map-apply (fun xss)
-  (mapcar (lambda (xs) (apply fun xs)) xss))
+;;;###autoload
+(defmacro lib-keys (&rest args)
+  "为一个可交互函数绑定一个快捷按键.
+ARGS 可以存在的 key 有 prefix, keymaps, autoload. package
+
+:PREFIX         后接一个 string 的 key.
+:KEYMAP or :map 后接一个 keymap 默认为 `(current-global-map)'.
+:AUTOLOAD       后接一个文件名, 如 :autoload \"test\", 将被展开为 (autoload def \"test\").
+:package        主要用于设置 keymap 且非 global-map 后, 快捷键在 keymap
+                对应文件加载后生效.避免报错.
+:doc DOCSTRING 添加文本说明.
+ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
+  (macroexp-progn (lib-key--form args)))
+
+;;;###autoload
+(defmacro lib-key-definer (name &optional dosctring)
+  "设置按键的前缀."
+  (declare (indent defun) (docstring 3))
+  `(defmacro ,name (&rest args)
+     ;; (declare (indent defun))
+     (macroexp-progn (lib-key--form args ,(symbol-value name)))))
+
+(defun lib-key--form (args &optional prefix)
+  "Bind multiple keys at once.
+:map MAP          - a keymap into which the keybindings should be added
+:prefix KEY       - when keybinding is a string. As a prefix key.
+:package PACKAGE  - From PACKAGE map as.
+:autoload FILE    - From PACKAGE function as.
+:filter FORM      - optional for to determine when bindings apply"
+  (let* (map doc pkg kv-list filter file)
+    (setq kv-list (lib-key--list2alist args))
+    (let ((map-alist (or (assoc :map kv-list) (assoc :keymap kv-list))))
+      (when map-alist
+        (setq map (cadr map-alist)
+              kv-list (delete map-alist kv-list))))
+    (let ((pkg-alist (assoc :package kv-list)))
+      (if pkg-alist
+          (setq pkg (cadr pkg-alist)
+                kv-list (delete pkg-alist kv-list))))
+    (let ((file-alist (assoc :autoload kv-list)))
+      (if file-alist
+          (setq file (cadr file-alist)
+                kv-list (delete file-alist kv-list))))
+    (let ((prefix-alist (assoc :prefix kv-list)))
+      (if prefix-alist
+          (setq prefix (cadr prefix-alist)
+                kv-list (delete prefix-alist kv-list))))
+    (let ((filter-alist (assoc :filter kv-list)))
+      (if filter-alist
+          (setq filter (cadr filter-alist)
+                kv-list (delete filter-alist kv-list))))
+    (setq kv-list (delete (assoc :doc kv-list) kv-list))
+
+    ;; key binding arguments
+    (cl-flet
+        ((bindkey-after-load-pkg
+          (map bindings)
+          (if (and map pkg (not (eq map 'global-map)))
+              `((if (boundp ',map)
+                    ,(macroexp-progn bindings)
+                  (eval-after-load ,(if (symbolp pkg) `',pkg pkg)
+                    ',(macroexp-progn bindings))))
+            bindings)))
+      (append
+       (when file
+         (cl-mapcan
+          (lambda (def)
+            `((autoload ,def ,(if (symbolp file) (symbol-name file) file) nil t)))
+          (mapcar #'cadr kv-list)))
+       (bindkey-after-load-pkg
+        map
+        (cl-mapcan (lambda (kv)
+                     (let ((key (nth 0 kv))
+                           (def (nth 1 kv))
+                           (filter (or (nth 2 kv) filter)))
+                       (if (and (stringp key) prefix)
+                           (setq key (concat prefix " " key)))
+                       (if (and map (not (eq map 'global-map)))
+                           `((lib-key ,key ,def ,map ,filter))
+                         `((lib-key ,key ,def nil ,filter)))))
+                   kv-list))))))
+
+
 
 (provide 'lib-key)
 
