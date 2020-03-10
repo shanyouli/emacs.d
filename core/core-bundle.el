@@ -4,7 +4,7 @@
 ;;              (term :defer t)
 ;;              ))
 ;;   (bundle! b))
-(bundle! pyim :defer t)
+(bundle! pyim :commands (lye/toggle-input-method lye//require-pyim))
 ;; (bundle! fcitx :defer t :if (and IS-LINUX (executable-find "fcitx-remote")))
 
 (bundle! term :defer t)

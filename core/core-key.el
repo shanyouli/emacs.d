@@ -29,7 +29,7 @@
 (lib-key-define "C-c y" 'lye/dict-point)
 
 ;; pyim-bundle
-(lib-key-define "<f9>" 'toggle-input-method
+(lib-key-define "<f9>" 'lye/toggle-input-method
   "C-<f9>" 'bundle-pyim-punctuation-toggle)
 
 ;;; toolkit

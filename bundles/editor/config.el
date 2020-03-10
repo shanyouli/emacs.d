@@ -115,3 +115,8 @@
 (when (fboundp 'backup-file)
   (setq backup-file-location (lib-f-join  lye-emacs-cache-dir "backup"))
   (add-hook! 'after-save-hook 'backup-file))
+
+;; insert-translated-name
+(with-eval-after-load 'insert-translated-name
+  (when (bundle-active-p 'pyim)
+    (advice-add 'insert-translated-name-active :before #'lye//require-pyim)))

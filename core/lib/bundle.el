@@ -62,7 +62,7 @@
     (cond
      (commands
       (cl-mapcan
-       (lambda (cmd) `((autoload ',cmd ,conf-path)))
+       (lambda (cmd) `((autoload ',cmd ,conf-path nil t)))
        (if (listp commands) commands (list commands))))
      (defer
        (let ((time (if (numberp defer) defer 0.1)))
