@@ -16,9 +16,10 @@
          ("sr" 'restart-emacs (require 'restart-emacs nil t))
          ;; hydra-bundle
          "ub" 'hydra-ui-menu/body
-         "od" 'hydra-open-dir-menu/body
-         "f"  'one-key-functions/menu
-         "ot" 'one-key-change-fontsize/menu
+         "hd" 'hydra-open-dir-menu/body
+         "hs" 'one-key-tmp-scratch/menu
+         "hf"  'one-key-functions/menu
+         "ht" 'one-key-change-fontsize/menu
          "ua" 'one-key-adjust-opacity/menu
          )
 
@@ -135,7 +136,7 @@
 
 
 ;; company-bundle
-(lib-keys "M-/" 'company-complete
+(lib-keys ;;"M-/" 'company-complete
           "<backtab>" 'company-yasnippet
           "C-c t" 'company-backend-with-tabnine
           "C-c T" 'company-backend-remove-tabnine

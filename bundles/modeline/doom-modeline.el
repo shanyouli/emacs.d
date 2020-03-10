@@ -2,7 +2,7 @@
 
 
 (unless after-init-time
-  (setq doom-modeline--old-format lye-default-modeline-format)
+  (setq doom-modeline--old-format mode-line-format)
   (setq-default mode-line-format nil))
 
 (setq doom-modeline-icon (display-graphic-p)

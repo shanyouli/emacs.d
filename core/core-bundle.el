@@ -52,9 +52,12 @@
 (bundle! git :defer t :menu one-key-magit/menu)
 
 ;; DONE: Use bundle replace modules
-(setq lye-use-modeline 'awetray)
+;; (setq lye-use-modeline 'awetray)
+(setq lye-use-modeline 'doom)
 (bundle! modeline)
 
 (bundle! org :defer 0.5)
 
 (bundle! pdf :defer 0.5)
+
+;; (bundle! evil)
