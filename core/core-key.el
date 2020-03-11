@@ -6,8 +6,8 @@
 (require 'lib-key)
 
 (lib-key-unset "C-z" "C-SPC" "C-\\" "C-x s" "C-x C-SPC" "M-," "M-.")
-(defconst syl-key "M-,")
-(lib-key-definer syl-key)
+
+(lib-key-definer syl-key :doc "emacs-status key." :prefix "M-,")
 (syl-key "xs" 'super-save-all-buffer
          ;; esup
          "se" #'esup
@@ -21,7 +21,16 @@
          "hf"  'one-key-functions/menu
          "ht" 'one-key-change-fontsize/menu
          "ua" 'one-key-adjust-opacity/menu
-         )
+         ;; tools-bundle
+         "po" 'link-hint-open-link
+         "pc" 'link-hint-copy-link
+         "tp" 'pomidor
+         ("sh" 'tldr (not IS-WINDOWS))
+         ("uc" 'cnfonts-ui (fboundp 'cnfonts-ui))
+         ;; company-bundle
+         "ct" 'toggle-company-tabnine
+         ;; English word completion with Chinese comments
+         "ce" 'toggle-company-english-helper)
 
 ;; dict-bundle
 (lib-key "C-c y" 'lye/dict-point)
@@ -136,12 +145,8 @@
 
 
 ;; company-bundle
-(lib-keys ;;"M-/" 'company-complete
-          "<backtab>" 'company-yasnippet
-          "C-c t" 'company-backend-with-tabnine
-          "C-c T" 'company-backend-remove-tabnine
-          "C-, i t" 'toggle-company-english-helper)
-;; English word completion with Chinese comments
+(lib-key "<backtab>" 'company-yasnippet)
+;; (lib-key "M-/" 'company-complete)
 (with-eval-after-load 'company
   (lib-keys :map company-active-map
     "C-p" 'company-select-previous
@@ -273,10 +278,3 @@
           [remap describe-symbol] 'helpful-symbol)
 (with-eval-after-load 'helpful
   (lib-key "r" 'remove-hook-at-point helpful-mode-map))
-
-;; tools-bundle
-(syl-key "po" 'link-hint-open-link
-         "pc" 'link-hint-copy-link
-         "tp" 'pomidor
-         ("sh" 'tldr (not IS-WINDOWS))
-         ("uc" 'cnfonts-ui (fboundp 'cnfonts-ui)))

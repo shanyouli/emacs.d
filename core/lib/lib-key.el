@@ -123,12 +123,15 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
   (macroexp-progn (lib-key--form args)))
 
 ;;;###autoload
-(defmacro lib-key-definer (name &optional dosctring)
-  "设置按键的前缀."
+(cl-defmacro lib-key-definer (name &key doc prefix)
+  "设置按键的前缀.
+:prefix key         - 表示使用的前缀为 key,如果不存在,则使用 NAME 的值.
+:doc docsting       - 对这个案件的文本说明."
   (declare (indent defun) (docstring 3))
-  `(defmacro ,name (&rest args)
-     ;; (declare (indent defun))
-     (macroexp-progn (lib-key--form args ,(symbol-value name)))))
+  (let ((prefix (or prefix (symbol-value name))))
+    `(defmacro ,name (&rest args)
+       ;; (declare (indent defun))
+       (macroexp-progn (lib-key--form args ,prefix)))))
 
 (defun lib-key--form (args &optional prefix)
   "Bind multiple keys at once.
@@ -189,8 +192,6 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
                            `((lib-key ,key ,def ,map ,filter))
                          `((lib-key ,key ,def nil ,filter)))))
                    kv-list))))))
-
-
 
 (provide 'lib-key)
 

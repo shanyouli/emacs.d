@@ -132,18 +132,19 @@
   ;; company-tabnine
   (setq company-tabnine-binaries-folder
         (lib-f-join (getenv "HOME") ".local/share/tabnine"))
-  (defun company-backend-with-tabnine ()
+  (defun toggle-company-tabnine ()
     "Add to `company-backends'"
     (interactive)
-    (setq company-backends
-          (append (list #'company-tabnine) company-backends)))
-  (defun company-backend-remove-tabnine ()
-    "delete tabnine `company-tabnine'"
-    (interactive)
-    (setq company-backends
-          (delete #'company-tabnine company-backends))
-    (setq company-backends
-          (delete '(company-tabnine :with company-yasnippet) company-backends)))
+    (if (or (memq 'company-tabnine company-backends)
+            (memq '(company-tabnine :with company-yasnippet) company-backends))
+        (progn
+          (setq company-backends
+                (delete #'company-tabnine company-backends))
+          (setq company-backends
+                (delete '(company-tabnine :with company-yasnippet)
+                        company-backends)))
+      (setq company-backends
+            (append (list #'company-tabnine) company-backends))))
 
   (with-eval-after-load 'company-tabnine
     (defun tabnine-start-advice (orig &rest rest)
