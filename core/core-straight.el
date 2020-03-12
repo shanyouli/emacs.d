@@ -101,12 +101,12 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
          (blist (mapcar #'buffer-name (buffer-list))))
     (if (and straight-buffer (member straight-buffer blist))
         (switch-to-buffer straight-buffer))))
-
-(defalias 'package+ 'straight-use-package)
-(autoload 'cl-defmacro "cl-macs" nil t)
+(eval-when-compile
+  (autoload 'cl-defmacro "cl-macs" nil t)
+  (autoload 'bundle-get-path "bundle" nil t))
 
 (cl-defmacro package!
-    (name &key disabled if commands mode recipe build-in defer)
+    (name &key disabled if commands mode recipe build-in defer with)
   "Install a package-name.
 
 Usage:
@@ -123,9 +123,10 @@ Usage:
   (declare (indent 1))
   (unless disabled
     (let* ((package (if recipe (cons name recipe) name))
+           (bundle with)
            (package-name (symbol-name name))
            (body-lists `,(core-package/concat
-                         (package-keys:install package build-in)
+                         (package-keys:install package build-in with)
                          (package-keys:commands commands package-name)
                          (package-keys:mode mode package-name)
                          (package-keys:defer defer name))))
@@ -135,9 +136,13 @@ Usage:
                ,@(mapcar 'identity body-lists))))
         (macroexp-progn body-lists)))))
 
-(defun package-keys:install (package build-in)
+(defun package-keys:install (package build-in bundle)
   (unless build-in
-    `((straight-use-package ',package))))
+    (if bundle
+        (let ((bundle-path (bundle-get-path bundle)))
+          `((with-eval-after-load ,(expand-file-name "package.el" bundle-path)
+              (straight-use-package ',package))))
+    `((straight-use-package ',package)))))
 
 (defun package-keys:commands (commands package-name)
   (when commands

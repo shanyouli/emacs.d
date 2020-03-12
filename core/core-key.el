@@ -5,7 +5,7 @@
 ;; Global uninstall button
 (require 'lib-key)
 
-(lib-key-unset "C-z" "C-SPC" "C-\\" "C-x s" "C-x C-SPC" "M-," "M-.")
+(lib-key-unset "C-SPC" "C-\\" "C-x s" "C-x C-SPC" "M-," "M-.")
 
 (lib-key-definer syl-key :doc "emacs-status key." :prefix "M-,")
 (syl-key "xs" 'super-save-all-buffer
@@ -30,7 +30,23 @@
          ;; company-bundle
          "ct" 'toggle-company-tabnine
          ;; English word completion with Chinese comments
-         "ce" 'toggle-company-english-helper)
+         "ce" 'toggle-company-english-helper
+         ;; backup-file
+         ("bf" 'backup-file-log (require 'backup-file nil t))
+         ;; select or mark
+         "mp"  'set-mark-command  ;Instead C-SPC for Chinese input method
+         "mr"  'rectangle-mark-mode     ;rectangle-mark-mode
+         "ms"  'mark-sexp
+         "ma"  'mark-whole-buffer
+         ;; Edit-bundles
+         ;; Chinese automatically translated as English
+         "io" 'insert-translated-name-insert-original-translation
+         "iu" 'insert-translated-name-insert-with-underline
+         "il" 'insert-translated-name-insert-with-line
+         "ic" 'insert-translated-name-insert-with-camel)
+
+(syl-key "ps" 'smart-align
+         :map prog-mode-map)
 
 ;; dict-bundle
 (lib-key "C-c y" 'lye/dict-point)
@@ -39,10 +55,6 @@
 (lib-keys "<f9>" 'lye/toggle-input-method
           "C-<f9>" 'bundle-pyim-punctuation-toggle)
 
-;;; toolkit
-(lib-keys "C-x SPC" 'set-mark-command    ; Instead C-SPC for Chinese input method
-          "C-x C-h" 'rectangle-mark-mode ; rectangle-mark-mode
-          "C-z C-z" 'suspend-frame)    ; Suspend-frame
 ;; ivy-bundle
 (lib-keys "C-s" 'swiper-isearch
           "C-r" 'swiper-isearch-backward
@@ -139,7 +151,9 @@
                  ((fboundp 'link-hint-open-link)
                   (call-interactively 'link-hint-open-link))
                  ((fboundp 'ace-link)
-                  (call-interactively 'ace-link))))
+                  (call-interactively 'ace-link))
+                 (t
+                  (message "not work, please install `link-hiint' or `ace-link'"))))
           :map elfeed-show-mode-map
           :package 'elfeed)
 
@@ -178,9 +192,6 @@
           :filter (executable-find "markdownfmt")
   "C-c f" 'markdownfmt-format-buffer)
 
-(lib-keys "C-z s m" 'smart-align
-          :map prog-mode-map)
-
 ;; editor-bundle
 (lib-keys "M-e"  'one-key-thing-edit/menu
           "C-:" 'avy-goto-char
@@ -188,14 +199,7 @@
           "M-g f" 'avy-goto-line
           "M-g w" 'avy-goto-word-1
           "M-g e" 'avy-goto-word-0)
-;; Chinese automatically translated as English
-(syl-key
-  "io" 'insert-translated-name-insert-original-translation
-  "iu" 'insert-translated-name-insert-with-underline
-  "il" 'insert-translated-name-insert-with-line
-  "ic" 'insert-translated-name-insert-with-camel)
 (lib-key "C-c s" 'one-key-color-rg-search/menu nil (fboundp 'color-rg-search-symbol))
-(lib-key "C-z s b" 'backup-file-log nil (fboundp 'backup-file))
 ;; treemacs-bundle
 (lib-keys [f8] 'treemacs
           "M-0" 'treemacs-select-window
@@ -273,7 +277,7 @@
   "C-c" 'eval-defun
   "C-b" 'eval-buffer
   "e" 'macrostep-expand)
-(lib-keys :map help-mode-map "r" 'remove-hook-at-point)
+(lib-key "r" 'remove-hook-at-point help-mode-map)
 (lib-keys [remap describe-key] 'helpful-key
           [remap describe-symbol] 'helpful-symbol)
 (with-eval-after-load 'helpful

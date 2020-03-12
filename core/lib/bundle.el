@@ -98,7 +98,7 @@ Usage:
 :menu CMD   Delay load hydra menu."
   (declare (indent 1))
   (unless (or disabled (not (bundle-exist-p bundle)))
-    (let ((bundle-dir (bundle-get-path (symbol-name bundle)))
+    (let ((bundle-dir (bundle-get-path bundle))
           (-if (or if t)))
       (macroexp-progn
        `((when (and ,-if (not (bundle-active-p ',bundle)))

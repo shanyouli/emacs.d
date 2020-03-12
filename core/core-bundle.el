@@ -5,8 +5,6 @@
 ;;              ))
 ;;   (bundle! b))
 (bundle! pyim :commands (lye/toggle-input-method lye//require-pyim))
-;; (bundle! fcitx :defer t :if (and IS-LINUX (executable-find "fcitx-remote")))
-
 (bundle! term :defer t)
 
 (bundle! icons :if (and (display-graphic-p) (not IS-WINDOWS)))
