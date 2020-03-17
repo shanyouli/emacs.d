@@ -1,11 +1,14 @@
 ;;; bundles/snails/config.el.el -*- lexical-binding: t -*-
-;;; snails-backend-buffer-blacklist
+
+;; Not use exec-path-from-shell-initialize
+(setq snails-use-exec-path-from-shell nil)
 (with-eval-after-load 'snails
   (if (fboundp 'fuz-build-and-load-dymod)
       (progn
         (lye-load! 'bundles/common/fuz-core nil t t)
         (setq snails-fuz-library-load-status "load"))
     (setq snails-fuz-library-load-status "unload"))
+  ;;; snails-backend-buffer-blacklist
   (dolist (buf (list
                 " *which-key*"
                 " *straight-process*"
@@ -31,10 +34,3 @@
   (interactive)
   (require 'snails-backend-themes)
   (snails '(snails-backend-themes)))
-
-;; selectrum
-;; (setq prescient-save-file (lib-f-join lye-emacs-cache-dir "var/prescient-save.el"))
-;; (add-hook! 'after-init-hook
-;;   (selectrum-mode +1)
-;;   (selectrum-prescient-mode +1)
-;;   (prescient-persist-mode +1))

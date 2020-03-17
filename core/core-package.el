@@ -62,5 +62,6 @@
   (when (display-graphic-p) (global-disable-mouse-mode +1))
 
   ;; Highlight diff
-  (autoload 'global-diff-hl-mode "diff-hl")
-  (global-diff-hl-mode +1))
+  ;; (autoload 'global-diff-hl-mode "diff-hl")
+  ;; (global-diff-hl-mode +1)
+  )

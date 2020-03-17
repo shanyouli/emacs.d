@@ -17,6 +17,8 @@
         all-the-icons-icon-alist)
   (push '("\\.bash\\'" all-the-icons-fileicon "terminal" :face all-the-icons-pink)
         all-the-icons-icon-alist)
+  (push '("\\.webm\\'" all-the-icons-fileicon "video" :face all-the-icons-blue-alt)
+        all-the-icons-icon-alist)
   ;;
   ;;; mode icons
   (push '(vterm-mode all-the-icons-faicon "terminal" :face all-the-icons-yellow)
@@ -38,7 +40,7 @@
 
 (with-eval-after-load 'dired
   (add-hook! 'dired-mode-hook #'all-the-icons-dired-mode)
-    (with-eval-after-load 'all-the-icons-dired
+  (with-eval-after-load 'all-the-icons-dired
     (defun my-all-the-icons-dired--display ()
       "Display the icons of files without colors in a dired buffer."
       (when dired-subdir-alist

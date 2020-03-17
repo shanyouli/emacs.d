@@ -234,11 +234,11 @@
          :package org)
 
 ;; window-bundle
-(lib-key "C-h z" 'shackle-last-popup-buffer)
+(lib-keys "C-h z" 'shackle-last-popup-buffer
+          [remap other-window] 'ace-window)
 (pcase lye-use-switch-windows-package
   ('ace-window
-   (lib-keys [remap other-window] 'ace-window
-             "M-0" 'aw-select-window-0
+   (lib-keys "M-0" 'aw-select-window-0
              "M-1" 'aw-select-window-1
              "M-2" 'aw-select-window-2
              "M-3" 'aw-select-window-3

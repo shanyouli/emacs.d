@@ -1,9 +1,9 @@
 ;;; /core/core-bundle.el -*- lexical-binding: t -*-
 
-;; (dolist (b '((pyim :defer t)
-;;              (term :defer t)
-;;              ))
-;;   (bundle! b))
+;; ;; (dolist (b '((pyim :defer t)
+;; ;;              (term :defer t)
+;; ;;              ))
+;; ;;   (bundle! b))
 (bundle! pyim :commands (lye/toggle-input-method lye//require-pyim))
 (bundle! term :defer t)
 
@@ -20,6 +20,7 @@
              one-key-change-fontsize/menu
              one-key-adjust-opacity/menu))
 
+(setq lye-use-switch-windows-package 'winum)
 (bundle! window)
 
 (bundle! elisp :defer t)
@@ -58,4 +59,5 @@
 
 (bundle! pdf :defer 0.5)
 
+(bundle! eaf :defer 0.5 :if IS-LINUX)
 ;; (bundle! evil)

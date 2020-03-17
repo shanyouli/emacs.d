@@ -1,8 +1,8 @@
 ;;; bundles/window/packge.el -*- lexical-binding: t -*-
 
-(pcase lye-use-switch-windows-package
-  ('ace-window (package! ace-window :commands ace-window-display-mode))
-  ('winum (package! winum :commands winum-mode)))
+(if (eq lye-use-switch-windows-package 'winum)
+    (package! winum :commands winum-mode))
+(package! ace-window :commands ace-window-display-mode)
 
 (package! windmove :build-in t :commands windmove-default-keybindings)
 

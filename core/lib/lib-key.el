@@ -35,10 +35,6 @@
 
 Elements have the form ((KEY . [MAP]) CMD ORIGINAL-CMD)")
 
-(defsubst lib-key::concat (&rest elems)
-  "Delete all empty lists from ELEMS (nil or (list nil)), and append thems."
-  (apply #'append (delete nil (delete (list nil) elems))))
-
 (defsubst lib-key--list2alist (lists)
   "A list to alist, But The first element can not be a list."
   (if (null lists)
@@ -128,7 +124,8 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
 :prefix key         - 表示使用的前缀为 key,如果不存在,则使用 NAME 的值.
 :doc docsting       - 对这个案件的文本说明."
   (declare (indent defun) (docstring 3))
-  (let ((prefix (or prefix (symbol-value name))))
+  (let ((prefix (or prefix (symbol-value name)))
+        (dosctring (or doc (symbol-name name))))
     `(defmacro ,name (&rest args)
        ;; (declare (indent defun))
        (macroexp-progn (lib-key--form args ,prefix)))))

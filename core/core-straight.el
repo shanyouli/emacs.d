@@ -101,6 +101,8 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
          (blist (mapcar #'buffer-name (buffer-list))))
     (if (and straight-buffer (member straight-buffer blist))
         (switch-to-buffer straight-buffer))))
+;;
+;;; package! functions
 (eval-when-compile
   (autoload 'cl-defmacro "cl-macs" nil t)
   (autoload 'bundle-get-path "bundle" nil t))

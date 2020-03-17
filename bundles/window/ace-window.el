@@ -5,9 +5,7 @@
 (custom-set-faces
  '(aw-leading-char-face
    ((t (:inherit font-lock-keyword-face :bold t :height 2.0 :box t)))))
-
 (add-hook! 'emacs-startup-hook (ace-window-display-mode +1))
-
 (with-eval-after-load 'ace-window
   ;; Select widnow via `M-1'...`M-9'
   (defun aw--get-window-number (&optional win)

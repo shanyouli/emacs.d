@@ -24,8 +24,7 @@
                                 return font)
   "Customize Chinese font." :type 'string)
 (defcustom lye-unicode-font (cl-loop for font in
-                                     '("DejaVu Sans Mono"
-                                       "Symbola"
+                                     '("Symbola"
                                        "Apple Symbols"
                                        "Symbol"
                                        "icons-in-terminal")
@@ -209,7 +208,7 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
           ((pred listp) (core-ui::switch-themes))
           ((pred symbolp) (load-theme lye-default-theme t)))))))
 (setq lye-default-theme
-      '((doom-one doom-molokai) (30.93  113.92)))
+      '((doom-one doom-molokai) (30.91  113.92)))
 ;;
 ;;; font
 (defvar lye-init--font nil "记录 emacs 初始化使用的字体格式。")
