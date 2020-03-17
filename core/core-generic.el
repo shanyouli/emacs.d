@@ -209,8 +209,8 @@
 
     (setenv "PATH" (concat msys2-bin ";" mingw64-bin ";" (getenv "PATH")))))
 
-(advice-add 'find-file
-            :before (lambda (arg1 &rest rest)
-                      (let ((d (file-name-directory arg1)))
-                        (unless (file-exists-p d)
-                          (make-directory d t)))))
+;; (advice-add 'find-file
+;;             :before (lambda (arg1 &rest rest)
+;;                       (let ((d (file-name-directory arg1)))
+;;                         (unless (file-exists-p d)
+;;                           (make-directory d t)))))

@@ -56,8 +56,6 @@
 (bundle! modeline)
 
 (bundle! org :defer 0.5)
-
-(bundle! pdf :defer 0.5)
-
-(bundle! eaf :defer 0.5 :if IS-LINUX)
+(bundle! eaf :if IS-LINUX)
+(bundle! pdf :defer 0.5 :if (not (bundle-active-p 'eaf)))
 ;; (bundle! evil)
