@@ -1,112 +1,67 @@
-;;; core-package.el --- Initialize third-packages -*- lexical-binding: t -*-
+;;; core/core-package.el.el -*- lexical-binding: t -*-
+(add-hook! 'after-init-hook
+  :defer 0.1
+  :append t
+  ;; Start server
+  ;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
+  ;; @see https://emacs-china.org/t/use-package/12051/4?u=shanyouli
+  (when (and (boundp 'server-process) server-process
+             (not IS-WINDOWS))
+    (ignore-errors (server-start)))
 
-;; Author: shanyouli
-;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (dependencies)
-;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords:
+  ;; Save cursor position for everyfile you opened. So,  next time you open
+  ;; the file, the cursor will be at the position you last opened it.
+  (save-place-mode +1)
 
+  ;; Miantain a history of past actions and a resonable number of lists
+  (setq-default history-length 1000)
+  (setq enable-recursive-minibuffers t
+        history-delete-duplicates t
+        savehist-additional-variables '(mark-ring
+                                        global-mark-ring
+                                        search-ring
+                                        regexp-search-ring
+                                        extended-command-history)
+        savehist-autosave-interval 60)
+  (savehist-mode +1)
 
-;; This file is not part of GNU Emacs
+  ;; Save recentf file and open them
+  (setq recentf-max-saved-items 200
+        ;;Do not add these files to the recently opened text
+        recentf-exclude '((expand-file-name package-user-dir)
+                          ".cache"
+                          ".cask"
+                          "bookmarks"
+                          "ido.*"
+                          "recentf"
+                          "url"
+                          "COMMIT_EDITMSG\\'"
+                          "COMMIT_MSG"
+                          "\\/sudo:root\\@localhost:*"
+                          "\\/sudo:root\\@*"))
+  (recentf-mode +1)
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
+  ;; Automatically refresh files that have been changed elsewhere
+  (global-auto-revert-mode +1)
 
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
+  ;; Use undo-tree
+  ;;(global-undo-tree-mode +1)
 
-;; For a full copy of the GNU General Public License
-;; see <http://www.gnu.org/licenses/>.
+  ;; Save Emacs buffers when they lose focus after 2s
+  (with-eval-after-load 'super-save
+      (cl-pushnew 'split-window-below super-save-triggers)
+      (cl-pushnew 'split-window-right super-save-triggers))
+  (super-save-mode +1)
+  ;; Displays the key bindings following your currently entered
+  ;; incomplete command
+  (setq which-key-idle-delay 0.5
+        which-key-popup-type 'minibuffer)
+  (which-key-mode +1)
 
+  ;; not use mouse
+  (when (display-graphic-p) (global-disable-mouse-mode +1))
 
-;;; Commentary:
-
-;;; Code:
-
-;; Start server
-;; @see https://stackoverflow.com/questions/885793/emacs-error-when-calling-server-start
-(when (and (display-graphic-p)
-       (not (or system/cygwin system/windows)))
-  (add-hook 'after-init-hook
-            (lambda ()
-              (require 'server)
-              (setq server-auth-dir (concat lye-emacs-cache-dir "server"))
-              (unless (server-running-p)
-                (server-start)))))
-
-;; Save cursor position for everyfile you opened. So,  next time you open
-;; the file, the cursor will be at the position you last opened it.
-(add-hook 'after-init-hook
-          (lambda ()
-            (require 'saveplace)
-            (setq save-place-file (concat lye-emacs-cache-dir "saveplace"))
-            (save-place-mode)))
-
-
-;; Miantain a history of past actions and a resonable number of lists
-(add-hook 'after-init-hook
-          (lambda ()
-            (require 'savehist)
-            (setq-default history-length 1000)
-            (setq savehist-file (concat lye-emacs-cache-dir "history")
-                  enable-recursive-minibuffers t
-                  history-delete-duplicates t
-                  savehist-additional-variables '(mark-ring
-                                                  global-mark-ring
-                                                  search-ring
-                                                  regexp-search-ring
-                                                  extended-command-history)
-                  savehist-autosave-interval 60)
-            (savehist-mode)))
-
-;; Save recentf file and open them
-(add-hook 'after-init-hook
-          (lambda ()
-            (require 'recentf)
-
-            (setq recentf-max-saved-items 200
-                  recentf-save-file (concat lye-emacs-cache-dir "recentf"))
-            ;;Do not add these files to the recently opened text
-            (setq recentf-exclude '((expand-file-name package-user-dir)
-                                    ".cache"
-                                    ".cask"
-                                    "bookmarks"
-                                    "ido.*"
-                                    "recentf"
-                                    "url"
-                                    "COMMIT_EDITMSG\\'"
-                                    "COMMIT_MSG"
-                                    ))
-            (recentf-mode)))
-
-;; Automatically refresh files that have been changed elsewhere
-(add-hook 'after-init-hook (lambda () (global-auto-revert-mode t)))
-
-(add-hook 'after-init-hook
-          (lambda ()
-            ;; Use undo-tree
-            ;; (require 'undo-tree)
-            (global-undo-tree-mode)
-
-            ;; Save Emacs buffers when they lose focus after 1.5s
-            ;; (require 'auto-save)
-            (setq auto-save-idle 1.5)
-            (setq auto-save-silent t)
-            (auto-save-enable)
-
-            ;; Displays the key bindings following your currently entered incomplete command
-            ;; (require 'which-key)
-            (setq which-key-idle-delay 0.5)
-            (which-key-mode t)
-
-          ;; not use mouse
-            (if (display-graphic-p) (global-disable-mouse-mode))))
-
-(provide 'core-package)
-
-;;; core-package.el ends here
+  ;; Highlight diff
+  ;; (autoload 'global-diff-hl-mode "diff-hl")
+  ;; (global-diff-hl-mode +1)
+  )

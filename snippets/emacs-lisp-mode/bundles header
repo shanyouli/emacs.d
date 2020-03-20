@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: bundles header
+# key: bhd
+# --
+
+;;; `(substring (buffer-file-name) (length (expand-file-name user-emacs-directory)))`.el -*- lexical-binding: t -*-
+
+$0

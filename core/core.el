@@ -1,228 +1,136 @@
-;;; core.el --- Initialize Load Path -*- lexical-binding: t -*-
+;;; core.el --- Initialize core -*- lexical-binding: t -*-
 
-;; Author: shanyouli
-;; Maintainer: shanyouli
-;; Version: v0.1
-;; Package-Requires: (cl)
-;; Homepage: https://github.com/shanyouli/emacs.d
-;; Keywords: load-path
+;;; Code
 
+(pcase emacs-version
+  ((pred (lambda (x) (version< x "27.0")))
+   (load (concat user-emacs-directory "early-init") nil 'nomessage))
+  ((pred (lambda (x) (version< x "26.1")))
+   (error "Detected Emacs %s. Lye-Emacs only supports Emacs 26.1 and higher."
+          emacs-version)))
 
-;; This file is not part of GNU Emacs
+(defconst EMACS27+ (> emacs-major-version 26))
+(defconst IS-MAC (eq system-type 'darwin))
+(defconst IS-LINUX (eq system-type 'gnu/linux))
+(defconst IS-WINDOWS (memq system-type '(windows-nt ms-doc)))
 
-;; This file is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 3, or (at your option)
-;; any later version.
+(defvar lye--initial-file-name-handler-alist file-name-handler-alist)
+(defvar lye--initial-exec-path exec-path)
 
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;; GNU General Public License for more details.
+;;
+;;; Global variables
+(defconst lye-emacs-dir (expand-file-name user-emacs-directory)
+  "The path to the currently loaded .emacs.d directory. Must end with a slash.")
 
-;; For a full copy of the GNU General Public License
-;; see <http://www.gnu.org/licenses/>.
+(defconst lye-core-dir (file-name-directory (or load-file-name buffer-file-name))
+  "The root directory of Lye-Emacs's core files. Must end with a slash.")
 
+(defconst lye-core-library-dir (concat lye-core-dir "lib/")
+  "The root directory of libray directory. Must end with a slash.")
 
-;;; Commentary:
+(defconst lye-packags-dir (concat lye-emacs-dir "packages/")
+  "The root directory of package-manager, Must end with a slash.")
 
-;; Initialize Load-Path
+(defconst lye-etc-dir (concat lye-emacs-dir "etc/")
+  "etc dir in `lye-emacs-dir', Must end with a slash.")
 
-;;; Code:
-
-;; depends
-(require 'cl-macs)
-(require 'cl-seq)
-;; constant
-
-(defconst system/windows (eq system-type 'windows-nt)
-  "Are we running on a Windows System?")
-
-(defconst system/mac (eq system-type 'darwin)
-  "Are we running on a Mac System?")
-
-(defconst system/linux (eq system-type 'gnu/linux)
-  "Are we running on a GNU/Linux System?")
-
-(defconst system/cygwin (eq system-type 'cygwin)
-  "Are we running on a cygwin system?")
-
-(defconst *root* (string-equal "root" (getenv "USER"))
-  "Are you using ROOT user?")
-
-(defconst lye-emacs-site-lisp-dir (expand-file-name "site-lisp/" user-emacs-directory)
-  "The root directory of third packages.")
-
-(defconst lye-emacs-core-dir (expand-file-name "core/" user-emacs-directory)
-  "Initialize some packages that are not installed using package.el.")
-
-(defconst lye-emacs-init-dir (expand-file-name "lisp/" user-emacs-directory)
-  "Initialize some packages that are installed using package.el.")
-
-(defconst lye-emacs-modules-dir (expand-file-name "modules/" user-emacs-directory)
-  "You don't need to load directly but use the extended key to load the package
- configuration folder.")
-
-(defconst lye-emacs-cache-dir (concat user-emacs-directory ".cache/")
+(defconst lye-emacs-cache-dir (concat lye-emacs-dir ".cache/")
   "Is the cache directory this?")
 
-(defconst lye-emacs-share-dir (expand-file-name "share/" user-emacs-directory)
-  "Store files in non-el format, such as `plantuml.jar', `pyim-bigdict.pyim.gz'.")
+;; Ensure `lye-core-dir' and `lye-library-dir'  in `load-path'
+(push lye-core-dir load-path)
+(push lye-core-library-dir load-path)
 
-(defconst lye-emacs-pyim-big-file
-  (expand-file-name "pyim-dict/pyim-bigdict.pyim.gz" lye-emacs-share-dir)
-  "Store the location of the pyim-dictionary.")
+;; This is consulted on every `require', `load' and various path/io handling
+;; encrypted or compressed files, among other things.
+(setq file-name-handler-alist nil)
 
-(defconst lye-emacs-plantuml-file
-  (expand-file-name "plantuml/plantuml.jar" lye-emacs-share-dir)
-  "Store the location of the plantuml.jar.")
+;; Restore `file-name-handler-alist', because it is needed for handling
+;; encrypted or compressed files, among other things.
+(defun lye--reset-file-handler-alist-h ()
+  (setq file-name-handler-alist lye--initial-file-name-handler-alist))
+(add-hook 'emacs-startup-hook #'lye--reset-file-handler-alist-h)
 
-(defconst lye-emacs-yas-snippets-dir
-  (expand-file-name "snippets" lye-emacs-share-dir)
-  "Store the location of the `Yas-snippets'.")
+;; Load the bare necessities
+(autoload 'lib-f-join "lib-f")
+(autoload 'lib-autoload-initialize "lib-autoload")
+(autoload 'lye-load! "core-loads")
+(autoload 'lye-initialize-base-autoload! "core-loads")
 
-(defconst lye-emacs-custom-temp-file
-  (expand-file-name "custom-template.el" lye-emacs-share-dir)
-  "The custom template of `custom-file'.")
+(lye-load! 'core/core-libs)
 
+;; Do this on idle timer to defer a possible GC pause that could result; also
+;; allows deferred packages to take advantage of these optimizations.
+;; see@https://github.com/emacsmirror/gcmh
+(defvar lye--gc-cons-threshold (if (display-graphic-p) #x1000000 #x400000)
+  "The default value to use for `gc-cons-threshold'. If you experience freezing,
+decrease this. If you experience stuttering, increase this.
+When use graphic, its value is 16Mib, otherwise 4Mib")
+
+(defvar lye--gc-cons-upper-limit (if (display-graphic-p) #x20000000 #x8000000)
+  "The temporary value for `gc-cons-threshold' to defer it.
+Whe use graphic, its value is 512Mib, otherwise 128Mib.")
+
+(defvar lye--gc-timer (run-with-idle-timer 10 t #'garbage-collect)
+  "Run garbarge collection when idle 10s.")
+
+(add-hook! 'emacs-startup-hook
+    (setq gc-cons-threshold lye--gc-cons-threshold)
+  ;; GC automatically while unfocusing the frame
+  ;; `focus-out-hook' is obsolete since 27.1
+  (if (boundp 'after-focus-change-function)
+      (add-function :after after-focus-change-function
+                    (lambda () (unless (frame-focus-state) (garbage-collect))))
+    (add-hook! 'focus-out-hook #'garbage-collect))
+  ;; Avoid GCs while using `ivy'/`counsel'/`swiper' and `helm', etc.
+  ;; @see http://bling.github.io/blog/2016/01/18/why-are-you-changing-gc-cons-threshold/
+  (defun lye-minibuffer-setup-h ()
+    (setq gc-cons-threshold lye--gc-cons-upper-limit))
+  (defun lye-minibuffer-exit-h ()
+    (setq gc-cons-threshold lye--gc-cons-threshold))
+  (add-hook! 'minibuffer-setup-hook #'lye-minibuffer-setup-h)
+  (add-hook! 'minibuffer-exit-hook #'lye-minibuffer-exit-h))
+
+;;
 ;;; customization
-(defcustom lye-full-name "shanyouli"
-  "Set user full name."
-  :type 'string)
+(defgroup lye nil "Lye-emacs group" :group 'lye)
+(defcustom lye-full-name "shanyouli" "Set user full name."
+  :type 'string
+  :group 'lye)
 
 (defcustom lye-mail-address "shanyouli6@gmail.com"
   "Set user mail address."
-  :type 'string)
+  :type 'string
+  :group 'lye)
 
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
 
-(defcustom lye-package-archives 'melpa
-  "Set package archives from which to fetch."
-  :type '(choice (const :tag "Melpa" melpa)
-                 (const :tag "Melpa-mirror" melpa-mirror)
-                 (const :tag "Emacs-china" emacs-china)
-                 (const :tag "Netease" netease)
-                 (const :tag "Tuna" tuna)
-                 (const :tag "Tencent" tencent)))
+(unless (file-directory-p lye-emacs-cache-dir)
+  (make-directory lye-emacs-cache-dir t))
 
-(defcustom lye-company-enable-yas nil
-  "Enable yasnippet for company backends or not."
-  :type  'boolean)
-
-(defcustom lye-enable-benchmark-p nil
-  "Enable the init benchmark or not."
-  :type 'boolean)
-
-(defcustom lye-init-fullscreen-p nil
-  "Full SCREEN or not when initializing."
-  :type 'boolean)
-
-(defcustom lye-load-all-module-file-p nil
-  "Import all el files in lye-emacs-modules-dir on first run."
-  :type 'boolean)
-
-(defcustom lye-use-fuz-or-flx-in-ivy nil
-  "If it is `flx', use fuzzy match with `flx' package.
-If it is `fuz', use fuzzy match with `fuz' package.
-If it is `nil', Not use fuzzy match."
-  :type '(choice (const :tag "fuzzy match" 'flx)
-                 (const :tag "fuzzy" 'fuz)
-                 (const :tag "Null" nil)))
-
-(defcustom lye-enable-sdcv-or-youdao 'sdcv
-  "If it is sdcv, use `sdcv' as a translation tool.
-If it is youdao, use `youdao-dictionary' as a translation tool."
-  :type '(choice (const :tag "Sdcv" sdcv)
-                 (const :tag "Youdao" youdao)))
-
-(defcustom lye-sdcv-dictionary-data-dir (expand-file-name "stardict" lye-emacs-share-dir)
-  "Sdcv dictionary storage directory."
-  :type 'string)
-
-(defcustom lye-emacs-autoload-file (expand-file-name "loadfs.el" lye-emacs-cache-dir)
-  "Extract the autoload magic annotation file from the third party package."
-  :type '(choice (string :tag "Fire Name")
-                 (const :tag "Error" nil)))
-
-;; Set the temporal directory
-(unless (file-exists-p lye-emacs-cache-dir)
-  (make-directory lye-emacs-cache-dir))
+(define-error 'lye-error "Error in Lye Emacs core")
+(define-error 'lye-hook-error "Error in a Doom startup hook" 'lye-error)
 
 ;;; Load `custom-file'
-(setq custom-file (expand-file-name "custom.el" lye-emacs-cache-dir))
+(setq custom-file (concat lye-emacs-cache-dir "custom.el"))
+(if (file-exists-p custom-file) (load custom-file :no-error :no-message))
 
-(if (and (file-exists-p lye-emacs-custom-temp-file)
-         (not (file-exists-p custom-file)))
-    (copy-file lye-emacs-custom-temp-file custom-file))
+;; This is consulted on every `require', `load' and various path/io functions.
+;; You get a minor speed up by nooping this.
+(lye-add-load-path! lye-etc-dir t)
+(lye-initialize-base-autoload! lye-core-dir
+                               lye-etc-dir)
 
-(if (file-exists-p custom-file) (load custom-file))
 
-;; modules
-(defmacro lye/modules-require (pkg)
-  "Import the *.el file in the lye-emacs-modules-dir folder."
-  `(require ,pkg (format "%s%s.el" ,lye-emacs-modules-dir ,pkg)))
-
-;; init Dired
-(defmacro lye/init-require (pkg)
-  "Import the `*.el' file in the lye-emacs-lisp-dir folder."
-  `(require ,pkg (format "%s%s.el" ,lye-emacs-init-dir ,pkg)))
-
-;;Test added third party packages
-;; (defmacro lye/test-package (pkg-base-dir &optional pkg-file path-dir)
-;;   "Add the folder of the trial package to the load-path table and import it."
-;;   `(let* ((pkg (or ,pkg-file ,pkg-base-dir))
-;;           (path (or ,path-dir ,lye-emacs-site-lisp-dir))
-;;           (apath (expand-file-name (format "%s" ,pkg-base-dir) path)))
-;;      (if (file-directory-p apath)
-;;          (or (member apath load-path)
-;;              (put apath load-path)))
-;;      (require pkg)))
-
-;;; `Load-path'
-(defun lye/add-subdidrs-to-load-path (parent-dir)
-  "Adds every non-hidden subdir of PARENT_DIR to `load-path'."
-  (when (and parent-dir (file-directory-p parent-dir))
-    (let* ((default-directory parent-dir))
-      (setq load-path
-            (append
-             (cl-loop for dir in (cl-remove-if
-                               (lambda (f) (string-prefix-p "." f))
-                               (directory-files parent-dir))
-                   unless (not (file-directory-p dir))
-                   collecting (expand-file-name dir))
-             load-path)))))
-
-(defun lye/update-load-path (&rest _)
-  "Update `load-path'."
-
-  ;; add `lye-emacs-init-dir' to load-path
-  (push lye-emacs-init-dir load-path)
-
-  ;; add `lye-emacs-site-lisp-dir' to load-path
-  (lye/add-subdidrs-to-load-path lye-emacs-site-lisp-dir)
-
-  ;; add `lye-emacs-modules-dir' to load-path
-  (push lye-emacs-modules-dir load-path))
-
-(advice-add #'package-initialize :after #'lye/update-load-path)
-
-(lye/update-load-path)
-
-(add-hook 'after-init-hook
-          (lambda ()
-            (run-with-idle-timer
-             5 nil
-             (lambda ()
-               (lye/core-require 'core-funcs)
-               (setq load-path (delete-same-element-in-list load-path))))))
-
-;;; bechmark-init
-(when lye-enable-benchmark-p
-  (require 'benchmark-init-modes)
-  (require 'benchmark-init)
-  (benchmark-init/activate))
-
-(provide 'core)
-
-;;; core.el ends here
+(defun lye-core-initialize ()
+  "Load Lye's core files for an interactive session."
+  (lye-load! 'core/core-benchmark) ; benchmark
+  (lye-load! 'core/core-custom)    ; Custom-Varliable
+  (lye-load! 'core/core-generic)   ; generic and delete *scratch*
+  (lye-load! 'core/core-straight)  ; staraight, package
+  (lye-load! 'core/core-ui)        ; UI
+  (lye-load! 'core/core-package)   ; packages initialization
+  (lye-load! 'core/core-bundle)
+  (lye-load! 'core/core-key)       ; Keybinding
+  )

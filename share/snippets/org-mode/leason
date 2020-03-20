@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: leason
-# key: leason
-# --
-- [-] Leason $1 -- $2 error $3 wpm
-$4
