@@ -27,6 +27,7 @@
 ;;; dependences
 
 (require 'lib-var)
+(declare-function which-key-add-key-based-replacements 'which-key)
 
 ;;; Code:
 

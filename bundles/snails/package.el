@@ -3,6 +3,7 @@
 (package! snails :recipe (:type git
             :host github
             :repo "manateelazycat/snails"
+            :files (:defaults "*.sh" "*.el")
             :no-byte-compile t)
   :commands snails)
 
