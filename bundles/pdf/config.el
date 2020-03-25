@@ -2,7 +2,7 @@
 
 (defun lye//pdf-tools-check ()
   (let ((epdfinfo-file (locate-library "epdfinfo"))
-        (lye--pdf-tools (lib-f-join straight-dynamic-modules-dir "epdfinfo")))
+        (lye--pdf-tools (lib-f-join dynamic-module-dir "epdfinfo")))
     (cond
       ((file-exists-p lye--pdf-tools)
        (setq pdf-info-epdfinfo-program lye--pdf-tools))

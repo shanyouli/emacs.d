@@ -3,7 +3,7 @@
 2. [[https://github.com/mattiase/xr][xr]]
 3. [[https://github.com/hlissner/emacs-doom-themes][Doom-themes]]
 4. [[https://github.com/jwiegley/emacs-async][Async]]
-5. [[https://github.com/tumashu/pyim][Pyim]]
+5. [[https://github.com/tumashu/pyim][Pyim]] commit ID: 77170724fa3c5226c0f7b3f59ad3f408822577a7
 6. [[https://github.com/tumashu/pyim-basedict][Pyim-basedict]]
 7. [[https://github.com/tumashu/posframe][Posframe]]
 8. [[https://github.com/iqbalansari/restart-emacs][Restart-Emacs]]

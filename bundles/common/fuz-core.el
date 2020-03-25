@@ -17,6 +17,6 @@
                              (IS-MAC "libfuz_core.dylib")
                              ((memq system-type '(windows-nt ms-dos cygwin))
                               "fuz_core.dll")))
-                      (concat straight-dynamic-modules-dir
+                      (concat dynamic-module-dir
                               (file-name-nondirectory old-file)))
       (delete-file old-file))))

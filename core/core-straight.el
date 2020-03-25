@@ -1,6 +1,143 @@
 ;;; core/core-straight.el.el -*- lexical-binding: t -*-
 
 ;;
+;;; package.el
+
+;; Emacs Lisp Package Archive (ELPA)
+;; @see https://github.com/melpa/melpa and https://elpa.emacs-china.org/.
+(defcustom lye-package-archives-alist
+  (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
+                      (not (gnutls-available-p))))
+         (proto (if no-ssl "http" "https")))
+    `(,(cons 'melpa
+             `(,(cons "gnu"   (concat proto "://elpa.gnu.org/packages/"))
+               ,(cons "melpa" (concat proto "://melpa.org/packages/"))))
+      ,(cons 'melpa-mirror
+             `(,(cons "gnu"   (concat proto "://elpa.gnu.org/packages/"))
+               ,(cons "melpa" (concat proto "://www.mirrorservice.org/sites/melpa.org/packages/"))))
+      ,(cons 'emacs-china
+             `(,(cons "gnu"   (concat proto "://elpa.emacs-china.org/gnu/"))
+               ,(cons "melpa" (concat proto "://elpa.emacs-china.org/melpa/"))))
+      ,(cons 'netease
+             `(,(cons "gnu"   (concat proto "://mirrors.163.com/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.163.com/elpa/melpa/"))))
+      ,(cons 'ustc
+             `(,(cons "gnu"   (concat proto "://mirrors.ustc.edu.cn/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.ustc.edu.cn/elpa/melpa/"))))
+      ,(cons 'tencent
+             `(,(cons "gnu"   (concat proto "://mirrors.cloud.tencent.com/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.cloud.tencent.com/elpa/melpa/"))))
+      ,(cons 'tuna
+             `(,(cons "gnu"   (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/"))
+               ,(cons "melpa" (concat proto "://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/"))))))
+  "The package archives group list."
+  :group 'lye
+  :type '(alist :key-type (symbol :tag "Archve grup name")
+                :value-type (alist :key-type (string :tag "Archive name")
+                                   :value-type (string :tag "URL or directory name"))))
+
+(defcustom lye-package-archives 'tuna
+  "Set package archives from which to fetch."
+  :group 'lye
+  :set (lambda (symbol value)
+         (set symbol value)
+         (setq package-archives
+               (or (alist-get value lye-package-archives-alist)
+                   (error "Unknown package archives: `%s'" value))))
+  :type `(choice ,@(mapcar
+                    (lambda (item)
+                      (let ((name (car item)))
+                        (list 'const
+                              :tag (capitalize (symbol-name name))
+                                    name)))
+                    lye-package-archives-alist)))
+
+(defun lye-set-package-archives (archives &optional refresh async no-save)
+  "set the package archives (ELPA).
+REFRESH is non-nil, will refresh archive contents.
+ASYNC specifies whether to perform the downloads in the background.
+Save to `custom-file' if NO-SAVE is nil."
+  (interactive
+   (list (intern (completing-read "Select package archives: "
+                                  (mapcar #'car lye-package-archives-alist)))))
+  ;; Set option
+  (lye-set-custom-variable 'lye-package-archives archives no-save)
+
+  ;; Refresh if need
+  (and refresh (package-refresh-contents async))
+  (message "Set package archives to `%s'" archives))
+
+;; Refer to https://emacs-china.org/t/elpa/11192
+(defun lye-test-package-archives (&optional no-chart)
+  "Test connection speed of all package archives and display on chart.
+
+Not displaying the chart if NO-CHART is non-nil.
+Return the fastest package archive."
+  (interactive)
+  (let* ((urls (mapcar
+                (lambda (url)
+                  (concat url "archive-contents"))
+                (mapcar #'cdr
+                        (mapcar #'cadr
+                                (mapcar #'cdr
+                                        lye-package-archives-alist)))))
+         (durations (mapcar
+                     (lambda (url)
+                       (let ((start (current-time)))
+                         (message "Fetching %s..." url)
+                         (cond ((executable-find "curl")
+                                (call-process "curl" nil nil nil "--max-time" "10" url))
+                               ((executable-find "wget")
+                                (call-process "wget" nil nil nil "--timeout=10" url))
+                               (t (user-error "curl or wget is not found")))
+                         (float-time (time-subtract (current-time) start))))
+                     urls))
+         (fastest (car (nth (cl-position (apply #'min durations) durations)
+                            lye-package-archives-alist))))
+
+    ;; Display on chart
+    (when (and (not no-chart)
+               (require 'chart nil t)
+               (require 'url nil t))
+      (chart-bar-quickie
+       'horizontal
+       "Speed test for the ELPA mirrors"
+       (mapcar (lambda (url) (url-host (url-generic-parse-url url))) urls) "ELPA"
+       (mapcar (lambda (d) (* 1e3 d)) durations) "ms"))
+
+    (message "%s" urls)
+    (message "%s" durations)
+    (message "%s is the fastest package archive" fastest)
+
+    ;; Return the fastest
+    fastest))
+
+;; and `custom-file' and Select the package archives
+(when (not (file-exists-p custom-file))
+  (if (or (executable-find "curl") (executable-find "wget"))
+      (progn
+        ;; Get and select the fastest package archives automatically
+        (message "Testing connection.. Please wait a moment.")
+        (lye-set-package-archives
+         (lye-test-package-archives 'no-chart)))
+    ;; Select package archives manually
+    (lye-set-package-archives
+     (intern
+      (ido-completing-read "Select package archives:"
+                           (mapcar (lambda (x) (symbol-name (car x)))
+                                   lye-package-archives-alist))))))
+
+;; (and (file-readable-p custom-file) (load custom-file))
+
+;; HACK: DO NOT copy package-selected-packages to init/custom file forcibly.
+;; https://github.com/jwiegley/use-package/issues/383#issuecomment-247801751
+(defun my-save-selected-packages (&optional value)
+  "Set `package-selected-packages' to VALUE but don't save to `custom-file'."
+  (when value
+    (setq package-selected-packages value)))
+(advice-add 'package--save-selected-packages :override #'my-save-selected-packages)
+
+;;
 ;;; straight.
 (defvar straight-core-package-sources
   '((org-elpa :local-repo nil)
@@ -25,11 +162,12 @@
     (super-save :type built-in)
     (posframe :type built-in)
     (restart-emacs :type built-in)
-    (which-key :type built-in)))
+    (which-key :type built-in)
+    (straight :type built-in)))
 
-(defvar lye-core-packages '(straight)
-  "A list of packages that must be installed (and will be auto-installed if
-missing) and shouldn't be deleted.")
+;; (defvar lye-core-packages '(straight)
+;;   "A list of packages that must be installed (and will be auto-installed if
+;; missing) and shouldn't be deleted.")
 
 ;; straight
 (setq straight-base-dir lye-emacs-cache-dir
@@ -46,8 +184,7 @@ missing) and shouldn't be deleted.")
       straight-recipes-emacsmirror-use-mirror t
       straight-process-buffer " *straight-process*" ; hide *straight-process*
       straight-check-for-modifications nil
-      straight-build-dir (concat straight-base-dir "straight/build")
-      straight-dynamic-modules-dir (concat straight-base-dir "dynamic-modules/"))
+      )
 
 (defun lye-ensure-straight ()
   "Ensure `straight' is installed and was compiled with this version of Emacs."
@@ -59,28 +196,32 @@ missing) and shouldn't be deleted.")
                                      "repos" "straight.el" "bootstrap.el"))
          (bootstrap-version 5))
     (lib-f-make-dir straight-build-dir)
-    (lib-f-make-dir straight-dynamic-modules-dir)
-    (lye-add-load-path! straight-dynamic-modules-dir)
-    (unless (featurep 'straight)
-      (unless (or (require 'straight nil t)
-                  (file-readable-p bootstrap-file))
-        (with-current-buffer
-            (url-retrieve-synchronously
-             (format "https://raw.githubusercontent.com/raxod502/straight.el/%s/install.el"
-                     straight-repository-branch)
-             'silent 'inhibit-cookies)
-          (goto-char (point-max))
-          (eval-print-last-sexp)))
-      (load bootstrap-file nil t))))
+    (lib-f-make-dir dynamic-module-dir)
+    (lye-add-load-path! dynamic-module-dir))
+  (require 'straight))
+    ;; (unless (featurep 'straight)
+    ;;   (unless (or (require 'straight nil t)
+    ;;               (file-readable-p bootstrap-file))
+    ;;     (with-current-buffer
+    ;;         (url-retrieve-synchronously
+    ;;          (format "https://raw.githubusercontent.com/raxod502/straight.el/%s/install.el"
+    ;;                  straight-repository-branch)
+    ;;          'silent 'inhibit-cookies)
+    ;;       (goto-char (point-max))
+    ;;       (eval-print-last-sexp)))
+    ;;   (load bootstrap-file nil t))))
 
-(defun straight-initialize-packages (&optional straight-init-notp)
+(defun straight-initialize-packages (&optional force-p)
   "Initialize `package' and `straight',
-If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
-  (unless straight-init-notp
-    (message "Initializing straight...")
-    (unless (fboundp 'straight--reset-caches)
-      (lye-ensure-straight)
-      (require 'straight))
+If FORCE-P are non-nil, do it anyway."
+  (when (or force-p (not (bound-and-true-p package--initialized)))
+    (message "Initializing package.el")
+    (package-initialize))
+  (message "Initializing straight...")
+  (unless (fboundp 'straight--reset-caches)
+    (lib-f-make-dir straight-build-dir)
+    (lye-ensure-straight)
+    (require 'straight)
     ;; (straight--reset-caches)
     ;; (setq straight-recipe-repositories nil
     ;; straight-recipe-overrides nil)
@@ -92,7 +233,8 @@ If STRAIGHT-INIT-NOTP are non-nil, then `straight.el' is not initialized."
     ;;             :branch ,straight-repository-branch
     ;;             :no-byte-compile t))
     (mapc #'straight-use-package lye-build-in-packags)
-    (mapc #'straight-use-package lye-core-packages)))
+    ;; (mapc #'straight-use-package lye-core-packages)
+    ))
 
 (defun switch-to-straight-buffer ()
   "Open the `*straight-process*'."
