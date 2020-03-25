@@ -151,23 +151,30 @@ Return the fastest package archive."
                         :host github
                         :repo "emacs-straight/emacsmirror-mirror")))
 
-(defvar lye-build-in-packags
-  '((org :type built-in)
-    (pyim :type built-in)
-    (async :type built-in)
-    (xr :type built-in)
-    (pyim-basedict :type built-in)
-    (doom-themes :type built-in)
-    (noflet :type built-in)
-    (super-save :type built-in)
-    (posframe :type built-in)
-    (restart-emacs :type built-in)
-    (which-key :type built-in)
-    (straight :type built-in)))
-
-;; (defvar lye-core-packages '(straight)
-;;   "A list of packages that must be installed (and will be auto-installed if
-;; missing) and shouldn't be deleted.")
+(defvar lye-build-in-package '(org
+                                pyim
+                                async
+                                xr
+                                pyim-basedict
+                                noflet
+                                super-save
+                                posframe
+                                restart-emacs
+                                which-key
+                                straight))
+;; (defvar lye-build-in-packags
+;;   '(;(org :type built-in)
+;;     (pyim :type built-in)
+;;     (async :type built-in)
+;;     ;; (xr :type built-in)
+;;     (pyim-basedict :type built-in)
+;;     (doom-themes :type built-in)
+;;     (noflet :type built-in)
+;;     (super-save :type built-in)
+;;     (posframe :type built-in)
+;;     (restart-emacs :type built-in)
+;;     (which-key :type built-in)
+;;     (straight :type built-in)))
 
 ;; straight
 (setq straight-base-dir lye-emacs-cache-dir
@@ -183,8 +190,7 @@ Return the fastest package archive."
       straight-vc-git-default-clone-depth 1
       straight-recipes-emacsmirror-use-mirror t
       straight-process-buffer " *straight-process*" ; hide *straight-process*
-      straight-check-for-modifications nil
-      )
+      straight-check-for-modifications nil)
 
 (defun lye-ensure-straight ()
   "Ensure `straight' is installed and was compiled with this version of Emacs."
@@ -226,13 +232,14 @@ If FORCE-P are non-nil, do it anyway."
     ;; (setq straight-recipe-repositories nil
     ;; straight-recipe-overrides nil)
     (mapc #'straight-use-recipes straight-core-package-sources)
+    (mapc (lambda (pkg) (straight-register-package `(,pkg :type built-in)))
+          lye-build-in-package)
     ;; (straight-register-package
     ;;  `(straight :type git :host github
     ;;             :repo ,(format "%s/straight.el" straight-repository-user)
     ;;             :files ("straight*.el")
     ;;             :branch ,straight-repository-branch
     ;;             :no-byte-compile t))
-    (mapc #'straight-use-package lye-build-in-packags)
     ;; (mapc #'straight-use-package lye-core-packages)
     ))
 
