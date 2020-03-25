@@ -21,5 +21,6 @@
                      ("https://pinecast.com/feed/emacscast" emacscast)
                      ("https://manateelazycat.github.io/feed.xml" lazycat)
                      ("https://www.reddit.com/r/emacs.rss" reddit)))
-(with-eval-after-load 'elfeed
-  (push elfeed-db-directory recentf-exclude))
+(with-eval-after-load 'recentf
+  (with-eval-after-load 'elfeed
+    (push elfeed-db-directory recentf-exclude)))

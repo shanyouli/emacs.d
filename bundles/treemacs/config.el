@@ -17,10 +17,9 @@
       (treemacs-git-mode 'deferred))
     (`(t . _)
       (treemacs-git-mode 'simple)))
-
   (with-eval-after-load 'magit
-    (dolist (h (list magit-post-commit
-                     git-commit-post-finish
-                     magit-post-stage
-                     magit-post-unstage))
+    (dolist (h (list magit-post-commit-hook
+                     git-commit-post-finish-hook
+                     magit-post-stage-hook
+                     magit-post-unstage-hook))
       (add-hook! 'h (treemacs-magit--schedule-update)))))

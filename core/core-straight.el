@@ -137,6 +137,17 @@ Return the fastest package archive."
     (setq package-selected-packages value)))
 (advice-add 'package--save-selected-packages :override #'my-save-selected-packages)
 
+;; On-demand installation of packages
+(defun require-package (package &optional min-version no-refresh)
+  "Ask elpa to install given PACKAGE."
+  (cond
+   ((package-installed-p package min-version)
+    t)
+   ((or (assoc package package-archive-contents) no-refresh)
+    (package-install package))
+   (t
+    (package-refresh-contents)
+    (require-package package min-version t))))
 ;;
 ;;; straight.
 (defvar straight-core-package-sources
@@ -150,20 +161,19 @@ Return the fastest package archive."
     (emacsmirror-mirror :type git
                         :host github
                         :repo "emacs-straight/emacsmirror-mirror")))
-
-(defvar lye-build-in-packags
-  '((org :type built-in)
-    (pyim :type built-in)
-    (async :type built-in)
-    (xr :type built-in)
-    (pyim-basedict :type built-in)
-    (doom-themes :type built-in)
-    (noflet :type built-in)
-    (super-save :type built-in)
-    (posframe :type built-in)
-    (restart-emacs :type built-in)
-    (which-key :type built-in)
-    (straight :type built-in)))
+(defvar lye-builtin-packages '(org
+                                pyim
+                                async
+                                xr
+                                pyim-basedict
+                                doom-themes
+                                noflet
+                                super-save
+                                posframe
+                                restart-emacs
+                                which-key
+                                straight)
+  "Lye-emacs built-in packages.")
 
 ;; (defvar lye-core-packages '(straight)
 ;;   "A list of packages that must be installed (and will be auto-installed if
@@ -211,12 +221,15 @@ Return the fastest package archive."
     ;;       (eval-print-last-sexp)))
     ;;   (load bootstrap-file nil t))))
 
+(with-eval-after-load 'finder-inf
+  (setq straight--cached-built-in-packages nil)
+  (mapc (lambda (x) (unless (assq x package--builtins)
+                 (push `(,x . [nil nil "The package already exists with Lye-Emacs."])
+                       package--builtins)))
+        lye-builtin-packages))
 (defun straight-initialize-packages (&optional force-p)
   "Initialize `package' and `straight',
 If FORCE-P are non-nil, do it anyway."
-  (when (or force-p (not (bound-and-true-p package--initialized)))
-    (message "Initializing package.el")
-    (package-initialize))
   (message "Initializing straight...")
   (unless (fboundp 'straight--reset-caches)
     (lib-f-make-dir straight-build-dir)
@@ -232,10 +245,10 @@ If FORCE-P are non-nil, do it anyway."
     ;;             :files ("straight*.el")
     ;;             :branch ,straight-repository-branch
     ;;             :no-byte-compile t))
-    (mapc #'straight-use-package lye-build-in-packags)
-    ;; (mapc #'straight-use-package lye-core-packages)
+    ;; (mapc #'straight-use-package lye-build-in-packags)
+    (mapc (lambda (p) (straight-register-package `(,p :type built-in)))
+          lye-builtin-packages)
     ))
-
 (defun switch-to-straight-buffer ()
   "Open the `*straight-process*'."
   (interactive)
@@ -243,6 +256,37 @@ If FORCE-P are non-nil, do it anyway."
          (blist (mapcar #'buffer-name (buffer-list))))
     (if (and straight-buffer (member straight-buffer blist))
         (switch-to-buffer straight-buffer))))
+
+(defun straight-use-package-a (orig-fun &rest args)
+  (let ((pkg-sym (car args)))
+    (if (and (symbolp pkg-sym)
+             (memq pkg-sym
+                   (mapcar #'car
+                           (or (bound-and-true-p package-archive-contents)
+                               (progn (package-refresh-contents)
+                                      package-archive-contents))))
+             (ignore-errors (require-package pkg-sym)))
+        (straight-register-package `(pkg-sym :type built-in))
+      (apply orig-fun args))))
+(advice-add #'straight-use-package :around #'straight-use-package-a)
+
+(defvar lye-cache--straight-build-packages nil
+  "Use `straight.el' installed packages.")
+(defun lye-reload--straight-build-packages ()
+  (unless lye-cache--straight-build-packages
+    (setq lye-cache--straight-build-packages
+          (if (file-directory-p straight-build-dir)
+              (mapcar #' intern (directory-files straight-build-dir
+                                                 nil "^[^\\.|\\-]"))))))
+
+(defun package-built-in-p-a (orig-fun &rest args)
+  (let ((pkg (car args)))
+    (lye-reload--straight-build-packages)
+    (if  (memq pkg (bound-and-true-p lye-cache--straight-build-packages))
+        t
+      (apply orig-fun args))))
+(advice-add #'package-built-in-p :around #'package-built-in-p-a)
+
 ;;
 ;;; package! functions
 (eval-when-compile
@@ -315,3 +359,6 @@ Usage:
   (apply #'append (delete nil (delete (list nil) elem))))
 
 (straight-initialize-packages)
+(when (not (bound-and-true-p package--initialized))
+  (message "Initializing package.el")
+  (package-initialize))
