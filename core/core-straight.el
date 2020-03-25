@@ -162,22 +162,18 @@ Return the fastest package archive."
                         :host github
                         :repo "emacs-straight/emacsmirror-mirror")))
 (defvar lye-builtin-packages '(org
-                                pyim
-                                async
-                                xr
-                                pyim-basedict
-                                doom-themes
-                                noflet
-                                super-save
-                                posframe
-                                restart-emacs
-                                which-key
-                                straight)
+                              pyim
+                              async
+                              xr
+                              pyim-basedict
+                              doom-themes
+                              noflet
+                              super-save
+                              posframe
+                              restart-emacs
+                              which-key
+                              straight)
   "Lye-emacs built-in packages.")
-
-;; (defvar lye-core-packages '(straight)
-;;   "A list of packages that must be installed (and will be auto-installed if
-;; missing) and shouldn't be deleted.")
 
 ;; straight
 (setq straight-base-dir lye-emacs-cache-dir
@@ -193,8 +189,7 @@ Return the fastest package archive."
       straight-vc-git-default-clone-depth 1
       straight-recipes-emacsmirror-use-mirror t
       straight-process-buffer " *straight-process*" ; hide *straight-process*
-      straight-check-for-modifications nil
-      )
+      straight-check-for-modifications nil)
 
 (defun lye-ensure-straight ()
   "Ensure `straight' is installed and was compiled with this version of Emacs."
@@ -245,10 +240,9 @@ If FORCE-P are non-nil, do it anyway."
     ;;             :files ("straight*.el")
     ;;             :branch ,straight-repository-branch
     ;;             :no-byte-compile t))
-    ;; (mapc #'straight-use-package lye-build-in-packags)
     (mapc (lambda (p) (straight-register-package `(,p :type built-in)))
-          lye-builtin-packages)
-    ))
+          lye-builtin-packages)))
+
 (defun switch-to-straight-buffer ()
   "Open the `*straight-process*'."
   (interactive)
