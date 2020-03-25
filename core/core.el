@@ -34,6 +34,9 @@
 (defconst lye-etc-dir (concat lye-emacs-dir "etc/")
   "etc dir in `lye-emacs-dir', Must end with a slash.")
 
+(defconst lye-quelpa-recipe-dir (concat lye-etc-dir "quelpa/recipe/")
+  "Custom quelpa-recipe storage directory.")
+
 (defconst lye-emacs-cache-dir (concat lye-emacs-dir ".cache/")
   "Is the cache directory this?")
 
@@ -106,8 +109,23 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 (defconst lye-homepage  "https://github.com/shanyouli/emacs.d"
   "The Github page of My Emacs Configurations.")
 
-(unless (file-directory-p lye-emacs-cache-dir)
-  (make-directory lye-emacs-cache-dir t))
+(defvar dynamic-module  nil "Save dynamic module dir.")
+(defcustom lye-package-dir (concat lye-emacs-dir "pkgs/")
+  "The root directory of Lye-emacs's pkg dirs, Must end with a slash."
+  :type 'directory
+  :set (lambda (symbol value)
+         (set symbol value)
+         (let* ((emacs-v (format "%s.%s" emacs-major-version emacs-minor-version))
+                (package-user-base-name (format "elpa-%s/" emacs-v))
+                (dynamic-base-name "dynamic-modules/")
+                (straight-build-base-name (format "straight-build-%s/" emacs-v)))
+           (setq package-user-dir (lib-f-join value package-user-base-name)
+                 straight-build-dir (lib-f-join value straight-build-base-name)
+                 dynamic-module-dir (lib-f-join value dynamic-base-name))))
+  :group 'lye)
+
+(mapcar (lambda (dir) (unless (file-directory-p dir) (make-directory dir t)))
+        (list lye-emacs-cache-dir lye-package-dir))
 
 (define-error 'lye-error "Error in Lye Emacs core")
 (define-error 'lye-hook-error "Error in a Doom startup hook" 'lye-error)
@@ -119,9 +137,7 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
 (lye-add-load-path! lye-etc-dir t)
-(lye-initialize-base-autoload! lye-core-dir
-                               lye-etc-dir)
-
+(lye-initialize-base-autoload! lye-core-dir lye-etc-dir)
 
 (defun lye-core-initialize ()
   "Load Lye's core files for an interactive session."
