@@ -176,8 +176,7 @@ Return the fastest package archive."
   "Lye-emacs built-in packages.")
 
 ;; straight
-(setq straight-base-dir lye-emacs-cache-dir
-      straight-repository-branch "develop"
+(setq straight-repository-branch "develop"
       straight-cache-autoloads nil  ; use-autoload
       ;; Doom doesn't encourage you to modify packages in place. Disabling this
       ;; makes 'doom refresh' instant (once everything set up), which is much
@@ -229,17 +228,11 @@ If FORCE-P are non-nil, do it anyway."
   (unless (fboundp 'straight--reset-caches)
     (lib-f-make-dir straight-build-dir)
     (lye-ensure-straight)
-    (require 'straight)
-    ;; (straight--reset-caches)
-    ;; (setq straight-recipe-repositories nil
-    ;; straight-recipe-overrides nil)
+    ;; (require 'straight)
+    (straight--reset-caches)
+    (setq straight-recipe-repositories nil
+          straight-recipe-overrides nil)
     (mapc #'straight-use-recipes straight-core-package-sources)
-    ;; (straight-register-package
-    ;;  `(straight :type git :host github
-    ;;             :repo ,(format "%s/straight.el" straight-repository-user)
-    ;;             :files ("straight*.el")
-    ;;             :branch ,straight-repository-branch
-    ;;             :no-byte-compile t))
     (mapc (lambda (p) (straight-register-package `(,p :type built-in)))
           lye-builtin-packages)))
 
@@ -288,19 +281,21 @@ If FORCE-P are non-nil, do it anyway."
   (autoload 'bundle-get-path "bundle" nil t))
 
 (cl-defmacro package!
-    (name &key disabled if commands mode recipe build-in defer with)
+    (name &key disabled if commands mode recipe build-in defer with custom)
   "Install a package-name.
 
 Usage:
-
     (package! NAME
         [:keyword [option]])
+
 :if EXPR     Initialize and load only if EXPR evaluates to a non-nil value.
 :build-in    If noinstall is t, not run (straight-use-package NAME).
 :recipe EXPR when use straight install package, need.
 :commands    Define autoloads for commands that that will be defined by the
              package. This is useful if the package is being lazily loaded.
 :mode EXPR   run (add-to-list 'auto-mode-alist EXPR).
+:custom LIST Run
+:disable t   Do not load package.
 "
   (declare (indent 1))
   (unless disabled
@@ -308,7 +303,8 @@ Usage:
            (bundle with)
            (package-name (symbol-name name))
            (body-lists `,(core-package/concat
-                         (package-keys:install package build-in with)
+                          (package-keys:install package build-in with)
+                          (package-keys:custom custom package-name)
                          (package-keys:commands commands package-name)
                          (package-keys:mode mode package-name)
                          (package-keys:defer defer name))))
@@ -348,6 +344,15 @@ Usage:
       `((run-with-idle-timer
          ,time nil
          (lambda (&rest _) (require ',package nil t)))))))
+
+(defun package-keys:custom (custom package-name)
+  (when custom
+    (cl-mapcan
+     (lambda (alist)
+       `((customize-set-variable ',(nth 0 alist) ,(nth 1 alist)
+                                 ,(format "Customized with `Package!' %s"
+                                          package-name))))
+     (if (listp (car-safe custom)) custom (list custom)))))
 
 (defsubst core-package/concat (&rest elem)
   (apply #'append (delete nil (delete (list nil) elem))))

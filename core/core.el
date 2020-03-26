@@ -118,10 +118,12 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
          (let* ((emacs-v (format "%s.%s" emacs-major-version emacs-minor-version))
                 (package-user-base-name (format "elpa-%s/" emacs-v))
                 (dynamic-base-name "dynamic-modules/")
-                (straight-build-base-name (format "straight-build-%s/" emacs-v)))
+                (straight-build-base-name (format "build-%s/" emacs-v)))
            (setq package-user-dir (lib-f-join value package-user-base-name)
-                 straight-build-dir (lib-f-join value straight-build-base-name)
-                 dynamic-module-dir (lib-f-join value dynamic-base-name))))
+                 straight-base-dir value
+                 straight-build-dir straight-build-base-name
+                 dynamic-module-dir (lib-f-join value dynamic-base-name)
+                 )))
   :group 'lye)
 
 (mapcar (lambda (dir) (unless (file-directory-p dir) (make-directory dir t)))

@@ -14,7 +14,7 @@
   "Data directory on the system."
   :type 'directory)
 
-(defcustom liberime-user-data-dir (lib-f-join lye-emacs-cache-dir "rime/")
+(defcustom liberime-user-data-dir (lib-f-join lye-emacs-cache-dir "pyim/" "rime/")
   "Data directory on the user home directory."
   :type 'directory)
 
