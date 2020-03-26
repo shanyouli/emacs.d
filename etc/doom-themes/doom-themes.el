@@ -30,6 +30,7 @@
 ;;   [X] `doom-challenger-deep' (added by fuxialexnder)
 ;;   [X] `doom-dark+' (added by ema2159)
 ;;   [X] `doom-dracula' (added by fuxialexnder)
+;;   [X] `doom-ephemeral' (added by karetsu)
 ;;   [X] `doom-fairy-floss' (added by ema2159)
 ;;   [X] `doom-gruvbox' (added by JongW)
 ;;   [X] `doom-horizon' (added by karetsu)
@@ -38,6 +39,8 @@
 ;;   [X] `doom-material' (added by tam5)
 ;;   [X] `doom-manegarm' (added by kenranunderscore)
 ;;   [X] `doom-molokai'
+;;   [X] `doom-monokai-classic' (added by ema2159)
+;;   [X] `doom-monokai-pro' (added by kadenbarlow)
 ;;   [X] `doom-moonlight' (added by Brettm12345)
 ;;   [X] `doom-nord' (added by fuxialexnder)
 ;;   [X] `doom-nord-light' (added by fuxialexnder)
@@ -48,6 +51,7 @@
 ;;   [X] `doom-outrun' (added by ema2159)
 ;;   [X] `doom-palenight' (added by Brettm12345)
 ;;   [X] `doom-peacock' (added by teesloane)
+;;   [X] `doom-rouge' (added by JordanFaust)
 ;;   [X] `doom-snazzy' (added by ar1a)
 ;;   [X] `doom-solarized-dark' (added by ema2159)
 ;;   [X] `doom-solarized-light' (added by fuxialexnder)
@@ -402,6 +406,12 @@ theme face specs. These is a simplified spec. For example:
        (provide-theme ',name))))
 
 ;;;###autoload
+;; (when (and (boundp 'custom-theme-load-path) load-file-name)
+;;   (let* ((base (file-name-directory load-file-name))
+;;          (dir (expand-file-name "themes/" base)))
+;;     (add-to-list 'custom-theme-load-path
+;;                  (or (and (file-directory-p dir) dir)
+;;                      base))))
 (when (and (boundp 'custom-theme-load-path) load-file-name)
   (let* ((base (file-name-directory load-file-name))
          (dir (expand-file-name "themes/" base)))
