@@ -161,6 +161,7 @@ Return the fastest package archive."
     (emacsmirror-mirror :type git
                         :host github
                         :repo "emacs-straight/emacsmirror-mirror")))
+
 (defvar lye-builtin-packages '(org
                               pyim
                               async
@@ -190,46 +191,14 @@ Return the fastest package archive."
       straight-process-buffer " *straight-process*" ; hide *straight-process*
       straight-check-for-modifications nil)
 
-(defun lye-ensure-straight ()
-  "Ensure `straight' is installed and was compiled with this version of Emacs."
-  (defvar bootstrap-version)
-  (let* (;; Force straight to install into ~/.emacs.d/package/straight instead of
-         ;; ~/.emacs.d/straight by pretending `lye-emacs-package-dir' is our .emacs.d.
-         (user-emacs-directory straight-base-dir)
-         (bootstrap-file (lib-f-join straight-base-dir "straight"
-                                     "repos" "straight.el" "bootstrap.el"))
-         (bootstrap-version 5))
-    (lib-f-make-dir straight-build-dir)
-    (lib-f-make-dir dynamic-module-dir)
-    (lye-add-load-path! dynamic-module-dir))
-  (require 'straight))
-    ;; (unless (featurep 'straight)
-    ;;   (unless (or (require 'straight nil t)
-    ;;               (file-readable-p bootstrap-file))
-    ;;     (with-current-buffer
-    ;;         (url-retrieve-synchronously
-    ;;          (format "https://raw.githubusercontent.com/raxod502/straight.el/%s/install.el"
-    ;;                  straight-repository-branch)
-    ;;          'silent 'inhibit-cookies)
-    ;;       (goto-char (point-max))
-    ;;       (eval-print-last-sexp)))
-    ;;   (load bootstrap-file nil t))))
-
-(with-eval-after-load 'finder-inf
-  (setq straight--cached-built-in-packages nil)
-  (mapc (lambda (x) (unless (assq x package--builtins)
-                 (push `(,x . [nil nil "The package already exists with Lye-Emacs."])
-                       package--builtins)))
-        lye-builtin-packages))
 (defun straight-initialize-packages (&optional force-p)
   "Initialize `package' and `straight',
 If FORCE-P are non-nil, do it anyway."
   (message "Initializing straight...")
   (unless (fboundp 'straight--reset-caches)
-    (lib-f-make-dir straight-build-dir)
-    (lye-ensure-straight)
-    ;; (require 'straight)
-    (straight--reset-caches)
+    ;; "Ensure `straight' is installed and was compiled with this version of Emacs."
+    (require 'straight)
+    ;; (straight--reset-caches)
     (setq straight-recipe-repositories nil
           straight-recipe-overrides nil)
     (mapc #'straight-use-recipes straight-core-package-sources)
@@ -269,7 +238,8 @@ If FORCE-P are non-nil, do it anyway."
 (defun package-built-in-p-a (orig-fun &rest args)
   (let ((pkg (car args)))
     (lye-reload--straight-build-packages)
-    (if  (memq pkg (bound-and-true-p lye-cache--straight-build-packages))
+    (if (or (memq pkg (bound-and-true-p lye-cache--straight-build-packages))
+            (memq pkg (bound-and-true-p lye-builtin-packages)))
         t
       (apply orig-fun args))))
 (advice-add #'package-built-in-p :around #'package-built-in-p-a)

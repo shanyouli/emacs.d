@@ -55,8 +55,9 @@
 (if (bundle-active-p 'pyim)
     (lib-keys "<f9>" 'lye/toggle-input-method
               "C-<f9>" 'bundle-pyim-punctuation-toggle))
-(when (bundle-active-p 'prime)
-  (lib-key "C-`" 'rime-send-keybinding rime-mode-map))
+(when (bundle-active-p 'rime)
+  (with-eval-after-load 'rime
+    (lib-key "C-`" 'rime-send-keybinding rime-mode-map)))
 
 ;; ivy-bundle
 (lib-keys "C-s" 'swiper-isearch

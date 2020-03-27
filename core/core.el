@@ -126,8 +126,8 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
                  )))
   :group 'lye)
 
-(mapcar (lambda (dir) (unless (file-directory-p dir) (make-directory dir t)))
-        (list lye-emacs-cache-dir lye-package-dir))
+(mapc (lambda (dir) (unless (file-directory-p dir) (make-directory dir t)))
+      (list lye-emacs-cache-dir lye-package-dir dynamic-module-dir))
 
 (define-error 'lye-error "Error in Lye Emacs core")
 (define-error 'lye-hook-error "Error in a Doom startup hook" 'lye-error)
@@ -139,6 +139,7 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 ;; This is consulted on every `require', `load' and various path/io functions.
 ;; You get a minor speed up by nooping this.
 (lye-add-load-path! lye-etc-dir t)
+(lye-add-load-path! dynamic-module-dir)
 (lye-initialize-base-autoload! lye-core-dir lye-etc-dir)
 
 (defun lye-core-initialize ()

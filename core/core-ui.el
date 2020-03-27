@@ -207,6 +207,10 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
         (pcase lye-default-theme
           ((pred listp) (core-ui::switch-themes))
           ((pred symbolp) (load-theme lye-default-theme t)))))))
+
+(setq lye-theme-use-list
+      (cl-remove-if-not (lambda (x) (string-prefix-p "doom-" (symbol-name x)))
+                        (custom-available-themes)))
 (setq lye-default-theme
       '((doom-one doom-molokai) (30.91  113.92)))
 ;;
