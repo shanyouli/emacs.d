@@ -4,7 +4,8 @@
             :host github
             :repo "manateelazycat/snails"
             :files (:defaults "*.sh" "*.el")
-            :no-byte-compile t)
+            :no-byte-compile t
+            :no-autoloads t)
   :commands snails)
 
 (package! snails-backend-themes :recipe (:type git

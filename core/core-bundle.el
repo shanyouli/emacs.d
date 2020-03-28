@@ -26,7 +26,7 @@
 
 (bundle! elisp :defer t)
 
-;; (bundle! snails :defer t)
+(bundle! snails :defer t)
 (bundle! ivy)
 
 (bundle! rss :menu elfeed-hydra/body)

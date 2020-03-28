@@ -144,7 +144,8 @@ Return the fastest package archive."
    ((package-installed-p package min-version)
     t)
    ((or (assoc package package-archive-contents) no-refresh)
-    (package-install package))
+    (or (package-install package)
+        (package-installed-p package min-version)))
    (t
     (package-refresh-contents)
     (require-package package min-version t))))
@@ -191,38 +192,38 @@ Return the fastest package archive."
       straight-process-buffer " *straight-process*" ; hide *straight-process*
       straight-check-for-modifications nil)
 
-(defun straight-initialize-packages (&optional force-p)
+(defvar lye-packages--list nil)
+(defun lye-initialize-packages (&optional force-p)
   "Initialize `package' and `straight',
 If FORCE-P are non-nil, do it anyway."
-  (message "Initializing straight...")
-  (unless (fboundp 'straight--reset-caches)
+  (when (or force-p (not (fboundp 'straight--reset-caches)))
+    (message "Initializing straight...")
     ;; "Ensure `straight' is installed and was compiled with this version of Emacs."
     (require 'straight)
-    ;; (straight--reset-caches)
+    (straight--reset-caches)
     (setq straight-recipe-repositories nil
           straight-recipe-overrides nil)
     (mapc #'straight-use-recipes straight-core-package-sources)
     (mapc (lambda (p) (straight-register-package `(,p :type built-in)))
-          lye-builtin-packages)))
+          lye-builtin-packages))
+  (when (or force-p (not (bound-and-true-p package--initialized)))
+    (message "Initializing package.el")
+    (package-initialize)
+    (unless (bound-and-true-p package-archive-contents)
+      (package-refresh-contents))
+    (setq lye-packages--list (mapcar #'car package-archive-contents))))
 
 (defun switch-to-straight-buffer ()
   "Open the `*straight-process*'."
   (interactive)
-  (let* ((straight-buffer straight-process-buffer)
-         (blist (mapcar #'buffer-name (buffer-list))))
-    (if (and straight-buffer (member straight-buffer blist))
-        (switch-to-buffer straight-buffer))))
+  (switch-to-buffer straight-process-buffer))
 
 (defun straight-use-package-a (orig-fun &rest args)
   (let ((pkg-sym (car args)))
     (if (and (symbolp pkg-sym)
-             (memq pkg-sym
-                   (mapcar #'car
-                           (or (bound-and-true-p package-archive-contents)
-                               (progn (package-refresh-contents)
-                                      package-archive-contents))))
+             (memq pkg-sym lye-packages--list)
              (ignore-errors (require-package pkg-sym)))
-        (straight-register-package `(pkg-sym :type built-in))
+        (straight-register-package `(,pkg-sym :type built-in))
       (apply orig-fun args))))
 (advice-add #'straight-use-package :around #'straight-use-package-a)
 
@@ -238,8 +239,8 @@ If FORCE-P are non-nil, do it anyway."
 (defun package-built-in-p-a (orig-fun &rest args)
   (let ((pkg (car args)))
     (lye-reload--straight-build-packages)
-    (if (or (memq pkg (bound-and-true-p lye-cache--straight-build-packages))
-            (memq pkg (bound-and-true-p lye-builtin-packages)))
+    (if (or (memq pkg lye-cache--straight-build-packages)
+            (memq pkg lye-builtin-packages))
         t
       (apply orig-fun args))))
 (advice-add #'package-built-in-p :around #'package-built-in-p-a)
@@ -327,7 +328,4 @@ Usage:
 (defsubst core-package/concat (&rest elem)
   (apply #'append (delete nil (delete (list nil) elem))))
 
-(straight-initialize-packages)
-(when (not (bound-and-true-p package--initialized))
-  (message "Initializing package.el")
-  (package-initialize))
+(lye-initialize-packages)

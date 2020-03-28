@@ -132,9 +132,9 @@
            yas-minor-mode-map
            (require 'ivy-yasnippet nil t)))
 ;;  or snails-bundle
-;; (lib-keys "C-x b" 'snails
-;;           "C-c c t" 'snails-load-theme
-;;           :filter (and (not IS-WINDOWS) (display-graphic-p)))
+(lib-keys "C-x b" 'snails
+          "C-c c t" 'snails-load-theme
+          :filter (and (not IS-WINDOWS) (display-graphic-p)))
 (lib-keys :map snails-mode-map
           :package snails
   "<up>" 'snails-select-prev-item
