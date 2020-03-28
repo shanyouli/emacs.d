@@ -29,9 +29,5 @@
        ;; Is not magit buffer.
        (and (string-prefix-p "magit" name)
             (not (file-name-extension name))))))
-
-  (defun lye/refresh-awesome-tab-mode+ ()
-    "Refresh `awesome-tab-mode', especially after replacing themes."
-    (when (awesome-tab-mode-on-p)
-      (awesome-tab-mode -1)
-      (awesome-tab-mode +1))))
+  (setq awesome-tab-height 120)
+  (setq awesome-tab-label-fixed-length 20))
