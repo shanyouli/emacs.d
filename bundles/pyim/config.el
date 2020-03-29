@@ -21,11 +21,12 @@
     (setq pyim-page-tooltip 'minibuffer
           pyim-page-style 'one-line))
   (setq pyim-default-scheme 'quanpin)
-  (pcase lye-use-pyim-dictionary
-    ('base (pyim-basedict-enable))
-    ('big (pyim-bigdict-enable))
-    ('librime (lye-load! "liberime" nil t t)
-              (pyim-liberime-enable))))
+    (pyim-basedict-enable))
+  ;; (pcase lye-use-pyim-dictionary
+  ;;   ('base (pyim-basedict-enable))
+  ;;   ('big (pyim-bigdict-enable))
+  ;;   ('librime (lye-load! "liberime" nil t t)
+  ;;             (pyim-liberime-enable))))
 
 (defun bundle-pyim-punctuation-toggle ()
   (interactive)
@@ -45,8 +46,9 @@
   "Toggle-input method"
   (unless (featurep 'pyim) (require 'pyim nil t)))
 
-(defun lye/toggle-input-method ()
-  "Toggle-input method"
-  (interactive)
-  (lye//require-pyim)
-  (toggle-input-method))
+(defun toggle-input-method-pyim-a (orign &rest args)
+  (if (string= default-input-method "pyim")
+      (require 'pyim))
+  (advice-remove #'toggle-input-method #'toggle-input-method-pyim-a))
+
+(advice-add #'toggle-input-method :before #'toggle-input-method-pyim-a)

@@ -4,5 +4,6 @@
 
 (pcase lye-use-modeline
   ('doom (lye-load! "doom-modeline" nil t t))
-  ('awetray (lye-load! "awesome-tray" nil t t)
-            (lye-load! "awesome-tab" nil t t)))
+  ('awetray (lye-load! "awesome-tray" nil t t)))
+
+ (lye-load! "awesome-tab" nil t t)

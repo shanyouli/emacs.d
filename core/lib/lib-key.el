@@ -25,8 +25,6 @@
 ;; see @http://caiorss.github.io/Emacs-Elisp-Programming/Elisp_Programming.html#sec-6-1-2
 
 ;;; dependences
-
-(require 'lib-var)
 (declare-function which-key-add-key-based-replacements 'which-key)
 
 ;;; Code:
@@ -111,7 +109,8 @@ FROM: https://github.com/jwiegley/use-package/blob/master/bind-key.el."
 ARGS 可以存在的 key 有 prefix, keymaps, autoload. package
 
 :PREFIX         后接一个 string 的 key.
-:KEYMAP or :map 后接一个 keymap 默认为 `(current-global-map)'.
+:KEYMAP or :map 后接一个 keymap 默认为 `global-map' or (package map).
+                PACKAGE 为 MA 所在文件名
 :AUTOLOAD       后接一个文件名, 如 :autoload \"test\", 将被展开为 (autoload def \"test\").
 :package        主要用于设置 keymap 且非 global-map 后, 快捷键在 keymap
                 对应文件加载后生效.避免报错.
@@ -129,14 +128,14 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
         (dosctring (or doc (symbol-name name))))
     `(defmacro ,name (&rest args)
        ,dosctring
-       ;; (declare (indent defun))
+       (declare (indent defun))
        (macroexp-progn (lib-key--form args ,prefix)))))
 
 (defun lib-key--form (args &optional prefix)
   "Bind multiple keys at once.
 :map MAP          - a keymap into which the keybindings should be added
 :prefix KEY       - when keybinding is a string. As a prefix key.
-:package PACKAGE  - From PACKAGE map as.
+:package PACKAGE  - From PACKAGE function as.
 :autoload FILE    - From PACKAGE function as.
 :filter FORM      - optional for to determine when bindings apply"
   (let* (map doc pkg kv-list filter file)
@@ -144,12 +143,12 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
     (let ((map-alist (or (assoc :map kv-list) (assoc :keymap kv-list))))
       (when map-alist
         (setq map (cadr map-alist)
-              kv-list (delete map-alist kv-list))))
-    (let ((pkg-alist (assoc :package kv-list)))
-      (if pkg-alist
-          (setq pkg (cadr pkg-alist)
-                kv-list (delete pkg-alist kv-list))))
-    (let ((file-alist (assoc :autoload kv-list)))
+              kv-list (delete map-alist kv-list))
+        (when (listp map)
+          (setq pkg (car map)
+                map (cdr map)))))
+    (let ((file-alist (or (assoc :package kv-list )
+                          (assoc :autoload kv-list))))
       (if file-alist
           (setq file (cadr file-alist)
                 kv-list (delete file-alist kv-list))))

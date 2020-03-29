@@ -52,10 +52,11 @@
 (lib-key "C-c y" 'lye/dict-point)
 
 ;; pyim-bundle
-(if (bundle-active-p 'pyim)
-    (lib-keys "<f9>" 'lye/toggle-input-method
-              "C-<f9>" 'bundle-pyim-punctuation-toggle))
-(when (bundle-active-p 'rime)
+(lib-key "<XF86Tools>" 'toggle-input-method)
+(with-after-bundle 'pyim
+    (lib-key "C-`" 'bundle-pyim-punctuation-toggle))
+
+(with-after-bundle 'rime
   (with-eval-after-load 'rime
     (lib-key "C-`" 'rime-send-keybinding rime-mode-map)))
 
@@ -104,50 +105,45 @@
           "C-c c w" 'counsel-colors-web
           "C-c c v" 'counsel-set-variable
           "C-c c z" 'counsel-fzf)
-(lib-keys :map counsel-mode-map
-          :package counsel
+(lib-keys :map (counsel . counsel-mode-map)
           [remap swiper]          'counsel-grep-or-swiper
           [remap swiper-backward] 'counsel-gre-or-swiper-backward
           [remap dired]           'counsel-dired
           [remap set-variable]    'counsel-set-variable
           [remap insert-char]     'counsel-unicode-char)
-(lib-keys :map counsel-find-file-map
-          :package counsel
+(lib-keys :map (counsel . counsel-find-file-map)
           "C-h" 'counsel-up-directory)
-(lib-keys :map counsel-ag-map
-          :package counsel
+(lib-keys :map (counsel . counsel-ag-map)
           "<C-return>" 'my-swiper-toggle-counsel-rg)
-(lib-keys :map swiper-map
-          :package swiper
+(lib-keys :map (swiper . swiper-map)
   [escape] 'minibuffer-keyboard-quit
   "M-s" 'swiper-isearch-toggle
   "M-%" 'swiper-query-replace)
-(lib-keys :map ivy-minibuffer-map
-          :package ivy
+(lib-keys :map (ivy . ivy-minibuffer-map)
   "<C-return>" 'ivy-immediate-done
   [escape] 'minibuffer-keyboard-quit
   "C-w" 'ivy-yank-word)
+
 (with-eval-after-load 'yasnippet
   (lib-key "C-c i y" 'ivy-yasnippet
            yas-minor-mode-map
            (require 'ivy-yasnippet nil t)))
 ;;  or snails-bundle
-(lib-keys "C-x b" 'snails
-          "C-c c t" 'snails-load-theme
-          :filter (and (not IS-WINDOWS) (display-graphic-p)))
-(lib-keys :map snails-mode-map
-          :package snails
-  "<up>" 'snails-select-prev-item
-  "<down>" 'snails-select-next-item
-  "<left>" 'snails-select-prev-backend
-  "<right>" 'snails-select-next-backend)
+(with-after-bundle snails
+  (lib-keys "C-x b" 'snails
+            "C-c c t" 'snails-load-theme
+            :filter (and (not IS-WINDOWS) (display-graphic-p)))
+  (lib-keys :map (snails . snails-mode-map)
+    "<up>" 'snails-select-prev-item
+    "<down>" 'snails-select-next-item
+    "<left>" 'snails-select-prev-backend
+    "<right>" 'snails-select-next-backend))
 
 ;; Rss-bundles
 (lib-keys "C-x W" 'newsticker-show-news
           "C-x w" 'elfeed)
 (lib-keys "?" 'elfeed-hydra/body
-          :map elfeed-search-mode-map
-          :package 'elfeed)
+          :map (elfeed . elfeed-search-mode-map))
 (lib-keys "q" 'delete-window
           "o" (lambda ()
                 (interactive)
@@ -158,8 +154,7 @@
                   (call-interactively 'ace-link))
                  (t
                   (message "not work, please install `link-hiint' or `ace-link'"))))
-          :map elfeed-show-mode-map
-          :package 'elfeed)
+          :map (elfeed . elfeed-show-mode-map))
 
 
 ;; company-bundle
@@ -178,8 +173,7 @@
     (lib-key-unset company-active-map (format "M-%d" i))))
 
 ;; dired-bundle
-(lib-keys :map dired-mode-map
-          :package dired
+(lib-keys :map (dired . dired-mode-map)
   "C-c C-p" 'wdired-change-to-wdired-mode
   ")" 'dired-git-info-mode
   "C-c C-r" 'dired-rsync
@@ -191,8 +185,7 @@
         (bundle-active-p 'hydra))))
 
 ;; mode-bundle
-(lib-keys :map markdown-mode-map
-          :package markdown-mode
+(lib-keys :map (markdonw-mode . markdown-mode-map)
           :filter (executable-find "markdownfmt")
   "C-c f" 'markdownfmt-format-buffer)
 
@@ -213,8 +206,7 @@
 (with-eval-after-load 'treemacs
   (lib-keys "C-x 1" 'treemacs-delete-other-windows
             "C-x t 1" 'treemacs-delete-other-windows)
-  (lib-keys :map projectile-command-map
-            :package projectile
+  (lib-keys :map (projectile . projectile-command-map)
     "h" 'treemacs-projectile))
 
 ;; Git-bundle
@@ -234,8 +226,7 @@
 (lib-key "<f5>" 'shell-pop)
 (syl-key "pi" 'org-cliplink
          :autoload "org-cliplink"
-         :map org-mode-map
-         :package org)
+         :map (org . org-mode-map))
 
 ;; window-bundle
 (lib-keys "C-h z" 'shackle-last-popup-buffer
@@ -271,11 +262,10 @@
 (lib-keys [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
           [remap xref-find-references] 'lsp-ui-peek-find-references
           "C-c u" 'lsp-ui-imenu
-          :map lsp-ui-mode-map
-          :package lsp-ui)
+          :map (lsp-ui . lsp-ui-mode-map))
 
 ;; elisp-bundles
-(lib-keys :map emacs-lisp-mode-map
+(lib-keys :map (elisp-mode . emacs-lisp-mode-map)
           :prefix "C-c"
   "C-x" 'ielm
   "C-c" 'eval-defun

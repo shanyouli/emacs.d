@@ -175,7 +175,8 @@ Return the fastest package archive."
                               posframe
                               restart-emacs
                               which-key
-                              straight)
+                              straight
+                              lv)
   "Lye-emacs built-in packages.")
 
 ;; straight

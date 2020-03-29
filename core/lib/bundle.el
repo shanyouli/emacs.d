@@ -109,5 +109,16 @@ Usage:
                (bundle-keys:config defer commands bundle-dir)
                (bundle-keys:menu menu bundle-dir)))))))))
 
+;;;###autoload
+(defmacro with-after-bundle (bundle &rest body)
+  "When the bundle is started, executed body."
+  (declare (indent 1) (debug t))
+  `(eval-after-load
+       ,(concat (bundle-get-path (if (cdr-safe bundle)
+                                     (cadr bundle)
+                                   bundle))
+                "package.el")
+     (lambda () ,@body)))
+
 (provide 'bundle)
 ;;; bundle.el ends here

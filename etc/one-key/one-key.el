@@ -364,7 +364,7 @@ If nil, it is calculated by `window-width'."
   :group 'one-key)
 
 (defface one-key-keystroke
-  '((t (:foreground "DarkRed")))
+  '((t (:foreground "magenta")))
   "Face for highlighting keystroke."
   :group 'one-key)
 
@@ -460,15 +460,21 @@ Argument INFO-ALIST is help information as format ((key . describe) . command)."
         (with-current-buffer one-key-buffer-name
           (scroll-down 1)))))
 
+(defun one-key--iterms-per-line (inf-max-length)
+  (or one-key-items-per-line
+      (if (eq one-key-hint-display-type 'buffer)
+          (floor (/ (- (window-width) 3)
+                    (+ inf-max-length 4)))
+        (floor (/ (- (frame-text-cols) 3)
+                  (+ inf-max-length 4))))))
+
 (defun one-key-help-format (info-alist)
   "Format `one-key' help information.
 Argument INFO-ALIST is help information as format ((key . describe) . command)."
   (let* ((max-length (loop for ((key . desc) . command) in info-alist
                            maximize (+ (string-width key) (string-width desc))))
          (current-length 0)
-         (items-per-line (or one-key-items-per-line
-                             (floor (/ (- (window-width) 3)
-                                       (+ max-length 4)))))
+         (items-per-line (one-key--iterms-per-line max-length))
          keystroke-msg)
     (loop for ((key . desc) . command) in info-alist
           for counter from 1  do
@@ -545,8 +551,6 @@ last command when it miss match in key alist."
     ;; and option `one-key-popup-window' is `non-nil'.
     (when (and one-key-menu-call-first-time
                one-key-popup-window)
-      ;; (one-key-help-window-toggle title info-alist)
-      ;; (one-key-help-lv-open  title info-alist)
       (if (eq one-key-hint-display-alist 'buffer)
           (one-key-help-window-toggle title info-alist)
         (funcall (nth 1 (assoc one-key-hint-display-type
@@ -582,9 +586,8 @@ last command when it miss match in key alist."
                     ;; Call function when match keystroke.
                     (when (one-key-match-keystroke key match-key)
                       ;; Close help window first.
-                      ;; (one-key-help-window-close)
-                      (funcall (nth 2 (assoc one-key-hint-display-type one-key-hint-display-alist)))
-                      ;; (one-key-help-lv-close)
+                      (funcall (nth 2 (assoc one-key-hint-display-type
+                                             one-key-hint-display-alist)))
                       ;; Set `one-key-menu-call-first-time' with "t" for recursion execute.
                       (setq one-key-menu-call-first-time t)
                       ;; Execute.
@@ -598,7 +601,8 @@ last command when it miss match in key alist."
            ;; Match build-in keystroke.
            ((one-key-match-keystroke key "q")
             ;; quit
-            (one-key-help-lv-close)
+            (funcall (nth 2 (assoc one-key-hint-display-type
+                                   one-key-hint-display-alist)))
             (keyboard-quit))
            ((one-key-match-keystroke key "?")
             ;; toggle help window

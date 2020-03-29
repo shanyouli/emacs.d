@@ -9,8 +9,10 @@
 (defcustom lye-frame-height-scale nil
   "The height of window screen ratio accounted for emacs-frame."
   :type 'float)
+
 (defcustom lye-frame-width-scale nil
   "The Wedth of window screen ratio accounted for emacs-frame.")
+
 (defcustom lye-frame-use-fullframe (not IS-WINDOWS)
   "是否启动全屏。" :type 'boolean)
 
@@ -49,16 +51,6 @@ or
 ;;
 ;;; Frame size
 ;; FIX: see https://github.com/syl20bnr/spacemacs/issues/4365#issuecomment-202812771
-;; 获得整 个frame 大致的行数，和列数
-(defun lye-get-columns-in-the-entire-frame ()
-  (if (display-graphic-p)
-      (let ((edges (frame-edges)))
-        (truncate (/ (- (nth 2 edges) (nth 0 edges)) (default-font-width))))))
-
-(defun lye-get-lines-in-the-entire-frame ()
-  (if (display-graphic-p)
-      (let ((edges (frame-edges)))
-        (truncate (/ (- (nth 3 edges) (nth 1 edges)) (default-font-height))))))
 (defun fullscreen-toggle ()
   "Toggle fullscreen status."
   (interactive)
@@ -270,7 +262,7 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
   "当文件的列宽 <86 或者文件的 Major－mode 为 org－mode 且行数大于 1000,
 不显示行号。"
   (if (and (or (not (display-graphic-p))
-               (> (lye-get-columns-in-the-entire-frame) 86))
+               (> (window-width) 86))
            (or (not (eq major-mode 'org-mode))
                (< (line-number-at-pos (point-max) 1000))))
       (display-line-numbers-mode +1)
