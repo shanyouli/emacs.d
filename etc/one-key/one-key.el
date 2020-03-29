@@ -224,6 +224,7 @@
 ;;   * syl:
 ;;       * Using the `one-key-highlight-key' `one-key-highlight' substituted Function
 ;;       * Fix the bug when `one-key-hint-display-type' is lv, `?' not work
+;;       * add `one-key-lv-toggle', adjust `one-key-help-window*' function
 ;; 2020/03/28
 ;;   * syl:
 ;;       * Remove `one-key-insert-template' function
@@ -352,8 +353,14 @@ If nil, it is calculated by `window-width'."
   :group 'one-key)
 
 (defvar one-key-hint-display-alist
-  (list (list 'lv #'lv-message #'lv-delete-window)
-        (list 'buffer #'one-key-help-window-toggle #'one-key-help-window-close)))
+  (list (list 'lv
+              #'lv-message
+              #'lv-delete-window
+              #'one-key-lv-toggle)
+        (list 'buffer
+              #'one-key-help-window-open
+              #'one-key-help-window-close
+              #'one-key-help-window-toggle)))
 
 (defcustom one-key-hint-display-type 'lv
   "The utility to show hydra hint."
@@ -385,39 +392,35 @@ If nil, it is calculated by `window-width'."
 (defvar one-key-menu-call-first-time t
   "The first time call function `one-key-menu'.")
 
-;;; help-windows
+;;; lv-toggle
+(defun one-key-lv-toggle (format-string &rest args)
+  "Lv toggle"
+  (if (window-live-p lv-wnd)
+      (lv-delete-window)
+    (apply #'lv-message format-string args)))
 
+;;; help-windows
 (defun one-key-help-window-exist-p ()
   "Return `non-nil' if `one-key' help window exist.
 Otherwise, return nil."
   (and (get-buffer one-key-buffer-name)
        (window-live-p (get-buffer-window (get-buffer one-key-buffer-name)))))
 
-(defun one-key-help-window-toggle (title info-alist)
-  "Toggle the help window.
-Argument TITLE is title name for help information.
-Argument INFO-ALIST is help information as format ((key . describe) . command)."
-  (if (one-key-help-window-exist-p)
-      ;; Close help window.
-      (one-key-help-window-close)
-    ;; Open help window.
-    (one-key-help-window-open title info-alist)))
+(defun one-key-help-window-toggle (format-string &rest args)
+  "Toggle the help window."
+    (if (one-key-help-window-exist-p)
+        (one-key-help-window-close)
+      (apply #'one-key-help-window-open format-string args)))
 
-(defun one-key-help-window-open (title info-alist)
-  "Open the help window.
-Argument TITLE is title name for help information.
-Argument INFO-ALIST is help information as format ((key . describe) . command)."
-  ;; Save current window configuration.
+(defun one-key-help-window-open (format-string &rest args)
+  "Open the help window.and Display (`format' FORMAT-STRING ARGS)."
   (or one-key-help-window-configuration
       (setq one-key-help-window-configuration (current-window-configuration)))
-  ;; Generate buffer information.
-  (unless (get-buffer one-key-buffer-name)
-    (with-current-buffer (get-buffer-create one-key-buffer-name)
-      (goto-char (point-min))
-      (save-excursion
-        (insert (one-key-highlight-help
-                 title
-                 (one-key-help-format info-alist))))))
+  (let ((str (apply #'format format-string args)))
+    (unless (get-buffer one-key-buffer-name)
+      (with-current-buffer (get-buffer-create one-key-buffer-name)
+        (goto-char (point-min))
+        (save-excursion (insert str)))))
   ;; Pop `one-key' buffer.
   (pop-to-buffer one-key-buffer-name)
   (set-buffer one-key-buffer-name)
@@ -472,14 +475,15 @@ Argument INFO-ALIST is help information as format ((key . describe) . command)."
                     (+ inf-max-length 4)))
         (floor (/ (- (frame-text-cols) 3)
                   (+ inf-max-length 4))))))
+
 (defun one-key-help-format (info-alist)
   "Format `one-key' help information.
 Argument INFO-ALIST is help information as format ((key . describe) . command)."
   (setq info-alist (append info-alist
                            '((("?" . "Toggle-help") . nil)
                              (("q" . "quit") . nil ))))
-  (let* ((max-length (loop for ((key . desc) . command) in info-alist
-                           maximize (+ (string-width key) (string-width desc))))
+  (let* ((max-length (cl-loop for ((key . desc) . command) in info-alist
+                              maximize (+ (string-width key) (string-width desc))))
          (current-length 0)
          (items-per-line (one-key--iterms-per-line max-length))
          keystroke-msg)
@@ -499,16 +503,12 @@ Argument INFO-ALIST is help information as format ((key . describe) . command)."
   (concat "["
           (propertize (format "%s" key) 'face '(one-key-keystroke-face))
           "]"))
-(defun one-key-highlight-menu (title)
-  (concat "<"
-          (propertize title 'face '(one-key-title-face))
-          ">"))
 
 (defun one-key-highlight-help (title keystroke)
   "Highlight TITLE help information with KEYSTROKE."
-  (setq title (format "The list of %s Keystrokes.\n"
-                      (one-key-highlight-menu title)))
-  (concat title keystroke))
+  (concat (format "The list of <%s> Keystrokes.\n"
+                  (propertize title 'face '(one-key-title-face)))
+          (one-key-help-format keystroke)))
 
 (defun one-key-menu (title
                      info-alist
@@ -532,10 +532,11 @@ that call in `unwind-protect'.
 `ALTERNATE-FUNCTION' the alternate function execute at last.
 `EXECUTE-LAST-COMMAND-WHEN-MISS-MATCH' whether execute
 last command when it miss match in key alist."
-  (let ((self (function
+  (let* ((def-info-alist info-alist)
+         (self (function
                (lambda ()
                  (one-key-menu
-                  title info-alist miss-match-exit-p
+                  title def-info-alist miss-match-exit-p
                   recursion-p
                   protect-function
                   alternate-function
@@ -545,13 +546,10 @@ last command when it miss match in key alist."
     ;; and option `one-key-popup-window' is `non-nil'.
     (when (and one-key-menu-call-first-time
                one-key-popup-window)
-      (if (eq one-key-hint-display-type 'buffer)
-          (one-key-help-window-toggle title info-alist)
-        (funcall (nth 1 (assoc one-key-hint-display-type
-                               one-key-hint-display-alist))
-                 (eval (one-key-highlight-help
-                        title
-                        (one-key-help-format info-alist))))))
+      (funcall (nth 1 (assoc one-key-hint-display-type
+                             one-key-hint-display-alist))
+               (eval (one-key-highlight-help title info-alist))))
+    ;; )
     ;; Execute.
     (unwind-protect
         (let* ((event (read-event
@@ -598,16 +596,10 @@ last command when it miss match in key alist."
             (keyboard-quit))
            ((one-key-match-keystroke key "?")
             ;; toggle help window
-            (cond ((eq one-key-hint-display-type 'buffer)
-                   (one-key-help-window-toggle title info-alist))
-                  ((eq one-key-hint-display-type 'lv)
-                   (if (window-live-p lv-wnd)
-                       (lv-delete-window)
-                     (funcall (nth 1 (assoc one-key-hint-display-type
+            (funcall (nth 3 (assoc one-key-hint-display-type
                                             one-key-hint-display-alist))
-                              (eval (one-key-highlight-help
-                                     title
-                                     (one-key-help-format info-alist)))))))
+                     (eval (one-key-highlight-help
+                            title info-alist)))
             (funcall self))
            ((one-key-match-keystroke key "C-n")
             ;; scroll up one line
@@ -630,7 +622,6 @@ last command when it miss match in key alist."
            ;; Not match any keystrokes.
            (t
             ;; Close help window first.
-            ;; (one-key-help-window-close)
             (funcall (nth 2 (assoc one-key-hint-display-type one-key-hint-display-alist)))
             ;; Quit when keystroke not match
             ;; and argument `miss-match-exit-p' is `non-nil'.
@@ -645,7 +636,6 @@ last command when it miss match in key alist."
       (setq one-key-menu-call-first-time t)
       ;; Close help window.
       (funcall (nth 2 (assoc one-key-hint-display-type one-key-hint-display-alist)))
-      ;; (one-key-help-window-close)
       ;; Run protect function
       ;; when `protect-function' is valid function.
       (if (and protect-function
@@ -700,56 +690,6 @@ when option RECURSION-P is non-nil."
   ;; `recursion-p' is `non-nil'.
   (if recursion-p
       (funcall recursion-function)))
-
-
-;; (defun one-key-make-template (keymap title)
-;;   "Generate template code.
-;; KEYMAP is keymap you want generate.
-;; TITLE is title name that any string you like."
-;;   (with-temp-buffer
-;;     (let ((indent-tabs-mode t)
-;;           (funcname (replace-regexp-in-string " " "-" title)))
-;;       (insert (substitute-command-keys "\\<keymap>\\{keymap}"))
-;;       ;; Remove header/footer
-;;       (goto-char (point-min))
-;;       (forward-line 3)
-;;       (delete-region 1 (point))
-;;       (goto-char (point-max))
-;;       (backward-delete-char 1)
-;;       ;; Insert.
-;;       (goto-char (point-min))
-;;       ;; Insert alist variable.
-;;       (insert (format "(defvar one-key-menu-%s-alist nil\n\"The `one-key' menu alist for %s.\")\n\n"
-;;                       funcname title)
-;;               (format "(setq one-key-menu-%s-alist\n'(\n" funcname))
-;;       ;; Insert (("key" . "desc") . command).
-;;       (while (not (eobp))
-;;         (unless (eq (point-at-bol) (point-at-eol))
-;;           (destructuring-bind (key cmd)
-;;               (split-string (buffer-substring (point-at-bol) (point-at-eol)) "\t+")
-;;             (delete-region (point-at-bol) (point-at-eol))
-;;             (insert (format "((\"%s\" . \"%s\") . %s)"
-;;                             (replace-regexp-in-string
-;;                              "\\\"" "\\\\\""
-;;                              (replace-regexp-in-string "\\\\" "\\\\\\\\" key))
-;;                             (capitalize (replace-regexp-in-string "-" " " cmd))
-;;                             cmd))
-;;             (when (and cmd
-;;                        (string-match " " (concat key cmd)))
-;;               (forward-sexp -1)
-;;               (insert ";; "))))
-;;         (forward-line 1))
-;;       (goto-char (point-max))
-;;       (insert "))\n\n")
-;;       ;; Insert function.
-;;       (insert (format "(defun one-key-menu-%s ()\n\"The `one-key' menu for %s\"\n(interactive)\n(one-key-menu \"%s\" one-key-menu-%s-alist))\n"
-;;                       funcname title title funcname))
-;;       ;; Indent.
-;;       (emacs-lisp-mode)
-;;       (indent-region (point-min) (point-max))
-;;       ;; Result.
-;;       (buffer-string)
-;;       )))
 
 (provide 'one-key)
 
