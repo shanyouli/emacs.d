@@ -220,6 +220,10 @@
 ;;
 
 ;;; Change log:
+;; 2020/03/29
+;;   * syl:
+;;       * Using the `one-key-highlight-key' `one-key-highlight' substituted Function
+;;       * Fix the bug when `one-key-hint-display-type' is lv, `?' not work
 ;; 2020/03/28
 ;;   * syl:
 ;;       * Remove `one-key-insert-template' function
@@ -358,19 +362,20 @@ If nil, it is calculated by `window-width'."
   :group 'one-key)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Faces ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defface one-key-title
-  '((t (:foreground "Gold")))
-  "Face for highlighting title."
-  :group 'one-key)
 
-(defface one-key-keystroke
-  '((t (:foreground "magenta")))
+(defface one-key-keystroke-face
+  '((((background light))
+     :foreground "#cc2444" :bold t)
+    (t
+     (:foreground "#ff2d55" :bold t)))
   "Face for highlighting keystroke."
   :group 'one-key)
 
-(defface one-key-prompt
-  '((t (:foreground "khaki3")))
-  "Face for highlighting prompt."
+(defface one-key-title-face
+  '((((background light))
+     :foreground "khaki1" :bold t)
+    (t (:foreground "khaki3" :bold t)))
+  "Face for highlighting Title."
   :group 'one-key)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Variable ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -467,18 +472,20 @@ Argument INFO-ALIST is help information as format ((key . describe) . command)."
                     (+ inf-max-length 4)))
         (floor (/ (- (frame-text-cols) 3)
                   (+ inf-max-length 4))))))
-
 (defun one-key-help-format (info-alist)
   "Format `one-key' help information.
 Argument INFO-ALIST is help information as format ((key . describe) . command)."
+  (setq info-alist (append info-alist
+                           '((("?" . "Toggle-help") . nil)
+                             (("q" . "quit") . nil ))))
   (let* ((max-length (loop for ((key . desc) . command) in info-alist
                            maximize (+ (string-width key) (string-width desc))))
          (current-length 0)
          (items-per-line (one-key--iterms-per-line max-length))
          keystroke-msg)
-    (loop for ((key . desc) . command) in info-alist
+    (cl-loop for ((key . desc) . command) in info-alist
           for counter from 1  do
-          (push (format "[%s] %s " key desc) keystroke-msg)
+          (push (format "%s %s " (one-key-highlight-key key) desc) keystroke-msg)
           (setq current-length (+ (string-width key) (string-width desc)))
           (push (if (zerop (% counter items-per-line))
                     "\n"
@@ -487,33 +494,20 @@ Argument INFO-ALIST is help information as format ((key . describe) . command)."
     (mapconcat 'identity (nreverse keystroke-msg) "")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;; Utilities Functions ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defun one-key-highlight (msg msg-regexp msg-face)
-  "Highlight special `MSG' with regular expression `MSG-REGEXP'.
-Will highlight this `MSG' with face `MSG-FACE'."
-  (with-temp-buffer
-    (insert msg)
-    (goto-char (point-min))
-    (while (re-search-forward msg-regexp nil t)
-      (add-text-properties (match-beginning 0)
-                           (match-end 0)
-                           msg-face))
-    (buffer-string)))
-
-(defun one-key-highlight-prompt (prompt)
-  "Highlight PROMPT information."
-  (let ((msg (format "The keystroke menu of <%s> type '?' for help." prompt)))
-    (message (one-key-highlight msg
-                                " \\(<[^<>]*>\\|'[^']*'\\) "
-                                '(face one-key-prompt)))))
+(defun one-key-highlight-key (key)
+  "add key"
+  (concat "["
+          (propertize (format "%s" key) 'face '(one-key-keystroke-face))
+          "]"))
+(defun one-key-highlight-menu (title)
+  (concat "<"
+          (propertize title 'face '(one-key-title-face))
+          ">"))
 
 (defun one-key-highlight-help (title keystroke)
   "Highlight TITLE help information with KEYSTROKE."
-  (setq title (one-key-highlight (format "Here is a list of <%s> keystrokes. Type '?' for hide. Type 'q' for exit.\n\n" title)
-                                 "\\(<[^<>]*>\\|'[^']*'\\)"
-                                 '(face one-key-title)))
-  (setq keystroke (one-key-highlight keystroke
-                                     "\\[\\([^\\[\\]\\)*\\]"
-                                     '(face one-key-keystroke)))
+  (setq title (format "The list of %s Keystrokes.\n"
+                      (one-key-highlight-menu title)))
   (concat title keystroke))
 
 (defun one-key-menu (title
@@ -551,7 +545,7 @@ last command when it miss match in key alist."
     ;; and option `one-key-popup-window' is `non-nil'.
     (when (and one-key-menu-call-first-time
                one-key-popup-window)
-      (if (eq one-key-hint-display-alist 'buffer)
+      (if (eq one-key-hint-display-type 'buffer)
           (one-key-help-window-toggle title info-alist)
         (funcall (nth 1 (assoc one-key-hint-display-type
                                one-key-hint-display-alist))
@@ -564,9 +558,7 @@ last command when it miss match in key alist."
                        ;; Just show help message when first call,
                        ;; don't overwritten message from command.
                        (if one-key-menu-call-first-time
-                           (progn
-                             (one-key-highlight-prompt title)
-                             (setq one-key-menu-call-first-time nil))
+                           (setq one-key-menu-call-first-time nil)
                          "")))
                (key (if (if (<= emacs-major-version 22)
                             (with-no-warnings
@@ -606,13 +598,16 @@ last command when it miss match in key alist."
             (keyboard-quit))
            ((one-key-match-keystroke key "?")
             ;; toggle help window
-            (if (eq one-key-hint-display-alist 'buffer)
-                (one-key-help-window-toggle title info-alist)
-              (funcall (nth 1 (assoc one-key-hint-display-type
-                                     one-key-hint-display-alist))
-                       (eval (one-key-highlight-help
-                            title
-                            (one-key-help-format info-alist)))))
+            (cond ((eq one-key-hint-display-type 'buffer)
+                   (one-key-help-window-toggle title info-alist))
+                  ((eq one-key-hint-display-type 'lv)
+                   (if (window-live-p lv-wnd)
+                       (lv-delete-window)
+                     (funcall (nth 1 (assoc one-key-hint-display-type
+                                            one-key-hint-display-alist))
+                              (eval (one-key-highlight-help
+                                     title
+                                     (one-key-help-format info-alist)))))))
             (funcall self))
            ((one-key-match-keystroke key "C-n")
             ;; scroll up one line
