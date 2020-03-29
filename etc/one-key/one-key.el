@@ -225,6 +225,7 @@
 ;;       * Using the `one-key-highlight-key' `one-key-highlight' substituted Function
 ;;       * Fix the bug when `one-key-hint-display-type' is lv, `?' not work
 ;;       * add `one-key-lv-toggle', adjust `one-key-help-window*' function
+;;       * remove `onekey-ext.el' file
 ;; 2020/03/28
 ;;   * syl:
 ;;       * Remove `one-key-insert-template' function
@@ -690,6 +691,60 @@ when option RECURSION-P is non-nil."
   ;; `recursion-p' is `non-nil'.
   (if recursion-p
       (funcall recursion-function)))
+
+(defun one-key--make-defun (cmd-name cmd-doc name menu-list &optional args)
+  "Create a `one-menu-*' functions."
+  (let ((miss-match-exit-p (nth 0 args))
+        (recursion-p (nth 1 args))
+        (protect-function (nth 2 args))
+        (alternate-function (nth 3 args))
+        (execute-last-command-when-miss-match (nth 4 args)))
+  `(defun ,cmd-name ()
+     ,cmd-doc
+     (interactive)
+     (require 'one-key)
+     (one-key-menu ,name
+                   ,menu-list
+                   ,miss-match-exit-p
+                   ,recursion-p
+                   ,protect-function
+                   ,alternate-function
+                   ,execute-last-command-when-miss-match))))
+
+;;;###autoload
+(defmacro defonekey (name args &optional docstring &rest heads)
+  "A similar macro and defhydra. "
+  (declare (indent defun) (doc-string 3))
+  (setq heads (copy-tree heads))
+  (condition-case-unless-debug err
+      (let* ((menu-list)
+             (name-upcase (upcase (format "%S" name)))
+             (def-name (intern (format "one-key-%S/menu" name)))
+             (name-menu (intern (format "%S/menu" name)))
+             (name-docstring (format "The `one-key' menu for %s" name-upcase)))
+        (dolist (h heads)
+          (let ((len (length h)))
+            (cond ((< len 2)
+                   (error "Each head should have at least two items: %S" h))
+                  ((= len 2)
+                   (let ((h-command (cadr h))
+                         (h-list))
+                     (setq h-list (cons (cons (car h) (symbol-name h-command))
+                                        h-command))
+                     (setq menu-list (cons h-list menu-list))))
+                  (t
+                   (setq menu-list (cons (cons (cons (car h) (caddr h))
+                                               (cadr h))
+                                         menu-list))))))
+        (setq menu-list (nreverse menu-list))
+        `(progn
+           (set (defvar ,(intern (format "%S/menu" name)) nil)
+                ',menu-list)
+           ,(one-key--make-defun def-name
+                                 name-docstring
+                                 name-upcase
+                                 name-menu
+                                 args)))))
 
 (provide 'one-key)
 
