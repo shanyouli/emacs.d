@@ -8,56 +8,55 @@
 (lib-key-unset "C-SPC" "C-\\" "C-x s" "C-x C-SPC" "M-," "M-.")
 
 (lib-key-definer syl-key :doc "emacs-status key." :prefix "M-,")
-(syl-key "xs" 'super-save-all-buffer
-         ;; esup
-         "se" #'esup
-         ;; benchmark
-         "sb" #'core-benchmark/require-times
-         "sr" 'restart-emacs
-         ;; hydra-bundle
-         "ub" 'hydra-ui-menu/body
-         "hd" 'hydra-open-dir-menu/body
-         "hs" 'one-key-tmp-scratch/menu
-         "hf"  'one-key-functions/menu
-         "ht" 'one-key-change-fontsize/menu
-         "ua" 'one-key-adjust-opacity/menu
-         ;; tools-bundle
-         "po" 'link-hint-open-link
-         "pc" 'link-hint-copy-link
-         "tp" 'pomidor
-         ("sh" 'tldr nil (not IS-WINDOWS))
-         ("uc" 'cnfonts-ui nil (fboundp 'cnfonts-ui))
-         ;; company-bundle
-         "ct" 'toggle-company-tabnine
-         ;; English word completion with Chinese comments
-         "ce" 'toggle-company-english-helper
-         ;; backup-file
-         ("bf" 'backup-file-log nil (require 'backup-file nil t))
-         ;; select or mark
-         "mp"  'set-mark-command  ;Instead C-SPC for Chinese input method
-         "mr"  'rectangle-mark-mode     ;rectangle-mark-mode
-         "ms"  'mark-sexp
-         "ma"  'mark-whole-buffer
-         ;; Edit-bundles
-         ;; Chinese automatically translated as English
-         "io" 'insert-translated-name-insert-original-translation
-         "iu" 'insert-translated-name-insert-with-underline
-         "il" 'insert-translated-name-insert-with-line
-         "ic" 'insert-translated-name-insert-with-camel)
-
-(syl-key "ps" 'smart-align
-         :map prog-mode-map)
+(syl-key
+  "xs" 'super-save-all-buffer
+  ;; esup
+  "se" #'esup
+  ;; benchmark
+  "sb" #'core-benchmark/require-times
+  "sr" 'restart-emacs
+  ;; hydra-bundle
+  "ub" 'hydra-ui-menu/body
+  "hd" 'hydra-open-dir-menu/body
+  "hs" 'one-key-tmp-scratch/menu
+  "hf"  'one-key-functions/menu
+  "ht" 'one-key-change-fontsize/menu
+  "ua" 'one-key-adjust-opacity/menu
+  ;; tools-bundle
+  "po" 'link-hint-open-link
+  "pc" 'link-hint-copy-link
+  "tp" 'pomidor
+  ("sh" 'tldr nil (not IS-WINDOWS))
+  ("uc" 'cnfonts-ui nil (fboundp 'cnfonts-ui))
+  ;; company-bundle
+  "ct" 'toggle-company-tabnine
+  ;; English word completion with Chinese comments
+  "ce" 'toggle-company-english-helper
+  ;; backup-file
+  ("bf" 'backup-file-log nil (require 'backup-file nil t))
+  ;; select or mark
+  "mp"  'set-mark-command  ;Instead C-SPC for Chinese input method
+  "mr"  'rectangle-mark-mode     ;rectangle-mark-mode
+  "ms"  'mark-sexp
+  "ma"  'mark-whole-buffer
+  ;; Edit-bundles
+  ;; Chinese automatically translated as English
+  "io" 'insert-translated-name-insert-original-translation
+  "iu" 'insert-translated-name-insert-with-underline
+  "il" 'insert-translated-name-insert-with-line
+  "ic" 'insert-translated-name-insert-with-camel
+  ;; smart-align
+  ("ps" 'smart-align prog-mode-map))
 
 ;; dict-bundle
 (lib-key "C-c y" 'lye/dict-point)
 
 ;; pyim-bundle
 (lib-key "<XF86Tools>" 'toggle-input-method)
-(with-after-bundle 'pyim
-    (lib-key "C-`" 'bundle-pyim-punctuation-toggle))
+(bundle-key! 'pyim  "C-`" 'bundle-pyim-punctuation-toggle)
 
-(with-after-bundle 'rime
-  (lib-key "C-`" 'rime-send-keybinding rime-mode-map nil rime))
+(bundle-key! 'rime
+    ("C-`" 'rime-send-keybinding rime-mode-map nl rime))
 
 ;; ivy-bundle
 (lib-keys "C-s" 'swiper-isearch
@@ -105,15 +104,15 @@
           "C-c c v" 'counsel-set-variable
           "C-c c z" 'counsel-fzf)
 (lib-keys :map (counsel . counsel-mode-map)
-          [remap swiper]          'counsel-grep-or-swiper
-          [remap swiper-backward] 'counsel-gre-or-swiper-backward
-          [remap dired]           'counsel-dired
-          [remap set-variable]    'counsel-set-variable
-          [remap insert-char]     'counsel-unicode-char)
+  [remap swiper]          'counsel-grep-or-swiper
+  [remap swiper-backward] 'counsel-gre-or-swiper-backward
+  [remap dired]           'counsel-dired
+  [remap set-variable]    'counsel-set-variable
+  [remap insert-char]     'counsel-unicode-char)
 (lib-keys :map (counsel . counsel-find-file-map)
-          "C-h" 'counsel-up-directory)
+  "C-h" 'counsel-up-directory)
 (lib-keys :map (counsel . counsel-ag-map)
-          "<C-return>" 'my-swiper-toggle-counsel-rg)
+  "<C-return>" 'my-swiper-toggle-counsel-rg)
 (lib-keys :map (swiper . swiper-map)
   [escape] 'minibuffer-keyboard-quit
   "M-s" 'swiper-isearch-toggle
@@ -225,8 +224,8 @@
 ;; term-bundle
 (lib-key "<f5>" 'shell-pop)
 (syl-key "pi" 'org-cliplink
-         :autoload "org-cliplink"
-         :map (org . org-mode-map))
+  :autoload "org-cliplink"
+  :map (org . org-mode-map))
 
 ;; window-bundle
 (lib-keys "C-h z" 'shackle-last-popup-buffer
@@ -259,19 +258,22 @@
           "C-x 4 r" 'winner-redo)
 
 ;; lsp
-(lib-keys [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
-          [remap xref-find-references] 'lsp-ui-peek-find-references
-          "C-c u" 'lsp-ui-imenu
-          :map (lsp-ui . lsp-ui-mode-map))
+(bundle-key! lsp
+    [remap xref-find-definitions] 'lsp-ui-peek-find-definitions
+    [remap xref-find-references] 'lsp-ui-peek-find-references
+    "C-c u" 'lsp-ui-imenu
+    :map (lsp-ui . lsp-ui-mode-map))
 
 ;; elisp-bundles
-(lib-keys :map (elisp-mode . emacs-lisp-mode-map)
-          :prefix "C-c"
+(bundle-key! elisp
+    :map (elisp-mode . emacs-lisp-mode-map)
+    :prefix "C-c"
   "C-x" 'ielm
   "C-c" 'eval-defun
   "C-b" 'eval-buffer
   "e" 'macrostep-expand)
-(lib-keys ("r" 'remove-hook-at-point help-mode-map)
-          [remap describe-key] 'helpful-key
-          [remap describe-symbol] 'helpful-symbol
-          ("r" 'remove-hook-at-point helpful-mode-map nil helpful))
+(bundle-key! elisp
+    ("r" 'remove-hook-at-point help-mode-map)
+    [remap describe-key] 'helpful-key
+  [remap describe-symbol] 'helpful-symbol
+  ("r" 'remove-hook-at-point helpful-mode-map nil helpful))

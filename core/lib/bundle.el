@@ -23,8 +23,9 @@
 ;; Bundle-Framework Manager
 
 ;;; Code:
-(eval-when-compile
-  (autoload 'cl-defmacro "cl-macs" nil t))
+(require 'subr-x)
+(require 'cl-macs)
+(require 'lib-key)
 
 (defvar bundle--active-list '())
 
@@ -119,6 +120,18 @@ Usage:
                                    bundle))
                 "package.el")
      (lambda () ,@body)))
+
+;;;###autoload
+(defmacro bundle-key! (bundle &rest args)
+  "When bundle is active. bind key."
+  (declare (indent 4) (debug t))
+  (let ((bundle (if (cdr-safe bundle)
+                    (cadr bundle)
+                  bundle)))
+    `(if (bundle-active-p ',bundle)
+         ,(macroexp-progn (lib-key--form args))
+       (with-after-bundle ',bundle
+         ,(macroexp-progn (lib-key--form args))))))
 
 (provide 'bundle)
 ;;; bundle.el ends here

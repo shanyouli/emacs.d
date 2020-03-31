@@ -144,28 +144,24 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
 :package PACKAGE  - From PACKAGE function as.
 :autoload FILE    - From PACKAGE function as.
 :filter FORM      - optional for to determine when bindings apply"
-  (let* (map doc pkg kv-list filter file)
+  (let (map doc pkg kv-list filter file)
     (setq kv-list (lib-key--list2alist args))
-    (let ((map-alist (or (assoc :map kv-list) (assoc :keymap kv-list))))
-      (when map-alist
-        (setq map (cadr map-alist)
-              kv-list (delete map-alist kv-list))
-        (when (listp map)
-          (setq pkg (car map)
-                map (cdr map)))))
-    (let ((file-alist (or (assoc :package kv-list )
-                          (assoc :autoload kv-list))))
-      (if file-alist
-          (setq file (cadr file-alist)
-                kv-list (delete file-alist kv-list))))
-    (let ((prefix-alist (assoc :prefix kv-list)))
-      (if prefix-alist
-          (setq prefix (cadr prefix-alist)
-                kv-list (delete prefix-alist kv-list))))
-    (let ((filter-alist (assoc :filter kv-list)))
-      (if filter-alist
-          (setq filter (cadr filter-alist)
-                kv-list (delete filter-alist kv-list))))
+    (when-let ((map-alist (or (assoc :map kv-list) (assoc :keymap kv-list))))
+      (setq map (cadr map-alist)
+            kv-list (delete map-alist kv-list))
+      (when (listp map)
+        (setq pkg (car map)
+              map (cdr map))))
+    (when-let ((file-alist (or (assoc :package kv-list )
+                               (assoc :autoload kv-list))))
+      (setq file (cadr file-alist)
+            kv-list (delete file-alist kv-list)))
+    (when-let ((prefix-alist (assoc :prefix kv-list)))
+      (setq prefix (cadr prefix-alist)
+            kv-list (delete prefix-alist kv-list)))
+    (when-let ((filter-alist (assoc :filter kv-list)))
+      (setq filter (cadr filter-alist)
+            kv-list (delete filter-alist kv-list)))
     (setq kv-list (delete (assoc :doc kv-list) kv-list))
 
     ;; key binding arguments
