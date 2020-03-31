@@ -13,7 +13,7 @@
          "se" #'esup
          ;; benchmark
          "sb" #'core-benchmark/require-times
-         ("sr" 'restart-emacs (require 'restart-emacs nil t))
+         "sr" 'restart-emacs
          ;; hydra-bundle
          "ub" 'hydra-ui-menu/body
          "hd" 'hydra-open-dir-menu/body
@@ -25,14 +25,14 @@
          "po" 'link-hint-open-link
          "pc" 'link-hint-copy-link
          "tp" 'pomidor
-         ("sh" 'tldr (not IS-WINDOWS))
-         ("uc" 'cnfonts-ui (fboundp 'cnfonts-ui))
+         ("sh" 'tldr nil (not IS-WINDOWS))
+         ("uc" 'cnfonts-ui nil (fboundp 'cnfonts-ui))
          ;; company-bundle
          "ct" 'toggle-company-tabnine
          ;; English word completion with Chinese comments
          "ce" 'toggle-company-english-helper
          ;; backup-file
-         ("bf" 'backup-file-log (require 'backup-file nil t))
+         ("bf" 'backup-file-log nil (require 'backup-file nil t))
          ;; select or mark
          "mp"  'set-mark-command  ;Instead C-SPC for Chinese input method
          "mr"  'rectangle-mark-mode     ;rectangle-mark-mode
@@ -57,8 +57,7 @@
     (lib-key "C-`" 'bundle-pyim-punctuation-toggle))
 
 (with-after-bundle 'rime
-  (with-eval-after-load 'rime
-    (lib-key "C-`" 'rime-send-keybinding rime-mode-map)))
+  (lib-key "C-`" 'rime-send-keybinding rime-mode-map nil rime))
 
 ;; ivy-bundle
 (lib-keys "C-s" 'swiper-isearch
@@ -180,6 +179,7 @@
   "H" 'dired-omit-mode
   ("S"
    'hydra-dired-quick-sort/body
+   nil
    (and (or (and IS-MAC (executable-find "gls"))
             (and (not IS-MAC) (executable-find "ls")))
         (bundle-active-p 'hydra))))
@@ -271,8 +271,7 @@
   "C-c" 'eval-defun
   "C-b" 'eval-buffer
   "e" 'macrostep-expand)
-(lib-key "r" 'remove-hook-at-point help-mode-map)
-(lib-keys [remap describe-key] 'helpful-key
-          [remap describe-symbol] 'helpful-symbol)
-(with-eval-after-load 'helpful
-  (lib-key "r" 'remove-hook-at-point helpful-mode-map))
+(lib-keys ("r" 'remove-hook-at-point help-mode-map)
+          [remap describe-key] 'helpful-key
+          [remap describe-symbol] 'helpful-symbol
+          ("r" 'remove-hook-at-point helpful-mode-map nil helpful))

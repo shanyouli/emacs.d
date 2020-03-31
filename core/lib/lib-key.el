@@ -66,7 +66,7 @@ ARGS format is: (keymaps key1 key2...) or (key1 key2 ...).
 ;;; 为交互函数设定快捷按键.
 
 ;;;###autoload
-(defmacro lib-key (key-name command &optional keymap predicate)
+(defmacro lib-key (key-name command &optional keymap predicate package)
   "Bind KEY-NAME to COMMAND in KEYMA(`global-map' if not passed).
 
 KEY-NAME may be a vector or string.
@@ -82,26 +82,32 @@ FROM: https://github.com/jwiegley/use-package/blob/master/bind-key.el."
   (let ((namevar (make-symbol "name"))
         (keyvar (make-symbol "key"))
         (kdescvar (make-symbol "kdesc"))
-        (bindingvar (make-symbol "binding")))
-    `(let* ((,namevar ,key-name)
-            (,keyvar (if (vectorp ,namevar) ,namevar
-                       (read-kbd-macro ,namevar)))
-            (,kdescvar (cons (if (stringp ,namevar) ,namevar
-                               (key-description ,namevar))
-                             (quote ,keymap)))
-            (,bindingvar (lookup-key (or ,keymap global-map) ,keyvar)))
-       (let ((entry (assoc ,kdescvar lib-key-personal-keybindings))
-             (details (list ,command (unless (numberp ,bindingvar)
-                                       ,bindingvar))))
-         (if entry
-             (setcdr entry details)
-           (add-to-list 'lib-key-personal-keybindings (cons ,kdescvar details)))
-         ,(if predicate
-              `(define-key (or ,keymap global-map) ,keyvar
-                 '(menu-item "" nil :filter (lambda (&optional _)
-                                              (when ,predicate
-                                                ,command))))
-            `(define-key (or ,keymap global-map) ,keyvar ,command))))))
+        (bindingvar (make-symbol "binding"))
+        (cmd (make-symbol "command"))
+        forms)
+    (setq forms
+          `(let* ((,namevar ,key-name)
+                  (,keyvar (if (vectorp ,namevar) ,namevar
+                             (read-kbd-macro ,namevar)))
+                  (,kdescvar (cons (if (stringp ,namevar) ,namevar
+                                     (key-description ,namevar))
+                                   (quote ,keymap)))
+                  (,bindingvar (lookup-key (or ,keymap global-map) ,keyvar))
+                  (,cmd ,(if predicate
+                             `'(menu-item "" nil :filter (lambda (&optional _)
+                                                           (when ,predicate
+                                                             ,command)))
+                           command)))
+             (let ((entry (assoc ,kdescvar lib-key-personal-keybindings))
+                   (details (list ,command (unless (numberp ,bindingvar)
+                                             ,bindingvar))))
+               (if entry
+                   (setcdr entry details)
+                 (add-to-list 'lib-key-personal-keybindings (cons ,kdescvar details)))
+               (define-key (or ,keymap global-map) ,keyvar ,cmd))))
+    (if package
+        `(eval-after-load ',package ',forms)
+      forms)))
 
 ;;;###autoload
 (defmacro lib-keys (&rest args)
@@ -183,12 +189,14 @@ ARGS 默认格式为 (k1 func1 k2 func2 k3 func3 .....)."
         (cl-mapcan (lambda (kv)
                      (let ((key (nth 0 kv))
                            (def (nth 1 kv))
-                           (filter (or (nth 2 kv) filter)))
+                           (map (or (nth 2 kv) map))
+                           (filter (or (nth 3 kv) filter))
+                           (package (nth 4 kv)))
                        (if (and (stringp key) prefix)
                            (setq key (concat prefix " " key)))
                        (if (and map (not (eq map 'global-map)))
-                           `((lib-key ,key ,def ,map ,filter))
-                         `((lib-key ,key ,def nil ,filter)))))
+                           `((lib-key ,key ,def ,map ,filter ,package))
+                         `((lib-key ,key ,def nil ,filter ,package)))))
                    kv-list))))))
 
 (provide 'lib-key)
