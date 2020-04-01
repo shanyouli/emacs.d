@@ -5,7 +5,7 @@
 ;; ;;              ))
 ;; ;;   (bundle! b))
 ;; (bundle! pyim :commands (lye/toggle-input-method lye//require-pyim))
-(bundle! rime)
+(bundle! rime :defer t)
 (bundle! term :defer t)
 
 (bundle! icons :if (and (display-graphic-p) (not IS-WINDOWS)))

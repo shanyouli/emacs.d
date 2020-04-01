@@ -184,45 +184,49 @@
         (bundle-active-p 'hydra))))
 
 ;; mode-bundle
-(lib-keys :map (markdonw-mode . markdown-mode-map)
-          :filter (executable-find "markdownfmt")
-  "C-c f" 'markdownfmt-format-buffer)
+(bundle-key! mode
+    ("C-c f" 'markdownfmt-format-buffer markdown-mode-map
+     (executable-find "markdownfmt") markdown-mode))
 
 ;; editor-bundle
-(lib-keys "M-e"  'one-key-thing-edit/menu
-          "C-:" 'avy-goto-char
-          "C-'" 'avy-goto-char-2
-          "M-g f" 'avy-goto-line
-          "M-g w" 'avy-goto-word-1
-          "M-g e" 'avy-goto-word-0)
-(lib-key "C-c s" 'one-key-color-rg-search/menu nil (fboundp 'color-rg-search-symbol))
+(bundle-key! editor
+    "M-e"  'one-key-thing-edit/menu
+    "C-:" 'avy-goto-char
+    "C-'" 'avy-goto-char-2
+    "M-g f" 'avy-goto-line
+    "M-g w" 'avy-goto-word-1
+    "M-g e" 'avy-goto-word-0
+    ("C-c s" 'one-key-color-rg-search/menu nil (fboundp 'color-rg-search-symbol)))
+
 ;; treemacs-bundle
-(lib-keys [f8] 'treemacs
-          "M-0" 'treemacs-select-window
-          "C-x t t" 'treemacs
-          "C-x t b" 'treemacs-bookmark
-          "C-x t M-t" 'treemacs-find-tag)
+(bundle-key! treemacs
+    [f8] 'treemacs
+    "M-0" 'treemacs-select-window
+    "C-x t t" 'treemacs
+    "C-x t b" 'treemacs-bookmark
+    "C-x t M-t" 'treemacs-find-tag
+    ("C-x 1" 'treemacs-delete-other-windows nil nil treemacs)
+    ("C-x t 1" 'treemacs-delete-other-windows nil nil treemacs))
+
 (with-eval-after-load 'treemacs
-  (lib-keys "C-x 1" 'treemacs-delete-other-windows
-            "C-x t 1" 'treemacs-delete-other-windows)
   (lib-keys :map (projectile . projectile-command-map)
     "h" 'treemacs-projectile))
 
 ;; Git-bundle
-(lib-keys "C-x g" 'one-key-magit/menu
-          "C-x M-g" 'magit-dispatch
-          "C-c M-g" 'magit-file-popup)
-
-;; unset C-x g
-;; @see https://github.com/magit/magit/issues/3522#issuecomment-407640436
-(with-eval-after-load "magit-files"
-  ;; (define-key magit-file-mode-map (kbd "C-x g") nil)
-  (lib-key-unset magit-file-mode-map "C-x g"))
+(bundle-key! 'git
+    "C-x g" 'one-key-magit/menu
+    "C-x M-g" 'magit-dispatch
+    "C-c M-g" 'magit-file-popup
+    ;; unset C-x g when use `magit-file-mode-map'
+    ;; @see https://github.com/magit/magit/issues/3522#issuecomment-407640436
+    ("C-x g" nil magit-file-mode-map nil magit-files))
 (with-eval-after-load "magit-mode"
   (lib-key-unset magit-mode-map "M-1" "M-2" "M-3"))
 
+
 ;; term-bundle
 (lib-key "<f5>" 'shell-pop)
+
 (syl-key "pi" 'org-cliplink
   :autoload "org-cliplink"
   :map (org . org-mode-map))
