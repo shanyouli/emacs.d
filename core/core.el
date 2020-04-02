@@ -28,14 +28,8 @@
 (defconst lye-core-library-dir (concat lye-core-dir "lib/")
   "The root directory of libray directory. Must end with a slash.")
 
-(defconst lye-packags-dir (concat lye-emacs-dir "packages/")
-  "The root directory of package-manager, Must end with a slash.")
-
 (defconst lye-etc-dir (concat lye-emacs-dir "etc/")
   "etc dir in `lye-emacs-dir', Must end with a slash.")
-
-(defconst lye-quelpa-recipe-dir (concat lye-etc-dir "quelpa/recipe/")
-  "Custom quelpa-recipe storage directory.")
 
 (defconst lye-emacs-cache-dir (concat lye-emacs-dir ".cache/")
   "Is the cache directory this?")
