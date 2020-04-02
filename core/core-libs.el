@@ -134,15 +134,18 @@ ARGS: format string arguments"
     (when message-log-max
       (add-to-list 'lye-buffer--warnings msg 'append))))
 
-(defun lye-set-custom-variable (variable value no-save)
+(defun lye-set-custom-variable (variable value &optional no-save)
   "Setting a variable and saved to `custom-file'.
 NO-SAVE is non-nil, not save to `custom-file'."
-  (if (or no-save (not (file-writable-p custom-file)))
-      (customize-set-value variable value)
-    (if after-init-time
-        (let ((save-silently inhibit-message))
-          (customize-save-variable variable value))
-      (add-hook 'after-init-hook (lambda () (lye-set-custom-variable variable value))))))
+  (let ((result t))
+    (unless (or no-save (file-writable-p (bound-and-true-p custom-file)))
+      (if after-init-time
+          (let ((save-silently inhibit-message))
+            (setq result nil)
+            (custom-save-variables variable value))
+        (add-hook 'after-init-hook
+                  (lambda () (custom-save-variables variable value)))))
+    (if result (setq variable value))))
 
 (provide 'core-libs)
 
