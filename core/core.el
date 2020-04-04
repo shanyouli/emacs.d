@@ -71,6 +71,9 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 (defvar lye--gc-timer (run-with-idle-timer 10 t #'garbage-collect)
   "Run garbarge collection when idle 10s.")
 
+;;
+(defvar lye-doctor-p t "Gets the loading time of each library.")
+(if lye-doctor-p (require 'lib-doctor))
 (add-hook! 'emacs-startup-hook
     (setq gc-cons-threshold lye--gc-cons-threshold)
   ;; GC automatically while unfocusing the frame
@@ -138,7 +141,6 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 
 (defun lye-core-initialize ()
   "Load Lye's core files for an interactive session."
-  (lye-load! 'core/core-benchmark) ; benchmark
   (lye-load! 'core/core-custom)    ; Custom-Varliable
   (lye-load! 'core/core-generic)   ; generic and delete *scratch*
   (lye-load! 'core/core-straight)  ; staraight, package
