@@ -33,7 +33,9 @@
   ;;
   ;;; dir-icons
   (push '("Videos?" all-the-icons-faicon "film") all-the-icons-dir-icon-alist)
-  (push '("Work" all-the-icons-material "work") all-the-icons-dir-icon-alist))
+  (push '("Works?" all-the-icons-material "work") all-the-icons-dir-icon-alist)
+  (push '("\\(O\\|o\\)rgs?" all-the-icons-fileicon "org" :face all-the-icons-blue)
+        all-the-icons-dir-icon-alist))
 
 (with-eval-after-load 'ivy
   (all-the-icons-ivy-rich-mode +1))

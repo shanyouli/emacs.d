@@ -73,7 +73,9 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 
 ;;
 (defvar lye-doctor-p t "Gets the loading time of each library.")
+
 (if lye-doctor-p (require 'lib-doctor))
+
 (add-hook! 'emacs-startup-hook
     (setq gc-cons-threshold lye--gc-cons-threshold)
   ;; GC automatically while unfocusing the frame
@@ -94,6 +96,7 @@ Whe use graphic, its value is 512Mib, otherwise 128Mib.")
 ;;
 ;;; customization
 (defgroup lye nil "Lye-emacs group" :group 'lye)
+
 (defcustom lye-full-name "shanyouli" "Set user full name."
   :type 'string
   :group 'lye)

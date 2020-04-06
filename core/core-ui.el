@@ -258,18 +258,15 @@ When `lye-frame-use-fullfrmae' is nil, use default-frame."
 ;;; Line-Number
 ;; 文件超过10000行，不显示行号，只留4位吧
 (setq display-line-numbers-width-start 4)
-(defun lye-display-line-numbers ()
-  "当文件的列宽 <86 或者文件的 Major－mode 为 org－mode 且行数大于 1000,
+(defun +display-line-numbers-mode-f ()
+"当文件的列宽 <86 或者文件的 Major－mode 为 org－mode 且行数大于 1000,
 不显示行号。"
-  (if (and (or (not (display-graphic-p))
-               (> (window-width) 86))
-           (or (not (eq major-mode 'org-mode))
-               (< (line-number-at-pos (point-max) 1000))))
-      (display-line-numbers-mode +1)
-    (display-line-numbers-mode -1)))
+(when (or (not (display-graphic-p))
+          (> (window-width) 86))
+  (display-line-numbers-mode +1)))
 
-(add-hook! '(prog-mode-hook org-mode-hook conf-mode-hook nxml-mode-hook)
-  #'lye-display-line-numbers)
+(add-hook! '(prog-mode-hook conf-mode-hook nxml-mode-hook)
+  #'+display-line-numbers-mode-f)
 
 ;; Title
 (when (display-graphic-p)
