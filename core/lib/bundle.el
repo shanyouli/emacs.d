@@ -44,11 +44,12 @@
 
 (defun bundle-get-path (bundle)
   "Get the path of BUNDLE."
-  (cl-some (lambda (parent)
-             (let* ((bundle-name (if (stringp bundle) bundle (symbol-name bundle)))
-                    (path (concat (file-name-directory parent) bundle-name)))
-               (when (file-directory-p path) (file-name-as-directory path))))
-           bundle-directories))
+  (let ((bundle-name (if (stringp bundle) bundle
+                       (symbol-name bundle))))
+    (cl-some (lambda (parent)
+               (let ((path (concat (file-name-directory parent) bundle-name)))
+                 (when (file-directory-p path) (file-name-as-directory path))))
+             bundle-directories)))
 
 (defsubst bundle/concat (&rest elems)
   "Delete all empty lists from ELEMS (nil or (list nil)), and append thems."
@@ -114,12 +115,12 @@ Usage:
 (defmacro with-after-bundle (bundle &rest body)
   "When the bundle is started, executed body."
   (declare (indent 1) (debug t))
-  `(eval-after-load
-       ,(concat (bundle-get-path (if (cdr-safe bundle)
-                                     (cadr bundle)
-                                   bundle))
-                "package.el")
-     (lambda () ,@body)))
+  (let* ((bundle-name (if (cdr-safe bundle) (cadr bundle)
+                        bundle))
+         (bundle-path (bundle-get-path bundle-name)))
+    (if bundle-path
+        `(eval-after-load ,(concat bundle-path "package.el")
+           (lambda () ,@body)))))
 
 ;;;###autoload
 (defmacro bundle-key! (bundle &rest args)

@@ -251,7 +251,7 @@ If FORCE-P are non-nil, do it anyway."
 ;;; package! functions
 (eval-when-compile
   (autoload 'cl-defmacro "cl-macs" nil t)
-  (autoload 'bundle-get-path "bundle" nil t))
+  (autoload 'with-after-bundle "bundle" nil t))
 
 (cl-defmacro package!
     (name &key disabled if commands mode recipe build-in defer with custom)
@@ -290,9 +290,8 @@ Usage:
 (defun package-keys:install (package build-in bundle)
   (unless build-in
     (if bundle
-        (let ((bundle-path (bundle-get-path bundle)))
-          `((with-eval-after-load ,(expand-file-name "package.el" bundle-path)
-              (straight-use-package ',package))))
+        `((with-after-bundle ,bundle
+            (straight-use-package ',package)))
     `((straight-use-package ',package)))))
 
 (defun package-keys:commands (commands package-name)
