@@ -1,0 +1,4448 @@
+#+title: My Doom Emacs Config
+#+EMAIL: shanyouli6@gmail.com
+#+DATE: 2023-03-31
+#+AUTHOR: Syl
+#+html_head: <link rel='shortcut icon' type='image/png' href='https://www.gnu.org/software/emacs/favicon.png'>
+#+property: header-args:emacs-lisp :tangle yes :comments link
+#+property: header-args+:elisp :exports code
+#+property: header-args+:tangle "no" :results silent :eval no
+#+options: coverpage:yes
+#+startup: fold
+
+这份配置是个人的 [[https://github.com/doomemacs/doomemacs/blob/develop/docs/getting_started.org][doomemacs]] 私有配置
+* Emacs
+
+Emacs or EMACS(Editor MACroS) is a family of text editors that are characterized by
+their extensibility. The manual for the most widely used variant, GNU Emacs, describes
+it as "the extensible, customizable, self-documenting, real-time display editor".
+Develoment of the first Emacs began in the mid-1970s, and work on its direct
+descendant, GNU Emacs, continues actively as of 2020.
+
+* 基础配置
+创建语法绑定可以稍微加速一个配置文件运行
+#+begin_src emacs-lisp :comments no
+;;; config.el -*- lexical-binding: t; -*-
+#+end_src
+配置个人基础信息, 且配置 gpgkey
+#+begin_src emacs-lisp
+;;; If you use NIXOS yourself to generate the configuration, you may need to load it.
+(load! "config.init.el" doom-user-dir 'no-error)
+(setq user-full-name "Shanyou Li"
+      user-mail-address "shanyouli6@gmail.com"
+      ;; user-gpg-key ""
+      org-directory "~/org"
+      my-workdir (expand-file-name "~/Workspace")
+      ;; My Blog Dir
+      user-blog-dir (concat my-workdir "/Blog")
+      )
+
+;; @https://emacs-china.org/t/topic/13254
+;; toggle-word-wrap：遇到中英文混合文本会折在空格，即使空格离右面还很远。因为他只能折在空格和 tab 上
+(setq word-wrap-by-category t)
+
+;; 我不希望打开软链接文件时会跳转到原文件
+(setq find-file-visit-truename nil)
+
+;; 自动缓存 url 下载
+(setq url-automatic-caching t)
+
+;; 大文件处理
+;; @see https://emacs-china.org/t/topic/25811/9
+(setq-default bidi-display-reordering nil) ;; 不用阿语外包
+(setq bidi-inhibit-bpa t
+      long-line-threshold 1000
+      large-hscroll-threshold 1000
+      syntax-wholeline-max 1000)
+#+end_src
+自定义一个宏，加载对应​~doom-user-dir~​目录下​~myfun.el~​文件的函数
+#+begin_src emacs-lisp
+(defmacro myfun-autoload (&rest functions)
+  "Autoload FUNCTIONS. the Functions from myfun.el"
+  `(progn
+     ,@(mapcar (lambda (function)
+                 `(autoload ',function ,(expand-file-name "myfun.el" doom-user-dir ) nil t))
+               (if (listp ',functions)
+                   functions
+                 (listp ',functions)))))
+#+end_src
+在​~doom-user-dir~​目录下创建一个 lang 文件，需要生成代码片段
+#+begin_src emacs-lisp :tangle  yes :noweb-ref none
+(defvar my-loaded-part-el-list nil)
+(let ((lang-dir (expand-file-name "lang" doom-user-dir)))
+  (unless (file-directory-p lang-dir)
+    (make-directory lang-dir t)))
+
+(defun load-part-el-file (filename)
+  "Load a file from the lang directory."
+  (if (member filename my-loaded-part-el-list)
+      t
+    (let ((filepath (expand-file-name filename doom-user-dir)))
+      (if (or (file-exists-p filepath)
+              (file-exists-p (concat filepath ".el")))
+          (progn
+            (push filename my-loaded-part-el-list)
+            (load filepath 'noerror 'nomessage))
+        nil))))
+#+end_src
+** DONE 自定义函数
+CLOSED: [2023-04-04 Tue 14:55]
+:properties:
+:CUSTOM_ID: myfun
+:header-args:emacs-lisp: :tangle no :noweb-ref myfun-conf
+:end:
+:intro:
+将一些自定义的函数放入其中，仅当调用函数时，才会加载该文件
+
+#+begin_src emacs-lisp :noweb no-export :tangle "myfun.el" :noweb-prefix no :noweb-ref nil
+;;; myfun.el --- my function -*- lexical-binding: t; -*-
+;;
+;; Copyright (C) 2023 Shanyou Li
+;;
+;; Author: Shanyou Li <shanyouli6@gmail.com>
+;; Maintainer: Shanyou Li <shanyouli6@gmail.com>
+;; Created: April 04, 2023
+;; Modified: April 04, 2023
+;; Version: 0.0.1
+;; Keywords: abbrev bib c calendar comm convenience data docs emulations extensions faces files frames games hardware help hypermedia i18n internal languages lisp local maint mail matching mouse multimedia news outlines processes terminals tex tools unix vc wp
+;; Package-Requires: ((emacs "24.3"))
+;;
+;; This file is not part of GNU Emacs.
+;;
+;;; Commentary:
+;;
+;;  my function
+;;
+;;; Code:
+
+<<myfun-conf>>
+
+(provide 'myfun)
+;;; myfun.el ends here
+#+end_src
+*** 简单的 indent 函数
+参考[[https://emacs-china.org/t/elisp-use-package/23812/10][indent 配置]]
+#+begin_src emacs-lisp
+(defun indent-region-or-buffer()
+  "To indent the buffer or region"
+  (interactive)
+  (save-excursion
+    (if (region-active-p)
+        (progn
+          (indent-region (region-beginning) (region-end))
+          (message "Indent selected region."))
+      (indent-region (point-min) (point-max))
+      (message "Indent buffer."))))
+
+#+end_src
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload indent-region-or-buffer)
+(map! "C-M-\\" :desc "indent" #'indent-region-or-buffer)
+#+end_src
+*** 记录光标位置
+#+begin_src emacs-lisp
+(defun remember-init ()
+  "记住当前位置."
+  (interactive)
+  (point-to-register 8)
+  (message "Have remember one position"))
+
+(defun remember-jump ()
+  "跳转到最后一次的位置."
+  (interactive)
+  (let ((tmp (point-marker)))
+    (jump-to-register 8)
+    (set-register 8 tmp))
+  (message "Have back to remember position"))
+#+end_src
+
+*** 函数定义跳转
+lsp-bridge-find-def 和 dumb-jump 的封装
+#+begin_src emacs-lisp
+(defun my/def-jump-go ()
+  (interactive)
+  (cond ((eq major-mode 'emacs-lisp-mode)
+         (when-let ((symb (function-called-at-point)))
+           (find-function symb)))
+        ((bound-and-true-p lsp-bridge-mode)
+         (lsp-bridge-find-def))
+        ((require 'dumb-jump nil t)
+         (dumb-jump-go))
+        (t (message "Please Install dumb-jump"))))
+
+(defun my/def-jump-back ()
+  (interactive)
+  (cond ((bound-and-true-p lsp-bridge-mode)
+         (lsp-bridge-find-def-return))
+        ((require 'dumb-jump nil t)
+         (dumb-jump-back))
+        (t (message "Please install dumb-jump package"))))
+
+#+end_src
+*** 设置 frame 大小
+#+begin_src emacs-lisp
+(defun init-default-frame (&optional frame wratio hratio)
+  "设置 `frame'的大小"
+  (interactive)
+  (let ((x-width (or (alist-get 'width default-frame-alist)
+                     (truncate (- (* (x-display-pixel-width)
+                                     (or wratio 0.5)) 20))))
+        (y-height (or (alist-get 'height default-frame-alist)
+                      (truncate (* (x-display-pixel-height)
+                                   (or hratio 0.5))))))
+    (set-frame-size (or frame (selected-frame)) x-width y-height t)))
+#+end_src
+
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload init-default-frame)
+#+end_src
+*** 插入日期
+格式为​=%Y-%m-%d %G-%M-%S=​
+#+begin_src emacs-lisp
+;; :tangle "yes" :noweb-ref myfun-conf
+(defun insert-datetime ()
+  "Insert date at point."
+    (interactive)
+    (insert (format-time-string "%Y-%m-%d %H:%M:%S")))
+#+end_src
+使用方式
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload insert-datetime)
+#+end_src
+
+*** 系统默认工具打开文件
+#+begin_src emacs-lisp
+(defun open-in-external-app (&optional @fname)
+  "Open the current file or dired marked files in external app.
+When called in emacs lisp, if @fname is given, open that.
+URL `http://xahlee.info/emacs/emacs/emacs_dired_open_file_in_ext_apps.html'
+Version 2022-06-26  8:46:00"
+  (interactive)
+  (let* (($file-list (if @fname
+                         (progn (list @fname))
+                       (if (or
+                            (string-equal major-mode "dired-mode")
+                            (string-equal major-mode "dirvish-mode"))
+                           (dired-get-marked-files)
+                         (list (buffer-file-name)))))
+         ($do-it-p (if (<= (length $file-list) 5)
+                       t
+                     (y-or-n-p "Open more than 5 files? "))))
+    (when $do-it-p
+      (cond ((string-equal system-type "windows-nt")
+             (mapc (lambda ($fpath)
+                     (shell-command (concat "PowserShell -Command \"Invoke-Item -LiteralPath\" " "'"
+                                            (shell-quote-argument (expand-file-name $fpath)) "'")))
+                   $file-list))
+            ((string-equal system-type "darwin")
+             (mapc (lambda ($fpath)
+                     (shell-command (concat "open " (shell-quote-argument $fpath)))) $file-list))
+            ((string-equal system-type "gnu/linux")
+             (mapc (lambda ($fpath)
+                     (let ((process-connection-type nil))
+                       (start-process "" nil "xdg-open" $fpath))) $file-list))))))
+#+end_src
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload open-in-external-app)
+(map! :leader
+  :desc "open in external app" "os" #'open-in-external-app)
+#+end_src
+*** 自动打开文件夹
+#+begin_src emacs-lisp
+(defun +find-file-in-project (project)
+  "在一个 `project' 中打开文件"
+  (unless (file-directory-p project)
+    (make-directory project t))
+  (doom-project-find-file project))
+
+#+end_src
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload +find-file-in-project)
+(map! :leader
+  (:prefix-map ("d" . "my prjs")
+  :desc "dotfile" "d" (cmd!
+                       (+find-file-in-project (or (bound-and-true-p mydotfile)
+                                                  (getenv "DOTFILES")
+                                                  (expand-file-name "~/.dotfiles"))))
+  :desc "org" "o" (cmd!
+                   (+find-file-in-project (or (bound-and-true-p org-directory)
+                                              "~/org")))
+  :desc "draft" "t" (cmd! (+find-file-in-project "~/Workspace/Draft"))
+  :desc "flashes" "f" (cmd! (+find-file-in-project "~/flashes"))))
+
+#+end_src
+*** 自动对齐
+自动对齐等号的方法, 代码来源:[[https://github.com/manateelazycat/smart-align/blob/master/smart-align.el#L99][smart-align/smart-align.el]],相关讨论 [[https://emacs-china.org/t/topic/13464][[求助]如何使文字向中间或中间列对齐呢]]
+#+begin_src emacs-lisp
+(defun smart-align ()
+  (interactive)
+  (with-demoted-errors
+      "Something wrong when align."
+    (let ((align-start
+           (save-excursion
+             (backward-up-list)
+             (point)
+             ))
+          (align-end
+           (save-excursion
+             (up-list)
+             (point))))
+      (align-regexp align-start align-end "\\(\\s-*\\)\\(=\\|:\\)" 1 1))))
+#+end_src
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload smart-align)
+#+end_src
+
+*** Emacs-client
+我使用​src_bash{emacs --fg-daemon="main"}​启动 emacs 服务，然后使用
+​src_bash{emacsclient -s main -e '(+create-EmacsClient-frame)'}​
+创建启动 frame
+#+begin_src emacs-lisp
+(defvar +emacs-client-frame-parameters
+  `((name . "EmacsClient")
+    (width . 90)
+    (height . 26)
+    (transient . t)
+    ,@(when IS-MAC
+        `((window-system . ns)
+          (menu-bar-lines . 1)))
+    ,@(when IS-LINUX
+        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
+          (display . ,(or (getenv "WAYLAND_DISPLAY")
+                          (getenv "DISPLAY")
+                          ":0"))))
+ ;; ,(if IS-MAC '(menu-bar-lines . 1))
+    )
+  "TODO")
+
+(defun +create-EmacsClient-frame (&optional fn)
+  "创建一个名为 Emacslient 的 frame,如果该 frame 存在则聚焦到它"
+  (interactive)
+  (let* ((frame-title-format "")
+         (preframe (cl-loop for frame in (frame-list)
+                            if (string-prefix-p "EmacsClient" (frame-parameter frame 'name))
+                            return frame))
+         (frame (or preframe (make-frame +emacs-client-frame-parameters))))
+    (select-frame-set-input-focus frame)
+    (when frame
+      (with-selected-frame frame
+        (if fn
+            (call-interactively fn)
+          (with-current-buffer (switch-to-buffer "*scratch*")
+            (text-scale-set 0.2)
+            (when (eq major-mode 'fundamental-mode)
+              (emacs-lisp-mode)))
+          ;; (redisplay)
+          )))))
+
+#+end_src
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload +create-EmacsClient-frame)
+#+end_src
+*** tressit
+emacs 内部的 tree-sitter, 判断是否可以使用 treesit
+#+begin_src emacs-lisp
+(defun my-treesit-available-p ()
+  "Check whether tree-sitter is available. Native tree-sitter is introduced since 29."
+  (and (fboundp 'treesit-available-p) (treesit-available-p)))
+#+end_src
+
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload my-treesit-available-p)
+#+end_src
+
+*** EmacsClient 配置函数
+设置 emacs-client-frame-parameter
+#+begin_src emacs-lisp
+;;;###autoload
+(defvar my-emacs-client-frame-name "EmacsClient" "emacsclient frame default name")
+;;;###autoload
+(defvar my-emacs-client-frame nil "Store the generated EmacsClient frame")
+;;;###autoload
+(defvar +my-emacs-client-frame-parameters
+  `((name . ,my-emacs-client-frame-name)
+    ;; (transient . t)
+    ,@(when IS-LINUX
+        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
+          (display . ,(or (getenv "WAYLAND_DISPLAY")
+                          (getenv "DISPLAY")
+                          ":0"))))
+    ,(if IS-MAC '(menu-bar-lines . 1)))
+  "TODO")
+#+end_src
+判断 rame 是否是 EmacsClient frame
+#+begin_src emacs-lisp
+(defun +my-emacs-client-frame-p (&optional frame)
+  "Return t if the current frame is an Emacs-Client frame opened by
+`+my-emacs-client-open-frame'."
+  (and (string-prefix-p (alist-get 'name +my-emacs-client-frame-parameters)
+                        (frame-parameter frame 'name))
+       t
+       ;; (frame-parameter frame 'transient)
+       ))
+;;;###autoload
+(defun emacs-client-frame-is-live-p ()
+    "Return t, if `my-emacs-client-frame' exists"
+    (if (and my-emacs-client-frame (frame-live-p my-emacs-client-frame))
+        t
+      (setq my-emacs-client-frame
+            (cl-find-if (lambda (frame)
+                          (and (frame-live-p frame)
+                               (+my-emacs-client-frame-p frame)))
+                        (frame-list)))
+      (and my-emacs-client-frame (frame-live-p my-emacs-client-frame))))
+#+end_src
+打开一个 emacs-client，只能打开一个 emacsClient frame
+#+begin_src emacs-lisp
+;;;###autoload
+(defun +my-emacs-client-open-frame (&optional $file)
+  (interactive)
+  (let* ((frame-title-format "")
+         (frame (if (emacs-client-frame-is-live-p)
+                    my-emacs-client-frame
+                  (make-frame +my-emacs-client-frame-parameters))))
+    (setq my-emacs-client-frame frame)
+    (select-frame-set-input-focus frame)
+    (if (and $file (file-exists-p $file))
+        (when frame
+          (with-selected-frame frame
+            (find-file $file))))))
+#+end_src
+自动更新 emacsClient frame 的 Title
+#+begin_src emacs-lisp
+;;;###autoload
+(defun update-emacs-client-title ()
+  (let* ((frame (selected-frame)))
+    (when (string-prefix-p my-emacs-client-frame-name (frame-parameter frame 'name))
+      (modify-frame-parameters
+       frame
+       (list (cons 'name
+                   (concat my-emacs-client-frame-name " - " (buffer-name))))))))
+#+end_src
+autoload
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload update-emacs-client-title +my-emacs-client-open-frame emacs-client-frame-is-live-p)
+(add-hook 'doom-first-file-hook
+          (lambda ()
+            (run-with-idle-timer
+             1 nil
+             (lambda ()
+               (add-hook 'doom-switch-buffer-hook
+                         #'update-emacs-client-title)))))
+#+end_src
+
+** 设置一些常用的默认值
+#+begin_src emacs-lisp
+(setq-default delete-by-moving-to-trash t ; 文件删除到回收站
+              window-combination-resize t ; 从其它窗口获取新窗口大小
+              x-stretch-cursor t) ; 光标拉伸到字形宽度
+
+(setq! undo-limit 104857600         ; 重置撤销限制到 100 MiB
+       auto-save-default t          ; 没有人喜欢丢失工作，我也是如此
+       truncate-string-ellipsis "…" ; Unicode 省略号相比 ascii 更好
+                                    ; 同时节省 /宝贵的/ 空间
+       password-cache-expiry nil    ; 我能信任我的电脑 ... 或不能?
+       ; scroll-preserve-screen-position 'always
+                                    ; 不要让 `点' (光标) 跳来跳去
+       scroll-margin 3              ; 适当保持一点点边距
+       gc-cons-threshold 1073741824
+       read-process-output-max 1048576)
+
+;; (remove-hook 'text-mode-hook #'visual-line-mode) ;; 视觉上换行
+;; (add-hook 'text-mode-hook #'auto-fill-mode)  ;; 自动换行，按照 fill-column 设置
+(add-hook 'text-mode-hook #'toggle-word-wrap) ;; 自动视觉换行
+
+(global-subword-mode 1)             ; 识别驼峰，而不是傻瓜前进
+(global-unset-key (kbd "C-z"))      ; 关闭 "C-z" 最小化
+
+(define-key! global-map "C-s" #'+default/search-buffer)
+
+(map! (:leader (:desc "load a saved workspace" :g "wr" #'+workspace/load))) ;; workspace load keybind
+
+(when IS-WINDOWS
+  (setq-default buffer-file-coding-system 'utf-8-unix)
+  (set-default-coding-systems 'utf-8-unix)
+  (prefer-coding-system 'utf-8-unix)) ; 将 Windows 上的编码改为 UTF-8 Unix 换行
+
+(custom-set-variables '(delete-selection-mode t) ; delete when you select region and modify
+                      '(delete-by-moving-to-trash t) ; delete && move to trash
+                      '(inhibit-compacting-font-caches t) ;; don't compact font caches during GC. 在 windows 上可能需要开启它
+                      '(gc-cons-percentage 1))
+
+(add-hook 'prog-mode-hook (lambda () (setq show-trailing-whitespace t))) ; 高亮结尾的空白符
+
+(setq word-wrap-by-category t)  ; Chinese Wrap
+(setq confirm-kill-emacs nil)   ; kill emacs, not prompt
+(setq confirm-kill-processes nil) ; 退出后自动杀掉进程
+#+end_src
+定义一个自己的 key leader
+#+begin_src emacs-lisp
+(general-create-definer my/leader
+  :states '(normal insert emacs visual)
+  :keymaps 'override
+  :prefix ","
+  :non-normal-prefix "s-,")
+#+end_src
+默认下自定义界面所有修改都会加入到 =init.el= 上，常用的方法是放在 =costom.el= 上
+#+begin_src emacs-lisp
+(setq custom-file (expand-file-name "custom.el" doom-local-dir))
+(when (file-exists-p custom-file)
+  (load custom-file 'no-error 'no-message))
+#+end_src
+窗口交换的方法
+#+begin_src emacs-lisp
+(map! :map ctl-x-map
+  "<left>" #'windmove-left
+  "<down>" #'windmove-down
+  "<up>" #'windmove-up
+  "<right>" #'windmove-right)
+
+(map! :map evil-window-map
+  "SPC" #'rotate-layout
+  "<left>" #'windmove-left
+  "<down>" #'windmove-down
+  "<up>" #'windmove-up
+  "<right>" #'windmove-right
+  ;; 交换窗口
+  "C-<left>"   #'+evil/window-move-left
+  "C-<down>"   #'+evil/window-move-down
+  "C-<up>"     #'+evil/window-move-up
+  "C-<right>"  #'+evil/window-move-right)
+#+end_src
+修复当在终端使用​src_bash{emacs -T title} 启动时，emacs 标题不变的问题,目前应该没有效果了
+#+begin_src emacs-lisp
+(add-hook! doom-after-init-modules
+  (let ((title (assoc 'title default-frame-alist)))
+    (delq! title default-frame-alist)))
+#+end_src
+为不同的 frame 设置不同的窗口大小，目前使用系统功能代替, 依赖​~myfun.el~​中的​=init-default-frame=​函数
+#+begin_src emacs-lisp :tangle "no"
+(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (pcase (frame-parameter nil 'name)
+              ("scratch" (init-default-frame frame))
+              ("org-protocol" (init-default-frame frame 0.618 0.618)))))
+#+end_src
+** 最近文件的管理
+#+begin_src emacs-lisp
+(setq recentf-max-saved-items 200
+      recentf-exclude
+      '("\\.?cache" ".cask" "url" "COMMIT_EDITMSG\\'" "bookmars"
+        "\\.\\(?.gz\\|gif\\|svg\\|png\\|jpe?g\\|bmp\\|xpm\\)$"
+        "\\.?ido\\.last$" "\\.revive$" "/G?TAGS$" "/.elfeed/"
+        "^/tmp/" "^/var/folders/.+$" "^/nix/"
+        (lambda (file)
+          (or (file-directory-p file)
+              (file-in-directory-p file (bound-and-true-p package-user-dir))
+              (file-in-directory-p file (concat straight-base-dir "straight"))
+              (file-in-directory-p file
+                                   (file-name-directory (doom-session-file)))))))
+
+(after! recentf
+  (push (expand-file-name recentf-save-file) recentf-exclude))
+#+end_src
+** 自动保存文件
+使用 ~auto-save-visited-mode~ ,相关讨论[[https://emacs-china.org/t/macos-save-silently-t/24086][关于在 macOS 上设置了 save-silently 为 t ，自动保存时仍然会显示消息的问题]]
+#+begin_src emacs-lisp
+(use-package! emacs
+  :init
+  (setq auto-save-visited-interval 2
+        save-silently t
+        auto-save-visited-predicate
+        (lambda () (and (not (buffer-live-p (get-buffer " *vundo tree*")))
+                   (not (string-suffix-p "gpg" (file-name-extension (buffer-name)) t))
+                   (not (eq (buffer-base-buffer (get-buffer (concat "CAPTURE-" (buffer-name))))
+                            (current-buffer)))
+                   (or (not (boundp 'corfu--total)) (zerop corfu--total))
+                   ;; Company is not active?
+                   (or (not (boundp 'company-candidates))
+                       (not company-candidates))
+                   ;; rime 输入中文时，不自动保存
+                   (or (not (featurep 'rime))
+                       (and (bound-and-true-p rime--lib-loaded)
+                            (string= "" (rime--build-candidate-content))))
+                   ;; 不聚焦到 minibuffer 时
+                   (not (active-minibuffer-window))
+                   (or (not (boundp 'yas--active-snippets)) (not yas--active-snippets)))))
+  :hook (doom-first-file . auto-save-visited-mode)
+  :config
+  ;; NOTE: macos 上设置 save-silently 为 t, 自动保存时还是会显示消息
+
+  (when IS-MAC
+    (setq inhibit-message-regexps '("^Saving" "^Wrote")
+          set-message-functions '(inhibit-message))
+    ;; (defadvice! +auto-save-visited-mode (fn &rest args)
+    ;;   :after #'auto-save-visited-mode
+    ;;   (if (bound-and-true-p auto-save-visited-mode)
+    ;;     (setq inhitbit-message-regexps nil
+    ;;           set-message-functions '(set-minibuffer-message))))
+    )
+  )
+#+end_src
+** 日历配置
+#+begin_src emacs-lisp
+(use-package! calendar
+  :hook (calendar-today-visible . calendar-mark-today)
+  :config
+  ;; 不显示中国节目，用`cal-chinese-x' 插件显示
+  (setq calendar-chinese-all-holidays-flag nil)
+  ;; 显示节目
+  (setq calendar-mark-holiday-flag t
+        ;; 不显示 Emacs 日记，使用 org-mode 写日记
+        calendar-mark-diary-entries-flag nil
+        ;; 使用数字显示时区
+        calendar-time-zone-style 'numberic
+        ;; 日期显示方式为 year/month/day
+        calendar-date-style 'iso
+        ;; 中文天干地支
+        calendar-chinese-celestial-stem ["甲" "乙" "丙" "丁" "戊" "己" "庚" "辛" "壬" "癸"]
+        calendar-chinese-terrestrial-branch ["子" "丑" "寅" "卯" "辰" "巳" "午" "未" "申" "酉" "戌" "亥"]
+        ;; 设置中文月份
+        calendar-month-name-array ["一月" "二月" "三月" "四月" "五月" "六月" "七月" "八月" "九月" "十月" "十一月" "十二月"]
+        ;; 设置星期标题显示
+        calendar-day-name-array ["日" "一" "二" "三" "四" "五" "六"]
+        ;; 周日作为一周第一天
+        calendar-week-start-day 0))
+#+end_src
+
+** doom 配置
+拉取 doom-emacs 仓库的分支
+  - emacs-version: *29.0.60*
+*** 模组
+:properties:
+:header-args:emacs-lisp: :tangle no
+:end:
+
+#+name: init.el
+#+attr_html: :collapsed t
+#+begin_src emacs-lisp :tangle "init.el" :noweb no-export :comments no
+;;; init.el -*- lexical-binding: t; -*-
+
+;; This file controls what Doom modules are enabled and what order they load
+;; in. Remember to run 'doom sync' after modifying it!
+
+;; NOTE Press 'SPC h d h' (or 'C-h d h' for non-vim users) to access Doom's
+;;      documentation. There you'll find a link to Doom's Module Index where all
+;;      of our modules are listed, including what flags they support.
+
+;; NOTE Move your cursor over a module's name (or its flags) and press 'K' (or
+;;      'C-c c k' for non-vim users) to view its documentation. This works on
+;;      flags as well (those symbols that start with a plus).
+;;
+;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
+;;      directory (for easy access to its source code).
+(defadvice! my-remove-environment-value-a (&rest _)
+  :before #'doom-load-envvars-file
+  (delete "EMACSLOADPATH=" process-environment))
+
+;; Determine if there is an available lang-ts-mode
+(defun my-use-ts-mode-p (lang)
+  (let ((mode (intern (format "%s-ts-mode" (symbol-name lang)))))
+    (and (fboundp 'treesit-language-available-p)
+         (treesit-language-available-p lang)
+         (fboundp mode))))
+
+(doom! :input
+       <<doom-input>>
+
+       :completion
+       <<doom-completion>>
+
+       :ui
+       <<doom-ui>>
+
+       :editor
+       <<doom-editor>>
+
+       :emacs
+       <<doom-emacs>>
+
+       :term
+       <<doom-term>>
+
+       :checkers
+       <<doom-checkers>>
+
+       :tools
+       <<doom-tools>>
+
+       :os
+       <<doom-os>>
+
+       :lang
+       <<doom-lang>>
+
+       :email
+       <<doom-email>>
+
+       :app
+       <<doom-app>>
+
+       :config
+       <<doom-config>>
+       )
+#+end_src
+**** 结构化配置
+这是一篇文学编程，同时也是 Doom Emacs 的配置文件。 Doom 对其支持良好，更多详情
+可以通过 ~literate~ (文学) 模块了解。
+
+#+name: doom-config
+#+begin_src emacs-lisp
+literate
+(default +bindings +smartparens)
+#+end_src
+**** 接口
+可以用来增强 emacs 功能的配置
+- 输入法 ::
+#+name: doom-input
+#+begin_src emacs-lisp
+;;chinese     ; 使用自己定义的配置
+;;japanese
+;;layout            ; auie,ctsrnm is the superior home row
+#+end_src
+- 补全 ::
+  我使用 company + vertico
+#+name: doom-completion
+#+begin_src emacs-lisp
+(company +childframe)
+;;helm              ; the *other* search engine for love and life
+;;ido               ; the other *other* search engine...
+;;(ivy              ; a search engine for love and life
+;; +icons           ; ... icons are nice
+;; +prescient)      ; ... I know what I want(ed)
+(vertico +icons)    ; the search engine of the future
+#+end_src
+- UI ::
+  emacs 美化相关配置
+  #+name: doom-ui
+  #+begin_src emacs-lisp
+;;deft              ; notational velocity for Emacs
+doom              ; what makes DOOM look the way it does
+doom-dashboard    ; a nifty splash screen for Emacs
+;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
+(emoji +unicode +github)  ; 🙂
+hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
+;;hydra
+indent-guides     ; highlighted indent columns
+(ligatures +extra +pragmata-pro)         ; ligatures and symbols to make your code pretty again
+;;minimap           ; show a map of the code on the side
+modeline          ; snazzy, Atom-inspired modeline, plus API
+;;nav-flash         ; blink cursor line after big motions
+;;neotree           ; a project drawer, like NERDTree for vim
+ophints           ; highlight the region an operation acts on
+(popup +defaults)   ; tame sudden yet inevitable temporary windows
+;;tabs              ; a tab bar for Emacs
+;;treemacs          ; a project drawer, like neotree but cooler
+;;unicode           ; extended unicode support for various languages
+vc-gutter         ; vcs diff in the fringe
+vi-tilde-fringe   ; fringe tildes to mark beyond EOB
+window-select     ; visually switch windows
+workspaces        ; tab emulation, persistence & separate workspaces
+;;zen               ; distraction-free coding or writing
+  #+end_src
+- 文本编辑相关功能 :: *VI VI VI EDitor of the Beast*
+  #+name: doom-editor
+  #+begin_src emacs-lisp
+(evil +everywhere); come to the dark side, we have cookies
+file-templates    ; auto-snippets for empty files
+fold              ; (nigh) universal code folding
+format
+;;(format +onsave)  ; automated prettiness
+;;god               ; run Emacs commands without modifier keys
+;;lispy             ; vim for lisp, for people who don't like vim
+;;multiple-cursors  ; editing in many places at once
+;;objed             ; text object editing for the innocent
+;;parinfer          ; turn lisp into python, sort of
+;;rotate-text       ; cycle region at point between text candidates
+snippets          ; my elves. They type so I don't have to
+;;word-wrap         ; soft wrapping with language-aware indent
+  #+end_src
+- Emacs 内置功能增强 ::
+#+name: doom-emacs
+ #+begin_src emacs-lisp
+dired             ; making dired pretty [functional]
+electric          ; smarter, keyword-based electric-indent
+(ibuffer +icons)        ; interactive buffer management
+undo             ; persistent, smarter undo for your inevitable mistakes
+vc                ; version-control and Emacs, sitting in a tree
+ #+end_src
+- 终端功能 ::
+  #+name: doom-term
+#+begin_src emacs-lisp
+;; eshell            ; the elisp shell that works everywhere
+;;shell             ; simple shell REPL for Emacs
+;;term              ; basic terminal emulator for Emacs
+vterm             ; the best terminal emulation in Emacs
+#+end_src
+- 检测 :: 可以告诉我哪里不对，但我觉得我应该先好好背背单词或者看看 PEP8
+  #+name: doom-checkers
+ #+begin_src emacs-lisp
+syntax              ; tasing you for every semicolon you forget
+;; (:if (or (executable-find "hunspell")
+;;          (executable-find "aspell")) spell) ; tasing you for misspelling mispelling
+;;grammar           ; tasing grammar mistake every you make
+  #+end_src
+- 工具 :: workflow in Emacs!
+#+name: doom-tools
+#+begin_src emacs-lisp
+;; tree-sitter
+;;ansible
+;;biblio            ; Writes a PhD for you (citation needed)
+;;debugger          ; FIXME stepping through code, to help you add bugs
+direnv
+docker
+;;editorconfig      ; let someone else argue about tabs vs spaces
+;;ein               ; tame Jupyter notebooks with emacs
+(eval +overlay)     ; run code, run (also, repls)
+;;gist              ; interacting with github gists
+lookup              ; navigate your code and its documentation
+;; (lsp +eglot)               ; M-x vscode
+magit             ; a git porcelain for Emacs
+;;make              ; run make tasks from Emacs
+pass              ; password manager for nerds
+pdf               ; pdf enhancements
+;;prodigy           ; FIXME managing external services & code builders
+;;rgb               ; creating color strings
+;;taskrunner        ; taskrunner for all your projects
+;;terraform         ; infrastructure as code
+;;tmux              ; an API for interacting with tmux
+;;upload            ; map local to remote projects via ssh/ftp
+#+end_src
+- OS ::
+#+name: doom-os
+#+begin_src emacs-lisp
+(:if IS-MAC macos)  ; improve compatibility with macOS
+tty               ; improve the terminal Emacs experience
+#+end_src
+**** 编程语言支持
+
+最爽的事情就是，我可以在 Emacs 中编写任何语言 (的 =Hello World=)
+
+#+name: doom-lang
+#+begin_src emacs-lisp  :noweb-ref none
+;; #+begin_src emacs-lisp :var is-lua=lua-lang
+(:unless (my-use-ts-mode-p 'lua) lua)
+;;agda              ; types of types of types of types...
+;;beancount         ; mind the GAAP
+;;(cc +lsp)         ; C > C++ == 1
+;;clojure           ; java with a lisp
+;;common-lisp       ; if you've seen one lisp, you've seen them all
+;;coq               ; proofs-as-programs
+;;crystal           ; ruby at the speed of c
+;;csharp            ; unity, .NET, and mono shenanigans
+data              ; config/data formats
+;;(dart +flutter)   ; paint ui and not much else
+;;dhall
+;;elixir            ; erlang done right
+;;elm               ; care for a cup of TEA?
+emacs-lisp        ; drown in parentheses
+;;erlang            ; an elegant language for a more civilized age
+;;ess               ; emacs speaks statistics
+;;factor
+;;faust             ; dsp, but you get to keep your soul
+;;fortran           ; in FORTRAN, GOD is REAL (unless declared INTEGER)
+;;fsharp            ; ML stands for Microsoft's Language
+;;fstar             ; (dependent) types and (monadic) effects and Z3
+;;gdscript          ; the language you waited for
+;;(go +lsp)         ; the hipster dialect
+;;(haskell +lsp)    ; a language that's lazier than I am
+;;hy                ; readability of scheme w/ speed of python
+;;idris             ; a language you can depend on
+;; json              ; At least it ain't XML
+;;(java +lsp)       ; the poster child for carpal tunnel syndrome
+javascript        ; all(hope(abandon(ye(who(enter(here))))))
+;;julia             ; a better, faster MATLAB
+;;kotlin            ; a better, slicker Java(Script)
+;;latex             ; writing papers in Emacs has never been so fun
+;;lean              ; for folks with too much to prove
+;;ledger            ; be audit you can be
+markdown          ; writing docs for people to ignore
+;;nim               ; python + lisp at the speed of c
+nix               ; I hereby declare "nix geht mehr!"
+;;ocaml             ; an objective camel
+(org +hugo
+     +roam2
+     +dragndrop
+     )           ;organize your plain life in plain text
+;;php               ; perl's insecure younger brother
+;;plantuml          ; diagrams for confusing people more
+;;purescript        ; javascript, but functional
+python              ; beautiful is better than ugly
+;;qt                ; the 'cutest' gui framework ever
+;;racket            ; a DSL for DSLs
+;;raku              ; the artist formerly known as perl6
+;;rest              ; Emacs as a REST client
+;;rst               ; ReST in peace
+;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+;; rust             ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+;;scala             ; java, but good
+;;(scheme +guile)   ; a fully conniving family of lisps
+sh                ; she sells {ba,z,fi}sh shells on the C xor
+;;sml
+;;solidity          ; do you need a blockchain? No.
+;;swift             ; who asked for emoji variables?
+;;terra             ; Earth and Moon in alignment for performance.
+web               ; the tubes
+yaml              ; JSON, but readable
+;;zig               ; C, but simpler
+#+end_src
+**** everything  in Emacs
+- 邮件 :: 我不会在 EMacs 中使用邮件🙃
+#+name: doom-email
+#+begin_src emacs-lisp
+;;(mu4e +org +gmail)
+;;notmuch
+;;(wanderlust +gmail)
+#+end_src
+- app :: 可以在 emacs 中查看 RSS ， 上 irc
+#+name: doom-app
+#+begin_src emacs-lisp
+;;calendar
+;;emms
+;;everywhere        ; *leave* Emacs!? You must be joking
+;;irc               ; how neckbeards socialize
+(rss +org)        ; emacs as an RSS reader
+;;twitter           ; twitter client https://twitter.com/vnought
+#+end_src
+** 杂项
+* 包
+** 加载结构
+:properties:
+:header-args:emacs-lisp: :tangle no
+:end:
+doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就可以安装。
+需要注意，不应该将该文件编译为字节码。
+#+begin_src emacs-lisp :tangle "packages.el" :comments no
+;; -*- no-byte-compile: t; -*-
+;;; $DOOMDIR/packages.el
+;;; Load NIXOS automatically generated configuration.
+(load! "packages.init.el" doom-user-dir 'no-error)
+#+end_src
+
+*警告*: 不要禁用 =~/.emacs.d/core/packages.el= 中列出的包。Doom 依赖这些，禁用它们
+可能出现严重问题。
+- 从官方的源 [[https://melpa.org/][MELPA]] / [[http://elpa.gnu.org/][GNU ELPA]] / [[https://emacsmirror.net/][emacsmirror]] 安装
+  #+begin_src emacs-lisp
+(package! some-package)
+  #+end_src
+- 关闭某些包
+  #+begin_src emacs-lisp
+(package! some-package :disable t)
+  #+end_src
+- 从 Git Repo 安装
+  #+begin_src emacs-lisp
+;; github
+(package! github-package :recipe (:host github :repo "username/repo"))
+;; gitlab
+(package! gitlab-package :recipe (:host gitlab :repo "username/repo"))
+;; other
+(package! other-package :recipe (:host nil :repo "https://example.com/repo"))
+  #+end_src
+  如果 repo 仅中只有某个 / 某些文件是你需要的
+  #+begin_src emacs-lisp
+(package! some-package
+  :recipe (:host github :repo "username/repo"
+           :files ("some-file.el" "src/elisp/*.el")))
+  #+end_src
+  如果需要指定某个 =commit= 或某个 =branch=
+  #+begin_src emacs-lisp
+;; commit
+(package! some-package :pin "abcdefghijk")
+;; branch
+(package! some-package :recipe (:branch "stable"))
+  #+end_src
+- 使用本地的 repo
+  #+begin_src emacs-lisp
+(package! some-package :recipe (:local-repo "/path/to/repo"))
+  #+end_src
+** 辅助宏
+这些是 doom 添加的一些非常有用的宏
+- ~load!~ 可以相对于本文件进行外部 ~.el~ 文件的加载
+- ~use-package!~ 用于配置包
+- ~add-load-path!~ 将指定目录添加到 ~load-path~ 中，可以让 Emacs 在使用
+  ~require~ 和 ~use-package~ 时在 ~load-path~ 中进行查找
+- ~map!~ 用于绑定新的快捷键
+** UI
+字体，等主题 ui 配置
+*** 字体配置
+Doom exposes five (optional) variables or controlling fonts in Doom.
++ ~doom-font~ : set default font, 我使用 "Cascadia Code", size 为 12 ，备选字体: Fantasque Sans Mono, size 为 13
++ ~doom-variable-pitch-font~: Set Serif font, 目前没有喜欢的
++ ~doom-big-font~: used for `doom-big-font-mode`; use this for presentations or streaming ， 这个模式一般不会使用，如果选择字体，我回选择 Fira Code
++ ~doom-unicode-font~: Fallback font for Unicode glyphs ， Unicode ，或者默认字体，目前很多人推荐 [[https://juliamono.netlify.app/][JuliaMono]]， 我应该会尝试
++ 中文字体: LXGW WenKai Mono 备选 "Adobe Heiti Std" 和系统自带的字体
++ 如果你想获得使用等高且等宽的字体，请使用 [[https://github.com/be5invis/Sarasa-Gothic][更纱黑体]] (如果该字体的高度能小一点，我一定会用它，也许后续我会自己调整它的高度)
+  #+begin_src emacs-lisp
+(setq doom-unicode-font nil) ;; FIX: emoji 显示错误
+(defadvice! my/use-default-font-a (&rest _)
+  "Set `doom-font'!"
+  :before #'doom-init-fonts-h
+  (cl-loop for font in '("PragmataPro Liga" "Cascadia Code" "Fantasque Sans Mono")
+           when (doom-font-exists-p font)
+           return (setq doom-font (font-spec :family font :size 13)))
+  (unless doom-font
+    (cl-loop for font in '("JetBrains Mono" "Fira Code" "Source Code Pro" "Menlo" "monospace")
+             when (doom-font-exists-p font)
+             return (setq doom-font (font-spec :family font :size 12))))
+  (advice-remove #'doom-init-fonts-h #'my/use-default-font-a))
+
+(defadvice! my/use-chinese-font-a (&rest _)
+  "Set Chinese fonts"
+  :after #'doom-init-fonts-h
+  (cl-loop for font in '("LXGW WenKai Mono" "Adobe Heiti Std" "STXihei" "Microsoft Yahei"
+                         "Hiragino Sans GB W6" "WenQuanYi Micro Hei Mono")
+           when (doom-font-exists-p font)
+           return (dolist (charset '(kana han cjk-misc bopomofo))
+                    (set-fontset-font t charset font)))
+  ;; org modern header 字体配置
+  (when (doom-font-exists-p "Unifont")
+    (set-fontset-font t '(#x262f . #x2637) "Unifont")
+    (set-fontset-font t '(#x2460 . #x2468) "Unifont")))
+
+;; ligatures
+(when (modulep! :ui ligatures +extra)
+  (plist-put! +ligatures-extra-symbols :pipe "‖")
+  (add-hook 'after-setting-font-hook
+            (lambda ()
+              (when (and (display-graphic-p)
+                         (string-equal (font-get doom-font :family) "Fantasque Sans Mono"))
+                (set-fontset-font t '(#X03bb . #X03bb) "Fantasque Sans Mono") ;; :lambda
+                (set-fontset-font t '(#X2022 . #X2022) "Fantasque Sans Mono")) ;; dot
+
+              (cl-loop for font in '("STIX Two Math" "Latin Modern Math")
+                       when (doom-font-exists-p font)
+                       return (dolist (charset (list #X2218 ;; composition
+                                                     #X21a6 ;; map
+                                                     #X2205 ;; null
+                                                     #X1d54b ;; true
+                                                     #X1d53d ;; false
+                                                     #X2124 ;; int
+                                                     #X211d ;; float
+                                                     #X1d54a ;; str
+                                                     #X1d539 ;; bool
+                                                     #X1d543 ;; list
+                                                     #X22c3 ;; union
+                                                     #X2229 ;; intersect
+                                                     #X2216 ;; diff
+                                                     #X2a02 ;; tuple
+                                                     ))
+                                ;; (set-fontset-font t (cons charset charset) font)
+                                (set-fontset-font t `(,charset . ,charset) font))))))
+
+(defun my-ligatures-init-buffer-h ()
+  (when after-init-time
+    (let ((in-mode-extras-p (+ligatures--enable-p +ligatures-extras-in-modes)))
+      (when in-mode-extras-p
+        (prependq! prettify-symbols-alist
+                   (alist-get major-mode +ligatures-extra-alist)))
+      (when (and in-mode-extras-p
+                 prettify-symbols-alist)
+        (when prettify-symbols-mode
+          (prettify-symbols-mode -1))
+        (prettify-symbols-mode +1)))))
+(when (and (modulep! :ui ligatures)
+           (not (modulep! :ui ligatures +extra)))
+  (add-hook! 'doom-init-ui-hook :append
+    (defun my-ligatures-init-h ()
+      (add-hook 'after-change-major-mode-hook #'my-ligatures-init-buffer-h))))
+  #+end_src
+**** nerd-font
+使用​~Sysmbola Nerd Font Mono~​显示 icon 图标字体
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! nerd-icons
+  :recipe (:host github
+           :repo "rainstormstudio/nerd-icons.el"
+           :files (:defaults "data")))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! nerd-icons
+  :autoload (nerd-icons-mdicon nerd-icons-codicon)
+  :init
+  (defadvice! +my-set-ligatures-a (&rest _)
+    :before #'set-ligatures!
+    (appendq! +ligatures-extra-symbols
+              (list :arrow_left (nerd-icons-mdicon "nf-md-arrow_left")
+                    :arrow_right (nerd-icons-mdicon "nf-md-arrow_right")
+                    :arrow_lr (nerd-icons-mdicon "nf-md-arrow_left_right")
+                    :elispsis (nerd-icons-mdicon "nf-md-dots_horizontal")
+                    :properties (nerd-icons-codicon "nf-cod-symbol_property")
+                    :end (nerd-icons-mdicon "nf-md-arrow_collapse_right")
+                    :crypt (nerd-icons-mdicon "nf-md-key")
+                    :idcard (nerd-icons-mdicon "nf-md-id_card")))
+    (advice-remove #'set-ligatures! '+my-set-ligatures-a))
+  ;; (add-hook 'after-setting-font-hook #'nerd-icons-set-font) ;为对应字符绑定字体
+  ;; (defadvice! my/use-nerd-font-a (&rest _)
+  ;;   "Set Chinese fonts"
+  ;;   :after #'doom-init-fonts-h
+  ;;   ;; org modern header 字体配置
+  ;;   )
+  :custom
+  (nerd-icons-font-family "Symbols Nerd Font Mono")
+  :config
+  (when (and (display-graphic-p)
+             (not (doom-font-exists-p nerd-icons-font-family)))
+    (nerd-icons-install-fonts t)))
+#+end_src
+*** 主题和 modeline
+***** 主题的基本配置
+目前使用主要有 doom-theme ， modus-themes 和 catppuccin-theme
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! ef-themes)
+#+end_src
+#+begin_src emacs-lisp
+(setq doom-theme nil) ;; 使用 autodark 自动切换主题
+(setq modus-themes-italic-constructs t
+      modus-themes-bold-constructs t
+      modus-themes-subtle-line-numbers t
+      modus-themes-mode-line '(borderless padded)
+      ;; modus-themes-hl-line '(nil)
+      modus-themes-org-blocks 'gray-background)
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
+(setq display-line-numbers-type t)
+;;@see https://emacs-china.org/t/topic/451/4?u=ldbeth
+(define-fringe-bitmap 'right-curly-arrow [#b01110000
+                                          #b01110000
+                                          #b00000000
+                                          #b01110000
+                                          #b01110000
+                                          #b00000000
+                                          #b01110000
+                                          #b01110000])
+
+(define-fringe-bitmap 'left-curly-arrow [#b00001110
+                                         #b00001110
+                                         #b00000000
+                                         #b00001110
+                                         #b00001110
+                                         #b00000000
+                                         #b00001110
+                                         #b00001110])
+#+end_src
+- [[https://github.com/redguardtoo/emacs.d/blob/182b37a488f3e091b0f5754f79e92421b1be6482/lisp/init-theme.el#L81][自动随机切换主题]]
+#+begin_src emacs-lisp
+(setq my-light-themes '(doom-solarized-light
+                        doom-ayu-light
+                        doom-gruvbox-light
+                        doom-one-light
+                        doom-nord-light
+                        modus-operandi
+                        doom-tomorrow-day
+                        ef-cyprus
+                        ef-day
+                        ef-deuteranopia-light
+                        ef-duo-light
+                        ef-elea-light
+                        ef-frost
+                        ef-kassio
+                        ef-light
+                        ef-maris-light
+                        ef-melissa-light
+                        ef-spring
+                        ef-summer
+                        ef-trio-light
+                        ef-tritanopia-light
+                        ))
+
+(setq my-dark-themes '(doom-one
+                       modus-vivendi
+                       doom-solarized-dark
+                       doom-gruvbox
+                       doom-dracula
+                       doom-monokai-pro
+                       doom-nord
+                       doom-ayu-dark
+                       doom-tomorrow-night
+                       ef-autumn
+                       ef-bio
+                       ef-cherie
+                       ef-dark
+                       ef-deuteranopia-dark
+                       ef-duo-dark
+                       ef-elea-dark
+                       ef-maris-dark
+                       ef-melissa-dark
+                       ef-night
+                       ef-symbiosis
+                       ef-trio-dark
+                       ef-tritanopia-dark
+                       ef-winter
+                       ))
+
+(defun my--random-theme-f (themes &optional ctheme)
+  (let ((theme (nth (random (length themes)) themes)))
+    (if (not ctheme)
+        theme
+      (while (equal ctheme theme)
+        (setq theme (nth (random (length themes)) themes)))
+      theme)))
+
+(defun my--pickup-random-color-theme (themes)
+  "Pickup random color theme from THEMES."
+  (let* ((ctheme (or (car custom-enabled-themes) doom-theme))
+         (available-themes (mapcar 'symbol-name themes))
+         (theme (my--random-theme-f available-themes ctheme)))
+    (if (modulep! :completion vertico)
+        (consult-theme (intern theme))
+      (disable-theme (car custom-enabled-themes))
+      (load-theme (intern theme) t t))
+    (message "Color theme [%s] loaded." theme)))
+
+(defun my/random-theme ()
+  (interactive)
+  (let* ((ctheme (or (car custom-enabled-themes) doom-theme))
+         (themes (cond ((memq ctheme my-light-themes) my-light-themes)
+                       ((memq ctheme my-dark-themes) my-dark-themes)
+                       (t (custom-available-themes)))))
+    (my--pickup-random-color-theme themes)))
+(map! (:leader (:desc "load theme" "h t" #'my/random-theme))) ;; workspace load keybind
+#+end_src
+
+#+RESULTS:
+#+begin_results
+my/random-theme
+#+end_results
+
+****** 自动切换主题
+******* auto-dark
+Macos 上借助系统自带的进行主题切换
+#+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "packages.el" "no")
+(package! auto-dark :recipe (:type git :host github :repo "emacsmirror/auto-dark"))
+#+end_src
+#+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "yes" "no")
+(use-package! auto-dark
+  :init
+  (defadvice! my/doom-init-theme-a (fn &rest args)
+    "Using circadoam config"
+    :around #'doom-init-theme-h
+    (if (display-graphic-p)
+        (progn
+         (auto-dark-mode +1)
+         (setq doom-theme (car custom-enabled-themes)))
+      (setq doom-theme (my--random-theme-f my-light-themes))
+      (apply fn args)))
+  :config
+  (setq auto-dark-dark-theme (my--random-theme-f my-dark-themes)
+        auto-dark-light-theme  (my--random-theme-f my-light-themes)))
+#+end_src
+
+******* 使用经纬度切换
+#+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "no" "packages.el")
+(package! circadian)
+#+end_src
+
+#+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "no" "packages.el")
+(use-package! circadoam
+  :commands (circadian-setup)
+  :unless IS-MAC
+  :init
+  (setq calendar-longitude 114.03
+        calendar-latitude 30.58)
+  (setq circadian-themes `((:sunrise . ,(my--random-theme-f my-light-themes))
+                           (:sunset  . ,(my--random-theme-f my-dark-themes))))
+
+  (defadvice! my/doom-init-theme-a (&rest _)
+    "Using circadoam config"
+    :around #'doom-init-theme-h
+    (circadian-setup)
+    (setq doom-theme (car custom-enabled-themes))))
+#+end_src
+
+***** modeline and tab
+目前使用 [[https://github.com/manateelazycat/awesome-tray][awesome-tray]], 备用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]
+****** modeline 配置
++ awesome-tray
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! awesome-tray :recipe (:host github :repo "manateelazycat/awesome-tray"))
+(package! solaire-mode :disable t)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! awesome-tray
+  :commands (awesome-tray-mode awesome-tray-enable awesome-tray-disable)
+  :init
+  (setq awesome-tray-date-format "%H:%M")
+  (setq awesome-tray-active-modules
+        '("word-count" "location" "belong" "file-path" "mode-name" "battery" "date" "evil"))
+  (add-hook 'doom-after-init-hook #'awesome-tray-mode 100)
+  (setq awesome-tray-info-padding-right 2)
+  (add-hook! 'doom-load-theme-hook :depth 100
+    (when (bound-and-true-p awesome-tray-mode)
+      (awesome-tray-enable)
+      (when-let ((ctheme (car custom-enabled-themes)))
+        (let* ((str-ctheme (symbol-name ctheme))
+               (idx (string-match "-" str-ctheme))
+               (str-prefix (if idx (substring str-ctheme 0 idx) "")))
+          (pcase str-prefix
+            ("doom"
+             (set-face-attribute 'header-line nil
+                                 :foreground (doom-color 'fg)
+                                 :background (doom-color 'bg)
+                                 :distant-foreground (doom-color 'bg)
+                                 :inherit 'unspecified))
+            ("modus"
+             (set-face-attribute 'header-line nil
+                                 :foreground (modus-themes-with-colors fg-main)
+                                 :background (modus-themes-with-colors bg-main)
+                                 :distant-foreground (modus-themes-with-colors fg-alt)))
+            ("ef"
+             (set-face-attribute 'header-line nil
+                                 :foreground (ef-themes-with-colors fg-main)
+                                 :background (ef-themes-with-colors bg-main)
+                                 :distant-foreground (ef-themes-with-colors fg-alt)))
+            (_ nil))))
+      (set-face-attribute 'mode-line nil :height 0.1)))
+  (map! :leader :desc "modeline" "tm" #'awesome-tray-mode)
+  :config
+  (defadvice! +awesome-tray-enable-a (fn &rest args)
+    :around #'awesome-tray-enable
+    (when (bound-and-true-p doom-modeline-mode) (doom-modeline-mode -1))
+    (apply fn args)
+    (set-face-attribute 'header-line nil :inherit 'unspecified))
+
+  (defadvice! +awesome-tray-disable-a (&rest _)
+    :after #'awesome-tray-disable
+    (when (fboundp 'doom-modeline-mode) (doom-modeline-mode)))
+
+  (advice-add 'awesome-tray-module-mode-name-info :filter-return
+              (lambda (mode-name)
+                (let ((change-mode-alist '((emacs-lisp . "")
+                                           (org . "")
+                                           (python . "")
+                                           (python-ts . "")
+                                           (lua . "󰢱")
+                                           (lua-ts . "󰢱")
+                                           ("bash-ts" . "󱆃")
+                                           ("sh" . "󱆃"))))
+                  (or (alist-get (intern mode-name) change-mode-alist)
+                      mode-name)))
+              ))
+#+end_src
++ modeline
+  使用 doom-modeline 的一些配置
+  #+begin_src emacs-lisp
+(after! doom-modeline
+  (remove-function after-focus-change-function #'doom-modeline-focus-change)
+  ;; NOTE: 修复使用 awesome-tray 时，由于 (require 'doom-modeline-core) 而引起的 BUG
+  (defadvice! +my-doom-modeline-mode-a (fn &rest arg)
+    :around #'doom-modeline-mode
+    (if doom-modeline-mode
+        (progn
+          (remove-function after-focus-change-function #'doom-modeline-focus-change)
+          (apply fn arg))
+      (unless (bound-and-true-p awesome-tray-mode)
+        (add-function :around after-focus-change-function #'doom-modeline-focus-change)
+        (apply fn arg))))
+  (custom-set-variables '(doom-modeline-buffer-file-name-style 'relative-to-project)
+                        '(doom-modeline-major-mode-icon t)
+                        '(doom-modeline-modal-icon nil)))
+  #+end_src
+****** sort-tab 配置
+:PROPERTIES:
+:ID: 2fcbd9b0-f219-4043-8955-b65f343c0a77
+:END:
+使用 sort-tab 时，请不要随意更改字体，如果要更改字体请新关闭 sort-tab
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! sort-tab :recipe (:host github :repo "shanyouli/sort-tab"))
+#+end_src
+#+begin_src emacs-lisp
+;; @see https://github.com/manateelazycat/sort-tab/issues/13
+(use-package! sort-tab
+  ;; :disabled t
+  :hook (doom-first-buffer . sort-tab-mode)
+  :init
+  (setq sort-tab-show-index-number t)
+  :config
+  (map! :nvie "s-1" #'sort-tab-select-visible-tab
+        :nvie "s-2" #'sort-tab-select-visible-tab
+        :nvie "s-3" #'sort-tab-select-visible-tab
+        :nvie "s-4" #'sort-tab-select-visible-tab
+        :nvie "s-5" #'sort-tab-select-visible-tab
+        :nvie "s-6" #'sort-tab-select-visible-tab
+        :nvie "s-7" #'sort-tab-select-visible-tab
+        :nvie "s-8" #'sort-tab-select-visible-tab
+        :nvie "s-9" #'sort-tab-select-visible-tab
+    (:unless (modulep! :term vterm)
+     :nvie "s-0" #'sort-tab-select-visible-tab)
+        :leader
+        :desc "close all tabs" "qt" #'sort-tab-close-all-tabs
+        :desc "close current tab" "qc" #'sort-tab-close-current-tab
+        :desc "tab" "tt" #'sort-tab-mode
+        :localleader
+        :map global-map
+        (:prefix-map ("q" . "close")
+         :desc "Close other tabs" "o" #'my-sort-tab-close-all-tabs-without-current-tab))
+  (defun my-sort-tab-close-all-tabs-without-current-tab ()
+    (interactive)
+    (let ((visible-buffers sort-tab-visible-buffers))
+      (setq sort-tab-visible-buffers nil)
+      (dolist (buf visible-buffers)
+        (unless (eq buf (window-buffer))
+          (kill-buffer buf)))))
+  (after! ace-window
+    (pushnew! aw-ignored-buffers "*sort-tab*"))
+  (defadvice! +delete-other-windows (fn &optional window interactive)
+    :around #'delete-other-windows
+    (with-current-buffer (window-buffer (selected-window))
+      ;; (selected-window)
+      (if (and (bound-and-true-p sort-tab-mode)
+               (fboundp '+popup-window-p) (+popup-window-p))
+          (message "Please don't perform this function in this window, because will remove the `sort-tab-window'")
+        (funcall-interactively fn window interactive))))
+
+  (defadvice! sort-tab-buffer-need-hide-p-a (fn buf)
+    :around #'sort-tab-buffer-need-hide-p
+    (let ((bname (buffer-name buf)))
+      (cond ((string-prefix-p "dir-data" bname) t)
+            ((string-prefix-p "✅" bname) t)
+            ((string-prefix-p "⛔️" bname) t)
+            ((string-prefix-p "► Doom" bname) t)
+            (t (funcall fn buf))))))
+#+end_src
+*** 杂项
+#+begin_src emacs-lisp
+(setq doom-fallback-buffer-name "► Doom"
+      +doom-dashboard-name "► Doom")
+
+;; 当不适用 daemon 启动 EMACS 时，我喜欢窗口展示缓冲区的名字，然后是项目文件夹 (如果可用)。
+(when (daemonp)
+  (setq! frame-title-format
+         '("%b – Doom Emacs"
+           (:eval
+            (let ((project-name (projectile-project-name)))
+              (unless (string= "-" project-name)
+                (format "  -  [%s]" project-name)))))))
+#+end_src
+*** 允许 CLI 运行 org-babel 程序
+在 Org 中有时会写一点代码，[[https://orgmode.org/worg/org-contrib/babel][Org-Babel]] 就是各个语言在 Org-mode 中的巴别塔。大家都
+可以通过它来直接运行。
+
+但是在配置文件也会有一些代码，如果在 CLI 中执行 =doom sync= 之类的操作，大量的
+代码块输出会直接污染输出。这不能忍！
+
+好在 DOOM 提供了每次运行 CLI 前读取 =$DOOMDIR/cli.el= 的特性，我们可以不再手动
+确认是否运行某个代码块 (~org-confirm-babel-evaluate~)，并且用
+~org-babel-execute-src-block~ 来沉默这些代码块，避免污染输出。
+
+#+begin_src emacs-lisp :tangle cli.el :comments no
+;;; cli.el -*- lexical-binding: t; -*-
+(setq! org-confirm-babel-evaluate nil)
+(advice-add 'org-babel-execute-src-block
+            :around #'(lambda (orig-fn &rest args)
+                        (quiet! (apply orig-fn args))))
+#+end_src
+*** dashboard
+Dashboard 是打开 Emacs 的主页，在这里添加一些常用命令是很舒服的。
+#+begin_src emacs-lisp
+(map! :map +doom-dashboard-mode-map
+      :desc "org agenda" "a" #'org-agenda
+      :desc "find file" "f" #'find-file
+      :desc "recent session" "R" #'doom/quickload-session
+      :desc "recent files" "r" #'counsel-recentf
+      :desc "config dir" "C" #'doom/open-private-config
+      :desc "open config.org" "c" (cmd! (find-file (expand-file-name "config.org" doom-private-dir)))
+      ;; :desc "open dotfile" "." (cmd! (doom-project-find-file "~/.config/"))
+      :desc "notes (roam)" "n" #'org-roam-node-find
+      :desc "switch buffer" "b" #'+vertico/switch-workspace-buffer
+      ;; :desc "switch buffers (all)" "B" #'consult-buffer
+      :desc "ibuffer" "i" #'ibuffer
+      :desc "open project" "p" #'counsel-projectile-switch-project
+      ;; :desc "set theme" "t" #'consult-theme
+      :desc "quit" "q" #'save-buffers-kill-terminal
+      :desc "documentation" "H" #'doom/help
+      :desc "show keybindings" "h" (cmd! (which-key-show-major-mode)))
+#+end_src
+*** eros
+emacs 使用 C-x C-e 执行代码时，内联效果
+#+begin_src emacs-lisp
+(setq eros-eval-result-prefix "==>") ; default =>
+#+end_src
+*** rainbow-mode
+显示 "#232323" 对应的色彩
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! rainbow-mode)
+#+end_src
+只在 prog-mode  中开启
+#+begin_src emacs-lisp
+(use-package! rainbow-mode
+  :hook (prog-mode . rainbow-mode))
+#+end_src
+*** olivetti
+一个文本居中工具
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! olivetti :recipe (:host github :repo "rnkn/olivetti"))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! olivetti
+  :commands (olivetti-mode olivetti-set-width)
+  :autoload (+olivetti-mode-with-file)
+  :init
+  (add-hook! 'Info-mode-hook
+    (olivetti-mode +1)
+    (olivetti-set-width 100))
+  :config
+  (defun +olivetti-mode-with-file ()
+    (when-let ((fname (buffer-file-name)))
+      (unless (string-prefix-p "README" (upcase (file-name-base fname)))
+        (olivetti-mode +1)
+        (olivetti-set-width 100)))))
+#+end_src
+*** 换行
+[[https://codeberg.org/joostkremers/visual-fill-column][visual-fill-column]] [[https://ruib.in/posts/enable-line-wrapping-for-org-mode/][为 Org Mode 开启自动换行 - 没事瞎扯]]
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! visual-fill-column)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! visual-fill-column
+  :init
+  ;; (setq-hook! 'text-mode-hook fill-column 90)
+  :hook (org-mode . visual-fill-column-mode)
+  :config
+  ;; (add-hook 'visual-fill-column-mode-hook #'toggle-truncate-lines)
+  (define-key! evil-motion-state-map
+    "j" 'evil-next-visual-line
+    "k" #'evil-previous-visual-line))
+#+end_src
+
+** 工具
+*** common
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! psearch
+  :recipe (:host github :repo "twlz0ne/psearch.el"
+           :files ( "psearch.el" )
+           ))
+#+end_src
+*** Input
+**** Emacs-rime
+我用 [[https://github.com/DogLooksGood/emacs-rime][emacs-rime]] 作为 emacs 的输入法
+see@ https://emacs-china.org/t/os-smart-input-source/13436/726
+see@ https://emacs-china.org/t/native-os-sis/14089
+see@ https://github.com/DogLooksGood/emacs-rime/
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! rime :ignore IS-WINDOWS :built-in 'prefer)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! rime
+  :init
+  (setq default-input-method "rime"
+        rime-show-candidate 'posframe)
+  (setq rime-posframe-properties
+      (list :font "Unifont-18"
+        :internal-border-with 3))
+  (map! "C-\\" #'my-toggle-input-method
+        "s-." #'+rime-convert-string-at-point)
+  :commands (my-toggle-input-method +rime-convert-string-at-point)
+  :bind
+  (:map rime-mode-map ("C-`" . 'rime-send-keybinding))
+  :config
+  (define-key! rime-active-mode-map
+    ;; "<return>" (cmd! (rime--return)
+    ;;                  (when current-input-method (deactivate-input-method)))
+    "RET" (cmd! (rime--return)
+                     (when current-input-method (deactivate-input-method)))
+    "C-j" #'rime-inline-ascii)
+  ;;; fix posfrmae 吃字现象
+  (defun +rime--posframe-display-content-a (args)
+    "给 `rime--posframe-display-content' 传入的字符串加一个全角空
+  格，以解决 `posframe' 偶尔吃字的问题。"
+    (cl-destructuring-bind (content) args
+       (let ((newresult (if (string-blank-p content)
+                           content
+                         (concat content "　"))))
+        (list newresult))))
+
+  (if (fboundp 'rime--posframe-display-content)
+      (advice-add 'rime--posframe-display-content
+                  :filter-args
+                  #'+rime--posframe-display-content-a)
+    (error "Function `rime--posframe-display-content' is not available."))
+
+  (defadvice! +rime--load-dynamic-module-a (fn &rest args)
+    :around #'rime--load-dynamic-module
+    (if (active-minibuffer-window)
+        (with-temp-message ""
+          (let ((inhibit-message t))
+            (apply fn args)))
+      (apply fn args)))
+
+  (defun my-toggle-input-method ()
+    "避免误触开启输入法."
+    (interactive)
+    (cond ((and (boundp 'evil-mode) evil-mode)
+           ;; evil-mode
+           (cond ((or (eq evil-state 'insert) (eq evil-state 'emacs))
+                  (toggle-input-method))
+                 ((active-minibuffer-window)
+                  (toggle-input-method))
+                 (t nil))
+           (unless (active-minibuffer-window)
+             (cond
+              (current-input-method
+               ;; evil-escape and pyim may conflict
+               ;; @see https://github.com/redguardtoo/emacs.d/issues/629
+               (evil-escape-mode -1)
+               (message "IME on!"))
+              (t
+               (evil-escape-mode 1)
+               (message "IME off!")))))
+          (t (toggle-input-method))))
+
+  (defun +rime-force-enable ()
+    "强制`rime'使用中文输入状态。如果当前不是`rime'输入法，则新激活`rime',如果当前是`evil'的非编辑状态
+则转变为 `evil-insert-state'"
+    (interactive)
+    (let ((input-method "rime"))
+      (unless (string= current-input-method input-method)
+        (activate-input-method input-method))
+      (when (rime-predicate-evil-mode-p)
+        (if (= (+ 1 (point)) (line-end-position))
+            (evil-append 1)
+          (evil-insert 1))
+        (rime-force-enable))))
+
+  (defun +rime-convert-string-at-point (&optional return-cregexp)
+    "如果光标前的第一个字符是空格，则仅激活`rime',否则将光标前的字符串转换为中文"
+    (interactive "P")
+    (+rime-force-enable)
+    (unless (or (looking-back "\\s-" 1))
+      (let ((string (if mark-active
+                        (buffer-substring-no-properties
+                         (region-beginning) (region-end))
+                      (buffer-substring-no-properties
+                       (point) (max (line-beginning-position) (- (point) 80)))))
+            code
+            length)
+        (cond ((string-match "\\([a-z'-]+\\|[[:punct:]]\\) *$" string)
+               (setq code (replace-regexp-in-string
+                           "^[-']" ""
+                           (match-string 0 string)))
+               (setq length (length code))
+               (setq code (replace-regexp-in-string " +" "" code))
+               (if mark-active
+                   (delete-region (region-beginning) (region-end))
+                 (when (> length 0)
+                   (delete-char (- 0 length))))
+               (when (> length 0)
+                 (setq unread-command-events
+                       (append (listify-key-sequence code)
+                               unread-command-events))))
+              (t (message "`+rime-convert-string-at-point' did nothing.")))))))
+(after! evil
+  ;; 激活时
+  (defvar ime-cursor-insert '(bar "DarkOrange")
+    "Default cursor color if using an input method.")
+  (defvar ime-cursor-visual '(hollow "DarkOrange")
+    "Default cursor color if using an input method.")
+  (defvar ime-cursor-normal '(box "DarkOrange")
+    "Default cursor color if using an input method.")
+  ;; 不激活时
+  (defvar default-cursor-insert '(bar "CornflowerBlue")
+    "Default text cursor color.")
+  (defvar default-cursor-visual '(hollow "CornflowerBlue")
+    "Default text cursor color.")
+  (defvar default-cursor-normal '(box "CornflowerBlue")
+    "Default text cursor color.")
+  ;; 定义函数
+  (defun input-method-change-cursor-activate()
+    "Set cursor to show that input-method is activated."
+    (interactive)
+    (setq evil-normal-state-cursor ime-cursor-normal)
+    (setq evil-visual-state-cursor ime-cursor-visual)
+    (setq evil-insert-state-cursor ime-cursor-insert)
+    (evil-refresh-cursor))
+  (defun input-method-change-cursor-deactivate()
+    "Set cursor to show that input-method is deactivated."
+    (interactive)
+    (setq evil-normal-state-cursor default-cursor-normal)
+    (setq evil-visual-state-cursor default-cursor-visual)
+    (setq evil-insert-state-cursor default-cursor-insert)
+    (evil-refresh-cursor))
+  ;;(defun input-method-change-cursor-auto()
+  ;;    "Auto set cursor to show whether input-method is activated or not."
+  ;;    (interactive)
+  ;;  (if rime-mode (input-method-change-cursor-activate) (input-method-change-cursor-deactivate)))
+  ;; Hook
+  ;;(add-hook 'post-command-hook #'input-method-change-cursor-auto)
+  (add-hook 'input-method-activate-hook #'input-method-change-cursor-activate)
+  (add-hook 'input-method-deactivate-hook #'input-method-change-cursor-deactivate)
+  (add-hook 'evil-insert-state-entry-hook (lambda () (when current-input-method (deactivate-input-method))))
+  (add-hook 'evil-insert-state-exit-hook #'input-method-change-cursor-deactivate))
+#+end_src
+
+**** hungry-delete
+一次 ~backspace~ 吃掉所有空白符 (当前光标限定)
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! hungry-delete)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! hungry-delete
+  :defines doom-first-buffer-hook
+  :hook (doom-first-buffer . global-hungry-delete-mode)
+  :config
+  (setq-default hungry-delete-chars-to-skip " \t\f\v")
+  ;; NOTE: Counsel-find-file gives "text is read-only" on Backspace press.
+  ;; @see https://github.com/nflath/hungry-delete/issues/27
+  (push 'minibuffer-mode hungry-delete-except-modes)
+  (when (modulep! :config default +smartparens)
+    ;; NOTE: fix hungry-delete & smartparents conflict
+    ;; @see https://emacs-china.org/t/smartparens/2778/4
+    (defadvice hungry-delete-backward (before sp-delete-pair-advice activate)
+      (save-match-data (sp-delete-pair (ad-get-arg 0))))))
+#+end_src
+
+**** Dired
+#+begin_src emacs-lisp :tangle "packages.el"
+(unpin! dirvish)
+(package! dirvish)
+#+end_src
+#+begin_src emacs-lisp
+(after! dired
+  (use-package! dired-async
+    :commands (dired-async-do-rename
+               dired-async-do-symlink
+               dired-async-do-copy
+               dired-async-do-hardlink))
+
+  (define-key! dired-mode-map
+    "RET" #'dired-find-alternate-file
+    "<backspace>" #'dired-up-directory
+    "C" #'dired-async-do-copy
+    "H" #'dired-async-do-hardlink
+    "R" #'dired-async-do-rename
+    "S" #'dired-async-do-symlink))
+
+(use-package! dirvish
+  :defer t
+  :init (after! dired (dirvish-override-dired-mode))
+  :config
+  (setq dirvish-use-mode-line nil
+        dirvish-use-header-line nil
+        dirvish-cache-dir (concat doom-cache-dir "dirvish/")
+        dirvish-hide-details nil)
+  (set-popup-rule! "^ ?\\*Dirvish.*" :ignore t)
+  (map! :map dirvish-mode-map
+          :n  "?"   #'dirvish-dispatch
+          :n  "q"   #'dirvish-quit
+          :ng "a"   #'dirvish-quick-access
+          :ng "f"   #'dirvish-file-info-menu
+          :ng "y"   #'dirvish-yank-menu
+          :ng "s"   #'dirvish-quicksort
+          :ng "TAB" #'dirvish-subtree-toggle
+          :ng "M-t" #'dirvish-layout-toggle
+          :ng "M-b" #'dirvish-history-go-backward
+          :ng "M-f" #'dirvish-history-go-forward
+          :ng "M-n" #'dirvish-narrow
+          :ng "M-m" #'dirvish-mark-menu
+          :ng "M-s" #'dirvish-setup-menu
+          :ng "M-e" #'dirvish-emerge-menu
+          :map dired-mode-map
+          "C-c C-r" #'dirvish-rsync)
+   (setq dirvish-attributes '(file-size collapse nerd-icons git-msg))
+   (when (modulep! :ui vc-gutter)
+     (push 'vc-state dirvish-attributes))
+   (when (featurep 'diredfl)
+     (add-hook 'dirvish-directory-view-mode-hook #'diredfl-mode)))
+#+end_src
+更好的使用 emacs 编辑文件名
+#+begin_src emacs-lisp
+(use-package! wdired
+  :commands  (wdired-change-to-wdired-mode)
+  :config
+  (defadvice! my--wdired-exit-a (&rest _)
+    :after  #'wdired-exit
+    (dired-hide-details-mode -1))
+
+  (defadvice! my*wdired-change-to-wdired-mode-a (&rest _)
+    :after #'wdired-finish-edit
+    (dired-hide-details-mode 1))
+
+  (defadvice! my*wdired-change-to-wdired-mode-a (&rest _)
+    :before #'wdired-change-to-wdired-mode
+    (dired-hide-details-mode 1)))
+#+end_src
+**** avy
+让 avy 支持拼音搜索
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! ace-pinyin)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! ace-pinyin
+  :after avy
+  :init (setq ace-pinyin-use-avy t)
+  :config (ace-pinyin-global-mode 1))
+#+end_src
+
+*** Completion
+代码补全
+**** company
+#+begin_src emacs-lisp
+(after! company
+  (setq! company-idle-delay 0.15
+         company-minimum-prefix-length 2
+         comapny-show-numbers t)
+  (custom-set-variables '(company-show-numbers t)))
+  ;; 在某些 mode 中我不使用 company-mode 补全，使用 lsp-bridge 进行补全
+(defun dont-use-company-mode (mode)
+  "Do not use the company as the `mode' after completion"
+  (if (and (bound-and-true-p company-global-modes) (equal (car company-global-modes) 'not))
+      (add-to-list 'company-global-modes mode t)
+    (setq company-global-modes `(not ,mode erc-mode circe-mode message-mode help-mode gud-mode vterm-mode))))
+
+#+end_src
+
+**** Vertico
+***** 中文拼音搜索
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! pinyinlib)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! pinyinlib
+  :autoload pinyinlib-build-regexp-string)
+(when (modulep! :completion vertico)
+  (after! vertico (setq vertico-count 12))
+  (after! orderless
+    (defun completion--regex-pinyin (str)
+      (orderless-regexp (pinyinlib-build-regexp-string str)))
+    (add-to-list 'orderless-matching-styles 'completion--regex-pinyin)))
+#+end_src
+**** lsp-bridge
+lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服务工具
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! lsp-bridge
+  :recipe (:host github :repo "manateelazycat/lsp-bridge"
+           :files ("*.el" "*.py" "core" "langserver" "resources" "multiserver")
+           :build (:not compile native-compile)))
+(package! acm
+  :recipe (:host github :repo "manateelazycat/lsp-bridge" :files ("acm/*" "acm/icons")
+           :build (:not compile native-compile)))
+#+end_src
+
+#+begin_src emacs-lisp
+(use-package! lsp-bridge
+  ;; :hook (doom-first-buffer . enable-lsp-bridge-for-modes)
+  ;; :init (require 'acm) ;; Fix acm-silent is a void function error
+  :config
+  ;; (setq lsp-bridge-enable-log nil)
+  ;; (setq lsp-bridge-enable-diagnostics nil)
+  ;; (setq acm-enable-dabbrev nil)
+  (setq lsp-bridge-disable-backup nil)
+  (setq lsp-bridge-enable-auto-import t)
+  (setq lsp-bridge-completion-stop-commands '(corfu-complete corfu-insert undo-tree-undo undo-tree-redo save-buffer evil-normal-state))
+  (set-lookup-handlers! 'lsp-bridge-mode
+    :definition #'lsp-bridge-find-def
+    :references #'lsp-bridge-find-references
+    :documentation #'lsp-bridge-lookup-documentation
+    :implementations #'lsp-bridge-find-impl)
+  ;; Above setter will override elisp's definition handler
+  (set-lookup-handlers! '(emacs-lisp-mode lisp-interaction-mode helpful-mode)
+    :definition    #'+emacs-lisp-lookup-definition
+    :documentation #'+emacs-lisp-lookup-documentation)
+  ;; lsp-bridge-ref-mode 有自己的配置方法，使用 emacs
+  (after! evil (evil-set-initial-state 'lsp-bridge-ref-mode 'emacs))
+  ;; (defadvice! ++javascript-init-lsp-or-tide-maybe-h ()
+  ;;   :override #'+javascript-init-lsp-or-tide-maybe-h
+  ;;   nil)
+  (pushnew! lsp-bridge-single-lang-server-mode-list '(lua-ts-mode . "sumneko"))
+)
+
+(use-package! acm
+  :config
+  (setq acm-enable-quick-access t
+        acm-backend-yas-match-by-trigger-keyword t
+        acm-enable-tabnine nil
+        acm-enable-codeium t)
+  (defun my/acm-toggle-tabnine ()
+    (interactive)
+    (setq acm-enable-tabnine (not acm-enable-tabnine))
+    (when (and acm-enable-tabnine (bound-and-true-p lsp-bridge-mode))
+      (lsp-bridge-restart-process))))
+#+end_src
+*** term 工具
+**** vterm
+#+begin_quote
+As good as terminal emulation gets in Emacs
+#+end_quote
+有限使用系统工具安装在使用 nix 包管理器时
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! vterm :built-in 'prefer)
+#+end_src
+VTerm 的安装相对麻烦一些，需要编译一些依赖。当然对于 Unix 用户，用系统库更加方便！
+#+begin_src emacs-lisp
+
+(use-package! vterm
+  :commands (my/vterm-toggle)
+  :init
+  (setq! vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=yes")
+  (map! :nvie "s-0" #'my/vterm-toggle)
+  :config
+  ;; Finally, add update-pwd to the list of commands that Emacs is allowed to execute from vterm
+  (add-to-list 'vterm-eval-cmds '("update-pwd" (lambda (path) (setq default-directory path))))
+
+  (defvar my--vterm-last-buffer nil)
+
+  (defun my/vterm-toggle ()
+    (interactive)
+    (let* ((cbuffer (current-buffer))
+           (vtermb "*vterm*"))
+      (if (and my--vterm-last-buffer
+               (string= (buffer-name cbuffer) vtermb))
+          (switch-to-buffer my--vterm-last-buffer)
+        (setq my--vterm-last-buffer cbuffer)
+        (if (get-buffer vtermb)
+            (switch-to-buffer vtermb)
+          (call-interactively #'+vterm/here))))))
+#+end_src
+**** Eshell
+使用 emacs 怎么不可以使用下 emacs 自带的 eshell 呢？😏
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! aweshell :recipe (:type git :host github :repo "manateelazycat/aweshell"))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! aweshell
+  :init
+  (setq aweshell-use-exec-path-from-shell nil)
+  (map! :leader
+    (:prefix-map ("o" . "open")
+     :desc "Toggle Eshell popup" "e" #'aweshell-dedicated-toggle
+     :desc "Toggle Eshell" "E" #'aweshell-toggle))
+  :commands (aweshell-dedicated-toggle aweshell-toggle)
+  :config
+  (use-package! em-alias
+    :config
+    (eshell/alias "unzip" "atool --extract --explain $1")))
+#+end_src
+*** TODO 截图工具
+*** TODO gif 工具
+
+*** 阅读工具
+**** DONE Ebook 管理工具
+CLOSED: [2023-05-24 Wed 12:24]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2023-05-24 Wed 12:24]
+:END:
+使用 calibredb，依赖 calibre
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! calibredb)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! calibredb
+  :config
+  (setq calibredb-root-dir "~/Documents/mybook"
+        calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)
+        calibredb-library-alist '(("~/Documents/mybook")
+                                  ("~/Documents/netbooks")
+                                  ("~/Documents/archiveRead"))
+        sql-sqlite-program "sqlite3")
+  (when IS-MAC
+    (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")))
+#+end_src
+**** DONE epub 阅读工具
+CLOSED: [2023-05-24 Wed 13:13]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2023-05-24 Wed 13:13]
+:END:
+nov
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! nov)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! nov
+  :mode ("\\.epub\\'" . nov-mode)
+  :hook (nov-mode . my-nov-setup)
+  :config
+  (map! :map nov-mode-map
+    "J" #'nov-next-document
+    "K" #'nov-previous-document)
+  (defun my-nov-setup ()
+    "Setup `nov-mode' for better reading experience."
+    (visual-line-mode 1)
+    (centaur-read-mode)
+    ;; (face-remap-add-relative 'variable-pitch :family "Times New Roman" :height 1.5)
+    )
+  (define-minor-mode centaur-read-mode
+    "Minor Mode for better reading experience."
+    :init-value nil
+    :group centaur
+    (if centaur-read-mode
+        (progn
+          (and (fboundp 'olivetti-mode) (olivetti-mode 1))
+          (and (fboundp 'mixed-pitch-mode) (mixed-pitch-mode 1))
+          (text-scale-set +1))
+      (progn
+        (and (fboundp 'olivetti-mode) (olivetti-mode -1))
+        (and (fboundp 'mixed-pitch-mode) (mixed-pitch-mode -1))
+        (text-scale-set 0))))
+
+  (with-no-warnings
+    ;; WORKAROUND: errors while opening `nov' files with Unicode characters
+    ;; @see https://github.com/wasamasa/nov.el/issues/63
+    (defun my-nov-content-unique-identifier (content)
+      "Return the the unique identifier for CONTENT."
+      (let* ((name (nov-content-unique-identifier-name content))
+             (selector (format "package>metadata>identifier[id='%s']"
+                               (regexp-quote name)))
+             (id (car (esxml-node-children (esxml-query selector content)))))
+        (and id (intern id))))
+    (advice-add #'nov-content-unique-identifier :override #'my-nov-content-unique-identifier)))
+#+end_src
+
+**** eww 浏览器
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! link-hint)
+(package! shr)
+#+end_src
+#+begin_src emacs-lisp
+(use-package eww
+  :commands eww eww-follow-link
+  :hook (eww-mode . visual-line-mode)
+  :init
+  (map! :map eww-mode-map
+    "o" #'eww-browse-with-external-browser
+    "D" #'eww-forward-url
+    "S" #'eww-back-url
+    "f" #'link-hint-open-link
+    "TAB" #'shr-next-link
+    "<backtab>" #'shr-previous-link
+    "j" #'scroll-up-line
+    "k" #'scroll-down-line)
+  :config
+  (setq eww-download-directory (expand-file-name "~/Downloads"))
+  (setq eww-form-checkbox-symbol "☐")
+  (setq eww-form-checkbox-selected-symbol "☑"))
+(use-package! shr
+  :defer t
+  :custom
+  (shr-inhibit-images t)                ; 不显示图片
+  (shr-image-animate nil)               ; 不显示 gif
+  )
+#+end_src
+**** pdf tools
+在 emacs 中查看 pdf 的工具
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! pdf-tools :built-in 'prefer)
+(package! saveplace-pdf-view :built-in 'prefer)
+#+end_src
+#+begin_src emacs-lisp
+(after! pdf-tools
+  (setq-default pdf-view-display-size 'fit-width)
+  (add-hook! 'pdf-view-mode-hook #'pdf-view-midnight-minor-mode))
+#+end_src
+*** Emojify
+#+begin_comment
+来自 =:ui emoji= 模块
+#+end_comment
+
+设置一个你喜欢的 emoji 字符集，当然你只能从三个字符集中做选择，但你可以选择不同
+版本
+  + [[https://www.joypixels.com/][emojione]]
+    * emojione-v2
+    * emojione-v2-22
+    * emojione-v2.2.6
+    * emojione-v2.2.6-22
+  + [[https://twemoji.twitter.com/][twemoji]]
+    * twemoji-v2
+    * twemoji-v2-22
+  + [[https://openmoji.org/][openmoji]]
+    * openmoji-v13-0
+
+#+begin_src emacs-lisp
+(setq emojify-emoji-set "twemoji-v2")
+#+end_src
+OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能会显示为 emoji。
+直接从 emoji 表中删除它们 (除了有点暴力)
+#+begin_src emacs-lisp
+(defvar emojify-disabled-emojis
+  '(;; Org
+    "◼" "☑" "☸" "⚙" "⏩" "⏪" ":end:" "↔"
+    ;; Org Heading
+    "✙" "♱" "♰" "☥" "✞" "✟" "✝" "†"
+    "☯" "☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷"
+    "☿" "♀" "♁" "♂" "♃" "♄" "♅" "♆" "♇" "☽" "☾"
+    "♈" "♉" "♊" "♋" "♌" "♍" "♎" "♏" "♐" "♑" "♒" "♓"
+    "♔" "♕" "♖" "♗" "♘" "♙"
+    "♚" "♛" "♜" "♝" "♞" "♟"
+    ;; Org Agenda
+    "⚡" "↑" "↓" "☕" "❓"
+    ;; I just want to see this as text
+    "©" "™")
+  "Characters that should never be affected by `emojify-mode'.")
+
+(defadvice! emojify-delete-from-data ()
+  "Ensure `emojify-disabled-emojis' don't appear in `emojify-emojis'."
+  :after #'emojify-set-emoji-data
+  (dolist (emoji emojify-disabled-emojis)
+    (remhash emoji emojify-emojis)))
+#+end_src
+*** hl todo
+~hl-todo~ 允许你设置一些关键字，这些关键字将高亮并且便于查找。往往用于代码注释中
+强调某些内容。
+#+begin_src emacs-lisp
+(custom-set-variables
+ '(hl-todo-keyword-faces '(("NOTE" font-lock-builtin-face bold) ;; needs discussion or further investigation.
+                           ("REVIEW" font-lock-keyword-face bold) ;; review was conducted.
+                           ("HACK" font-lock-variable-name-face bold) ;; workaround a known problem.
+                           ("DEPRECATED" region bold) ;; why it was deprecated and to suggest an alternative.
+                           ("XXX+" font-lock-constant-face bold) ;; warn other programmers of problematic or misguiding code.
+                           ("TODO" font-lock-function-name-face bold) ;; tasks/features to be done.
+                           ("FIXME" font-lock-warning-face bold) ;; problematic or ugly code needing refactoring or cleanup.
+                           ("KLUDGE" font-lock-preprocessor-face bold )
+                           ("BUG" error bold) ;; a known bug that should be corrected.
+                           )))
+#+end_src
+*** edit
+**** Puni
+通用、可定制的语法删除
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! puni :recipe (:host github :repo "AmaiKinono/puni"))
+#+end_src
+#+begin_src emacs-lisp
+;; (use-package! puni
+;;   :hook (prog-mode . puni-mode))
+
+#+end_src
+**** separedit
+#+begin_quote
+separedit.el: 在单独的缓冲区编辑注释、docstring 或其中的代码块
+#+end_quote
+
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! separedit :recipe (:host github :repo "twlz0ne/separedit.el"))
+#+end_src
+更多用法参考:
+[[https://emacs-china.org/t/separedit-el-docstring/11196/7][separedit.el: 在单独
+的缓冲区编辑注释、docstring 或其中的代码块]]
+#+begin_src emacs-lisp
+(use-package! separedit
+  :init
+  (my/leader ";" '(separedit :wk "comment"))
+  :config
+  (custom-set-variables '(separedit-default-mode 'org-mode)))
+#+end_src
+**** 中文结巴分词
+#+begin_quote
+基于 结巴分词 的 Emacs 中文分词 工具，实现了以中文词语为单位的移动和编辑。支持 Linux、Cygwin、Windows 和 Android/Termux 平台。目前 Windows 平台支持是通过调用 Cygwin 进程实 现的。
+#+end_quote
++ 安装
+#+begin_src bash :tangle "no"
+[[ ! -d $HOME/Repos ]] && mkdir -p $HOME/Repos
+git clone --depth 1 https://github.com/kanglmf/emacs-chinese-word-segmentation $HOME/Repos/emacs-chinese-word-segmentation
+pushd $HOME/Repos/emacs-chinese-word-segmentation
+# using g++
+make
+# using clang++
+env CXX=clang++ make
+popd
+#+end_src
+#+begin_src emacs-lisp :tangle (if (file-directory-p (concat (getenv "HOME") "/Repos/emacs-chinese-word-segmentation")) "yes" "no")
+(setq my-cns-path (concat (getenv "HOME") "/Repos/emacs-chinese-word-segmentation"))
+(use-package! cns
+  :load-path my-cns-path
+  :init
+  (setq cns-prog (concat my-cns-path "/cnws")
+        cns-dict-directory (concat my-cns-path "/cppjieba/dict")
+        cns-recent-segmentation-limit 20 ; 分词限制
+        cns-debug nil) ; debug 模式
+)
+#+end_src
+
+**** 自动删除空白
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! ws-butler :recipe (:host github :repo "lewang/ws-butler"))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! ws-butler
+  ;; :diminish
+  :hook (doom-first-file . ws-butler-global-mode))
+#+end_src
+**** file-temple
+#+begin_src emacs-lisp
+(when (modulep! :editor file-templates)
+  (defer-until! (boundp '+file-templates-alist)
+    (setq +file-templates-alist
+          (cl-remove-if (lambda (elt) (equal '(nix-mode) elt)) +file-templates-alist))))
+#+end_src
+
+**** 记录光标位置
+[[https://emacs-china.org/t/topic/24533/9][请问如何记录光标位置 - Emacs-general - Emacs China]]
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload remember-jump remember-init)
+(map! "C->"  #'remember-init
+      "C-<" #'remember-jump)
+#+end_src
+**** 在 Unicode 与英文之间插入空格
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! wraplish
+  :recipe (:host github :repo "manateelazycat/wraplish"
+           :files ("*.el" "*.py")
+           :build (:not compile native-compile)))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! wraplish
+  :hook ((org-mode . wraplish-mode)
+         (gfw-mode . wraplish-mode))
+  :config
+  (when (boundp 'lsp-bridge-python-command)
+    (setq wraplish-python-command lsp-bridge-python-command)))
+#+end_src
+
+**** [[https://github.com/ncaq/auto-sudoedit/tree/master][ncaq/auto-sudoedit]]
+允许 sudo 编辑文件
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! auto-sudoedit)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! auto-sudoedit
+  :hook (doom-first-file . auto-sudoedit-mode)
+  :config
+  ;; 以/nix/store 开头的文件不进入`auto-sudoedit-mode‘模式
+  (defadvice! +auto-sudoedit-current-path-a (fn &rest args)
+    :around #'auto-sudoedit-current-path
+    (let ((current-path (apply fn args)))
+      (if (and current-path (string-prefix-p "/nix/store" current-path))
+          nil
+        current-path))))
+#+end_src
+**** expand-region
+一个很好用的选中工具，以后会移除
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! expand-region)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! expand-region
+  :commands (er/contract-region er/expand-region)
+  ;; :init
+  ;; (map! :nv "v"   (general-predicate-dispatch 'er/expand-region
+  ;;                 (eq (evil-visual-type) 'line)
+  ;;                 'evil-visual-char)
+  ;;     :nv "C-v" (general-predicate-dispatch 'er/contract-region
+  ;;                 (eq er/history nil) 'evil-visual-block))
+  :config
+  (defadvice! doom--quit-expand-region-a (&rest _)
+    "Properly abort an expand-region region."
+    :before '(evil-escape doom/escape)
+    (when (memq last-command '(er/expand-region er/contract-region))
+      (er/contract-region 0))))
+#+end_src
+*** disable mouse
+不用鼠标操作 emacs
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! disable-mouse)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! disable-mouse
+  :hook (doom-first-buffer . global-disable-mouse-mode)
+  :config
+  (after! evil
+    (mapc #'disable-mouse-in-keymap
+        (list evil-motion-state-map
+              evil-normal-state-map
+              evil-visual-state-map
+              evil-insert-state-map))))
+#+end_src
+*** noflet
+用来，当我退出 emacs 时，不会提示有一些子命令正在运行, 参考来源 [[https://github.com/manateelazycat/lazycat-emacs/blob/8087ff9be53e94f1c82d5d58002667db9529262a/site-lisp/config/init-generic.el#L135][manateelazycat/init-generic.el]]
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! noflet)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! noflet
+  :commands (noflet)
+  :init
+  (defadvice! +no-query-kill-emacs-a (orign &rest args)
+    :around #'no-query-kill-emacs
+    (noflet ((process-list ())) (apply orign args)))
+  (setq kill-buffer-query-functions
+        (remq 'process-kill-buffer-query-function
+              kill-buffer-query-functions)))
+#+end_src
+*** chatgpt
+**** mind-wave
+一个 chatgpt 的实现,用法创建一个 ~.chat~ 文件，在该文件中执行 ~mind-wave-chat-ask~ 提问，执行​~mind-wave-chat-continue~​继续提问，​~mind-wave-chat-generate-title~ 生成新的标题， 目前作为备选应用尝试, 更多用法详见[[https://emacs-china.org/t/mind-wave-chatgpt-api-emacs-ai/23881][mind-wave -- 基于 ChatGPT API 的 Emacs AI 插件]], 使用第三方 api 存在问题
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! mind-wave
+  :recipe (:host github :repo "manateelazycat/mind-wave"
+           :files ("*.el" "*.py")))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! mind-wave
+  :commands (mind-wave-chat-ask)
+  :mode ("\\.chat\\'" . mind-wave-chat-mode)
+  :config
+  (setq mind-wave-auto-change-title nil))
+#+end_src
+
+***** chatpgt-shell
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! chatgpt-shell)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! chatgpt-shell
+  :config
+  (setq chatgpt-shell-api-url-base "https://api.chatanywhere.com.cn")
+(setq chatgpt-shell-openai-key (lambda () (nth 0 (process-lines "gopass" "show" "app/chatanywhere")))))
+#+end_src
+*** easy-hugo
+=hugo=​的 emacs 管理工具
+#+begin_src emacs-lisp :tangle (if (executable-find "hugo") "packages.el" "no") :noweb-ref none
+(package! easy-hugo)
+#+end_src
+#+begin_src emacs-lisp :tangle (if (executable-find "hugo") "yes" "no") :noweb-ref none
+(use-package! easy-hugo
+  :init (map! :leader (:desc "easy-hugo" "oh" #'easy-hugo))
+  :custom
+  (easy-hugo-default-ext ".org")
+  (easy-hugo-url "https://shanyouli.github.io")
+  (easy-hugo-basedir user-blog-dir)
+  (easy-hugo-postdir "content/posts")
+  :config
+  (after! evil (evil-set-initial-state 'easy-hugo-mode 'emacs)))
+#+end_src
+*** dwim-shell-command
+一个更好的在 emacs 中执行 shell 命令的工具
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! dwim-shell-command :recipe (:host github :repo "xenodium/dwim-shell-command"))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! proced :commands (proced-process-attributes))
+(use-package! dwim-shell-command
+  :commands (dwim-shell-command
+             my/dwim-shell-coommands-unzip
+             my/dwim-shell-commands-zip
+             my/dwim-shell-command-kill-process)
+  :init
+  (map! "M-!" #'dwim-shell-command)
+  :config
+  (defun my/dwim-shell-commands-unzip ()
+    "Unzip all marked archives (of any kind) using `atool'."
+    (interactive)
+    (dwim-shell-command-on-marked-files
+     "Unzip" "atool --extract --explain '<<f>>'"
+     :utils "atool"))
+
+  (defun my/dwim-shell-commands-zip (file)
+    "zip all marked archives (of any kind) to `file' using `atools'"
+    (interactive (if-let ((dir (bound-and-true-p dired-directory)))
+                     (progn
+                       (setq dir (concat (file-name-base  (directory-file-name dir)) ".tar.gz"))
+                       (list (read-string (format "Archive Name(%s):" dir) nil nil dir)))
+                   (list  (read-string (format "Archive Name: " )))))
+    (dwim-shell-command-on-marked-files
+     "zip" (format "atool -F .tar.xz --add %s '<<*>>'" file)
+     :utils "atool"))
+
+  (defun my/dwim-shell-command-kill-process ()
+    "Select and kill process."
+    (interactive)
+    (let* ((pid-width 5)
+            (comm-width 25)
+           (user-width 10)
+           (processes (proced-process-attributes))
+           (candidates
+            (mapcar (lambda (attributes)
+                      (let* ((process (cdr attributes))
+                             (pid (format (format "%%%ds" pid-width) (map-elt process 'pid)))
+                             (user (format (format "%%-%ds" user-width)
+                                           (truncate-string-to-width
+                                            (map-elt process 'user) user-width nil nil t)))
+                             (comm (format (format "%%-%ds" comm-width)
+                                           (truncate-string-to-width
+                                            (map-elt process 'comm) comm-width nil nil t)))
+                             (args-width (- (window-width) (+ pid-width user-width comm-width 3)))
+                             (args (map-elt process 'args)))
+                        (cons (if args
+                                  (format "%s %s %s %s" pid user comm (truncate-string-to-width args args-width nil nil t))
+                                (format "%s %s %s" pid user comm))
+                              process)))
+                    processes))
+           (selection (map-elt candidates
+                               (completing-read "kill process: "
+                                                (seq-sort
+                                                 (lambda (p1 p2)
+                                                   (string-lessp (nth 2 (split-string (string-trim (car p1))))
+                                                                 (nth 2 (split-string (string-trim (car p2))))))
+                                                 candidates) nil t)))
+           (prompt-title (format "%s %s %s"
+                                 (map-elt selection 'pid)
+                                 (map-elt selection 'user)
+                                 (map-elt selection 'comm))))
+      (when (y-or-n-p (format "Kill? %s" prompt-title))
+        (dwim-shell-command-on-marked-files
+         (format "Kill %s" prompt-title)
+         (format "kill -9 %d" (map-elt selection 'pid))
+         :utils "kill"
+         :error-autofocus t
+         :silent-success t)))))
+#+end_src
+*** 格式化工具
+doom 有自己的格式化模块，但我习惯使用[[https://github.com/purcell/emacs-reformatter][reformatter]]
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! reformatter)
+#+end_src
+使用方法
+#+begin_src emacs-lisp :tangle "no"
+(reformatter-define python-format :program "black" :args '("-"))
+#+end_src
+*** avy
+让 avy 支持拼音搜索
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! ace-pinyin)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! ace-pinyin
+  :after avy
+  :init (setq ace-pinyin-use-avy t)
+  :config (ace-pinyin-global-mode 1))
+#+end_src
+*** evil
+emacs 中模拟 vim 按键风格的神器
+**** evil-pinyin
+使用 pinyin 首字母进行搜索，用法使用冒号：开启
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+;;(package! evil-pinyin)
+#+end_src
+之前在安装过程中出现问题，不再使用。
+#+begin_src emacs-lisp :tangle "no"
+;;(use-package! evil-pinyin
+;;  :after evil
+;;  :config
+;;  (global-evil-pinyin-mode +1))
+#+end_src
+**** evil-escape
+Use JK as a shortcut button for <ESC>
+#+begin_src emacs-lisp
+(setq evil-escape-delay 0.2)
+#+end_src
+*** 中文日历增强
+使用[[https://github.com/xwl/cal-china-x][cal-china-x]]加强日历配置
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! cal-china-x)
+#+end_src
+时间解析增加中文拼音
+#+begin_src emacs-lisp
+(use-package! parse-time
+  :defer t
+  :config
+  (setq parse-time-months
+        (append '(("yiy" . 1) ("ery" . 2) ("sany" . 3)
+                  ("siy" . 4) ("wuy" . 5) ("liuy" . 6)
+                  ("qiy" . 7) ("bay" . 8) ("jiuy" . 9)
+                  ("shiy" . 10) ("shiyiy" . 11) ("shiery" . 12)
+                  ("yiyue" . 1) ("eryue" . 2) ("sanyue" . 3)
+                  ("siyue" . 4) ("wuyue" . 5) ("liuyue" . 6)
+                  ("qiyue" . 7) ("bayue" . 8) ("jiuyue" . 9)
+                  ("shiyue" . 10) ("shiyiyue" . 11) ("shieryue" . 12))
+                parse-time-months))
+
+  (setq parse-time-weekdays
+        (append '(("zri" . 0) ("zqi" . 0)
+                  ("zyi" . 1) ("zer" . 2) ("zsan" . 3)
+                  ("zsi" . 4) ("zwu" . 5) ("zliu" . 6)
+                  ("zr" . 0) ("zq" . 0)
+                  ("zy" . 1) ("ze" . 2) ("zs" . 3)
+                  ("zsi" . 4) ("zw" . 5) ("zl" . 6))
+                parse-time-weekdays)))
+#+end_src
+中文节日设置
+#+begin_src emacs-lisp
+(use-package! cal-china-x
+  :commands cal-china-x-setup
+  :hook (after-init . cal-china-x-setup)
+  :config
+  ;; 重要节日设置
+  (setq cal-china-x-important-holidays cal-china-x-chinese-holidays)
+  ;; 所有节日设置
+  (setq cal-china-x-general-holidays
+        '(;;公历节日
+          (holiday-fixed 1 1 "元旦")
+          (holiday-fixed 2 14 "情人节")
+          (holiday-fixed 3 8 "妇女节")
+          (holiday-fixed 3 14 "白色情人节")
+          (holiday-fixed 4 1 "愚人节")
+          (holiday-fixed 5 1 "劳动节")
+          (holiday-fixed 5 4 "青年节")
+          (holiday-float 5 0 2 "母亲节")
+          (holiday-fixed 6 1 "儿童节")
+          (holiday-float 6 0 3 "父亲节")
+          (holiday-fixed 9 10 "教师节")
+          (holiday-fixed 10 1 "国庆节")
+          (holiday-fixed 10 2 "国庆节")
+          (holiday-fixed 10 3 "国庆节")
+          (holiday-fixed 10 24 "程序员节")
+          (holiday-fixed 11 11 "双 11 购物节")
+          (holiday-fixed 12 25 "圣诞节")
+          ;; 农历节日
+          (holiday-lunar 12 30 "春节" 0)
+          (holiday-lunar 1 1 "春节" 0)
+          (holiday-lunar 1 2 "春节" 0)
+          (holiday-lunar 1 15 "元宵节" 0)
+          (holiday-solar-term "清明" "清明节")
+          (holiday-solar-term "小寒" "小寒")
+          (holiday-solar-term "大寒" "大寒")
+          (holiday-solar-term "立春" "立春")
+          (holiday-solar-term "雨水" "雨水")
+          (holiday-solar-term "惊蛰" "惊蛰")
+          (holiday-solar-term "春分" "春分")
+          (holiday-solar-term "谷雨" "谷雨")
+          (holiday-solar-term "立夏" "立夏")
+          (holiday-solar-term "小满" "小满")
+          (holiday-solar-term "芒种" "芒种")
+          (holiday-solar-term "夏至" "夏至")
+          (holiday-solar-term "小暑" "小暑")
+          (holiday-solar-term "大暑" "大暑")
+          (holiday-solar-term "立秋" "立秋")
+          (holiday-solar-term "处暑" "处暑")
+          (holiday-solar-term "白露" "白露")
+          (holiday-solar-term "秋分" "秋分")
+          (holiday-solar-term "寒露" "寒露")
+          (holiday-solar-term "霜降" "霜降")
+          (holiday-solar-term "立冬" "立冬")
+          (holiday-solar-term "小雪" "小雪")
+          (holiday-solar-term "大雪" "大雪")
+          (holiday-solar-term "冬至" "冬至")
+          (holiday-lunar 5 5 "端午节" 0)
+          (holiday-lunar 8 15 "中秋节" 0)
+          (holiday-lunar 7 7 "七夕情人节" 0)
+          (holiday-lunar 12 8 "腊八节" 0)
+          (holiday-lunar 9 9 "重阳节" 0)))
+  ;; 设置日历的节日，通用节日已经包含了所有节日
+  (setq calendar-holidays (append cal-china-x-general-holidays)))
+#+end_src
+*** 字典
+**** insert-translated-name
+一个很好用的中文翻译为英文插件
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! insert-translated-name
+  :recipe (:type git
+           :host github
+           :repo "shanyouli/insert-translated-name"
+           :build (:not compile native-compile)))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! insert-translated-name
+  :commands (insert-translated-name-insert-with-line
+             insert-translated-name-insert-with-underline
+             insert-translated-name-insert-with-camel
+             insert-translated-name-insert
+             insert-translated-name-insert-original-translation)
+  :config
+  (setq insert-translated-name-translate-engine "deeplx")
+
+  (defun my/change-insert-translate-engine ()
+    (interactive)
+    (cond ((string-equal insert-translated-name-translate-engine "deeplx")
+           (setq insert-translated-name-translate-engine "trans"))
+          ((string-equal insert-translated-name-translate-engine "trans")
+           (setq insert-translated-name-translate-engine "deeplx"))
+          ))
+  (defvar insert--evil-last-status-is-edit-p nil "缓存当前的 evil state 是否为编辑模式")
+
+  (defadvice! +insert-translated-name-active (fn &rest args)
+    "在调用之前 load rime,防止提示无法激活 rime 输入法"
+    :before #'insert-translated-name-active
+    (when (fboundp 'evil-mode)
+      (setq insert--evil-last-status-is-edit-p (or (evil-insert-state-p)
+                                                   (evil-emacs-state-p)))
+      (unless insert--evil-last-status-is-edit-p (evil-insert-state)))
+    (if (and (not (featurep 'rime))
+             (string= "rime" default-input-method))
+        (require 'rime nil t)))
+
+  (defadvice! +insert-translated-name-inactive (fn &rest args)
+    :after
+    (when (fboundp 'evil-mode)
+      (unless insert--evil-last-status-is-edit-p
+        (evil-change-to-previous-state)))))
+#+end_src
+**** immersive-translate
+[[https://github.com/Elilif/emacs-immersive-translate/blob/main/README_CN.org][emacs-immersive-translate]]是受 immersive-translate/immersive-translate 的启发，在 Emacs 中实现了类似的功能。
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! immersive-translate)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! immersive-translate
+  :init
+  (setq immersive-translate-backend 'trans))
+#+end_src
+**** youdao-dictionary
+有道翻译工具
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! youdao-dictionary :built-in 'prefer)
+(package! posframe :built-in 'prefer)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! youdao-dictionary
+  :commands my/youdao-dictionary-point
+  :init
+;; Set file for saving search history
+  (setq youdao-dictionary-search-history-file  (concat doom-local-dir "ydcv/"))
+  :config
+  (setq url-automatic-caching t
+        ;; Enable Chinese word segmentation support (支持中文分词)
+        youdao-dictionary-use-chinese-word-segmentaton t)
+  (defun my/youdao-dictionary-point ()
+    (interactive)
+    (if (display-graphic-p)
+        (call-interactively #'youdao-dictionary-search-at-point-posframe)
+      (call-interactively #'youdao-dictionary-search-at-point))))
+
+(my/leader :states '(normal visual)
+  "s" '(:ignore t :which-key "search")
+  "s y" '(my/youdao-dictionary-point :wk "youdao"))
+#+end_src
+**** sdcv
+使用​~sdcv~​命令进行查询
+1. sdcv 命令安装
+#+begin_src bash :tangle "no"
+brew install sdcv
+#+end_src
+2. 插件安装
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! sdcv :recipe (:type git :host github :repo "manateelazycat/sdcv"))
+#+end_src
+3. 配置
+#+begin_src emacs-lisp :tangle (if (executable-find "sdcv") "yes" "no")
+(use-package! sdcv
+  :commands (my/sdcv-point)
+  :init
+  :config
+  (setq sdcv-program "sdcv")
+  ;; (setq sdcv-only-data-dir nil)
+  (setq sdcv-dictionary-data-dir
+        (or (getenv "STARDICT_DATA_DIR")
+            (expand-file-name "startdict"
+                              (or (getenv "XDG_DATA_HOME")
+                                  "~/.local/share"))))
+  (setq sdcv-dictionary-simple-list ; setup dictionary list for simple search
+        '("懒虫简明英汉词典"
+          "懒虫简明汉英词典"))
+  (setq sdcv-dictionary-complete-list ; setup dictionary list for complete search
+        '("懒虫简明英汉词典"
+          "懒虫简明汉英词典"
+          "新世纪汉英科技大词典"
+          "牛津现代英汉双解词典"
+          "quick_eng-zh_CN"))
+  (defun my/sdcv-point ()
+    (interactive)
+    (if (display-graphic-p)
+        (call-interactively #'sdcv-search-pointer+)
+      (call-interactively #'sdcv-search-pointer))))
+
+(my/leader :states '(normal visual)
+  "s" '(:ignore t :which-key "search")
+  "s s" '(my/sdcv-point :wk "sdcv"))
+#+end_src
+**** 按键配置
+#+begin_src emacs-lisp
+(map! :leader
+      :desc "zh2en" "it" #'insert-translated-name-insert
+      (:prefix-map ("iT" . "ZH-EN")
+       :desc "underline" "u" #'insert-translated-name-insert-with-underline
+       :desc "line" "l" #'insert-translated-name-insert-with-line
+       :desc "camel" "c" #'insert-translated-name-insert-with-camel
+       :desc "origin" "o" #'insert-translated-name-insert-original-translation)
+      (:prefix-map ("v" . "visual")
+       :desc "fanyi whole buffer" "f"  #'english-teacher-follow-mode
+       :desc "youdao" "y" #'my/youdao-dictionary-point
+       (:when (executable-find "sdcv")
+        :desc "sdcv" "s" #'my/sdcv-point)))
+#+end_src
+*** pass
+#+begin_src emacs-lisp
+(use-package! pass
+  :config
+  (setq password-store-executable "gopass"))
+#+end_src
+*** 音乐播放
+bongo 一个基于 mpv 或 afplayer 的播放工具
+#+begin_src emacs-lisp :tangle (if (executable-find "mpd") "packages.el" "no") :nonweb-ref none
+(package! bongo)
+#+end_src
+#+begin_src emacs-lisp :tangle (if (executable-find "mpd") "yes" "no")
+(use-package! bongo
+  :init (setq bongo-mode-line-indicator-mode nil)
+  :config
+  (with-eval-after-load 'dired
+    (with-no-warnings
+      (defun bongo-add-dired-files ()
+        "Add marked files to the Bongo library."
+        (interactive)
+        (bongo-buffer)
+        (let (file (files nil))
+          (dired-map-over-marks
+           (setq file (dired-get-filename)
+                 files (append files (list file)))
+           nil t)
+          (with-bongo-library-buffer
+           (mapc 'bongo-insert-file files)))
+        (bongo-switch-buffers)))))
+#+end_src
+mpd
+#+begin_src emacs-lisp :tangle (if (executable-find "mpd") "packages.el" "no") :nonweb-ref none
+(package! mingus)
+(package! simple-mpc)
+#+end_src
+#+begin_src emacs-lisp :tangle (if (executable-find "mpd") "yes" "no")
+
+;; Music Player Daemon
+;; Built-in mpc client
+(use-package! mpc
+  :ensure nil
+  :init
+  (defun restart-mpd
+      (interactive)
+    (call-process "pkill" nil nil nil "mpd")
+    (call-process "mpd")))
+
+;; MPD Interface
+;; mingus
+
+(use-package! simple-mpc
+  :custom-face
+  (simple-mpc-main-name ((t (:inherit font-lock-string-face :bold t :height 1.3))))
+  (simple-mpc-main-headers ((t (:inherit font-lock-keyword-face :bold t :height 1.1))))
+  (simple-mpc-current-track-face ((t (:inherit font-lock-keyword-face))))
+  :init (setq simple-mpc-playlist-format
+              "[%time% ][[%title%[ - %artist%[ (%album%)]]]|[%file%]]")
+  :config
+  (with-no-warnings
+    (defun simple-mpc-play ()
+      "Start playing the song."
+      (interactive)
+      (simple-mpc-call-mpc nil "play"))
+
+    (defun simple-mpc-stop ()
+      "Stop the playback."
+      (interactive)
+      (simple-mpc-call-mpc nil "stop"))
+
+    (defun simple-mpc-update ()
+      "Update database."
+      (interactive)
+      (message "Updating music DB...")
+      (simple-mpc-call-mpc nil "update")
+      (message "Updating music DB...done"))
+
+    ;; Enhance UI
+    (defun simple-mpc+ (&optional _ignore-auto _noconfirm)
+      "Start simple-mpc.
+
+IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
+      (interactive)
+      (let ((buf (get-buffer-create simple-mpc-main-buffer-name)))
+        (with-current-buffer buf
+          (read-only-mode -1)
+          (erase-buffer)
+          (insert (propertize "🔊 Simple MPC\n"
+                              'face 'simple-mpc-main-name)
+
+                  (propertize "\n  ⚙ Controls\n" 'face 'simple-mpc-main-headers)
+                  "\t [t]oggle\n"
+                  "\t [n]ext track\n"
+                  "\t [p]revious track\n"
+                  "\t seek [f]orward\n"
+                  "\t seek [b]ackward\n"
+                  "\t increase [V]olume\n"
+                  "\t decrease [v]olume\n"
+                  "\t toggle [r]epeat mode\n"
+
+                  (propertize "\n  🔈 Playlist\n" 'face 'simple-mpc-main-headers)
+                  "\t Start [P]laying\n"
+                  "\t St[O]p playing\n"
+                  "\t view [c]urrent playlist\n"
+                  "\t [C]lear current playlist\n"
+                  "\t [S]huffle playlist\n"
+                  "\t [l]oad playlist\n"
+                  "\t [u]pdate database\n"
+                  "\t [s]earch database\n"
+
+                  (propertize "\n 🛠 Misc\n" 'face 'simple-mpc-main-headers)
+                  "\t [q]uit")
+          (simple-mpc-mode) ; start major mode
+          (switch-to-buffer buf))))
+
+    (define-advice simple-mpc-format-as-table (:around (fn &rest args) plus)
+      "Prettify playlist."
+      (propertize (apply fn args) 'face 'font-lock-constant-face))
+
+    ;; Display current song in mode-line
+    (defvar simple-mpc-current nil)
+    (add-to-list 'global-mode-string '("" (:eval simple-mpc-current)))
+
+    (defun simple-mpc-current ()
+      "Get current song information."
+      (setq simple-mpc-current
+            (when (derived-mode-p 'simple-mpc-mode)
+              (let ((strs (simple-mpc-call-mpc-strings nil)))
+                (when (length> strs 2)
+                  (when-let* ((title (nth 0 strs))
+                              (info (nth 1 strs))
+                              (info-strs (split-string info))
+                              (state (nth 0 info-strs))
+                              (time (nth 2 info-strs)))
+                    (concat
+                     (when (icons-displayable-p)
+                       (pcase state
+                         ("[playing]"
+                          (concat
+                           " "
+                           (nerd-icons-mdicon "nf-md-play_circle_outline" :face font-lock-comment-face)))
+                         ("[paused]"
+                          (concat
+                           " "
+                           (nerd-icons-mdicon "nf-md-pause_circle_outline" :face font-lock-comment-face)))
+                         (_ "")))
+                     (propertize (format " %s [%s] " title time)
+                                 'face '(:inherit 'font-lock-comment-face :height 0.9))))))))
+      (force-mode-line-update))
+
+    (defvar simple-mpc--timer nil)
+    (defun simple-mpc-start-timer ()
+      "Start simple-mpc timer to refresh current song."
+      (setq simple-mpc--timer (run-with-timer 1 1 #'simple-mpc-current)))
+    (defun simple-mpc-stop-timer ()
+      "Stop simple-mpc timer."
+      (when (timerp simple-mpc--timer)
+        (cancel-timer simple-mpc--timer)))
+    (simple-mpc-start-timer)))
+#+end_src
+*** atomic-chrome
+在浏览器中使用 emacs 作为输入工具, 需要在客户端上安装对应插件如 [[https://github.com/fregante/GhostText][GhostText]]
+[[https://emacs-china.org/t/topic/2523][实用：请教怎样用 emacs 来编辑论坛的帖子 - Emacs-general - Emacs China]]
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! atomic-chrome)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! atomic-chrome
+  :hook (emacs-startup . atomic-chrome-start-server)
+  :init (setq atomic-chrome-buffer-frame-width 88
+              atomic-chrome-buffer-frame-height 26
+              atomic-chrome-buffer-open-style 'frame)
+  :config
+  (when (fboundp 'gfm-mode)
+    (setq atomic-chrome-url-major-mode-alist
+          '(("github\\.com" . gfm-mode)
+            ("gitlab\\.com" . gfm-mode)))))
+#+end_src
+
+#+RESULTS:
+#+begin_results
+| atomic-chrome-start-server | doom--reset-file-handler-alist-h |
+#+end_results
+
+** 窗口管理
+#+begin_src emacs-lisp
+(after! ace-window
+  (set-face-attribute
+   'aw-leading-char-face nil
+   ;; :foreground "deep sky blue"
+   :weight 'bold
+   :height 3.0)
+  (set-face-attribute
+   'aw-mode-line-face nil
+   ;; :foreground "lawn green"
+   :inherit 'mode-line-buffer-id)
+  (add-hook! 'doom-load-theme-hook
+    (set-face-attribute
+     'aw-leading-char-face nil
+     ;; :foreground "deep sky blue"
+     :weight 'bold
+     :height 3.0)
+    (set-face-attribute
+     'aw-mode-line-face nil
+     ;; :foreground "lawn green"
+     :inherit 'mode-line-buffer-id
+      )))
+;; https://emacs-china.org/t/psearch-patch/23593
+;; (add-hook! 'after-init-hook
+;;   (when (fboundp 'doom/delete-frame-with-prompt)
+;;     (psearch-patch doom/delete-frame-with-prompt
+;;       (psearch-replace '`(when ,_ ,body)
+;;                        '`,body))))
+#+end_src
+
+#+RESULTS:
+#+begin_results
+#+end_results
+
+* 编程语言配置
+** 公共配置
+- 发现函数的定义
+#+begin_src emacs-lisp :tangle "yes"
+(myfun-autoload my/def-jump-go my/def-jump-back)
+(define-key! lsp-bridge-mode-map [remap evil-jump-to-tag] 'my/def-jump-go)
+#+end_src
+- treesit 相关配置
+#+begin_src emacs-lisp
+(use-package! treesit
+  :init
+  (setq treesit-font-lock-level 4)
+  (setq treesit-language-source-alist
+        '((org . ("https://github.com/milisims/tree-sitter-org")))))
+#+end_src
+- 关闭 pin flycheck
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(unpin! flycheck)
+#+end_src
+** 纯文本
+*** 无行号边距
+我不介意左侧没有任何边距的 buffer，但是一旦剥离行号，buffer 就会感觉有点不对劲。
+
+#+begin_src emacs-lisp :tangle "yes"
+(defvar +text-mode-left-margin-width 1
+  "The `left-margin-width' to be used in `text-mode' buffers.")
+
+(defun +setup-text-mode-left-margin ()
+  (when (and (derived-mode-p 'text-mode)
+             (eq (current-buffer) ; Check current buffer is active.
+                 (window-buffer (frame-selected-window))))
+    (setq left-margin-width (if display-line-numbers
+                                0 +text-mode-left-margin-width))
+    (set-window-buffer (get-buffer-window (current-buffer))
+                       (current-buffer))))
+#+end_src
+
+现在我们只需要将它连接到所有可能表明条件发生变化或需要重新应用设置的事件。
+
+#+begin_src emacs-lisp
+;; (add-hook 'window-configuration-change-hook #'+setup-text-mode-left-margin)
+;; (add-hook 'display-line-numbers-mode-hook #'+setup-text-mode-left-margin)
+;; (add-hook 'text-mode-hook #'+setup-text-mode-left-margin)
+#+end_src
+
+Doom 有一个小问题，因为 ~doom/toggle-line-numbers~ 不运行 ~display-line-numbers-mode-hook~​，所以需要一些设置。
+
+#+begin_src emacs-lisp
+(defadvice! +doom/toggle-line-numbers--call-hook-a ()
+  :after #'doom/toggle-line-numbers
+  (run-hooks 'display-line-numbers-mode-hook))
+#+end_src
+
+最后，我想我真的很喜欢这个，我会继续在文本模式下删除行号。
+
+#+begin_src emacs-lisp
+(remove-hook 'text-mode-hook #'display-line-numbers-mode)
+#+end_src
+
+*** ANSI 色彩
+Emacs 可以显示 ANSI 颜色代码。然而，在 Emacs 28 之前，如果不修改缓冲区是不可能做到这
+一点的，所以让我们以此为基础设置这个块。
+#+begin_src emacs-lisp
+(after! text-mode
+  (when (>= emacs-major-version 28)
+    (add-hook! 'text-mode-hook
+      (unless (derived-mode-p 'org-mode)
+        ;; Apply ANSI color codes
+        (with-silent-modifications
+          (ansi-color-apply-on-region (point-min) (point-max) t))))))
+#+end_src
+** Org Mode
+:properties:
+:CUSTOM_ID: org
+:header-args:emacs-lisp: :tangle no :noweb-ref org-conf
+:end:
+:intro:
+Org Mode 无疑是 Emacs 的杀手级应用，其扩展能力以及 Emacs 的契合，让它吊打一众
+标记语言和富文本格式。当然 LaTeX 除外。
+| 格式       | 细粒度控制 | 上手易用性 | 语法 a 简单 | 编辑器支持 | 集成度 | 易于参考 | 多功能性 |
+|-----------+-----------+-----------+------------+-----------+-------+---------+---------|
+| Word      |         2 |         4 |          4 |         2 |     3 |       2 |       2 |
+| LaTeX     |         4 |         1 |          1 |         3 |     2 |       4 |       3 |
+| Org Mode  |         4 |         2 |        3.5 |         1 |     4 |       4 |       4 |
+| Markdown  |         1 |         3 |          3 |         4 |     3 |       3 |       1 |
+| MD+Pandoc |       2.5 |       2.5 |        2.5 |         3 |     3 |       3 |       2 |
+
+在 =.org= 文件可以包含代码块 (不支持 noweb 模板)，这些代码块可以与专用源代码文件纠缠
+在一起，并通过各种 (可扩展的) 方法编译成文档 (报告、文档、演示文稿等)。这些源块甚至可以
+创建要包含在文档中的图像或其他内容，或者生成源代码。
+因为这部分初始化时相当费时，我们需要将其放在 src_elisp{(after! ...)} 中。
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! emacsql-sqlite-builtin :built-in 'prefer)
+;; (package! org :built-in 'prefer)
+#+end_src
+#+begin_src emacs-lisp :noweb no-export :tangle yes :noweb-prefix no :noweb-ref nil
+(after! org
+  <<org-conf>>)
+#+end_src
+*** Git diffs
+Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-hunk-elisp-org/][非常有用的文章]]，他在其中解释了如何将 git diff 块标题更改为
+比大块上方的直接行更有用的东西 --- 就像父标题一样。
+
+这可以通过首先在 =~/.config/git/attributes= 中为 git 添加新的差异模式来实现。
+#+begin_example
+,*.org   diff=org
+#+end_example
+
+
+然后为它添加一个正则表达式到 =~/.config/git/config= 。
+#+begin_example
+[diff "org"]
+  xfuncname = "^(\\*+ +.*)$"
+#+end_example
+*** 基本配置
+#+begin_src emacs-lisp
+(setq! org-use-property-inheritance t         ; it's convenient to have properties inherited
+       ;; org-export-in-background t             ; run export processes in external emacs process
+       org-catch-invisible-edits 'smart       ; try not to accidently do weird stuff in invisible regions
+       org-export-with-sub-superscripts '{}   ; don't treat lone _ / ^ as sub/superscripts, require _{} / ^{}
+       org-hide-emphasis-markers t            ; 自动隐藏 ~a~, ++,__,==,**
+       org-special-ctrl-a/e t)
+
+(setq org-hugo-base-dir user-blog-dir)
+
+;; 设置归档位置
+(setq org-archive-location "%s_archive::datetree/")
+
+;; 远程图片查看
+(setq org-display-remote-inline-images 'cache)
+
+;; BUG: https://github.com/doomemacs/doomemacs/pull/7509
+(remove-hook 'org-mode-hook #'+org-make-last-point-visible-h)
+#+end_src
+我不喜欢编写​=org-mode=​时，自动化换行
+#+begin_src emacs-lisp
+(setq-hook! 'org-mode-hook truncate-lines nil)
+(setq-hook! 'org-mode-hook fill-column 100)
+(setq-hook! 'org-mode-hook visual-fill-column-center-text t)
+#+end_src
+设置打开 org links 的程序
+#+begin_src emacs-lisp
+(defun my-func/open-and-play-gif-image (file &optional link)
+  "Open and play GIF image `FILE' in Emacs buffer.
+Optional for Org-mode file: `LINK'."
+  (let ((gif-image (create-image file))
+        (tmp-buf (get-buffer-create "*Org-mode GIF image animation*")))
+    (switch-to-buffer tmp-buf)
+    (erase-buffer)
+    (insert-image gif-image)
+    (image-animate gif-image nil t)
+    (local-set-key (kbd "q") 'bury-buffer)))
+
+(setq org-file-apps '(("\\.png\\'" . default)
+                      (auto-mode   . emacs)
+                      (directory . emacs)
+                      ("\\.mm\\'" . default)
+                      ("\\.x?html?\\'" . default)
+                      ("\\.pdf\\'" . emacs)
+                      ("\\.md\\'" . emacs)
+                      ("\\.gif\\'" . my-func/open-and-play-gif-image)
+                      ("\\.xlsx?\\'" . default)
+                      ("\\.svg\\'" . default)
+                      ("\\.pptx?\\'" . default)
+                      ("\\.docx?\\'" . default)))
+#+end_src
+使用 utf8 显示
+#+begin_src emacs-lisp
+(setq org-pretty-entities t)
+#+end_src
+允许字母列表
+#+begin_src emacs-lisp
+(setq org-list-allow-alphabetical t
+      org-list-demote-modify-bullet '(("-" . "+")
+                                       ("+" . "1.")
+                                       ("1." . "a.")))
+#+end_src
+编辑时检查是否在折叠的不可见区域
+#+begin_src emacs-lisp
+(setq org-fold-catch-invisible-edits 'smart)
+#+end_src
+设置图片的最大宽度，1080，t, nil
+#+begin_src emacs-lisp
+(setq org-image-actual-width '(500))
+#+end_src
+插入新的标题是在当前位置还是在标题行后
+#+begin_src emacs-lisp
+(setq org-insert-heading-respect-content nil)
+#+end_src
+org imenu 最大深度
+#+begin_src emacs-lisp
+(setq org-imenu-depth 3)
+#+end_src
+复制粘贴标题
+#+begin_src emacs-lisp
+(setq org-clone-delete-id t ; 复制粘贴标题行时删除 org-id
+      org-yank-adjusted-subtrees t) ; 粘贴时调整标题行
+#+end_src
+org link 快捷方法
+#+begin_src emacs-lisp
+(pushnew! org-link-abbrev-alist
+          '("doubanmovie" . "https://movie.douban.com/subject/%s")
+          '("qidian" . "https://book.qidian.com/info/%s/"))
+#+end_src
+org treesit
+#+begin_src emacs-lisp
+(when (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'org))
+  (add-hook! org-mode (treesit-parser-create 'org)))
+#+end_src
+**** 零宽空格
+偶尔在用 Org 是你希望将两个分开的块放在一起，这点有点烦人。比如将加​*重*​一个单词
+的一部分，或者说在内联源码块之前放一些符号。有一个可以解决的方法 --- 零宽空格。
+由于这是 Emacs，我们可以为 org-mode 做一个很小的改动将其添加到快捷键上 🙂。
+#+begin_src emacs-lisp
+;; (map! :map org-mode-map
+;;       :leader
+;;       :desc "zero-width-space" "SPC" (cmd! (insert "\u200B")))
+(define-key! org-mode-map "S-SPC" (cmd! (insert "\u200B")))
+#+end_src
+我不希望零宽字符被导出
+#+begin_src emacs-lisp
+(defun +org-export-remove-zero-width-space (text _backend _info)
+  "Remove zero width spaces from TEXT."
+  (unless (org-export-derived-backend-p 'org)
+    (replace-regexp-in-string "\u200B" "" text)))
+
+(after! ox
+  (add-to-list 'org-export-filter-final-output-functions #'+org-export-remove-zero-width-space t))
+#+end_src
+**** 生成目录
+需求不大，但有需要时
+#+begin_src emacs-lisp :noweb-ref none :tangle yes
+(use-package! toc-org
+  :defer t
+  :after (:any org markdown)
+  :config
+  (toc-org-mode 1)
+  (add-hook! '(org-mode-hook markdown-mode-hook) #'toc-org-mode)
+  (define-key! org-mode-map "C-c C-i" #'toc-org-insert-toc)
+  (define-key! markdown-mode-map "C-c M-t" #'toc-org-insert-toc))
+#+end_src
+=toc-org=​会清空带有​~TOC~​标签的 heading，并生成目录。
+**** TODO 加密块
+目前还不太了解，后续添加
+=org-crypt= 可以用 =GPG= 加密 Org Mode 的某些 heading，当然是带有 ~crypt~ 标签的。
+现在来设置一下。
+#+begin_src emacs-lisp :noweb-ref none :tangle no
+(use-package! org-crypt
+  :defer t
+  :after org
+  :custom
+  (org-crypt-key user-gpg-key)
+  (org-tags-exclude-from-inheritance '("crypt")) ;; avoid repeated encryption
+  :config
+  (org-crypt-use-before-save-magic) ;; encrypt when writing back to the hard disk
+  (map! :map org-mode-map
+        :localleader
+        :desc "org-encrypt" "C" nil
+        :desc "encrypt current" "C e" #'org-encrypt-entry
+        :desc "encrypt all" "C E" #'org-encrypt-entries
+        :desc "decrypt current" "C d" #'org-decrypt-entry
+        :desc "decrypt all" "C D" #'org-decrypt-entries))
+#+end_src
+
+如果想用其他密钥加密，可以设置 ~cryptkey~ 属性。
+#+begin_example
+,* Totally secret :crypt:
+:properties:
+:cryptkey: 0x0123456789012345678901234567890123456789
+:end:
+#+end_example
+**** TODO 从 Pandoc 导入
+有时我不得不使用 Org-mode 文件，但幸运的是，Pandoc 提供了处理非 Org-mode 文件的
+方法。
+#+begin_src emacs-lisp :tangle packages.el :comments no :noweb-ref none
+(package! org-pandoc-import :recipe
+  (:host github :repo "tecosaur/org-pandoc-import" :files ("*.el" "filters" "preprocessors")))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref none
+(use-package! org-pandoc-import
+  :after org)
+#+end_src
+
+**** TODO 标题结构
+说起标题行，我注意到了一个非常棒的包，它可以浏览并管理标题结构。
+#+begin_src emacs-lisp :tangle packages.el :comments no :noweb-ref none
+(package! org-ol-tree :recipe (:host github :repo "Townk/org-ol-tree"))
+#+end_src
+
+#+begin_src emacs-lisp :tangle no :noweb-ref none
+(use-package! org-ol-tree
+  :defer t
+  :after org
+  :commands org-ol-tree
+  :config
+  ;; (setq org-ol-tree-ui-icon-set
+  ;;       (if (and (display-graphic-p)
+  ;;                (fboundp 'all-the-icons-material))
+  ;;           'all-the-icons
+  ;;         'unicode))
+  ;; (org-ol-tree-ui--update-icon-set)
+  (map! :map org-mode-map
+        :localleader
+        :desc "Outline" "O" #'org-ol-tree))
+#+end_src
+
+**** agenda
+org todo 相关配置
+#+begin_src emacs-lisp
+;; (setq org-todo-keywords
+;;       '((sequence
+;;          "TODO(t)" ; A task that needs doing & is ready to do
+;;          "WIP(i)" ; 正在做的事
+;;          "HOLD(h)" ; This is paused/on hold because of me
+;;          "WAIT(w)" ; 等待
+;;          "PROJ(p)"  ; A project, which usually contains other tasks
+;;          "LOOP(l)"  ; A recurring task
+;;          "IDEA(i)"  ; An unconfirmed and unapproved task or notion
+;;          "|"
+;;          "DONE(d)" ; 完成
+;;          "KILL(k)") ; 终止任务，TASK was cancelled，
+;;         (sequence ; 代码相关
+;;          "REPORT(r)"
+;;          "BUG(b)"
+;;          "KNOWNCAUSE(k)"
+;;          "|"
+;;          "FIXED(f)")
+;;         ))
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "HOLD(h!)" "WIP(i!)" "WAIT(w!)" "|" "DONE(d!)" "CANCELLED(c@/!)")
+        (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f!)")))
+
+;; TODO 关键词的样式设置,可以使用 org-modern 管理
+;; (setq org-todo-keyword-faces
+;;       '(("TODO"       :foreground "#7c7c75" :weight bold)
+;;         ("HOLD"       :foreground "#feb24c" :weight bold)
+;;         ("WIP"        :foreground "#0098dd" :weight bold)
+;;         ("WAIT"       :foreground "#9f7efe" :weight bold)
+;;         ("DONE"       :foreground "#50a14f" :weight bold)
+;;         ("CANCELLED"  :foreground "#ff6480" :weight bold)
+;;         ("REPORT"     :foreground "magenta" :weight bold)
+;;         ("BUG"        :foreground "red"     :weight bold)
+;;         ("KNOWNCAUSE" :foreground "yellow"  :weight bold)
+;;         ("FIXED"      :foreground "green"   :weight bold)))
+
+;; 标签行状态变化时标签同步发生变化
+;; Moving  task to CANCELLED adds a CANCELLED tag
+;; Moving a task to WAIT adds a WAIT tag
+;; Moving a task to HOLD adds WAIT and HOLD tag
+;; moving a task to a done state removes WAIT adn HOLD tags
+;; moving a task to TODO removes WAIT, CANCELLED, and HOLD tags
+;; moving a task to DONE removes WAIT, CANCELLED< and HOLD tags
+(setq org-todo-state-tags-triggers
+      (quote (("CANCELLED" ("CANCELLED" . t))
+              ("WAIT" ("WAIT" . t))
+              ("HOLD" ("WAIT" ("HOLD" . t)))
+              (done ("WAIT") ("HOLD"))
+              ("TODO" ("WAIT") ("CANCELLED") ("HOLD"))
+              ("DONE" ("WAIT") ("CANCELLED") ("HOLD")))))
+
+;; 专家模式选择标题栏
+(setq org-use-fast-todo-selection 'expert)
+;; 父子状态有依赖
+(setq org-enforce-todo-dependencies t)
+;; 标题栏和任务复选框有依赖
+(setq org-enforce-todo-checkbox-dependencies t)
+
+;; 标题行全局属性设置
+(setq org-global-properties
+      '(("EFFORT_ALL" . "0:15 0:30 0:45 1:00 2:00 3:00 4:00 5:00 6:00 7:00 8:00")
+        ("APPT_WARNTIME_ALL" . "0 5 10 15 20 25 30 45 60")
+        ("RISK_ALL" . "Low Medium High")
+        ("STYLE_ALL" . "habit")))
+
+;; Org columns 的默认格式
+(setq org-columns-default-format
+      "%25ITEM %TODO %SCHEDULED %DEADLINE %3PRIORITY %TAGS %CLOCKSUM %EFFORT{:}")
+
+;; 当状态从 DONE 改成其他状态时，移除 CLOSED: [timestamp]
+(setq org-closed-keep-when-no-todo t)
+
+(setq org-log-done 'time ; DONE 时，加上时间戳
+      org-log-repeat 'time ; 重复执行时加上时间戳
+      org-log-reschedule 'note ; Schedule 修改时加上一条记录
+      org-log-redeadline 'note ; Deadline 修改时加上一条记录
+      org-log-into-drawer t ; 以抽屉的方式记录
+      ;;紧接着标题行或者计划/截止时间戳后加上记录抽屉
+      org-log-state-notes-insert-after-drawers nil)
+
+;; reflie 使用缓存
+(setq org-refile-use-cache t)
+;; refile 的目的地，这里设置为 agenda 文件的所有标题
+(setq org-refile-targets '((org-agenda-files . (:maxlevel . 9))))
+;; 文件名加入到路径中
+(setq org-refile-use-outline-path 'file)
+;; 是否按步骤 refile
+(setq org-outline-path-complete-in-steps nil)
+;; 允许创建新的标题行，但需要确认
+(setq org-refile-allow-creating-parent-nodes 'copnfirm)
+;; 标签默认位置, 77 列右对齐
+;; (setq org-tags-column -77)
+;; 自动对齐
+(setq org-auto-align-tags t
+      org-use-tag-inheritance nil ; 标签不继承
+      org-agenda-use-tag-inheritance nil ; 在日程视图的标签不继承
+      org-use-fast-tag-selection t ; 标签快速选择
+      org-fast-tag-selection-single-key t ; 标签选择不需要回车
+      org-track-ordered-property-with-tag t ;定义有序属性标题行也加上 OREDERD 标签
+      )
+
+;; 始终存在的标签
+(setq org-tag-persistent-alist
+      '(("read" . ?r)
+        ("mail" . ?m)
+        ("emacs" . ?e)
+        ("study" . ?s)
+        ("work" . ?w)))
+
+;; 定义好的标签
+(setq org-tag-alist '((:startgroup)
+                      ("crypt" . ?c)
+                      ("linux" . ?l)
+                      ("apple" . ?a)
+                      ("noexport" . ?n)
+                      ("ignore" . ?i)
+                      ("TOC" . ?t)
+                      (:endgroup)))
+#+end_src
+#+begin_src emacs-lisp :tangle yes :noweb-ref none
+(defvar org-agenda-dir (concat org-directory "/" "agenda"))
+(defvar org-agenda-todo-file (expand-file-name "todo.org" org-agenda-dir))
+(defvar org-agenda-project-file (expand-file-name "project.org" org-agenda-dir))
+(after! org-agenda
+  ;;urgancy|soon|as soon as possible|at some point|eventually
+  ;;
+  (setq! org-agenda-files `(,org-agenda-todo-file
+                            ,org-agenda-project-file)
+         org-agenda-skip-scheduled-if-done t
+         org-agenda-skip-deadline-if-done t
+         org-agenda-include-deadlines t
+         org-agenda-block-separator nil
+         org-agenda-tags-column 100 ;; from testing this seems to be a good value
+         org-agenda-compact-blocks t))
+#+end_src
+
+**** org-capture
+org-capture 模块设置
+#+begin_src emacs-lisp :noweb-ref none :tangle yes
+(after! org-capture
+  (setq! org-capture-dir (expand-file-name "capture" org-directory)
+         org-capture-snippet-file (expand-file-name "snippets.org" org-capture-dir)
+         org-capture-book-file (expand-file-name "books.org" org-capture-dir)
+         org-capture-movie-file (expand-file-name "movie.org" org-capture-dir)
+         org-capture-note-file (expand-file-name "notes.org" org-capture-dir)
+         ;; 这个应该会被删除，之后使用 org-roam 取代
+         org-capture-blog-file (expand-file-name "blog.org" org-capture-dir)
+         ;; 保存书签，
+         org-capture-bookmark-file (expand-file-name "bookmark.org" org-capture-dir))
+  (setq org-capture-templates
+        `(("j" "Journal" entry (file+datetree ,(concat org-directory "/journal.org"))
+           "* %U - %^{heading}\n  %?")
+          ("c" "Comment")
+          ("cb" "Book" entry (file+weektree ,org-capture-book-file)
+           "* %^{book} :book:%\\1:\n%?" :empty-lines 1)
+          ("cm" "Movie" entry (file+weektree ,org-capture-movie-file)
+           "* %^{movie} :movie:%\\1:\n%?" :empty-lines 1)
+          ("g" "GTD")
+          ("gt" "Todo" entry (file+headline ,org-agenda-todo-file "Personal")
+           "* TODO [#%^{priority|B|A|C|D|E}] %^{task} \n SCHEDULED: %^T DEADLINE: %^T\n:properties:\n:end:\n%?")
+          ("gd" "Daily" entry (file+headline ,org-agenda-todo-file "Daily")
+           "* TODO [#%^{priority|C|A|B|D|E}] %^{task}\n :properties:\n:end:\n SCHEDULED:  %<<%Y-%m-%d %a %H:%M ++1d>>\n%?"
+           :empty-lines 1)
+          ("gw" "Weekly" entry (file+headline ,org-agenda-todo-file "Weekly")
+           "* TODO [#%^{priority|B|A|C|D|E}] %^{task}\n:properties:\n:end:\n SCHEDULED: %<<%Y-%m-%d %a %H:%M ++1w>>\n%?"
+           :empty-lines 1)
+          ("gm" "Monthly" entry (file+headline ,org-agenda-todo-file "Monthly")
+           "* TODO [#%^{priority|C|A|B|D|E}] %^{task}\n:properties:\n:end:\n SCHEDULED: %<<%Y-%m-%d %a %H:%M ++1m>>\n%?"
+           :empty-lines 1)
+
+          ;; org-bookmark
+          ("pn" "Protocol Bookmarks" entry (file+headline ,org-capture-bookmark-file "Bookmark")
+           "* %U - %:annotation  \n %:initial \n" :immediate-finish t :kill-buffer t)
+        )))
+#+end_src
+
+**** org-src
+设置代码块的默认参数
+#+begin_src emacs-lisp
+(use-package! org-src
+  :init
+  (setq org-babel-default-header-args
+        '((:eval . "never-export")
+          (:session . "none")
+          (:results . "replace")
+          (:exports . "both")
+          (:cache . "no")
+          (:noweb . "no")
+          (:hlines . "no")
+          (:wrap . "results")
+          (:tangle . "no")))
+  :config
+  ;; ==================================
+  ;; 如果出现代码运行结果为乱码，可以参考：
+  ;; https://github.com/nnicandro/emacs-jupyter/issues/366
+  ;; ==================================
+  (defun display-ansi-colors ()
+    (ansi-color-apply-on-region (point-min) (point-max)))
+  (add-hook 'org-babel-after-execute-hook #'display-ansi-colors)
+
+  ;; ==============================================
+  ;; 通过 overlay 在代码块里显示行号，s-l 显示，任意键关闭
+  ;; ==============================================
+  (defvar number-line-overlays '()
+    "List of overlays for line numbers.")
+
+  (defun show-line-number-in-src-block ()
+    (interactive)
+    (save-excursion
+      (let* ((src-block (org-element-context))
+             (nlines (- (length
+                         (s-split
+                          "\n"
+                          (org-element-property :value src-block)))
+                        1)))
+        (goto-char (org-element-property :begin src-block))
+        (re-search-forward (regexp-quote (org-element-property :value src-block)))
+        (goto-char (match-beginning 0))
+
+        (cl-loop for i from 1 to nlines
+                 do
+                 (beginning-of-line)
+                 (let (ov)
+                   (setq ov (make-overlay (point) (point)))
+                   (overlay-put ov 'before-string (format "%3s | " (number-to-string i)))
+                   (add-to-list 'number-line-overlays ov))
+                 (next-line))))
+
+    ;; now read a char to clear them
+    (read-key "Press a key to clear numbers.")
+    (mapc 'delete-overlay number-line-overlays)
+    (setq number-line-overlays '()))
+
+  ;; =================================================
+  ;; 执行结果后，如果结果所在的文件夹不存在将自动创建
+  ;; =================================================
+  (defun check-directory-exists-before-src-execution (orig-fun
+                                                      &optional arg
+                                                      info
+                                                      params)
+    (when (and (assq ':file (cadr (cdr (org-babel-get-src-block-info))))
+               (member (car (org-babel-get-src-block-info)) '("mermaid" "ditaa" "dot" "lilypond" "plantuml" "gnuplot" "d2")))
+      (let ((foldername (file-name-directory (alist-get :file (nth 2 (org-babel-get-src-block-info))))))
+        (if (not (file-exists-p foldername))
+            (mkdir foldername)))))
+  (advice-add 'org-babel-execute-src-block :before #'check-directory-exists-before-src-execution)
+
+  ;; =================================================
+  ;; 自动给结果的图片加上相关属性
+  ;; =================================================
+  (setq original-image-width-before-del "400") ; 设置图片的默认宽度为 400
+  (setq original-caption-before-del "")        ; 设置默认的图示文本为空
+
+  (defun insert-attr-decls ()
+    "insert string before babel execution results"
+    (insert (concat "\n#+CAPTION:"
+                    original-caption-before-del
+                    "\n#+ATTR_ORG: :width "
+                    original-image-width-before-del
+                    "\n#+ATTR_LATEX: :width "
+                    (if (>= (/ (string-to-number original-image-width-before-del) 800.0) 1)
+                        "1.0"
+                      (number-to-string (/ (string-to-number original-image-width-before-del) 800.0)))
+                    "\\linewidth :float nil"
+                    "\n#+ATTR_HTML: :width "
+                    original-image-width-before-del
+                    )))
+
+  (defun insert-attr-decls-at (s)
+    "insert string right after specific string"
+    (let ((case-fold-search t))
+      (if (search-forward s nil t)
+          (progn
+            ;; (search-backward s nil t)
+            (insert-attr-decls)))))
+
+  (defun insert-attr-decls-at-results (orig-fun
+                                       &optional arg
+                                       info
+                                       param)
+    "insert extra image attributes after babel execution"
+    (interactive)
+    (progn
+      (when (member (car (org-babel-get-src-block-info)) '("mermaid" "ditaa" "dot" "lilypond" "plantuml" "gnuplot" "d2"))
+        (setq original-image-width-before-del (number-to-string (if-let* ((babel-width (alist-get :width (nth 2 (org-babel-get-src-block-info))))) babel-width (string-to-number original-image-width-before-del))))
+        (save-excursion
+          ;; `#+begin_results' for :wrap results, `#+RESULTS:' for non :wrap results
+          (insert-attr-decls-at "#+begin_results")))
+      (org-redisplay-inline-images)))
+  (advice-add 'org-babel-execute-src-block :after #'insert-attr-decls-at-results)
+
+  ;; 再次执行时需要将旧的图片相关参数行删除，并从中头参数中获得宽度参数，参考
+  ;; https://emacs.stackexchange.com/questions/57710/how-to-set-image-size-in-result-of-src-block-in-org-mode
+  (defun get-attributes-from-src-block-result (&rest args)
+    "get information via last babel execution"
+    (let ((location (org-babel-where-is-src-block-result))
+          ;; 主要获取的是图示文字和宽度信息，下面这个正则就是为了捕获这两个信息
+          (attr-regexp "[:blank:]*#\\+\\(ATTR_ORG: :width \\([0-9]\\{3\\}\\)\\|CAPTION:\\(.*\\)\\)"))
+      (setq original-caption-before-del "") ; 重置为空
+      (when location
+        (save-excursion
+          (goto-char location)
+          (when (looking-at (concat org-babel-result-regexp ".*$"))
+            (next-line 2)               ; 因为有个 begin_result 的抽屉，所以往下 2 行
+            ;; 通过正则表达式来捕获需要的信息
+            (while (looking-at attr-regexp)
+              (when (match-string 2)
+                (setq original-image-width-before-del (match-string 2)))
+              (when (match-string 3)
+                (setq original-caption-before-del (match-string 3)))
+              (next-line)               ; 因为设置了:wrap，所以这里不需要删除这一行
+              )
+            )))))
+  (advice-add 'org-babel-execute-src-block :before #'get-attributes-from-src-block-result))
+#+end_src
+
+*** 美化配置
+**** org 美化的基本配置
+设置合适的标题大小和每一级的行高
+#+begin_src emacs-lisp
+(custom-set-faces! '(org-document-title :height 1.75 :weight bold)
+  '(org-level-1 :height 1.25 :weight bold)
+  '(org-level-2 :height 1.2 :weight bold)
+  '(org-level-3 :height 1.15 :weight bold)
+  '(org-level-4 :height 1.1 :weight bold)
+  '(org-level-5 :height 1.05 :weight bold)
+  '(org-level-6 :height 1.025 :weight bold)
+  '(org-level-7 :height 1.0 :weight bold)
+  '(org-level-8 :height 1.0 :weight bold))
+
+(setq org-priority-faces '((?A . error)
+                           (?B . warning)
+                           (?C . success)))
+#+end_src
+代码块使用上下边线包裹
+#+begin_src emacs-lisp
+(custom-set-faces! '(org-block-begin-line :underline t :background unspecified)
+  '(org-block-end-line :overline t :underline nil :background unspecified))
+#+end_src
+提升 latex 预览的图片清晰度
+#+begin_src emacs-lisp
+(plist-put! org-format-latex-options :scale 1.8)
+#+end_src
+设置标题行之间总是空格;列表之间根据情况自动加空格
+#+begin_src emacs-lisp
+(setq! org-blank-before-new-entry '((heading . t) (plain-list-item . auto)))
+#+end_src
+设置
+org 自带的 todo,done,引用块美化
+#+begin_src emacs-lisp
+(setq org-fontify-todo-headline t
+      org-fontify-done-headline t
+      org-fontify-quote-and-verse-blocks t)
+#+end_src
+隐藏宏标记
+#+begin_src emacs-lisp
+(setq org-hide-macro-markers t)
+#+end_src
+高亮 latex 语法
+#+begin_src emacs-lisp
+(setq org-highlight-latex-and-related '(native script entities))
+#+end_src
+默认使用 overview 的模式展示标题行
+#+begin_src emacs-lisp
+(setq org-startup-folded 'overview)
+#+end_src
+**** org-modern
+使 =org-mode= buffer 尽可能漂亮是很重要的，Minad 的 =org-modern= 在这方面大有帮
+助。
+#+begin_src emacs-lisp :noweb-ref none :tangle packages.el
+(package! org-modern)
+#+end_src
+#+begin_src emacs-lisp :tangle yes :noweb-ref none
+(use-package! org-modern
+  :hook ((org-mode . org-modern-mode) (org-agenda-finalize . org-modern-agenda))
+  :config
+  (setq org-modern-block-fringe t
+        org-modern-star '("☯" "☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷"))
+  (if (modulep! :completion vertico +icons)
+      (setq org-modern-checkbox '((88 . "") (45 . "")  (32 . "")))
+    (setq org-modern-checkbox
+          '((?X . #("▢✓" 0 2 (composition ((2)))))
+            (?- . #("▢-" 0 2 (composition ((2)))))
+            (?\s . #("▢" 0 1 (composition ((1))))))))
+  ;; org-modern-table 存在无法对齐的情况, 我是用其他包管理
+  ;; @see https://github.com/minad/org-modern/issues/5
+  (setq org-modern-table nil)
+  ;; (setq org-modern-table-horizontal 0.3
+  ;;       org-modern-table-vertical 2)
+
+  ;; tag 边框宽度，还可以设置为 `auto' 即自动计算
+  (setq org-modern-label-border 'auto)
+  (setq org-modern-list (if (doom-font-exists-p "PragmataPro Liga")
+                            '((43 . "➤")
+                              (45 . "♫")
+                              (42 . "•"))
+                          '((43 . "➤")
+                            (45 . "–")
+                            (42 . "•")))
+        org-modern-todo-faces '(("TODO" :inverse-video t :inherit org-todo)
+                                ("PROJ" :inverse-video t :inherit +org-todo-project)
+                                ("STRT" :inverse-video t :inherit +org-todo-active)
+                                ("[-]"  :inverse-video t :inherit +org-todo-active)
+                                ("HOLD" :inverse-video t :inherit +org-todo-onhold)
+                                ("WAIT" :inverse-video t :inherit +org-todo-onhold)
+                                ("[?]"  :inverse-video t :inherit +org-todo-onhold)
+                                ("KILL" :inverse-video t :inherit +org-todo-cancel)
+                                ("NO"   :inverse-video t :inherit +org-todo-cancel))
+        org-modern-footnote (cons nil (cadr org-script-display))
+        org-modern-progress nil
+        org-modern-priority nil
+        org-modern-horizontal-rule (make-string 36 ?─)
+        ;; 使用 org-modern 自带的取代 org-tag 和 org-agenda-tags
+        org-tags-column 0
+        org-agenda-tags-column 0)
+
+  (setq org-modern-keyword '((t . t)))
+  (when (fboundp 'nerd-icons-mdicon)
+    (setq org-modern-keyword
+          `((t . t)
+            ("title" . ,(nerd-icons-mdicon "nf-md-format_title"))
+            ("email" . ,(nerd-icons-mdicon "nf-md-email"))
+            ("date" . ,(nerd-icons-octicon "nf-oct-calendar"))
+            ("author" . ,(nerd-icons-mdicon "nf-md-account"))
+            ("subtitle" . ,(nerd-icons-mdicon "nf-md-subtitles"))
+            ("property" . ,(nerd-icons-codicon "nf-cod-symbol_property"))
+            ("options" . ,(nerd-icons-codicon "nf-cod-settings"))
+            ("startup" . ,(nerd-icons-mdicon "nf-md-power"))
+            ("macro" . ,(nerd-icons-faicon "nf-fa-maxcdn"))
+            ("bind" . ,(nerd-icons-mdicon "nf-md-link"))
+            ("include" . ,(nerd-icons-mdicon "nf-md-code_braces"))
+            ("setupfile" . ,(nerd-icons-mdicon "nf-md-hammer_wrench"))
+            ("name" . ,(nerd-icons-mdicon "nf-md-alpha_n_box_outline"))
+            ("result" . ,(nerd-icons-mdicon "nf-md-alpha_r_box_outline"))
+            ("attr_latex" . ,(nerd-icons-mdicon "nf-md-alpha_l_circle_outline"))
+            ("attr_org" . ,(nerd-icons-mdicon "nf-md-alpha_o_circle_outline"))
+            ("attr_html" . ,(nerd-icons-mdicon "nf-md-alpha_h_circle_outline"))
+            ("html_head" . ,(nerd-icons-faicon "nf-fa-header"))
+            ("header" . ,(nerd-icons-mdicon "nf-md-format_header_increase"))
+            ("caption" . ,(nerd-icons-mdicon "nf-md-closed_caption"))
+            ("RESULTS" . ,(nerd-icons-mdicon "nf-md-read")))))
+  (custom-set-faces! '(org-modern-statistics :inherit org-checkbox-statistics-todo)))
+#+end_src
+由于 =org-modern= 的标签面取代了 Org 的标签面，我们需要调整拼写检查面忽略列表。
+#+begin_src emacs-lisp :tangle yes :noweb-ref none
+(after! spell-fu
+  (cl-pushnew 'org-modern-tag (alist-get 'org-mode +spell-excluded-faces-alist)))
+#+end_src
+**** 强调标记
+虽然 ~org-hide-emphasis-markers~ 非常好，但有时它会使边界处的编辑变得更加繁琐。
+我们可以使用 =org-appear= 包在不牺牲视觉便利的情况下改善这种情况。
+
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! org-appear :recipe (:type git :host github :repo "awth13/org-appear"))
+#+end_src
+
+#+begin_src emacs-lisp  :noweb-ref none :tangle "yes"
+(use-package! org-appear
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autolinks t)
+  (setq org-appear-autosubmarkers t)
+  (setq org-appear-autoentities t)
+  (setq org-appear-autokeywords t)
+  (setq org-appear-inside-latex t))
+#+end_src
+**** 符号配置
+用来更改于折叠项目的字符
+#+begin_src emacs-lisp
+(setq! org-elispsis " ▾ "
+       org-hide-leading-stars t
+       org-priority-highest ?A
+       org-priority-lowest ?E)
+#+end_src
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! org-fancy-priorities :pin "7f677c6c14ecf05eab8e0efbfe7f1b00ae68eb1d")
+#+end_src
+#+begin_src emacs-lisp  :noweb-ref none :tangle "yes"
+(use-package! org-fancy-priorities ; priority icons
+  :hook (org-mode . org-fancy-priorities-mode)
+  :hook (org-agenda-mode . org-fancy-priorities-mode)
+  :config
+  (custom-set-variables '(org-lowest-priority ?E))
+  (setq! org-fancy-priorities-list '("⚡" "↑" "↓" "☕" "❓")))
+#+end_src
+ligatures 配置,
+#+begin_src emacs-lisp :noweb-ref none :tangle "yes"
+(appendq! +ligatures-extra-symbols
+          (list :list_property "::" :em_dash "-"))
+(when (modulep! :lang org)
+  (defadvice! +org-init-appearance-h--no-ligatures-a ()
+    :after #'+org-init-appearance-h
+    (set-ligatures! 'org-mode nil)
+    (set-ligatures! 'org-mode
+      :list_property "::"
+      :em_dash       "---"
+      :ellipsis      "..."
+      :arrow_right   "->"
+      :arrow_left    "<-"
+      :arrow_lr      "<->"
+      :idcard        ":ID:"
+      :idcard        ":id:"
+      :properties    ":properties:"
+      :properties    ":PROPERTIES:"
+      :crypt         ":cryptkey:"
+      :end           ":end:"
+      :end ":END:")))
+#+end_src
+***** table
+使用 valign 对齐 org-table
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! valign :recipe (:host github :repo "casouri/valign"))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! valign
+  :hook (org-mode . valign-mode)
+  :config (setq valign-fancy-bar t))
+#+end_src
+
+**** iscroll-mode
+更平滑的滚动图片
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! iscroll)
+#+end_src
+#+begin_src emacs-lisp
+(add-hook! org-mode #'iscroll-mode)
+#+end_src
+*** org 图片处理
++ 参考
+  + [[https://remacs.cc/posts/%E9%9D%A2%E5%90%91%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86%E7%9A%84emacs%E6%95%99%E7%A8%8B18.-org-mode%E5%86%99%E6%96%87%E6%A1%A3%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B0%8F%E6%8A%80%E5%B7%A7/][面向产品经理的 Emacs 教程： 18. Org mode 写文档的一些小技巧 | Randolph 的博客]]
+  + [[https://emacs-china.org/t/org-download/1672/6][Org-download 不错 - Org-mode - Emacs China]]
+#+begin_src emacs-lisp
+(if (modulep! :lang org +dragndrop)
+    (after! org-download
+      ;; 如果 org-download-method 设为 'attach 的话，用下面这个就可以去掉标题里的 ATTACH 标签了
+      (setq org-attach-auto-tag nil)
+      (setq org-download-display-inline-images 'postformae)
+      ;; 默认不显示图片
+      (advice-remove #'org-download-insert-link #'+org--dragndrop-then-display-inline-images-a)
+      )
+  (defun my/org-insert-clipboard-image (width)
+    "Crteate a time stamped unique-named file from the clipboard in the sub-directory
+(%filename.assets) as the org-buffer and insert a link to this file."
+    (interactive (list
+                  (read-string (format "input image width, default is 800: ")
+                               nil nil "800")))
+
+    (let* (;; 设置存放图片的位置为当前 org 同名的.assets 下
+           (foldername (concat (file-name-base (buffer-file-name)) ".assets/"))
+           ;; 图片名称
+           (img-name (concat "img_" (format-time-string "%Y%m%d_%H%M%S") ".png"))
+           ;; 图片文件的相对路径
+           (relative-file-name (concat (file-name-base (buffer-name)) ".assets/" img-name)))
+
+      (unless (file-exists-p foldername)
+        (mkdir foldername))
+      ;; 根据不同操作系统设置不同的命令行工具
+      (cond (IS-LINUX
+             (shell-command (concat "xclip -selection clipboard -t image/png -o > " relative-file-name)))
+            (IS-MAC
+             (shell-command (concat "pngpaste " relative-file-name))))
+      ;; 给粘贴好的图片链接加上宽度属性，方便导出
+      (insert (concat "\n#+DOWNLOADED: screenshot @ "
+                      (format-time-string "%Y-%m-%d %a %H:%M:%S" (current-time))
+                      "\n#+CAPTION: \n#+ATTR_ORG: :width "
+                      width
+                      "\n#+ATTR_LATEX: :width "
+                      (if (>= (/ (string-to-number width) 800.0) 1.0)
+                          "1.0"
+                        (number-to-string (/ (string-to-number width) 800.0)))
+                      "\\linewidth :float nil\n"
+                      "#+ATTR_HTML: :width "
+                      width
+                      "\n[[file:" relative-file-name "]]\n"))
+      ;; 重新显示一下图片
+      (org-redisplay-inline-images)))
+  (map! "s-V" #'my/org-insert-clipboard-image))
+#+end_src
+
+*** org-roam
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! org-roam)
+(unpin! org-roam)
+(package! org-roam-ui)
+#+end_src
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+;; 使用 org-roam-ui 的配置
+(use-package! websocket :after org-roam)
+(use-package! org-roam
+  :init (setq org-roam-db-location
+              (concat
+               (file-name-as-directory doom-cache-dir)
+               "org-roam.db")
+              org-roam-database-connector 'sqlite-builtin
+              org-id-link-to-org-use-id t))
+
+(use-package! org-roam-ui
+  :after org-roam ;; or :after org
+         ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+  :config
+  (setq org-roam-ui-sync-theme t
+        org-roam-ui-follow t
+        org-roam-ui-update-on-save t
+        org-roam-ui-open-on-start t))
+#+end_src
+**** 多个 org-roam-root 目录切换
+在额外的 org-roam-directory 目录下添加如下内容
+#+begin_src emacs-lisp :tangle "no" :noweb-ref none
+((nil . ((eval . (setq-local
+                  org-roam-directory (expand-file-name (locate-dominating-file
+                                                        default-directory ".dir-locals.el"))))
+         (eval . (setq-local
+                  org-roam-db-location (expand-file-name "org-roam.db"
+                                                         org-roam-directory))))))
+;; 或者
+((nil . ((org-roam-directory . "/path/to/alt/org-roam-dir")
+         (org-roam-db-location . "/path/to/alt/org-roam-dir/org-roam.db"))))
+#+end_src
+*** org-mpv
+使用 org + mpv 记录视频笔记
+#+begin_src bash :tangle "no"
+# archlinx
+yay -S mpv yt-dlp ffmpeg tesseract danmaku2ass-git seam-git xclip
+# brew
+brew install yt-dlp ffmpeg tesseract
+# 需要手动安装 seam, danmaku2ass
+#+end_src
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! mpvi :recipe (:host github :repo "lorniu/mpvi"))
+#+end_src
+
+*** org-media-note
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+;; media note
+(package! org-media-note :recipe (:host github :repo "yuchen-lea/org-media-note"))
+
+#+end_src
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(use-package! org-media-note
+  :hook (org-mode .  org-media-note-mode)
+  :bind (
+         ("H-v" . org-media-note-hydra/body))  ;; 主功能入口
+  :config
+  (setq org-media-note-screenshot-image-dir "~/Pictures/Notes/")  ;; 用于存储视频截图的目录
+  )
+#+end_src
+** emacs-lisp
+:properties:
+:CUSTOM_ID: emacs-lisp
+:header-args:emacs-lisp: :tangle no :noweb-ref elisp-conf
+:end:
+:intro:
+使用编写​~emacs-lisp~​体验更好
+#+header: :var *my-treesit-use-elisp-p=(and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'elisp))
+#+begin_src emacs-lisp :noweb no-export :tangle yes :noweb-prefix no :noweb-ref nil
+(use-package! elisp-mode
+  :ensure nil
+  :init
+  (when (modulep! :checkers syntax)
+    ;;Disable the checkdoc checker
+    (setq-hook! 'emacs-lisp-mode-hook flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
+  (dont-use-company-mode 'emacs-lisp-mode)
+  :config
+  (when (boundp 'elisp-flymake-byte-compile-load-path)
+    (add-to-list 'elisp-flymake-byte-compile-load-path load-path))
+  (add-hook! emacs-lisp-mode
+             (lsp-bridge-mode +1)
+             (when *my-treesit-use-elisp-p (treesit-parser-create 'elisp)))
+  <<elisp-conf>>)
+#+end_src
+*** [[https://github.com/Fanael/highlight-defined][highlight-defined]]
+高亮已经定义的 symbols
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! highlight-defined :recipe (:host github :repo "Fanael/highlight-defined"))
+#+end_src
+相关配置
+#+begin_src emacs-lisp
+;; (use-package! highlight-defined
+;;   :hook ((emacs-lisp-mode . inferior-emacs-lisp-mode) . highlight-defined-mode))
+(use-package! highlight-defined
+  :hook ((emacs-lisp-mode inferior-emacs-lisp-mode) . highlight-defined-mode))
+#+end_src
+*** [[https://codeberg.org/ideasman42/emacs-elisp-autofmt][Elisp-autofmt]]
+一个​=emacs-lisp=​格式化的工具，但​=emacs-lisp=​的格式从来没有什么规范，只有一些约定俗称的例子，不同的包配置有不同的代码风格。所以这边包基本很少使用
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! elisp-autofmt)
+#+end_src
+这是[[http://xahlee.info/talk_show/xah_talk_show_2023-01-01.html][xahlee]]对该包的评价
+#+begin_src emacs-lisp
+ (use-package! elisp-autofmt
+   :disabled t
+   :commands (elisp-autofmt-mode elisp-autofmt-buffer)
+   :hook (emacs-lisp-mode . elisp-autofmt-mode)
+   :config (setq elisp-autofmt-python-bin "python"))
+#+end_src
+*** indent
+一个 emacs 对齐配置 [[https://github.com/seagle0128/.emacs.d/blob/c00760005b150eeba491c64f370580136c0bfbba/lisp/init-elisp.el#L56][seagle0128]]
+#+begin_src emacs-lisp
+(with-no-warnings
+ ;; Align indent keywords
+ ;; @see https://emacs.stackexchange.com/questions/10230/how-to-indent-keywords-aligned
+ (defun my-lisp-indent-function (indent-point state)
+   "This function is the normal value of the variable `lisp-indent-function'.
+The function `calculate-lisp-indent' calls this to determine
+if the arguments of a Lisp function call should be indented specially.
+
+INDENT-POINT is the position at which the line being indented begins.
+Point is located at the point to indent under (for default indentation);
+STATE is the `parse-partial-sexp' state for that position.
+
+If the current line is in a call to a Lisp function that has a non-nil
+property `lisp-indent-function' (or the deprecated `lisp-indent-hook'),
+it specifies how to indent.  The property value can be:
+
+,* `defun', meaning indent `defun'-style
+  \(this is also the case if there is no property and the function
+  has a name that begins with \"def\", and three or more arguments);
+
+,* an integer N, meaning indent the first N arguments specially
+  (like ordinary function arguments), and then indent any further
+  arguments like a body;
+
+,* a function to call that returns the indentation (or nil).
+  `lisp-indent-function' calls this function with the same two arguments
+  that it itself received.
+
+This function returns either the indentation to use, or nil if the
+Lisp function does not specify a special indentation."
+   (let ((normal-indent (current-column))
+        (orig-point (point)))
+   (goto-char (1+ (elt state 1)))
+   (parse-partial-sexp (point) calculate-lisp-indent-last-sexp 0 t)
+   (cond
+    ;; car of form doesn't seem to be a symbol, or is a keyword
+    ((and (elt state 2)
+          (or (not (looking-at "\\sw\\|\\s_"))
+              (looking-at ":")))
+     (if (not (> (save-excursion (forward-line 1) (point))
+                 calculate-lisp-indent-last-sexp))
+         (progn (goto-char calculate-lisp-indent-last-sexp)
+                (beginning-of-line)
+                (parse-partial-sexp (point)
+                                    calculate-lisp-indent-last-sexp 0 t)))
+     ;; Indent under the list or under the first sexp on the same
+     ;; line as calculate-lisp-indent-last-sexp.  Note that first
+     ;; thing on that line has to be complete sexp since we are
+     ;; inside the innermost containing sexp.
+     (backward-prefix-chars)
+     (current-column))
+    ((and (save-excursion
+            (goto-char indent-point)
+            (skip-syntax-forward " ")
+            (not (looking-at ":")))
+          (save-excursion
+            (goto-char orig-point)
+            (looking-at ":")))
+     (save-excursion
+       (goto-char (+ 2 (elt state 1)))
+       (current-column)))
+    (t
+     (let ((function (buffer-substring (point)
+                                       (progn (forward-sexp 1) (point))))
+           method)
+       (setq method (or (function-get (intern-soft function)
+                                      'lisp-indent-function)
+                        (get (intern-soft function) 'lisp-indent-hook)))
+       (cond ((or (eq method 'defun)
+                  (and (null method)
+                       (length> function 3)
+                       (string-match "\\`def" function)))
+              (lisp-indent-defform state indent-point))
+             ((integerp method)
+              (lisp-indent-specform method state
+                                    indent-point normal-indent))
+             (method
+              (funcall method indent-point state))))))))
+
+ (add-hook 'emacs-lisp-mode-hook
+           (lambda () (setq-local lisp-indent-function #'my-lisp-indent-function))))
+#+end_src
+*** help-mode
+对​=help-mode=​的一些优化配置
+#+begin_src emacs-lisp
+(with-no-warnings
+
+  ;; Add remove buttons for advices
+  (add-hook 'help-mode-hook 'cursor-sensor-mode)
+
+  (defun function-advices (function)
+    "Return FUNCTION's advices."
+    (let ((flist (indirect-function function)) advices)
+      (while (advice--p flist)
+        (setq advices `(,@advices ,(advice--car flist)))
+        (setq flist (advice--cdr flist)))
+      advices))
+
+  (defun add-remove-advice-button (advice function)
+    (when (and (functionp advice) (functionp function))
+      (let ((inhibit-read-only t)
+            (msg (format "Remove advice `%s'" advice)))
+        (insert "\t")
+        (insert-button
+         "Remove"
+         'face 'custom-button
+         'cursor-sensor-functions `((lambda (&rest _) ,msg))
+         'help-echo msg
+         'action (lambda (_)
+                   (when (yes-or-no-p msg)
+                     (message "%s from function `%s'" msg function)
+                     (advice-remove function advice)
+                     (if (eq major-mode 'helpful-mode)
+                         (helpful-update)
+                       (revert-buffer nil t))))
+         'follow-link t))))
+
+  (defun add-button-to-remove-advice (buffer-or-name function)
+    "Add a button to remove advice."
+    (with-current-buffer buffer-or-name
+      (save-excursion
+        (goto-char (point-min))
+        (let ((ad-list (function-advices function)))
+          (while (re-search-forward "^\\(?:This function has \\)?:[-a-z]+ advice: \\(.+\\)$" nil t)
+            (let ((advice (car ad-list)))
+              (add-remove-advice-button advice function)
+              (setq ad-list (delq advice ad-list))))))))
+
+  (define-advice describe-function-1 (:after (function) advice-remove-button)
+    (add-button-to-remove-advice (help-buffer) function))
+  (with-eval-after-load 'helpful
+    (define-advice helpful-update (:after () advice-remove-button)
+      (when helpful--callable-p
+        (add-button-to-remove-advice (current-buffer) helpful--sym))))
+
+  ;; Remove hooks
+  (defun remove-hook-at-point ()
+    "Remove the hook at the point in the *Help* buffer."
+    (interactive)
+    (unless (memq major-mode '(help-mode helpful-mode))
+      (error "Only for help-mode or helpful-mode"))
+
+    (let ((orig-point (point)))
+      (save-excursion
+        (when-let
+            ((hook (progn (goto-char (point-min)) (symbol-at-point)))
+             (func (when (and
+                          (or (re-search-forward (format "^Value:?[\s|\n]") nil t)
+                              (goto-char orig-point))
+                          (sexp-at-point))
+                     (end-of-sexp)
+                     (backward-char 1)
+                     (catch 'break
+                       (while t
+                         (condition-case _err
+                             (backward-sexp)
+                           (scan-error (throw 'break nil)))
+                         (let ((bounds (bounds-of-thing-at-point 'sexp)))
+                           (when (<= (car bounds) orig-point (cdr bounds))
+                             (throw 'break (sexp-at-point)))))))))
+          (when (yes-or-no-p (format "Remove %s from %s? " func hook))
+            (remove-hook hook func)
+            (if (eq major-mode 'helpful-mode)
+                (helpful-update)
+              (revert-buffer nil t)))))))
+  (define-key! help-mode-map  "r" #'remove-hook-at-point))
+#+end_src
+
+** Lua
+*** DONE 自动格式化
+#+begin_src emacs-lisp :tangle (if (executable-find "stylua") "lang/luafmt.el" "no")
+;;; lang/luafmt.el -*- lexical-binding: t; -*-
+(reformatter-define lua-format
+  :program "stylua"
+  :args '("--search-parent-directories" "-v" "-")
+  :group 'lua)
+
+(defun lua-format-region-or-buffer ()
+  "Lua format region or buffer."
+  (interactive)
+  (save-excursion
+    (if (region-active-p)
+        (call-interactively #'lua-format-region)
+      (call-interactively #'lua-format-buffer))))
+#+end_src
+
+CLOSED: [2023-04-04 Tue 13:02]
+#+begin_src emacs-lisp
+(defun +lua-format-region-or-buffer ()
+  "使用`stylua'对 lua 文件进行格式化，如果`stylua'不存在，
+则使用默认的 `indent-region' 进行 indent 格式化"
+  (interactive)
+  (if (load-part-el-file "lang/luafmt")
+      (call-interactively #'lua-format-region-or-buffer)
+    (call-interactively #'indent-region-or-buffer)))
+#+end_src
+*** 公共
+#+begin_src emacs-lisp :tangle yes
+(defun +my-lsp-bridge-with-lua ()
+  (setq-local lsp-bridge-enable-diagnostics nil)
+  (lsp-bridge-mode +1))
+
+(defun +my-init-lua-mode ()
+  (let (mode mode-map)
+    (if (modulep! :lang lua)
+        (setq mode 'lua-mode
+              mode-map 'lua-mode-map)
+      (setq mode 'lua-ts-mode
+            mode-map 'lua-ts-mode-map))
+    (set-ligatures! mode
+      :def "function"
+      :true "true" :false "false"
+      :not "not" :and "and" :or "or"
+      :in "in"
+      :for "for"
+      :return "return")
+    (dont-use-company-mode mode)
+
+  (my/leader :keymaps mode-map
+  "f" '(:ignore t :which-key "file")
+  "f p" '(+lua-format-region-or-buffer :wk "format"))
+  (map! :map mode-map "C-M-\\" :desc "indent" #'+lua-format-region-or-buffer)))
+
+#+end_src
+*** lua-mode
+我使用​=lsp-bridge=​进行补全
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! company-lua :disable t)
+#+end_src
+自用的 lua 配置
+#+begin_src emacs-lisp :tangle yes
+(use-package! lua-mode
+  :if (modulep! :lang lua)
+  :hook (lua-mode . +my-lsp-bridge-with-lua)
+  :config
+  ;;我一般使用 4 个空格
+  (setq lua-indent-level 4)
+  (+my-init-lua-mode))
+#+end_src
+*** lua-ts-mode
+#+begin_src emacs-lisp
+(use-package! lua-ts-mode
+  :unless (modulep! :lang lua)
+  :mode ("\\.lua\\'" . lua-ts-mode)
+  :init
+  (after! org-src
+    (add-to-list 'org-src-lang-modes '("lua" . lua-ts)))
+  :hook (lua-ts-mode . +my-lsp-bridge-with-lua)
+  :config
+  (+my-init-lua-mode)
+  (setq lua-ts-indent-offset 4))
+#+end_src
+** nxml-mode
+配合​~smartparen~​有一个小问题，无法正确匹配​“<”和“>”, 下面时是修改代码
+#+begin_src emacs-lisp
+(use-package! nxml-mode
+  :config
+  (when (modulep! :config default +smartparens)
+    (sp-local-pair 'nxml-mode "<" ">" :post-handlers '(("[d1]" "/")))))
+#+end_src
+
+** applescript
+macos 中自动化的一门脚本语言
+#+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "packages.el" "no") :noweb-ref none
+(package! applescript-mode)
+#+end_src
+
+** json 配置
+:PROPERTIES:
+:ID: 23b63cd8-aeb1-4ff8-a406-3fa884524f3a
+:END:
+一个性能更好的​=json-mode= 工具，29 版本的 emacs 有​~json-ts-mode~​​这个选择所以不安装它
+#+NAME: use-json-p
+#+begin_src emacs-lisp :tangle "no"
+(and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'json))
+#+end_src
+
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none :var us-treesit=use-json-p
+(unless (string= us-treesit "t")
+  (package! jsonian :recipe (:host github :repo "iwahbe/jsonian"))
+  (package! json-mode :disable t))
+#+end_src
+
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none :var us-treesit=use-json-p
+(if (string= us-treesit "t")
+    (progn
+      (pushnew! major-mode-remap-alist '(js-json-mode . json-ts-mode))
+      (after! org-src
+        (add-to-list 'org-src-lang-modes '("json" . json-ts))))
+  ;; To enable jsonian to work with flycheck
+  (after! (jsonian flycheck) (jsonian-enable-flycheck))
+  ;; To disable so-long mode overrides
+  (after! (jsonian so-long) (jsonian-no-so-long-mode)))
+#+end_src
+** sh
+*** org mode 中使用代码块
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(after! (:and sh-script org-src)
+    ;; for org babel
+  (defvar  org-babel-default-header-args:shell
+    '((:results . "output")
+      (:tangle  . "no"))))
+#+end_src
+*** 格式化
+#+begin_src emacs-lisp :tangle (if (executable-find "shfmt") "lang/shfmt.el" "no") :noweb-ref none
+(reformatter-define bash-format :program "shfmt"
+  :args
+  (list "-filename"
+        (or
+         (buffer-file-name)
+         input-file)
+        "-i" "4")
+  :group 'shfmt)
+(defun bash-format-region-or-buffer ()
+  "bash format region or buffer."
+  (interactive)
+  (save-excursion
+    (if (region-active-p)
+        (call-interactively #'bash-format-region)
+      (call-interactively #'bash-format-buffer))))
+#+end_src
+#+begin_src emacs-lisp
+(after! sh-script
+  (defun +bash-format-region-or-buffer ()
+    "使用`shfmt'对 lua 文件进行格式化，如果`shfmt'不存在，
+则使用默认的 `indent-region' 进行 indent 格式化"
+    (interactive)
+    (if (load-part-el-file "lang/shfmt")
+        (call-interactively #'bash-format-region-or-buffer)
+      (call-interactively #'indent-region-or-buffer)))
+
+  (my/leader :keymaps 'bash-mode-map
+    "f" '(:ignore t :which-key "file")
+    "f p" '(+bash-format-region-or-buffer :wk "format"))
+  (map! :map bash-mode-map "C-M-\\" :desc "indent" #'+bash-format-region-or-buffer))
+#+end_src
+
+*** 补全
+#+begin_src emacs-lisp
+(after! sh-script
+  (dont-use-company-mode 'sh-mode)
+  (add-hook! sh-mode :depth 100 (lsp-bridge-mode +1))
+  )
+#+end_src
+** python
+*** 格式化
+优先使用 black 格式化,备选 yapf
+#+begin_src emacs-lisp
+(after! python
+  (defun +python-format-region-or-buffer ()
+    "使用`black' or`yap' 对 python 文件进行格式化，如果都不存在，
+则使用默认的 `indent-region' 进行 indent 格式化"
+    (interactive)
+    (if (load-part-el-file "lang/pyfmt")
+        (call-interactively #'python-format-region-or-buffer)
+      (call-interactively #'indent-region-or-buffer)))
+  (my/leader :keymaps 'python-mode-map
+    "f" '(:ignore t :which-key "file")
+    "f p" '(+python-format-region-or-buffer :wk "format"))
+  (map! :map python-mode-map "C-M-\\" :desc "indent" #'+python-format-region-or-buffer))
+#+end_src
+**** 使用 black 工具格式化
+安装
+#+begin_src bash :tangle "no"
+pip install black --user
+#
+brew install black
+#+end_src
+使用
+#+begin_src emacs-lisp :tangle (if (executable-find "black") "lang/pyfmt.el" "no") :comments no
+;;; lang/pyfmt.el -*- lexical-binding: t; -*-
+
+(reformatter-define python-format :program "black" :args '("-"))
+#+end_src
+**** 使用 yapf 工具格式化
+安装 yapf
+#+begin_src bash :tangle no
+pip install yapf --user
+#+end_src
+#+begin_src emacs-lisp :tangle (if (and (not (executable-find "black")) (executable-find "yapf")) "lang/pyfmt.el" "no") :comments no
+;;; lang/pyfmt.el -*- lexical-binding: t; -*-
+
+(reformatter-define yapf :program "yapf")
+#+end_src
+**** 函数
+#+begin_src emacs-lisp :tangle (if (or (executable-find "black") (executable-find "yapf")) "lang/pyfmt.el" "no")
+(defun python-format-region-or-buffer ()
+    "python format region or buffer."
+    (interactive)
+    (save-excursion
+      (if (region-active-p)
+          (call-interactively #'python-format-region)
+        (when (fboundp 'py-isort-buffer) (py-isort-buffer))
+        (call-interactively #'python-format-buffer))))
+#+end_src
+
+*** 补全
+#+begin_src emacs-lisp
+(after! python
+  ;; 使用 lsp-bridge 自带的语法诊断功能取代 flycheck-mode
+  (defadvice! +python-use-correct-flycheck-executables-h-a (fn &rest args)
+    :around #'+python-use-correct-flycheck-executables-h
+    nil)
+  (dont-use-company-mode 'python-mode)
+  (add-hook! python-mode :depth 100
+    (flycheck-mode -1)
+    (lsp-bridge-mode +1)))
+#+end_src
+** rust
+:PROPERTIES:
+:ID:       b8fb23b1-ec93-4bbb-a32c-e3606dba0346
+:END:
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! rustic)
+#+end_src
+#+begin_src emacs-lisp
+(after! projectile
+  (add-to-list 'projectile-project-root-files "Cargo.toml"))
+
+(use-package! rustic
+  :mode ("\\.rs$" . rustic-mode)
+  :preface
+  ;; HACK `rustic' sets up some things too early. I'd rather disable it and let
+  ;;    our respective modules standardize how they're initialized.
+  (setq rustic-lsp-client nil)
+  (after! rustic-lsp
+    (remove-hook 'rustic-mode-hook 'rustic-setup-lsp))
+  (after! rustic-lsp
+    (remove-hook 'rustic-mode-hook #'flycheck-mode)
+    (remove-hook 'rustic-mode-hook #'flymake-mode-off)
+    (remove-hook 'flycheck-mode-hook #'rustic-flycheck-setup))
+  :init
+  (after! org-src
+    (defalias 'org-babel-execute:rust #'org-babel-execute:rustic)
+    (add-to-list 'org-src-lang-modes '("rust" . rustic)))
+  (when (my-treesit-available-p)
+    (pushnew! major-mode-remap-alist '(rustic-mode . rust-ts-mode)))
+  :config
+  (add-hook 'rustic-mode-hook #'rainbow-delimiters-mode)
+  (set-docsets! 'rustic-mode "Rust")
+  (set-popup-rule! "^\\*rustic-compilation" :vslot -1)
+
+  ;; Conflicts with (and is redundant with) :ui ligatures
+  (setq rust-prettify-symbols-alist nil)
+
+  ;; Leave automatic reformatting to the :editor format module.
+  (setq rustic-babel-format-src-block nil
+        rustic-format-trigger nil)
+
+  (dont-use-company-mode 'rustic-mode)
+  (dont-use-company-mode 'rust-ts-mode)
+  (add-hook 'rustic-mode-hook #'lsp-bridge-mode)
+  (add-hook 'rust-ts-mode-hook #'lsp-bridge-mode)
+
+  (map! :map rustic-mode-map
+        :localleader
+        (:prefix ("b" . "build")
+         :desc "cargo audit"      "a" #'+rust/cargo-audit
+         :desc "cargo build"      "b" #'rustic-cargo-build
+         :desc "cargo bench"      "B" #'rustic-cargo-bench
+         :desc "cargo check"      "c" #'rustic-cargo-check
+         :desc "cargo clippy"     "C" #'rustic-cargo-clippy
+         :desc "cargo doc"        "d" #'rustic-cargo-build-doc
+         :desc "cargo doc --open" "D" #'rustic-cargo-doc
+         :desc "cargo fmt"        "f" #'rustic-cargo-fmt
+         :desc "cargo new"        "n" #'rustic-cargo-new
+         :desc "cargo outdated"   "o" #'rustic-cargo-outdated
+         :desc "cargo run"        "r" #'rustic-cargo-run)
+        (:prefix ("t" . "cargo test")
+         :desc "all"              "a" #'rustic-cargo-test
+         :desc "current test"     "t" #'rustic-cargo-current-test)))
+#+end_src
+** nix
+*** 开头
+#+begin_src emacs-lisp
+(after! nix-mode
+#+end_src
+*** 补全
+:PROPERTIES:
+:ID:       dbccbd5e-5f26-4c96-84b4-65fe7631d5eb
+:header-args: :var nix-cmd=(cond ((executable-find "rnix-lsp") "rnix-lsp") ((executable-find "nil") "nil") (t nil))
+:header-args+: :tangle no :noweb-ref nix-config
+:END:
+需要安装 rnix-lsp 或者 nil
+#+begin_src emacs-lisp
+(dont-use-company-mode 'nix-mode)
+(setq lsp-bridge-nix-lsp-server nix-cmd)
+(add-hook! nix-mode :depth 100
+  (setq-local lsp-bridge-enable-diagnostics nil)
+  (lsp-bridge-mode +1))
+#+end_src
+*** 使用 treesit
+:PROPERTIES:
+:ID:       5bd62ba4-cb9b-4149-9f79-ca0efc0af6c9
+:header-args: :var us-treesit=(and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'nix))
+:END:
+#+begin_src emacs-lisp
+(when us-treesit
+  (add-hook! nix-mode (treesit-parser-create 'nix)))
+#+end_src
+*** 格式化
+使用 doom 自带的 format 函数
+#+begin_src emacs-lisp :tangle (if (executable-find "alejandra") "yes" "no")
+(set-formatter! 'alejandra '("alejandra --quiet") :modes '(nix-mode))
+
+(defun +nix-format-region-or-buffer ()
+  "使用`alejandra' 对 nix 文件进行格式化，如果都不存在，
+则使用默认的 `indent-region' 进行 indent 格式化"
+  (interactive)
+  (if (load-part-el-file "lang/nixfmt")
+      (call-interactively #'nix-format-region-or-buffer)
+    (call-interactively #'indent-region-or-buffer)))
+(my/leader :keymaps 'nix-mode-map
+  "f" '(:ignore t :which-key "file")
+  "f p" '(+nix-format-region-or-buffer :wk "format"))
+(map! :map nix-mode-map "C-M-\\" :desc "indent" #'+nix-format-region-or-buffer)
+#+end_src
+**** [[https://github.com/kamadorueda/alejandra][alejandra]]
+#+begin_src emacs-lisp :tangle (if (executable-find "alejandra") "lang/nixfmt.el" "no") :comments no
+;;; lang/pyfmt.el -*- lexical-binding: t; -*-
+
+(reformatter-define nix-format :program "alejandra" :args '("--quiet"))
+(defun nix-format-region-or-buffer ()
+    "python format region or buffer."
+    (interactive)
+    (save-excursion
+      (if (region-active-p)
+          (call-interactively #'nix-format-region)
+        (call-interactively #'nix-format-buffer))))
+#+end_src
+
+*** nix 结尾括号
+#+begin_src emacs-lisp
+)
+#+end_src
+
+** conf 配置文件
+#+begin_src emacs-lisp
+(after! conf-mode
+#+end_src
+*** toml
+[[https://emacs-china.org/t/emacs-toml/21254][emacs 中，如何实现对 toml 文件的格式化啊？ - Programming - Emacs China]]
+使用 taplo 工具
+#+begin_src emacs-lisp :tangle (if (executable-find "taplo") "lang/tomlfmt.el" "no") :comments no
+;;; lang/pyfmt.el -*- lexical-binding: t; -*-
+
+(reformatter-define toml-format :program "taplo" :args '("format"))
+(defun nix-format-region-or-buffer ()
+    "python format region or buffer."
+    (interactive)
+    (save-excursion
+      (if (region-active-p)
+          (call-interactively #'toml-format-region)
+        (call-interactively #'toml-format-buffer))))
+#+end_src
+#+begin_src emacs-lisp
+(set-formatter! 'taplo '("taplo" "format") :modes '(conf-toml-mode))
+(defun +toml-format-region-or-buffer ()
+  "使用`alejandra' 对 nix 文件进行格式化，如果都不存在，
+则使用默认的 `indent-region' 进行 indent 格式化"
+  (interactive)
+  (if (load-part-el-file "lang/tomlfmt")
+      (call-interactively #'toml-format-region-or-buffer)
+    (call-interactively #'indent-region-or-buffer)))
+(my/leader :keymaps 'conf-toml-mode-map
+  "f" '(:ignore t :which-key "file")
+  "f p" '(+python-format-region-or-buffer :wk "format"))
+(map! :map conf-toml-mode-map "C-M-\\" :desc "indent" #'+nix-format-region-or-buffer)
+#+end_src
+*** 结尾
+#+begin_src emacs-lisp
+  )
+#+end_src

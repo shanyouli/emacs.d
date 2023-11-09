@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: if name
+# key: ifn
+# --
+
+if __name__ == "__main__":
+   ${1:pass}

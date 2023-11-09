@@ -1,0 +1,31 @@
+#+title: Readme
+
+* emacs 配置安装
+#+begin_src bash
+git clone --depth 1 git@github.com:hlissner/doo-emacs ~/.emacs.d
+export DOOMDIR=${XDG_CONFIG_HOME:-${HOME}/.config}/doom
+git clone --depth 1  git@github.com/shanyouli/doom-private $DOOMDIR
+emacs --batch --eval "(progn (require 'org) (setq org-confirm-babel-evaluate nil) (org-babel-tangle-file (expand-file-name \"config.org\" (getenv \"DOOMDIR\"))))"
+~/.emacs.d/bin/doom install
+#+end_src
+
+* TODO 待办
+** DONE 参考[[https://github.com/GinShio/doom-private][GinShio doom 配置]] 重写 config.org
+CLOSED: [2023-06-11 Sun 17:13]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2023-06-11 Sun 17:13]
+:END:
+
+** DONE 多个 theme 自动切换
+CLOSED: [2023-06-11 Sun 17:13]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2023-06-11 Sun 17:13]
+:END:
+
+** DONE 优化光标显示方法
+CLOSED: [2023-07-04 Tue 10:59]
+:LOGBOOK:
+- State "DONE"       from              [2023-07-04 Tue 10:59]
+:END:
+
+** TODO 使 用 nerd-fonts 取代 all-the-icons
