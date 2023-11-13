@@ -1841,6 +1841,7 @@ lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服�
   ;;   :override #'+javascript-init-lsp-or-tide-maybe-h
   ;;   nil)
   (pushnew! lsp-bridge-single-lang-server-mode-list '(lua-ts-mode . "sumneko"))
+  (set-popup-rule! "^\\*lsp-bridge-ref\\*" :size 0.25 :vslot -4 :select t :quit t :ttl 0)
 )
 
 (use-package! acm
@@ -2379,6 +2380,10 @@ doom 有自己的格式化模块，但我习惯使用[[https://github.com/purcel
 使用方法
 #+begin_src emacs-lisp :tangle "no"
 (reformatter-define python-format :program "black" :args '("-"))
+#+end_src
+#+begin_src emacs-lisp
+(after! reformatter
+  (set-popup-rule! "^\\*.*format errors\\*" :size 0.25 :vslot -4 :select t :quit t :ttl 0))
 #+end_src
 *** avy
 让 avy 支持拼音搜索
