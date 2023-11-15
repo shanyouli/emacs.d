@@ -4224,7 +4224,7 @@ macos 中自动化的一门脚本语言
 #+end_src
 ** python
 *** 格式化
-优先使用 black 格式化,备选 yapf
+使用 ruff 进行格式化，其他可用的有 black，yapf
 #+begin_src emacs-lisp
 (after! python
   (defun +python-format-region-or-buffer ()
@@ -4239,28 +4239,31 @@ macos 中自动化的一门脚本语言
     "f p" '(+python-format-region-or-buffer :wk "format"))
   (map! :map python-mode-map "C-M-\\" :desc "indent" #'+python-format-region-or-buffer))
 #+end_src
-**** 使用 black 工具格式化
+**** 格式化工具
 安装
 #+begin_src bash :tangle "no"
-pip install black --user
-#
-brew install black
+# ruff 可以使用 pip 安装或官方安装命令安装
+pip install ruff # brew install ruff
+
+
+## black 可以使用 pip 安装或官方安装命令安装
+pip install black --user # or `brew install black`
+
+## yabai 同样
+pip install yapf # brew install yapf
+
+# 格式化命令
+ruff format
+black
+yapf
 #+end_src
 使用
-#+begin_src emacs-lisp :tangle (if (executable-find "black") "lang/pyfmt.el" "no") :comments no
+#+begin_src emacs-lisp :tangle "lang/pyfmt.el" :comments no
 ;;; lang/pyfmt.el -*- lexical-binding: t; -*-
 
-(reformatter-define python-format :program "black" :args '("-"))
-#+end_src
-**** 使用 yapf 工具格式化
-安装 yapf
-#+begin_src bash :tangle no
-pip install yapf --user
-#+end_src
-#+begin_src emacs-lisp :tangle (if (and (not (executable-find "black")) (executable-find "yapf")) "lang/pyfmt.el" "no") :comments no
-;;; lang/pyfmt.el -*- lexical-binding: t; -*-
-
-(reformatter-define yapf :program "yapf")
+(reformatter-define python-format :program "ruff" :args '("format" "-"))
+;; (reformatter-define python-format :program "yapf" )
+;; (reformatter-define python-format :program "black" :args '("-"))
 #+end_src
 **** 函数
 #+begin_src emacs-lisp :tangle (if (or (executable-find "black") (executable-find "yapf")) "lang/pyfmt.el" "no")
