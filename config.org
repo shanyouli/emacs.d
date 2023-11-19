@@ -1081,6 +1081,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
   (when (and (display-graphic-p)
              (not (doom-font-exists-p nerd-icons-font-family)))
     (nerd-icons-install-fonts t)))
+(map! :leader  :desc "nerd" "in" #'nerd-icons-insert)
 #+end_src
 *** 主题和 modeline
 ***** 主题的基本配置
@@ -1350,6 +1351,7 @@ Macos 上借助系统自带的进行主题切换
   :hook (doom-first-buffer . sort-tab-mode)
   :init
   (setq sort-tab-show-index-number t)
+  (setq sort-tab-buffer-name " *sort-tab*")
   :config
   (map! :nvie "s-1" #'sort-tab-select-visible-tab
         :nvie "s-2" #'sort-tab-select-visible-tab
@@ -1362,14 +1364,14 @@ Macos 上借助系统自带的进行主题切换
         :nvie "s-9" #'sort-tab-select-visible-tab
     (:unless (modulep! :term vterm)
      :nvie "s-0" #'sort-tab-select-visible-tab)
-        :leader
-        :desc "close all tabs" "qt" #'sort-tab-close-all-tabs
-        :desc "close current tab" "qc" #'sort-tab-close-current-tab
-        :desc "tab" "tt" #'sort-tab-mode
-        :localleader
-        :map global-map
-        (:prefix-map ("q" . "close")
-         :desc "Close other tabs" "o" #'my-sort-tab-close-all-tabs-without-current-tab))
+    :leader
+    :desc "close all tabs" "qt" #'sort-tab-close-all-tabs
+    :desc "close current tab" "qc" #'sort-tab-close-current-tab
+    :desc "tab" "tt" #'sort-tab-mode
+    :localleader
+    :map global-map
+    (:prefix-map ("q" . "close")
+     :desc "Close other tabs" "o" #'my-sort-tab-close-all-tabs-without-current-tab))
   (defun my-sort-tab-close-all-tabs-without-current-tab ()
     (interactive)
     (let ((visible-buffers sort-tab-visible-buffers))
@@ -1377,8 +1379,6 @@ Macos 上借助系统自带的进行主题切换
       (dolist (buf visible-buffers)
         (unless (eq buf (window-buffer))
           (kill-buffer buf)))))
-  (after! ace-window
-    (pushnew! aw-ignored-buffers "*sort-tab*"))
   (defadvice! +delete-other-windows (fn &optional window interactive)
     :around #'delete-other-windows
     (with-current-buffer (window-buffer (selected-window))
@@ -1402,7 +1402,7 @@ Macos 上借助系统自带的进行主题切换
 (setq doom-fallback-buffer-name "► Doom"
       +doom-dashboard-name "► Doom")
 
-;; 当不适用 daemon 启动 EMACS 时，我喜欢窗口展示缓冲区的名字，然后是项目文件夹 (如果可用)。
+;; 当不使用 daemon 启动 EMACS 时，我喜欢窗口展示缓冲区的名字，然后是项目文件夹 (如果可用)。
 (when (daemonp)
   (setq! frame-title-format
          '("%b – Doom Emacs"
@@ -1505,10 +1505,8 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 ** 工具
 *** common
 #+begin_src emacs-lisp :tangle "packages.el"
-(package! psearch
-  :recipe (:host github :repo "twlz0ne/psearch.el"
-           :files ( "psearch.el" )
-           ))
+(package! psearch :recipe (:host github :repo "twlz0ne/psearch.el"
+                           :files ( "psearch.el" )))
 #+end_src
 *** Input
 **** Emacs-rime
@@ -1735,7 +1733,7 @@ see@ https://github.com/DogLooksGood/emacs-rime/
           :ng "M-e" #'dirvish-emerge-menu
           :map dired-mode-map
           "C-c C-r" #'dirvish-rsync)
-   (setq dirvish-attributes '(file-size collapse nerd-icons git-msg))
+   (setq dirvish-attributes '(file-size collapse nerd-icons)) ; git-msg
    (when (modulep! :ui vc-gutter)
      (push 'vc-state dirvish-attributes))
    (when (featurep 'diredfl)
@@ -2136,6 +2134,7 @@ popd
 (setq my-cns-path (concat (getenv "HOME") "/Repos/emacs-chinese-word-segmentation"))
 (use-package! cns
   :load-path my-cns-path
+  :unless IS-MAC
   :init
   (setq cns-prog (concat my-cns-path "/cnws")
         cns-dict-directory (concat my-cns-path "/cppjieba/dict")
@@ -2143,14 +2142,25 @@ popd
         cns-debug nil) ; debug 模式
 )
 #+end_src
-
+***** macos
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! emt
+  :disable (not IS-MAC)
+  :recipe (:host github :repo "roife/emt" :files ("*.el" "module/*" "module")))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! emt
+  :when IS-MAC
+  :hook (doom-first-file . emt-mode)
+  :config
+  (setq emt-lib-path (concat user-emacs-directory "modules/libEMT.dylib")))
+#+end_src
 **** 自动删除空白
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (package! ws-butler :recipe (:host github :repo "lewang/ws-butler"))
 #+end_src
 #+begin_src emacs-lisp
 (use-package! ws-butler
-  ;; :diminish
   :hook (doom-first-file . ws-butler-global-mode))
 #+end_src
 **** file-temple
@@ -2185,7 +2195,7 @@ popd
 #+end_src
 
 **** [[https://github.com/ncaq/auto-sudoedit/tree/master][ncaq/auto-sudoedit]]
-允许 sudo 编辑文件
+允许 sudo 编辑文件, 排除目标路径以 =/nix= 开头的路径
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! auto-sudoedit)
 #+end_src
@@ -2197,7 +2207,7 @@ popd
   (defadvice! +auto-sudoedit-current-path-a (fn &rest args)
     :around #'auto-sudoedit-current-path
     (let ((current-path (apply fn args)))
-      (if (and current-path (string-prefix-p "/nix/store" current-path))
+      (if (and current-path (string-prefix-p "/nix/" (file-truename current-path)))
           nil
         current-path))))
 #+end_src
@@ -2385,17 +2395,6 @@ doom 有自己的格式化模块，但我习惯使用[[https://github.com/purcel
 (after! reformatter
   (set-popup-rule! "^\\*.*format errors\\*" :size 0.25 :vslot -4 :select t :quit t :ttl 0))
 #+end_src
-*** avy
-让 avy 支持拼音搜索
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! ace-pinyin)
-#+end_src
-#+begin_src emacs-lisp
-(use-package! ace-pinyin
-  :after avy
-  :init (setq ace-pinyin-use-avy t)
-  :config (ace-pinyin-global-mode 1))
-#+end_src
 *** evil
 emacs 中模拟 vim 按键风格的神器
 **** evil-pinyin
@@ -2569,28 +2568,25 @@ Use JK as a shortcut button for <ESC>
 **** youdao-dictionary
 有道翻译工具
 #+begin_src emacs-lisp :tangle "packages.el"
-(package! youdao-dictionary :built-in 'prefer)
 (package! posframe :built-in 'prefer)
+(package! maple-translate :recipe (:host github :repo "honmaple/emacs-maple-translate"))
 #+end_src
 #+begin_src emacs-lisp
-(use-package! youdao-dictionary
-  :commands my/youdao-dictionary-point
+(use-package! maple-translate
   :init
-;; Set file for saving search history
-  (setq youdao-dictionary-search-history-file  (concat doom-local-dir "ydcv/"))
+  (setq maple-translate-engine '(youdao dictcn))
+ :general
+  (my/leader :states '(normal visual)
+    "s" '(:ignore t :which-key "search")
+    "s y" '(maple-translate+ :wk "translate"))
   :config
-  (setq url-automatic-caching t
-        ;; Enable Chinese word segmentation support (支持中文分词)
-        youdao-dictionary-use-chinese-word-segmentaton t)
-  (defun my/youdao-dictionary-point ()
-    (interactive)
-    (if (display-graphic-p)
-        (call-interactively #'youdao-dictionary-search-at-point-posframe)
-      (call-interactively #'youdao-dictionary-search-at-point))))
-
-(my/leader :states '(normal visual)
-  "s" '(:ignore t :which-key "search")
-  "s y" '(my/youdao-dictionary-point :wk "youdao"))
+  ;; or use multi engines
+  (set-popup-rule! "^\\*maple-translate\\*" :size 0.25 :vslot -4 :select t :quit t :ttl 0)
+  ;; with google translate
+  (setq maple-translate-google-url "https://translate.googleapis.com/translate_a/single")
+  (setq maple-translate-google-proxies
+        '(("http" . "127.0.0.1:10801")
+          ("https" . "127.0.0.1:10801"))))
 #+end_src
 **** sdcv
 使用​~sdcv~​命令进行查询
@@ -2826,12 +2822,6 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
           '(("github\\.com" . gfm-mode)
             ("gitlab\\.com" . gfm-mode)))))
 #+end_src
-
-#+RESULTS:
-#+begin_results
-| atomic-chrome-start-server | doom--reset-file-handler-alist-h |
-#+end_results
-
 ** 窗口管理
 #+begin_src emacs-lisp
 (after! ace-window
@@ -2840,6 +2830,8 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
    ;; :foreground "deep sky blue"
    :weight 'bold
    :height 3.0)
+  (when (boundp 'sort-tab-buffer-name)
+    (pushnew! aw-ignored-buffers sort-tab-buffer-name))
   (set-face-attribute
    'aw-mode-line-face nil
    ;; :foreground "lawn green"
@@ -2856,16 +2848,11 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
      :inherit 'mode-line-buffer-id
       )))
 ;; https://emacs-china.org/t/psearch-patch/23593
-;; (add-hook! 'after-init-hook
-;;   (when (fboundp 'doom/delete-frame-with-prompt)
-;;     (psearch-patch doom/delete-frame-with-prompt
-;;       (psearch-replace '`(when ,_ ,body)
-;;                        '`,body))))
+(add-hook! emacs-startup-hook
+  (when (fboundp 'doom/delete-frame-with-prompt)
+    (psearch-patch doom/delete-frame-with-prompt
+      (psearch-replace '`(when ,_ ,body) '`,body))))
 #+end_src
-
-#+RESULTS:
-#+begin_results
-#+end_results
 
 * 编程语言配置
 ** 公共配置
