@@ -400,12 +400,14 @@ emacs 内部的 tree-sitter, 判断是否可以使用 treesit
          (frame (if (emacs-client-frame-is-live-p)
                     my-emacs-client-frame
                   (make-frame +my-emacs-client-frame-parameters))))
-    (setq my-emacs-client-frame frame)
-    (select-frame-set-input-focus frame)
-    (if (and $file (file-exists-p $file))
-        (when frame
-          (with-selected-frame frame
-            (find-file $file))))))
+    (if frame
+        (progn
+          (setq my-emacs-client-frame frame)
+          (select-frame-set-input-focus frame)
+          (when (and $file (file-exists-p $file))
+              (with-selected-frame frame (find-file $file)))
+          t)
+      nil)))
 #+end_src
 自动更新 emacsClient frame 的 Title
 #+begin_src emacs-lisp
@@ -749,7 +751,7 @@ format
 ;;(format +onsave)  ; automated prettiness
 ;;god               ; run Emacs commands without modifier keys
 ;;lispy             ; vim for lisp, for people who don't like vim
-;;multiple-cursors  ; editing in many places at once
+multiple-cursors  ; editing in many places at once
 ;;objed             ; text object editing for the innocent
 ;;parinfer          ; turn lisp into python, sort of
 ;;rotate-text       ; cycle region at point between text candidates
@@ -814,12 +816,9 @@ pdf               ; pdf enhancements
 tty               ; improve the terminal Emacs experience
 #+end_src
 **** 编程语言支持
-
 最爽的事情就是，我可以在 Emacs 中编写任何语言 (的 =Hello World=)
-
 #+name: doom-lang
 #+begin_src emacs-lisp  :noweb-ref none
-;; #+begin_src emacs-lisp :var is-lua=lua-lang
 (:unless (my-use-ts-mode-p 'lua) lua)
 ;;agda              ; types of types of types of types...
 ;;beancount         ; mind the GAAP
@@ -1599,6 +1598,9 @@ see@ https://github.com/DogLooksGood/emacs-rime/
     "RET" (cmd! (rime--return)
                      (when current-input-method (deactivate-input-method)))
     "C-j" #'rime-inline-ascii)
+  (add-hook! doom-load-theme-hook (setq rime-posframe-properties
+                                        (list :font "Unifont-18"
+                                              :internal-border-with 3)))
   ;;; fix posfrmae 吃字现象
   (defun +rime--posframe-display-content-a (args)
     "给 `rime--posframe-display-content' 传入的字符串加一个全角空
@@ -1621,7 +1623,8 @@ see@ https://github.com/DogLooksGood/emacs-rime/
         (with-temp-message ""
           (let ((inhibit-message t))
             (apply fn args)))
-      (apply fn args)))
+      (apply fn args))
+    (add-hook! kill-emacs-hook #'rime-lib-finalize))
 
   (defun my-toggle-input-method ()
     "避免误触开启输入法."
@@ -4142,6 +4145,7 @@ CLOSED: [2023-04-04 Tue 13:02]
       :not "not" :and "and" :or "or"
       :in "in"
       :for "for"
+      :null "nil"
       :return "return")
     (dont-use-company-mode mode)
 
