@@ -1774,6 +1774,7 @@ see@ https://github.com/DogLooksGood/emacs-rime/
 
 (use-package! dirvish
   :defer t
+  :after-call dired-noselect dired dired-jump
   :init (after! dired (dirvish-override-dired-mode))
   :config
   (setq dirvish-use-mode-line nil
@@ -1856,16 +1857,93 @@ see@ https://github.com/DogLooksGood/emacs-rime/
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! pinyinlib)
 #+end_src
++ [[https://emacs-china.org/t/consult-advice-lambda/23130/5][consult 构建正则的函数不再在外部接收参数后，如何使用 advice 处理其在内部 lambda 接收的参数]]
 #+begin_src emacs-lisp
-(use-package! pinyinlib
-  :autoload pinyinlib-build-regexp-string)
+(use-package! pinyinlib :autoload pinyinlib-build-regexp-string)
 (when (modulep! :completion vertico)
   (after! vertico (setq vertico-count 12))
   (after! orderless
-    (defun completion--regex-pinyin (str)
-      (orderless-regexp (pinyinlib-build-regexp-string str)))
-    (add-to-list 'orderless-matching-styles 'completion--regex-pinyin)))
+   (defun completion--regex-pinyin (str)
+     (orderless-regexp (pinyinlib-build-regexp-string str)))
+   (add-to-list 'orderless-matching-styles 'completion--regex-pinyin))
+  (after! consult
+   (defcustom my-consult-py-prefix ?:
+     "The prefix character when using consult to search Pinyin."
+     :group 'consult
+     :type 'character)
+
+   (defadvice! +my--consult-py-regexp-compiler-a (input type ignore-case)
+    "Compile the INPUT string to a list of regular expressions.
+
+The function should return a pair, the list of regular expressions and a
+highlight function. The highlight function should take a single
+argument, the string to highlight given the INPUT. TYPE is the desired
+type of regular expression, which can be `basic', `extended', `emacs' or
+`pcre'. If IGNORE-CASE is non-nil return a highlight function which
+matches case insensitively."
+    :override #'consult--default-regexp-compiler
+    (setq input
+          (consult--split-escaped
+           (if (char-equal my-consult-py-prefix (string-to-char input))
+               ;; Detect the first entered character. If it matches
+               ;; `my-consult-py-prefix', convert the subsequent
+               ;; characters into Pinyin regexp.
+               (pinyinlib-build-regexp-string (substring input 1))
+             input)))
+    (cons
+     (mapcar (lambda (x) (consult--convert-regexp x type)) input)
+     (when-let (regexps
+                (seq-filter #'consult--valid-regexp-p input))
+       (apply-partially #'consult--highlight-regexps regexps ignore-case))))))
 #+end_src
+
+***** 大文件搜索
+consult-line 在文件过大时，很慢，使用 consult-rg 进行搜索, 参考
+- [[https://emacs-china.org/t/emacs-rg-buffer/8347/17][emacs-china swiper-grep-or-line]]
+- [[https://github.com/minad/consult/wiki#consult-ripgrep-or-line-counsel-grep-or-swiper-equivalent
+][consult-wiki]]
+#+begin_src emacs-lisp
+(use-package! consult
+  :when (modulep! :completion vertico)
+  :commands (my/consult-ripgrep-or-line)
+  :init
+  (defadvice! +my-default/search-buffer-a ()
+    :override #'+default/search-buffer
+    (my/consult-ripgrep-or-line))
+  :config
+  (defcustom my-consult-ripgrep-or-line-limit 300000
+    "Buffer size threshold for `my-consult-ripgrep-or-line'."
+    :group 'consult
+    :type 'integer)
+
+  (defun my/consult-ripgrep-or-line ()
+    "Call `consult-line' for small buffers or `consult-ripgrep' for large files."
+    (interactive)
+    (if (or (not buffer-file-name)
+            (buffer-narrowed-p)
+            (ignore-errors (file-remote-p buffer-file-name))
+            (jka-compr-get-compression-info buffer-file-name)
+            (<= (buffer-size) (/ my-consult-ripgrep-or-line-limit (if (eq major-mode 'org-mode) 4 1))))
+        (consult-line)
+      (when (file-writable-p buffer-file-name)
+        (save-buffer))
+      (let ((consult-ripgrep-commands (concat "rg "
+                                             "--null "
+                                             "--line-buffered "
+                                             "--color=ansi "
+                                             "--max-columns=250 "
+                                             ;; default options
+                                             "--smart-case "
+                                             "--hidden  "
+                                             "--max-columns-preview "
+                                              ;; add back filename to get parsing to work
+                                             ;; "--with-filename "
+                                             "-e ARG OPTS "
+                                             (shell-quote-argument buffer-file-name))))
+        (consult-ripgrep))))
+)
+#+end_src
+
 **** lsp-bridge
 lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服务工具
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -1888,7 +1966,13 @@ lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服�
   ;; (setq acm-enable-dabbrev nil)
   (setq lsp-bridge-disable-backup nil)
   (setq lsp-bridge-enable-auto-import t)
-  (setq lsp-bridge-completion-stop-commands '(corfu-complete corfu-insert undo-tree-undo undo-tree-redo save-buffer evil-normal-state))
+  (setq lsp-bridge-completion-stop-commands
+        '(corfu-complete
+          corfu-insert
+          undo-tree-undo
+          undo-tree-redo
+          save-buffer
+          evil-normal-state))
   (set-lookup-handlers! 'lsp-bridge-mode
     :definition #'lsp-bridge-find-def
     :references #'lsp-bridge-find-references
@@ -2320,14 +2404,13 @@ popd
 #+end_src
 #+begin_src emacs-lisp
 (use-package! noflet
-  :commands (noflet)
+  :autoload noflet
   :init
   (defadvice! +no-query-kill-emacs-a (orign &rest args)
     :around #'no-query-kill-emacs
     (noflet ((process-list ())) (apply orign args)))
   (setq kill-buffer-query-functions
-        (remq 'process-kill-buffer-query-function
-              kill-buffer-query-functions)))
+        (remq 'process-kill-buffer-query-function kill-buffer-query-functions)))
 #+end_src
 *** chatgpt
 **** mind-wave
@@ -3050,8 +3133,8 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 ;; 远程图片查看
 (setq org-display-remote-inline-images 'cache)
 
-;; BUG: https://github.com/doomemacs/doomemacs/pull/7509
-(remove-hook 'org-mode-hook #'+org-make-last-point-visible-h)
+;; ;; BUG: https://github.com/doomemacs/doomemacs/pull/7509
+;; (remove-hook 'org-mode-hook #'+org-make-last-point-visible-h)
 #+end_src
 我不喜欢编写​=org-mode=​时，自动化换行
 #+begin_src emacs-lisp
@@ -3862,12 +3945,10 @@ brew install yt-dlp ffmpeg tesseract
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (package! mpvi :recipe (:host github :repo "lorniu/mpvi"))
 #+end_src
-
 *** org-media-note
+media note
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-;; media note
 (package! org-media-note :recipe (:host github :repo "yuchen-lea/org-media-note"))
-
 #+end_src
 #+begin_src emacs-lisp :tangle "yes" :noweb-ref none
 (use-package! org-media-note
@@ -3922,9 +4003,9 @@ brew install yt-dlp ffmpeg tesseract
 这是[[http://xahlee.info/talk_show/xah_talk_show_2023-01-01.html][xahlee]]对该包的评价
 #+begin_src emacs-lisp
  (use-package! elisp-autofmt
-   :disabled t
+   ;; :disabled t
    :commands (elisp-autofmt-mode elisp-autofmt-buffer)
-   :hook (emacs-lisp-mode . elisp-autofmt-mode)
+   ;; :hook (emacs-lisp-mode . elisp-autofmt-mode)
    :config (setq elisp-autofmt-python-bin "python"))
 #+end_src
 *** indent
@@ -4338,6 +4419,7 @@ yapf
     :around #'+python-use-correct-flycheck-executables-h
     nil)
   (dont-use-company-mode 'python-mode)
+  (setq-hook! python-mode flycheck-checker 'python-mypy)
   (add-hook! python-mode :depth 100
     (flycheck-mode -1)
     (lsp-bridge-mode +1)))
