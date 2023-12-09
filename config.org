@@ -899,7 +899,7 @@ yaml              ; JSON, but readable
 ;;emms
 ;;everywhere        ; *leave* Emacs!? You must be joking
 ;;irc               ; how neckbeards socialize
-(rss +org)        ; emacs as an RSS reader
+;; (rss +org)        ; emacs as an RSS reader
 ;;twitter           ; twitter client https://twitter.com/vnought
 #+end_src
 ** 杂项
@@ -1306,6 +1306,7 @@ Macos 上借助系统自带的进行主题切换
               (lambda (mode-name)
                 (let ((change-mode-alist '((emacs-lisp . "")
                                            (org . "")
+                                           (nix . "󱄅")
                                            (python . "")
                                            (python-ts . "")
                                            (lua . "󰢱")
@@ -1409,6 +1410,11 @@ Macos 上借助系统自带的进行主题切换
             (let ((project-name (projectile-project-name)))
               (unless (string= "-" project-name)
                 (format "  -  [%s]" project-name)))))))
+#+end_src
+
+*** 默认 ~scratch~ buffer 不显示信息
+#+begin_src emacs-lisp
+(setq-default initial-scratch-message nil)
 #+end_src
 *** 允许 CLI 运行 org-babel 程序
 在 Org 中有时会写一点代码，[[https://orgmode.org/worg/org-contrib/babel][Org-Babel]] 就是各个语言在 Org-mode 中的巴别塔。大家都
@@ -1833,7 +1839,6 @@ see@ https://github.com/DogLooksGood/emacs-rime/
   :init (setq ace-pinyin-use-avy t)
   :config (ace-pinyin-global-mode 1))
 #+end_src
-
 *** Completion
 代码补全
 **** company
@@ -2262,6 +2267,7 @@ separedit.el: 在单独的缓冲区编辑注释、docstring 或其中的代码�
   :init
   (my/leader ";" '(separedit :wk "comment"))
   :config
+  (set-popup-rule! "\\*edit-indirect " :side 'bottom :size .5 :select t :quit nil)
   (custom-set-variables '(separedit-default-mode 'org-mode)))
 #+end_src
 **** 中文结巴分词
@@ -2428,15 +2434,52 @@ popd
   (setq mind-wave-auto-change-title nil))
 #+end_src
 
-***** chatpgt-shell
+**** chatpgt-shell
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! chatgpt-shell)
 #+end_src
 #+begin_src emacs-lisp
-(use-package! chatgpt-shell
-  :config
-  (setq chatgpt-shell-api-url-base "https://api.chatanywhere.com.cn")
-(setq chatgpt-shell-openai-key (lambda () (nth 0 (process-lines "gopass" "show" "app/chatanywhere")))))
+(use-package!
+ chatgpt-shell
+ :commands (my/chatgpt-shell my/chatgpt-shell-switch)
+ :init
+ (map!
+  :leader
+  (:desc
+   "chatgpt" "oc" #'my/chatgpt-shell
+   :desc "chatgpt switch" "oC" #'my/chatgpt-shell-switch))
+ :config
+ (defun my/chatgpt-shell-switch ()
+   "Start a ChatGPT shell interactive command. base-url is
+`chatanywhere.com.cn' or `https://openkey.cloud'"
+   (interactive)
+   (if (string= chatgpt-shell-api-url-base "https://api.chatanywhere.com.cn")
+       (setq
+        chatgpt-shell-openai-key
+        (lambda () (nth 0 (process-lines "gopass" "show" "www/faucet")))
+        chatgpt-shell-api-url-base "https://openkey.cloud"
+        chatgpt-shell-model-version "gpt-3.5-turbo-16k")
+     (setq
+      chatgpt-shell-openai-key
+      (lambda () (nth 0 (process-lines "gopass" "show" "app/chatanywhere")))
+      chatgpt-shell-api-url-base "https://api.chatanywhere.com.cn"
+      chatgpt-shell-model-version "gpt-3.5-turbo-0613"))
+   (dolist (buffer (buffer-list))
+     (with-current-buffer buffer
+       (when (string-equal (prin1-to-string major-mode) "chatgpt-shell-mode")
+         (kill-buffer buffer))))
+   (chatgpt-shell))
+
+ (defun my/chatgpt-shell ()
+   "Start a ChatGPT shell interactive command. base-url is `chatanywhere.com.cn'"
+   (interactive)
+   (when (string= chatgpt-shell-api-url-base "https://api.openai.com")
+     (setq
+        chatgpt-shell-openai-key
+        (lambda () (nth 0 (process-lines "gopass" "show" "www/faucet")))
+        chatgpt-shell-api-url-base "https://openkey.cloud"
+        chatgpt-shell-model-version "gpt-3.5-turbo-16k"))
+   (chatgpt-shell)))
 #+end_src
 *** easy-hugo
 =hugo=​的 emacs 管理工具
@@ -2460,10 +2503,10 @@ popd
 (package! dwim-shell-command :recipe (:host github :repo "xenodium/dwim-shell-command"))
 #+end_src
 #+begin_src emacs-lisp
-(use-package! proced :commands (proced-process-attributes))
+(use-package! proced :autoload (proced-process-attributes))
 (use-package! dwim-shell-command
   :commands (dwim-shell-command
-             my/dwim-shell-coommands-unzip
+             my/dwim-shell-commands-unzip
              my/dwim-shell-commands-zip
              my/dwim-shell-command-kill-process)
   :init
@@ -2970,6 +3013,7 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
           '(("github\\.com" . gfm-mode)
             ("gitlab\\.com" . gfm-mode)))))
 #+end_src
+
 ** 窗口管理
 #+begin_src emacs-lisp
 (after! ace-window
@@ -3001,7 +3045,6 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
     (psearch-patch doom/delete-frame-with-prompt
       (psearch-replace '`(when ,_ ,body) '`,body))))
 #+end_src
-
 * 编程语言配置
 ** 公共配置
 - 发现函数的定义
@@ -3020,6 +3063,40 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
 - 关闭 pin flycheck
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (unpin! flycheck)
+#+end_src
+- yasnippet 支持 -ts-mode
+#+begin_src emacs-lisp
+(use-package! yasnippet
+  :defer t
+  :config
+  (advice-add 'yas--modes-to-activate :around
+              (defun yas--get-snippet-tables@tree-sitter (orig-fn &optional mode)
+                (funcall orig-fn
+                         (or (car (rassq (or mode major-mode) major-mode-remap-alist))
+                             mode)))))
+#+end_src
+
+*** grip
+- 描述: markdown-mode, org-mode 预览配置
+- 安装
+#+begin_src bash :tangle "no" :noweb-prefix no :noweb-ref nil
+pip install grip
+#+end_src
+- 安装
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! grip-mode)
+#+end_src
+- 配置
+#+begin_src emacs-lisp
+(use-package! grip-mode
+  :defer t
+  :init
+  (map! :map (markdown-mode-map org-mode-map)
+    :localleader
+    :desc "grip-mode" "v" #'grip-mode)
+  :config
+  ;; (setq grip-preview-use-webit t) ; Use embedded webkit to previe
+  (set-popup-rule! (regexp-quote "*xwidget") :side 'right :size .50 :select nil :quit t))
 #+end_src
 ** 纯文本
 *** 无行号边距
@@ -3095,6 +3172,7 @@ Org Mode 无疑是 Emacs 的杀手级应用，其扩展能力以及 Emacs 的契
 因为这部分初始化时相当费时，我们需要将其放在 src_elisp{(after! ...)} 中。
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (package! emacsql-sqlite-builtin :built-in 'prefer)
+(package! ox-gfm)
 ;; (package! org :built-in 'prefer)
 #+end_src
 #+begin_src emacs-lisp :noweb no-export :tangle yes :noweb-prefix no :noweb-ref nil
@@ -3133,8 +3211,8 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 ;; 远程图片查看
 (setq org-display-remote-inline-images 'cache)
 
-;; ;; BUG: https://github.com/doomemacs/doomemacs/pull/7509
-;; (remove-hook 'org-mode-hook #'+org-make-last-point-visible-h)
+;; ox 时，不 eval 代码块
+(setq org-export-babel-evaluate nil)
 #+end_src
 我不喜欢编写​=org-mode=​时，自动化换行
 #+begin_src emacs-lisp
@@ -3228,6 +3306,7 @@ org treesit
   (unless (org-export-derived-backend-p 'org)
     (replace-regexp-in-string "\u200B" "" text)))
 
+(require 'ox-gfm nil t) ; org to gfm
 (after! ox
   (add-to-list 'org-export-filter-final-output-functions #'+org-export-remove-zero-width-space t))
 #+end_src
@@ -4278,7 +4357,13 @@ macos 中自动化的一门脚本语言
 #+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "packages.el" "no") :noweb-ref none
 (package! applescript-mode)
 #+end_src
-
+#+begin_src emacs-lisp
+(use-package! applescript-mode
+  :when IS-MAC
+  :defer t
+  :config
+  (setq as-indent-offset 2))
+#+end_src
 ** json 配置
 :PROPERTIES:
 :ID: 23b63cd8-aeb1-4ff8-a406-3fa884524f3a
