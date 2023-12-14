@@ -690,7 +690,7 @@ autoload
 #+name: doom-config
 #+begin_src emacs-lisp
 literate
-(default +bindings +smartparens)
+(default +bindings)
 #+end_src
 **** 接口
 可以用来增强 emacs 功能的配置
@@ -2249,7 +2249,6 @@ OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能�
 #+begin_src emacs-lisp
 ;; (use-package! puni
 ;;   :hook (prog-mode . puni-mode))
-
 #+end_src
 **** separedit
 #+begin_quote
@@ -3204,7 +3203,7 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
        org-special-ctrl-a/e t)
 
 (setq org-hugo-base-dir user-blog-dir)
-
+(setq o-hugo-auto-set-lastmod t)
 ;; 设置归档位置
 (setq org-archive-location "%s_archive::datetree/")
 
@@ -3213,6 +3212,16 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 
 ;; ox 时，不 eval 代码块
 (setq org-export-babel-evaluate nil)
+
+;; auto last_modified timestrap
+(add-hook 'org-mode-hook
+          (lambda ()
+            (setq-local time-stamp-active t
+                        time-stamp-line-limit 18
+                        time-stamp-start "^#\\+LAST_MODIFIED: [ \t]*"
+                        time-stamp-end "$"
+                        time-stamp-format "\[%Y-%m-%d %a %H:%M:%S\]")
+            (add-hook 'before-save-hook 'time-stamp nil 'local)))
 #+end_src
 我不喜欢编写​=org-mode=​时，自动化换行
 #+begin_src emacs-lisp
@@ -3985,8 +3994,13 @@ ligatures 配置,
                (file-name-as-directory doom-cache-dir)
                "org-roam.db")
               org-roam-database-connector 'sqlite-builtin
-              org-id-link-to-org-use-id t))
-
+              org-id-link-to-org-use-id t)
+  :config
+  (setq org-roam-capture-templates
+      `(("d" "default" plain "%?" :target
+         (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                    "#+title: ${title}\n#+DATE: %<%Y-%m-%d>\n#+LAST_MODIFIED: %U\n\n")
+         :unnarrowed t))))
 (use-package! org-roam-ui
   :after org-roam ;; or :after org
          ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
@@ -4673,4 +4687,5 @@ yapf
 *** 结尾
 #+begin_src emacs-lisp
   )
+
 #+end_src

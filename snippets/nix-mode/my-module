@@ -5,14 +5,15 @@
 {pkgs, lib, config, options, ...}:
 with lib;
 with lib.my;
-let cfg = config.my.modules.$1;
-    cfm = config.my.modules;
+let
+  cfm = config.modules;
+  cfg = cfm.$1;
 in {
-   options.my.modules.$1 = {
-       enable = mkBoolOpt false;
-   };
-
-   config = mkIf cfg.enable {
-          $0
-   };
+  options.modules.$1 = {
+    enable = mkEnableOption "$2";
+    $3
+  };
+  config = mkIf cfg.enable {
+    $0
+  };
 }
