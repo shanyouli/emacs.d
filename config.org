@@ -33,8 +33,7 @@ descendant, GNU Emacs, continues actively as of 2020.
       org-directory "~/org"
       my-workdir (expand-file-name "~/Workspace")
       ;; My Blog Dir
-      user-blog-dir (concat my-workdir "/Blog")
-      )
+      user-blog-dir (concat my-workdir "/Blog"))
 
 ;; @https://emacs-china.org/t/topic/13254
 ;; toggle-word-wrap：遇到中英文混合文本会折在空格，即使空格离右面还很远。因为他只能折在空格和 tab 上
@@ -58,12 +57,14 @@ descendant, GNU Emacs, continues actively as of 2020.
 #+begin_src emacs-lisp
 (defmacro myfun-autoload (&rest functions)
   "Autoload FUNCTIONS. the Functions from myfun.el"
-  `(progn
-     ,@(mapcar (lambda (function)
-                 `(autoload ',function ,(expand-file-name "myfun.el" doom-user-dir ) nil t))
-               (if (listp ',functions)
-                   functions
-                 (listp ',functions)))))
+  (let ((first-element (car-safe functions)))
+    (when (listp first-element)
+      (setq functions (eval first-element)))
+    `(progn
+     ,@(mapcar
+        (lambda (function)
+          `(autoload ',function ,(expand-file-name "myfun.el" doom-user-dir ) nil t))
+        `,functions))))
 #+end_src
 在​~doom-user-dir~​目录下创建一个 lang 文件，需要生成代码片段
 #+begin_src emacs-lisp :tangle  yes :noweb-ref none
@@ -432,6 +433,27 @@ autoload
                          #'update-emacs-client-title)))))
 #+end_src
 
+*** create fontset
+#+begin_src emacs-lisp
+(defmacro my-create-fontset-m (name ascii-font han-font &rest font-list)
+  "Create fontset named NAME with given ASCII-FONT and HAN-FONT."
+  `(let ((registry (concat "fontset-variable " ,name)))
+     (create-fontset-from-fontset-spec
+      (font-xlfd-name
+       (font-spec :family ,ascii-font :registry registry)))
+     (set-fontset-font registry 'han (font-spec :family ,han-font))
+     (set-fontset-font registry 'cjk-misc (font-spec :family ,han-font))
+     ,(if font-list
+          `(progn
+             ,@(mapcar
+                (lambda (alist)
+                  `(set-fontset-font registry (car-safe ,alist) (car-safe (cdr-safe ,alist))))
+                font-list)))))
+#+end_src
+- autoload
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload my-create-fontset-m)
+#+end_src
 ** 设置一些常用的默认值
 #+begin_src emacs-lisp
 (setq-default delete-by-moving-to-trash t ; 文件删除到回收站
@@ -971,7 +993,6 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 + 中文字体: LXGW WenKai Mono 备选 "Adobe Heiti Std" 和系统自带的字体
 + 如果你想获得使用等高且等宽的字体，请使用 [[https://github.com/be5invis/Sarasa-Gothic][更纱黑体]] (如果该字体的高度能小一点，我一定会用它，也许后续我会自己调整它的高度)
   #+begin_src emacs-lisp
-(setq doom-unicode-font nil) ;; FIX: emoji 显示错误
 (defadvice! my/use-default-font-a (&rest _)
   "Set `doom-font'!"
   :before #'doom-init-fonts-h
@@ -2473,11 +2494,10 @@ popd
    "Start a ChatGPT shell interactive command. base-url is `chatanywhere.com.cn'"
    (interactive)
    (when (string= chatgpt-shell-api-url-base "https://api.openai.com")
-     (setq
-        chatgpt-shell-openai-key
-        (lambda () (nth 0 (process-lines "gopass" "show" "www/faucet")))
-        chatgpt-shell-api-url-base "https://openkey.cloud"
-        chatgpt-shell-model-version "gpt-3.5-turbo-16k"))
+     (setq chatgpt-shell-openai-key
+      (lambda () (nth 0 (process-lines "gopass" "show" "app/chatanywhere")))
+      chatgpt-shell-api-url-base "https://api.chatanywhere.com.cn"
+      chatgpt-shell-model-version "gpt-3.5-turbo-0613"))
    (chatgpt-shell)))
 #+end_src
 *** easy-hugo
@@ -3218,10 +3238,14 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
           (lambda ()
             (setq-local time-stamp-active t
                         time-stamp-line-limit 18
-                        time-stamp-start "^#\\+LAST_MODIFIED: [ \t]*"
+                        time-stamp-start "^#\\+LASTMOD: [ \t]*"
                         time-stamp-end "$"
                         time-stamp-format "\[%Y-%m-%d %a %H:%M:%S\]")
             (add-hook 'before-save-hook 'time-stamp nil 'local)))
+
+;; FIXME: https://github.com/doomemacs/doomemacs/issues/6741
+;; org-roam-capture show Warn Zombie snippet
+(set-file-template! 'org-mode :ignore t)
 #+end_src
 我不喜欢编写​=org-mode=​时，自动化换行
 #+begin_src emacs-lisp
@@ -3999,7 +4023,7 @@ ligatures 配置,
   (setq org-roam-capture-templates
       `(("d" "default" plain "%?" :target
          (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                    "#+title: ${title}\n#+DATE: %<%Y-%m-%d>\n#+LAST_MODIFIED: %U\n\n")
+                    "#+title: ${title}\n#+DATE: %<%Y-%m-%d>\n#+LASTMOD: %U\n\n")
          :unnarrowed t))))
 (use-package! org-roam-ui
   :after org-roam ;; or :after org
