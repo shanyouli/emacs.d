@@ -2251,6 +2251,9 @@ OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能�
 #+begin_src emacs-lisp
 (defadvice! +my-global-smartparens-mode-a ()
   :override #'smartparens-global-mode nil)
+(use-package! elec-pair
+  :hook (after-init . electric-pair-mode)
+  :init (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit))
 (use-package! puni
   :hook (prog-mode . puni-mode)
   :init
@@ -2381,6 +2384,19 @@ popd
 (use-package! auto-sudoedit
   :hook (doom-first-file . auto-sudoedit-mode)
   :config
+  (defvar my--user-login-name-v nil "user-login-name")
+  (defadvice! +my/auto-sudoedit-current-user (fn path)
+    :override #'auto-sudoedit-current-user
+    (if (tramp-tramp-file-p path)
+        ;; We can't just go by the user in the tramp filename, because it may have been omitted
+        (tramp-get-remote-uid (tramp-dissect-file-name path) 'string)
+      (if IS-MAC
+          (if-let (result (bound-and-true-p my--user-login-name-v))
+              result
+            (setq my--user-login-name-v (replace-regexp-in-string "[ \t\n]+$" "" (shell-command-to-string "id -un"))
+                  result my--user-login-name-v)
+            result)
+        (user-login-name))))
   ;; 以/nix/store 开头的文件不进入`auto-sudoedit-mode‘模式
   (defadvice! +auto-sudoedit-current-path-a (fn &rest args)
     :around #'auto-sudoedit-current-path
@@ -3234,6 +3250,11 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 (setq-hook! 'org-mode-hook truncate-lines nil)
 (setq-hook! 'org-mode-hook fill-column 100)
 (setq-hook! 'org-mode-hook visual-fill-column-center-text t)
+
+;; disable <> auto pairing in electric-pair-mode for org-mode
+(setq-hook! 'org-mode-hook electric-pair-inhibit-predicate
+            `(lambda (c) (if (char-equal c ?<) t
+                      (,electric-pair-inhibit-predicate c))))
 #+end_src
 设置打开 org links 的程序
 #+begin_src emacs-lisp
