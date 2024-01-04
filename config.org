@@ -2370,6 +2370,13 @@ popd
 (use-package! wraplish
   :hook ((org-mode . wraplish-mode)
          (gfw-mode . wraplish-mode))
+  :init
+  (my/leader
+    "t" '(:ignore t :which-key "toggle")
+    "t s" '(wraplish-mode :wk "auto insert space"))
+  (unless (daemonp)
+    (dolist (hook '(org-mode-hook gfw-mode-hook markdown-mode-hook))
+      (add-hook hook #'wraplish-mode)))
   :config
   (when (boundp 'lsp-bridge-python-command)
     (setq wraplish-python-command lsp-bridge-python-command)))
