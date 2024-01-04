@@ -2392,7 +2392,7 @@ popd
   :hook (doom-first-file . auto-sudoedit-mode)
   :config
   (defvar my--user-login-name-v nil "user-login-name")
-  (defadvice! +my/auto-sudoedit-current-user (fn path)
+  (defadvice! +my/auto-sudoedit-current-user (path)
     :override #'auto-sudoedit-current-user
     (if (tramp-tramp-file-p path)
         ;; We can't just go by the user in the tramp filename, because it may have been omitted
@@ -3262,6 +3262,13 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 (setq-hook! 'org-mode-hook electric-pair-inhibit-predicate
             `(lambda (c) (if (char-equal c ?<) t
                       (,electric-pair-inhibit-predicate c))))
+#+end_src
+停止自动 tangle-on-save
+#+begin_src emacs-lisp
+(when (modulep! :config literate)
+  (remove-hook 'org-mode-hook #'+literate-enable-recompile-h)
+  (my/leader "rr" (list :def (cmd! (+literate-recompile-maybe-h)) :wk "org-tangle")))
+
 #+end_src
 设置打开 org links 的程序
 #+begin_src emacs-lisp
