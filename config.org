@@ -505,6 +505,10 @@ autoload
   :keymaps 'override
   :prefix ","
   :non-normal-prefix "s-,")
+(my/leader
+  "t" '(:ignore t :which-key "toggle")
+  "o" '(:ignore t :which-key "open")
+  "r" '(:ignore t :which-key "reload"))
 #+end_src
 默认下自定义界面所有修改都会加入到 =init.el= 上，常用的方法是放在 =costom.el= 上
 #+begin_src emacs-lisp
@@ -1602,7 +1606,6 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 我用 [[https://github.com/DogLooksGood/emacs-rime][emacs-rime]] 作为 emacs 的输入法
 see@ https://emacs-china.org/t/os-smart-input-source/13436/726
 see@ https://emacs-china.org/t/native-os-sis/14089
-see@ https://github.com/DogLooksGood/emacs-rime/
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! rime :ignore IS-WINDOWS :built-in 'prefer)
 #+end_src
@@ -1616,6 +1619,14 @@ see@ https://github.com/DogLooksGood/emacs-rime/
         :internal-border-with 3))
   (map! "C-\\" #'my-toggle-input-method
         "s-." #'+rime-convert-string-at-point)
+
+  (when (daemonp)
+    (add-hook! after-init-hook
+      (unless (bound-and-true-p  rime--lib-loaded)
+        (unless (file-exists-p rime--module-path)
+          (rime-compile-module))
+        (rime--load-dynamic-module))))
+
   :commands (my-toggle-input-method +rime-convert-string-at-point)
   :bind
   (:map rime-mode-map ("C-`" . 'rime-send-keybinding))
@@ -1624,11 +1635,8 @@ see@ https://github.com/DogLooksGood/emacs-rime/
     ;; "<return>" (cmd! (rime--return)
     ;;                  (when current-input-method (deactivate-input-method)))
     "RET" (cmd! (rime--return)
-                     (when current-input-method (deactivate-input-method)))
+                (when current-input-method (deactivate-input-method)))
     "C-j" #'rime-inline-ascii)
-  (add-hook! doom-load-theme-hook (setq rime-posframe-properties
-                                        (list :font "Unifont-18"
-                                              :internal-border-with 3)))
   ;;; fix posfrmae 吃字现象
   (defun +rime--posframe-display-content-a (args)
     "给 `rime--posframe-display-content' 传入的字符串加一个全角空
@@ -2242,7 +2250,6 @@ OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能�
                            )))
 #+end_src
 *** edit
-
 **** Puni
 通用、可定制的语法删除
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
@@ -2368,12 +2375,9 @@ popd
 #+end_src
 #+begin_src emacs-lisp
 (use-package! wraplish
-  :hook ((org-mode . wraplish-mode)
-         (gfw-mode . wraplish-mode))
+  :commands (wraplish-mode)
   :init
-  (my/leader
-    "t" '(:ignore t :which-key "toggle")
-    "t s" '(wraplish-mode :wk "auto insert space"))
+  (my/leader "t s" '(wraplish-mode :wk "auto insert space"))
   (unless (daemonp)
     (dolist (hook '(org-mode-hook gfw-mode-hook markdown-mode-hook))
       (add-hook hook #'wraplish-mode)))
@@ -3267,7 +3271,8 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 #+begin_src emacs-lisp
 (when (modulep! :config literate)
   (remove-hook 'org-mode-hook #'+literate-enable-recompile-h)
-  (my/leader "rr" (list :def (cmd! (+literate-recompile-maybe-h)) :wk "org-tangle")))
+  (my/leader :keymaps 'org-mode-map
+    "rr" (list :def (cmd! (+literate-recompile-maybe-h)) :wk "org-tangle")))
 
 #+end_src
 设置打开 org links 的程序
@@ -4109,6 +4114,9 @@ media note
     ;;Disable the checkdoc checker
     (setq-hook! 'emacs-lisp-mode-hook flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
   (dont-use-company-mode 'emacs-lisp-mode)
+  (my/leader "oe" '(ielm :which-key "Elisp Repl")
+    :keymaps 'emacs-lisp-mode-map
+    "or" '(ielm :which-key "Repl"))
   :config
   (when (boundp 'elisp-flymake-byte-compile-load-path)
     (add-to-list 'elisp-flymake-byte-compile-load-path load-path))
