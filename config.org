@@ -454,6 +454,19 @@ autoload
 #+begin_src emacs-lisp :tangle "yes" :noweb-ref none
 (myfun-autoload my-create-fontset-m)
 #+end_src
+*** 大文件确认
+- buffer-size > 100000 即为大文件
+#+begin_src emacs-lisp
+(defun too-long-file-p ()
+  "Check whether the file is too long."
+  (or (> (buffer-size) 100000)
+      (and (fboundp 'buffer-line-statistics)
+           (> (car (buffer-line-statistics)) 10000))))
+#+end_src
+- autoload
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload too-long-file-p)
+#+end_src
 ** 设置一些常用的默认值
 #+begin_src emacs-lisp
 (setq-default delete-by-moving-to-trash t ; 文件删除到回收站
@@ -1611,31 +1624,30 @@ see@ https://emacs-china.org/t/native-os-sis/14089
 #+end_src
 #+begin_src emacs-lisp
 (use-package! rime
+  :commands (my-toggle-input-method +rime-convert-string-at-point)
+  :autoload (rime--load-dynamic-module)
+  :bind (:map rime-mode-map ("C-`" . 'rime-send-keybinding))
   :init
   (setq default-input-method "rime"
         rime-show-candidate 'posframe)
   (setq rime-posframe-properties
-      (list :font "Unifont-18"
-        :internal-border-with 3))
+        (list :font "Unifont-18" :internal-border-with 3))
   (map! "C-\\" #'my-toggle-input-method
         "s-." #'+rime-convert-string-at-point)
 
-  (when (daemonp)
-    (add-hook! after-init-hook
-      (unless (bound-and-true-p  rime--lib-loaded)
-        (unless (file-exists-p rime--module-path)
-          (rime-compile-module))
-        (rime--load-dynamic-module))))
+  (when (daemonp) (add-hook 'after-init-hook #'rime--load-dynamic-module))
 
-  :commands (my-toggle-input-method +rime-convert-string-at-point)
-  :bind
-  (:map rime-mode-map ("C-`" . 'rime-send-keybinding))
   :config
+  (defun my-rime-init-f ()
+    (unless (boundp rime--lib-loaded)
+      (unless (file-exists-p rime--module-path)
+        (rime-compile-module))
+      (rime--load-dynamic-module)))
   (define-key! rime-active-mode-map
-    ;; "<return>" (cmd! (rime--return)
-    ;;                  (when current-input-method (deactivate-input-method)))
     "RET" (cmd! (rime--return)
                 (when current-input-method (deactivate-input-method)))
+    ;; "<return>" (cmd! (rime--return)
+    ;;                  (when current-input-method (deactivate-input-method)))
     "C-j" #'rime-inline-ascii)
   ;;; fix posfrmae 吃字现象
   (defun +rime--posframe-display-content-a (args)
@@ -1919,43 +1931,20 @@ consult-line 在文件过大时，很慢，使用 consult-rg 进行搜索, 参�
 #+begin_src emacs-lisp
 (use-package! consult
   :when (modulep! :completion vertico)
-  :commands (my/consult-ripgrep-or-line)
+  :commands (my/consult-ripgrep-current-file)
   :init
-  (defadvice! +my-default/search-buffer-a ()
-    :override #'+default/search-buffer
-    (my/consult-ripgrep-or-line))
-  :config
-  (defcustom my-consult-ripgrep-or-line-limit 300000
-    "Buffer size threshold for `my-consult-ripgrep-or-line'."
-    :group 'consult
-    :type 'integer)
-
-  (defun my/consult-ripgrep-or-line ()
-    "Call `consult-line' for small buffers or `consult-ripgrep' for large files."
+  (defadvice! +my-default/search-buffer-a (fn)
+    :around #'+default/search-buffer
     (interactive)
-    (if (or (not buffer-file-name)
-            (buffer-narrowed-p)
-            (ignore-errors (file-remote-p buffer-file-name))
-            (jka-compr-get-compression-info buffer-file-name)
-            (<= (buffer-size) (/ my-consult-ripgrep-or-line-limit (if (eq major-mode 'org-mode) 4 1))))
-        (consult-line)
-      (when (file-writable-p buffer-file-name)
-        (save-buffer))
-      (let ((consult-ripgrep-commands (concat "rg "
-                                             "--null "
-                                             "--line-buffered "
-                                             "--color=ansi "
-                                             "--max-columns=250 "
-                                             ;; default options
-                                             "--smart-case "
-                                             "--hidden  "
-                                             "--max-columns-preview "
-                                              ;; add back filename to get parsing to work
-                                             ;; "--with-filename "
-                                             "-e ARG OPTS "
-                                             (shell-quote-argument buffer-file-name))))
-        (consult-ripgrep))))
-)
+    (if (too-long-file-p)
+        (my/consult-ripgrep-current-file)
+        (call-interactively fn)))
+  :config
+  (defun my/consult-ripgrep-current-file ()
+    "Caall `consult-ripgrep' for the current buffer (a single file)."
+    (interactive)
+    (let ((consult-project-function (lambda (x) nil)))
+      (consult-ripgrep (list (shell-quote-argument buffer-file-name))))))
 #+end_src
 
 **** lsp-bridge
