@@ -937,6 +937,7 @@ doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就
 ;;; $DOOMDIR/packages.el
 ;;; Load NIXOS automatically generated configuration.
 (load! "packages.init.el" doom-user-dir 'no-error)
+;; (disable-packages! smartparens)
 #+end_src
 
 *警告*: 不要禁用 =~/.emacs.d/core/packages.el= 中列出的包。Doom 依赖这些，禁用它们
@@ -1757,27 +1758,6 @@ see@ https://github.com/DogLooksGood/emacs-rime/
   (add-hook 'evil-insert-state-exit-hook #'input-method-change-cursor-deactivate))
 #+end_src
 
-**** hungry-delete
-一次 ~backspace~ 吃掉所有空白符 (当前光标限定)
-#+begin_src emacs-lisp :tangle "packages.el"
-(package! hungry-delete)
-#+end_src
-#+begin_src emacs-lisp
-(use-package! hungry-delete
-  :defines doom-first-buffer-hook
-  :hook (doom-first-buffer . global-hungry-delete-mode)
-  :config
-  (setq-default hungry-delete-chars-to-skip " \t\f\v")
-  ;; NOTE: Counsel-find-file gives "text is read-only" on Backspace press.
-  ;; @see https://github.com/nflath/hungry-delete/issues/27
-  (push 'minibuffer-mode hungry-delete-except-modes)
-  (when (modulep! :config default +smartparens)
-    ;; NOTE: fix hungry-delete & smartparents conflict
-    ;; @see https://emacs-china.org/t/smartparens/2778/4
-    (defadvice hungry-delete-backward (before sp-delete-pair-advice activate)
-      (save-match-data (sp-delete-pair (ad-get-arg 0))))))
-#+end_src
-
 **** Dired
 #+begin_src emacs-lisp :tangle "packages.el"
 (unpin! dirvish)
@@ -2262,14 +2242,37 @@ OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能�
                            )))
 #+end_src
 *** edit
+
 **** Puni
 通用、可定制的语法删除
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (package! puni :recipe (:host github :repo "AmaiKinono/puni"))
 #+end_src
 #+begin_src emacs-lisp
-;; (use-package! puni
-;;   :hook (prog-mode . puni-mode))
+(defadvice! +my-global-smartparens-mode-a ()
+  :override #'smartparens-global-mode nil)
+(use-package! puni
+  :hook (prog-mode . puni-mode)
+  :init
+  (map! :nv "v" (general-predicate-dispatch 'puni-expand-region
+                (or (evil-normal-state-p)
+                    (eq (evil-visual-type) 'line))
+                'evil-visual-char)
+        :nv "C-v" (general-predicate-dispatch 'puni-contract-region
+              (eq puni--region-history nil) 'evil-visual-block))
+  :config
+  (defun my/puni-backspace ()
+  "If the cursor is preceded by a blank character that is not a newline and is
+not the selection area, the `backward-delete-char-untabify' will be called,
+otherwise `puni-backward-delete-char' is used"
+  (interactive)
+  (if (and (not (use-region-p)) (looking-back "[ \f\t\v]"))
+      (let ((backward-delete-char-untabify-method 'hungry))
+        (call-interactively #'backward-delete-char-untabify))
+    (puni-backward-delete-char)))
+
+  (map! :map puni-mode-map
+    "<DEL>" #'my/puni-backspace))
 #+end_src
 **** separedit
 #+begin_quote
@@ -2385,27 +2388,6 @@ popd
       (if (and current-path (string-prefix-p "/nix/" (file-truename current-path)))
           nil
         current-path))))
-#+end_src
-**** expand-region
-一个很好用的选中工具，以后会移除
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! expand-region)
-#+end_src
-#+begin_src emacs-lisp
-(use-package! expand-region
-  :commands (er/contract-region er/expand-region)
-  ;; :init
-  ;; (map! :nv "v"   (general-predicate-dispatch 'er/expand-region
-  ;;                 (eq (evil-visual-type) 'line)
-  ;;                 'evil-visual-char)
-  ;;     :nv "C-v" (general-predicate-dispatch 'er/contract-region
-  ;;                 (eq er/history nil) 'evil-visual-block))
-  :config
-  (defadvice! doom--quit-expand-region-a (&rest _)
-    "Properly abort an expand-region region."
-    :before '(evil-escape doom/escape)
-    (when (memq last-command '(er/expand-region er/contract-region))
-      (er/contract-region 0))))
 #+end_src
 *** disable mouse
 不用鼠标操作 emacs
