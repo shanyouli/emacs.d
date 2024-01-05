@@ -52,6 +52,8 @@ descendant, GNU Emacs, continues actively as of 2020.
       long-line-threshold 1000
       large-hscroll-threshold 1000
       syntax-wholeline-max 1000)
+
+(setq initial-major-mode 'emacs-lisp-mode)
 #+end_src
 自定义一个宏，加载对应​~doom-user-dir~​目录下​~myfun.el~​文件的函数
 #+begin_src emacs-lisp
@@ -467,6 +469,62 @@ autoload
 #+begin_src emacs-lisp :tangle "yes" :noweb-ref none
 (myfun-autoload too-long-file-p)
 #+end_src
+
+*** 一些有用的交互函数
+- 重新revert当期buffer
+#+begin_src emacs-lisp
+(defun my/revert-this-buffer ()
+  "Revert the current buffer."
+  (interactive)
+  (unless (minibuffer-window-active-p (selected-window))
+    (revert-buffer t t)
+    (message "Reverted this buffer")))
+
+(defun my/delete-this-file ()
+  "Delete the current file, and kill the buffer."
+  (interactive)
+  (unless (buffer-file-name)
+    (error "No file is currently being edited."))
+  (when (yes-or-no-p (format "Really delete '%s'?"
+                             (file-name-nondirectory buffer-file-name)))
+    (delete-file (buffer-file-name))
+    (kill-this-buffer)))
+
+(defun my/rename-this-file (new-name)
+  "Rename both current buffer and file it's visiting to NEW-NAME."
+  (interactive "sNew name: ")
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (unless filename
+      (error "Buffer '%s' is not visiting a file!" name))
+    (progn
+      (when (file-exists-p filename)
+        (rename-file filename new-name 1))
+      (set-visited-file-name new-name)
+      (rename-buffer new-name))))
+
+(defun my/browse-this-file ()
+  "Open the current file as a URL using `browse-url'."
+  (interactive)
+  (let ((file-name (buffer-file-name)))
+    (if (and (fboundp 'tramp-tramp-file-p)
+             (tramp-tramp-file-p file-name))
+        (error "Cannot open tramp file")
+      (browse-url (concat "file://" file-name)))))
+
+(defun copy-file-name ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (if filename
+        (progn
+          (kill-new filename)
+          (message "Copied '%s'" filename))
+      (warn "Current buffer is not attached to a file!"))))
+#+end_src
+
 ** 设置一些常用的默认值
 #+begin_src emacs-lisp
 (setq-default delete-by-moving-to-trash t ; 文件删除到回收站
@@ -1744,7 +1802,7 @@ see@ https://emacs-china.org/t/native-os-sis/14089
     "Default cursor color if using an input method.")
   (defvar ime-cursor-normal '(box "DarkOrange")
     "Default cursor color if using an input method.")
-  ;; 不激活时
+  ;; 不激活时, #x6495ED
   (defvar default-cursor-insert '(bar "CornflowerBlue")
     "Default text cursor color.")
   (defvar default-cursor-visual '(hollow "CornflowerBlue")
