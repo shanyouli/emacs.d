@@ -1926,8 +1926,8 @@ matches case insensitively."
 ***** 大文件搜索
 consult-line 在文件过大时，很慢，使用 consult-rg 进行搜索, 参考
 - [[https://emacs-china.org/t/emacs-rg-buffer/8347/17][emacs-china swiper-grep-or-line]]
-- [[https://github.com/minad/consult/wiki#consult-ripgrep-or-line-counsel-grep-or-swiper-equivalent
-][consult-wiki]]
+- [[https://github.com/minad/consult/wiki#consult-ripgrep-or-line-counsel-grep-or-swiper-equivalent][consult-wiki]]
+- [[https://github.com/minad/consult/issues/407#issuecomment-1868143867][consult-ripgrep-single-file]]
 #+begin_src emacs-lisp
 (use-package! consult
   :when (modulep! :completion vertico)
@@ -2270,8 +2270,92 @@ otherwise `puni-backward-delete-char' is used"
         (call-interactively #'backward-delete-char-untabify))
     (puni-backward-delete-char)))
 
+  (defun my/backward-block ()
+    (unless (bobp)
+      (let ((word-beg (save-excursion (when (forward-word -1) (point)))))
+        (puni--backward-same-syntax word-beg))))
+
+  (defun my/forward-block ()
+  "Go forward a block.
+Return the point if success.
+
+A block is a continuous region with the same syntax, which
+contains no more than 1 word.  See the implementation for
+details."
+  (unless (eobp)
+    ;; A word may actually end at a position where the syntax on both sides are
+    ;; "word", e.g., when subword-mode is enabled.
+    (let ((word-end (save-excursion (when (forward-word) (point)))))
+      (puni--forward-same-syntax word-end))))
+  (defun my/bob-error ()
+    "Signal an error if point is at the beginning of buffer."
+    (when (bobp) (signal 'beginning-of-buffer nil)))
+
+  (defun my/eob-error ()
+    "Signal an error if point is and the end of buffer."
+    (when (eobp) (signal 'end-of-buffer nil)))
+
+  (defun my/backwrd-word ()
+    (interactive)
+    (my/bob-error)
+    (when (eq (puni--syntax-char-after (- (point) 2)) ?w)
+      (backward-char))
+    (my/backward-block))
+
+  (defun my/forward-word ()
+    "A finer version of `forward-word'.
+If there's *only one* non-word char between point and next word,
+move after it.  Then jump forward by a block.  A block is a
+continuous region with the same syntax, like a word, a bunch of
+whitespaces/punctuations, etc.
+
+This doesn't fly over most punctuations, while `forward-word'
+does."
+  (interactive)
+  (my/eob-error)
+  (when (eq (puni--syntax-char-after (1+ (point))) ?w)
+    (forward-char))
+  (my/forward-block))
+
+  (defun my/forward-delete-word ()
+    "Delete word forward while keeping expressions balanced."
+    (interactive)
+    (if (use-region-p)
+        (puni-delete-active-region)
+      (puni-soft-delete-by-move #'my/forward-word nil nil nil 'jump-and-reverse-delete)))
+
+  (defun my/backward-delete-word ()
+    "Delete word backward while keeping expressions balanced."
+    (if (use-region-p)
+        (puni-delete-active-region)
+      (puni-soft-delete-by-move #'my/backward-word nil nil nil 'jump-and-reverse-delete)))
+
+  (defun my/kill-line ()
+    "Kill a line forward while keeping expressions balanced.
+If nothing can be deleted, kill backward.  If still nothing can be
+deleted, kill the pairs around point."
+  (interactive)
+  (let ((bounds (puni-bounds-of-list-around-point)))
+    (if (eq (car bounds) (cdr bounds))
+        (when-let ((sexp-bounds (puni-bounds-of-sexp-around-point)))
+          (puni-delete-region (car sexp-bounds) (cdr sexp-bounds) 'kill))
+      (if (eq (point) (cdr bounds))
+          (puni-backward-kill-line)
+        (puni-kill-line)))))
+
+  (setcdr puni-mode-map nil)
   (map! :map puni-mode-map
-    "<DEL>" #'my/puni-backspace))
+    "<DEL>" #'my/puni-backspace
+    "C-d" #'puni-forward-delete-char
+    "M-d" #'my/forward-delete-word
+    "M-DEL" 'my/backward-delete-word
+    "C-k" 'my/kill-line
+    "C-u" 'puni-backward-kill-line
+    "C-DEL" 'puni-force-delete
+    "C-M-f" 'puni-forward-sexp
+    "C-M-b" 'puni-backward-sexp
+    "C-M-a" 'puni-beginning-of-sexp
+    "C-M-e" 'puni-end-of-sexp))
 #+end_src
 **** separedit
 #+begin_quote
@@ -2328,7 +2412,8 @@ popd
 #+begin_src emacs-lisp
 (use-package! emt
   :when IS-MAC
-  :hook (doom-first-file . emt-mode)
+  :commands (emt-mode)
+  ;; :hook (doom-first-file . emt-mode)
   :config
   (setq emt-lib-path (concat user-emacs-directory "modules/libEMT.dylib")))
 #+end_src
@@ -3112,6 +3197,7 @@ pip install grip
     :localleader
     :desc "grip-mode" "v" #'grip-mode)
   :config
+  (setq grip-preview-use-webkit (featurep 'xwidget-internal)) ; 如果emacs支持xwidget则，使用xwidget预览
   ;; (setq grip-preview-use-webit t) ; Use embedded webkit to previe
   (set-popup-rule! (regexp-quote "*xwidget") :side 'right :size .50 :select nil :quit t))
 #+end_src
