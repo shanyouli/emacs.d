@@ -347,10 +347,19 @@ emacs 内部的 tree-sitter, 判断是否可以使用 treesit
 (defun my-treesit-available-p ()
   "Check whether tree-sitter is available. Native tree-sitter is introduced since 29."
   (and (fboundp 'treesit-available-p) (treesit-available-p)))
+
+(defun my/load-treesit ()
+  (interactive)
+  (let ((fn (lambda (name) (when (treesit-language-available-p name)
+                        (treesit-parser-create name)))))
+    (pcase major-mode
+      ('emacs-lisp-mode (funcall fn 'elisp))
+      ('org-mode (funcall fn 'org))
+      (_ (message "major There is no corresponding treesit")))))
 #+end_src
 
 #+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload my-treesit-available-p)
+(myfun-autoload my-treesit-available-p my/load-treesit)
 #+end_src
 
 *** EmacsClient 配置函数
@@ -579,6 +588,7 @@ autoload
 (my/leader
   "t" '(:ignore t :which-key "toggle")
   "o" '(:ignore t :which-key "open")
+  "f" '(:ignore t :which-key "file")
   "r" '(:ignore t :which-key "reload"))
 #+end_src
 默认下自定义界面所有修改都会加入到 =init.el= 上，常用的方法是放在 =costom.el= 上
@@ -3439,14 +3449,13 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 #+end_src
 我不喜欢编写​=org-mode=​时，自动化换行
 #+begin_src emacs-lisp
-(setq-hook! 'org-mode-hook truncate-lines nil)
-(setq-hook! 'org-mode-hook fill-column 100)
-;; (setq-hook! 'org-mode-hook visual-fill-column-center-text t)
+(setq-hook! 'org-mode-hook truncate-lines nil
+            fill-column 100
+            ;; visual-fill-column-center-text t
 
-;; disable <> auto pairing in electric-pair-mode for org-mode
-(setq-hook! 'org-mode-hook electric-pair-inhibit-predicate
-            `(lambda (c) (if (char-equal c ?<) t
-                      (,electric-pair-inhibit-predicate c))))
+            ;; disable <> auto pairing in electric-pair-mode for org-mode
+            electric-pair-inhibit-predicate
+            `(lambda (c) (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))
 #+end_src
 停止自动 tangle-on-save
 #+begin_src emacs-lisp
@@ -3520,8 +3529,11 @@ org link 快捷方法
 #+end_src
 org treesit
 #+begin_src emacs-lisp
-(when (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'org))
-  (add-hook! org-mode (treesit-parser-create 'org)))
+;; (when (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'org))
+;;   (add-hook! org-mode (treesit-parser-create 'org)))
+;;
+(my/leader :keymap 'org-mode-map
+  "ft" '(my/load-treesit :wk "treesit"))
 #+end_src
 **** 零宽空格
 偶尔在用 Org 是你希望将两个分开的块放在一起，这点有点烦人。比如将加​*重*​一个单词
