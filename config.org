@@ -2084,6 +2084,7 @@ VTerm 的安装相对麻烦一些，需要编译一些依赖。当然对于 Unix
   (setq! vterm-module-cmake-args "-DUSE_SYSTEM_LIBVTERM=yes")
   (map! :nvie "s-0" #'my/vterm-toggle)
   :config
+  (map! :map vterm-mode-map "C-\\" 'toggle-input-method)
   ;; Finally, add update-pwd to the list of commands that Emacs is allowed to execute from vterm
   (add-to-list 'vterm-eval-cmds '("update-pwd" (lambda (path) (setq default-directory path))))
 
@@ -3450,9 +3451,7 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 停止自动 tangle-on-save
 #+begin_src emacs-lisp
 (when (modulep! :config literate)
-  (remove-hook 'org-mode-hook #'+literate-enable-recompile-h)
-  (my/leader :keymaps 'org-mode-map
-    "rr" (list :def (cmd! (+literate-recompile-maybe-h)) :wk "org-tangle")))
+  (remove-hook 'org-mode-hook #'+literate-enable-recompile-h))
 
 #+end_src
 设置打开 org links 的程序
@@ -4917,4 +4916,13 @@ yapf
 #+begin_src emacs-lisp
   )
 
+#+end_src
+
+** ass-mode
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! ass-mode :recipe (:host github :repo "disbeliever/ass-mode"))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! ass-mode
+  :mode (("\\.ass" . ass-mode)))
 #+end_src
