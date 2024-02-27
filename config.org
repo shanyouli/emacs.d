@@ -30,7 +30,7 @@ descendant, GNU Emacs, continues actively as of 2020.
 (setq user-full-name "Shanyou Li"
       user-mail-address "shanyouli6@gmail.com"
       ;; user-gpg-key ""
-      org-directory "~/org"
+      org-directory (file-truename "~/org")
       my-workdir (expand-file-name "~/Workspace")
       ;; My Blog Dir
       user-blog-dir (concat my-workdir "/Blog"))
@@ -1193,7 +1193,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 ***** 主题的基本配置
 目前使用主要有 doom-theme ， modus-themes 和 catppuccin-theme
 #+begin_src emacs-lisp :tangle "packages.el"
-(package! ef-themes)
+(package! ef-themes :built-in 'prefer)
 #+end_src
 #+begin_src emacs-lisp
 (setq doom-theme nil) ;; 使用 autodark 自动切换主题
@@ -1321,6 +1321,7 @@ Macos 上借助系统自带的进行主题切换
   (defadvice! my/doom-init-theme-a (fn &rest args)
     "Using circadoam config"
     :around #'doom-init-theme-h
+    (require 'ef-themes)
     (if (display-graphic-p)
         (progn
          (auto-dark-mode +1)
@@ -1350,6 +1351,7 @@ Macos 上借助系统自带的进行主题切换
   (defadvice! my/doom-init-theme-a (&rest _)
     "Using circadoam config"
     :around #'doom-init-theme-h
+    (require 'ef-themes)
     (circadian-setup)
     (setq doom-theme (car custom-enabled-themes))))
 #+end_src
@@ -1570,7 +1572,7 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 *** rainbow-mode
 显示 "#232323" 对应的色彩
 #+begin_src emacs-lisp :tangle "packages.el"
-(package! rainbow-mode)
+(package! rainbow-mode :built-in 'prefer)
 #+end_src
 只在 prog-mode  中开启, 参考: [[https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-highlight.el][.emacs.d/lisp/init-highlight.el at master · seagle0128/.emacs.d]]
 #+begin_src emacs-lisp
@@ -2313,7 +2315,7 @@ OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能�
 **** Puni
 通用、可定制的语法删除
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! puni :recipe (:host github :repo "AmaiKinono/puni"))
+(package! puni :recipe (:host github :repo "AmaiKinono/puni") :built-in 'prefer)
 #+end_src
 #+begin_src emacs-lisp
 (defadvice! +my-global-smartparens-mode-a ()
@@ -2323,29 +2325,44 @@ OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能�
   :hook (after-init . electric-pair-mode)
   ;; :init (setq electric-pair-inhibit-predicate 'electric-pair-conservative-inhibit)
   :config
+  (defun my-normal-word-before-point-p (position n fn)
+    "A normal word exists before POSITION.
+N characters before current point is checked.
+FN checks these characters belong to normal word characters."
+    (save-excursion
+      (goto-char position)
+      ;; sample N characters before POSITION
+      (let* ((rlt t)
+             (i 0))
+        (while (and (< i n) rlt)
+          (let* ((c (char-before (- (point) i))))
+            (when (not (and c (funcall fn c)))
+              (setq rlt nil)))
+          (setq i (1+ i)))
+        rlt)))
   (defun my-electric-pair-inhibit (char)
-  "Customize electric pair when input CHAR."
-  (let* (rlt
-         (quote-chars '(34 39))
-         (word-fn (lambda (c)
-                    (or (and (<= ?a c) (<= c ?z))
-                        (and (<= ?A c) (<= c ?Z))
-                        (and (<= ?0 c) (<= c ?9))))))
-    (cond
-     ((and (memq major-mode '(minibuffer-inactive-mode))
-           (not (string-match "^Eval:" (buffer-string))))
-      (setq rlt t))
+    "Customize electric pair when input CHAR."
+    (let* (rlt
+           (quote-chars '(34 39))
+           (word-fn (lambda (c)
+                      (or (and (<= ?a c) (<= c ?z))
+                          (and (<= ?A c) (<= c ?Z))
+                          (and (<= ?0 c) (<= c ?9))))))
+      (cond
+       ((and (memq major-mode '(minibuffer-inactive-mode))
+             (not (string-match "^Eval:" (buffer-string))))
+        (setq rlt t))
 
-     ;; Don't insert extra single/double quotes at the end of word
-     ;; Also @see https://github.com/redguardtoo/emacs.d/issues/892#issuecomment-740259242
-     ((and (memq (char-before (point)) quote-chars)
-           (my-normal-word-before-point-p (1- (point)) 4 word-fn))
-      (setq rlt t))
+       ;; Don't insert extra single/double quotes at the end of word
+       ;; Also @see https://github.com/redguardtoo/emacs.d/issues/892#issuecomment-740259242
+       ((and (memq (char-before (point)) quote-chars)
+             (my-normal-word-before-point-p (1- (point)) 4 word-fn))
+        (setq rlt t))
 
-     (t
-      (setq rlt (electric-pair-default-inhibit char))))
+       (t
+        (setq rlt (electric-pair-default-inhibit char))))
 
-    rlt))
+      rlt))
   ;; {{ @see https://debbugs.gnu.org/cgi/bugreport.cgi?bug=55340
   ;; `new-line-indent` disables `electric-indent-mode'
   (defun my-electric-pair-open-newline-between-pairs-psif-hack (orig-func &rest args)
@@ -2370,21 +2387,21 @@ OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能�
   :hook (prog-mode . puni-mode)
   :init
   (map! :nv "v" (general-predicate-dispatch 'puni-expand-region
-                (or (evil-normal-state-p)
-                    (eq (evil-visual-type) 'line))
-                'evil-visual-char)
+                  (or (evil-normal-state-p)
+                      (eq (evil-visual-type) 'line))
+                  'evil-visual-char)
         :nv "C-v" (general-predicate-dispatch 'puni-contract-region
-              (eq puni--region-history nil) 'evil-visual-block))
+                    (eq puni--region-history nil) 'evil-visual-block))
   :config
   (defun my/puni-backspace ()
-  "If the cursor is preceded by a blank character that is not a newline and is
+    "If the cursor is preceded by a blank character that is not a newline and is
 not the selection area, the `backward-delete-char-untabify' will be called,
 otherwise `puni-backward-delete-char' is used"
-  (interactive)
-  (if (and (not (use-region-p)) (looking-back "[ \f\t\v]"))
-      (let ((backward-delete-char-untabify-method 'hungry))
-        (call-interactively #'backward-delete-char-untabify))
-    (puni-backward-delete-char)))
+    (interactive)
+    (if (and (not (use-region-p)) (looking-back "[ \f\t\v]"))
+        (let ((backward-delete-char-untabify-method 'hungry))
+          (call-interactively #'backward-delete-char-untabify))
+      (puni-backward-delete-char)))
 
   (defun my/backward-block ()
     (unless (bobp)
@@ -2392,17 +2409,17 @@ otherwise `puni-backward-delete-char' is used"
         (puni--backward-same-syntax word-beg))))
 
   (defun my/forward-block ()
-  "Go forward a block.
+    "Go forward a block.
 Return the point if success.
 
 A block is a continuous region with the same syntax, which
 contains no more than 1 word.  See the implementation for
 details."
-  (unless (eobp)
-    ;; A word may actually end at a position where the syntax on both sides are
-    ;; "word", e.g., when subword-mode is enabled.
-    (let ((word-end (save-excursion (when (forward-word) (point)))))
-      (puni--forward-same-syntax word-end))))
+    (unless (eobp)
+      ;; A word may actually end at a position where the syntax on both sides are
+      ;; "word", e.g., when subword-mode is enabled.
+      (let ((word-end (save-excursion (when (forward-word) (point)))))
+        (puni--forward-same-syntax word-end))))
   (defun my/bob-error ()
     "Signal an error if point is at the beginning of buffer."
     (when (bobp) (signal 'beginning-of-buffer nil)))
@@ -2427,11 +2444,11 @@ whitespaces/punctuations, etc.
 
 This doesn't fly over most punctuations, while `forward-word'
 does."
-  (interactive)
-  (my/eob-error)
-  (when (eq (puni--syntax-char-after (1+ (point))) ?w)
-    (forward-char))
-  (my/forward-block))
+    (interactive)
+    (my/eob-error)
+    (when (eq (puni--syntax-char-after (1+ (point))) ?w)
+      (forward-char))
+    (my/forward-block))
 
   (defun my/forward-delete-word ()
     "Delete word forward while keeping expressions balanced."
@@ -2450,14 +2467,14 @@ does."
     "Kill a line forward while keeping expressions balanced.
 If nothing can be deleted, kill backward.  If still nothing can be
 deleted, kill the pairs around point."
-  (interactive)
-  (let ((bounds (puni-bounds-of-list-around-point)))
-    (if (eq (car bounds) (cdr bounds))
-        (when-let ((sexp-bounds (puni-bounds-of-sexp-around-point)))
-          (puni-delete-region (car sexp-bounds) (cdr sexp-bounds) 'kill))
-      (if (eq (point) (cdr bounds))
-          (puni-backward-kill-line)
-        (puni-kill-line)))))
+    (interactive)
+    (let ((bounds (puni-bounds-of-list-around-point)))
+      (if (eq (car bounds) (cdr bounds))
+          (when-let ((sexp-bounds (puni-bounds-of-sexp-around-point)))
+            (puni-delete-region (car sexp-bounds) (cdr sexp-bounds) 'kill))
+        (if (eq (point) (cdr bounds))
+            (puni-backward-kill-line)
+          (puni-kill-line)))))
 
   (setcdr puni-mode-map nil)
   (map! :map puni-mode-map
@@ -2625,7 +2642,7 @@ popd
 *** noflet
 用来，当我退出 emacs 时，不会提示有一些子命令正在运行, 参考来源 [[https://github.com/manateelazycat/lazycat-emacs/blob/8087ff9be53e94f1c82d5d58002667db9529262a/site-lisp/config/init-generic.el#L135][manateelazycat/init-generic.el]]
 #+begin_src emacs-lisp :tangle "packages.el"
-(package! noflet)
+(package! noflet :built-in 'prefer)
 #+end_src
 #+begin_src emacs-lisp
 (use-package! noflet
@@ -3786,6 +3803,31 @@ org-capture 模块设置
          org-capture-blog-file (expand-file-name "blog.org" org-capture-dir)
          ;; 保存书签，
          org-capture-bookmark-file (expand-file-name "bookmark.org" org-capture-dir))
+  (defun my--find-month-daily-tree ()
+    (let* ((path (list
+                  "Personal"
+                  (format-time-string "%Y年")
+                  (format-time-string "%m月")
+                  (format-time-string "%Y年%m月%d日")))
+           (level 1)
+           end)
+      (unless (derived-mode-p 'org-mode)
+        (error "Target buffer \"%s\" should be in Org mode" (current-buffer)))
+      (goto-char (point-min))             ;移动到 buffer 的开始位置
+      ;; 先定位表示年份的 headline，再定位表示月份的 headline
+      (dolist (heading path)
+        (let ((re (format org-complex-heading-regexp-format
+                          (regexp-quote heading)))
+              (cnt 0))
+          (if (re-search-forward re end t)
+              (goto-char (point-at-bol))  ;如果找到了 headline 就移动到对应的位置
+            (progn                        ;否则就新建一个 headline
+              (or (bolp) (insert "\n"))
+              (if (/= (point) (point-min)) (org-end-of-subtree t t))
+              (insert (make-string level ?*) " " heading "\n"))))
+        (setq level (1+ level))
+        (setq end (save-excursion (org-end-of-subtree t t))))
+      (org-end-of-subtree)))
   (setq org-capture-templates
         `(("j" "Journal" entry (file+datetree ,(concat org-directory "/journal.org"))
            "* %U - %^{heading}\n  %?")
@@ -3795,22 +3837,25 @@ org-capture 模块设置
           ("cm" "Movie" entry (file+weektree ,org-capture-movie-file)
            "* %^{movie} :movie:%\\1:\n%?" :empty-lines 1)
           ("g" "GTD")
-          ("gt" "Todo" entry (file+headline ,org-agenda-todo-file "Personal")
+          ("gt" "Todo" entry (file+headline ,org-agenda-todo-file "TODOS")
            "* TODO [#%^{priority|B|A|C|D|E}] %^{task} \n SCHEDULED: %^T DEADLINE: %^T\n:properties:\n:end:\n%?")
-          ("gd" "Daily" entry (file+headline ,org-agenda-todo-file "Daily")
+          ("gd" "Daily" entry (file+olp ,org-agenda-todo-file "Habit" "Daily")
            "* TODO [#%^{priority|C|A|B|D|E}] %^{task}\n :properties:\n:end:\n SCHEDULED:  %<<%Y-%m-%d %a %H:%M ++1d>>\n%?"
            :empty-lines 1)
-          ("gw" "Weekly" entry (file+headline ,org-agenda-todo-file "Weekly")
+          ("gw" "Weekly" entry (file+olp ,org-agenda-todo-file "Habit" "Weekly")
            "* TODO [#%^{priority|B|A|C|D|E}] %^{task}\n:properties:\n:end:\n SCHEDULED: %<<%Y-%m-%d %a %H:%M ++1w>>\n%?"
            :empty-lines 1)
-          ("gm" "Monthly" entry (file+headline ,org-agenda-todo-file "Monthly")
+          ("gm" "Monthly" entry (file+olp ,org-agenda-todo-file "Habit" "Monthly")
            "* TODO [#%^{priority|C|A|B|D|E}] %^{task}\n:properties:\n:end:\n SCHEDULED: %<<%Y-%m-%d %a %H:%M ++1m>>\n%?"
            :empty-lines 1)
-
+          ("t" "Todo" plain (file+function ,org-agenda-todo-file my--find-month-daily-tree)
+           "***** TODO [#%^{priority|B|A|C|D|E}] %^{task} \n SCHEDULED: %<<%Y-%m-%d %a %H:%M>> DEADLINE: %<<%Y-%m-%d %a 23:59>>\n:properties:\n:end:\n%?"
+           :empty-lines 1)
           ;; org-bookmark
           ("pn" "Protocol Bookmarks" entry (file+headline ,org-capture-bookmark-file "Bookmark")
            "* %U - %:annotation  \n %:initial \n" :immediate-finish t :kill-buffer t)
-        )))
+          ))
+  )
 #+end_src
 
 **** org-src
@@ -4737,9 +4782,6 @@ yapf
 (reformatter-define python-format :program "ruff" :args '("format" "-"))
 ;; (reformatter-define python-format :program "yapf" )
 ;; (reformatter-define python-format :program "black" :args '("-"))
-#+end_src
-**** 函数
-#+begin_src emacs-lisp :tangle (if (or (executable-find "black") (executable-find "yapf")) "lang/pyfmt.el" "no")
 (defun python-format-region-or-buffer ()
     "python format region or buffer."
     (interactive)
@@ -4749,7 +4791,6 @@ yapf
         (when (fboundp 'py-isort-buffer) (py-isort-buffer))
         (call-interactively #'python-format-buffer))))
 #+end_src
-
 *** 补全
 #+begin_src emacs-lisp
 (after! python

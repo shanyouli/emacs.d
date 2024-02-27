@@ -13,3 +13,4 @@ myfun.el
 lang/
 /config.html
 /config.md
+filycheck_*.el
