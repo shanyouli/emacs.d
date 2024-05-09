@@ -27,7 +27,7 @@ descendant, GNU Emacs, continues actively as of 2020.
 #+begin_src emacs-lisp
 ;;; If you use NIXOS yourself to generate the configuration, you may need to load it.
 (load! "config.init.el" doom-user-dir 'no-error)
-(setq user-full-name "Shanyou Li"
+(setopt user-full-name "Shanyou Li"
       user-mail-address "shanyouli6@gmail.com"
       ;; user-gpg-key ""
       org-directory (file-truename "~/org")
@@ -37,23 +37,23 @@ descendant, GNU Emacs, continues actively as of 2020.
 
 ;; @https://emacs-china.org/t/topic/13254
 ;; toggle-word-wrap：遇到中英文混合文本会折在空格，即使空格离右面还很远。因为他只能折在空格和 tab 上
-(setq word-wrap-by-category t)
+(setopt word-wrap-by-category t)
 
 ;; 我不希望打开软链接文件时会跳转到原文件
-(setq find-file-visit-truename nil)
+(setopt find-file-visit-truename nil)
 
 ;; 自动缓存 url 下载
-(setq url-automatic-caching t)
+(setopt url-automatic-caching t)
 
 ;; 大文件处理
 ;; @see https://emacs-china.org/t/topic/25811/9
 (setq-default bidi-display-reordering nil) ;; 不用阿语外包
-(setq bidi-inhibit-bpa t
+(setopt bidi-inhibit-bpa t
       long-line-threshold 1000
       large-hscroll-threshold 1000
       syntax-wholeline-max 1000)
 
-(setq initial-major-mode 'emacs-lisp-mode)
+(setopt initial-major-mode 'emacs-lisp-mode)
 #+end_src
 自定义一个宏，加载对应​~doom-user-dir~​目录下​~myfun.el~​文件的函数
 #+begin_src emacs-lisp
@@ -991,7 +991,7 @@ web               ; the tubes
 yaml              ; JSON, but readable
 ;;zig               ; C, but simpler
 #+end_src
-**** everything  in Emacs
+**** everything in Emacs
 - 邮件 :: 我不会在 EMacs 中使用邮件🙃
 #+name: doom-email
 #+begin_src emacs-lisp
@@ -2954,7 +2954,7 @@ Use JK as a shortcut button for <ESC>
              insert-translated-name-insert-original-translation)
   :config
   (setq insert-translated-name-translate-engine "deeplx")
-
+  (setq insert-translated-name-deeplx-url "https://api.deeplx.org/translate")
   (defun my/change-insert-translate-engine ()
     (interactive)
     (cond ((string-equal insert-translated-name-translate-engine "deeplx")
@@ -3394,13 +3394,13 @@ Emacs 可以显示 ANSI 颜色代码。然而，在 Emacs 28 之前，如果不�
 :intro:
 Org Mode 无疑是 Emacs 的杀手级应用，其扩展能力以及 Emacs 的契合，让它吊打一众
 标记语言和富文本格式。当然 LaTeX 除外。
-| 格式       | 细粒度控制 | 上手易用性 | 语法 a 简单 | 编辑器支持 | 集成度 | 易于参考 | 多功能性 |
-|-----------+-----------+-----------+------------+-----------+-------+---------+---------|
-| Word      |         2 |         4 |          4 |         2 |     3 |       2 |       2 |
-| LaTeX     |         4 |         1 |          1 |         3 |     2 |       4 |       3 |
-| Org Mode  |         4 |         2 |        3.5 |         1 |     4 |       4 |       4 |
-| Markdown  |         1 |         3 |          3 |         4 |     3 |       3 |       1 |
-| MD+Pandoc |       2.5 |       2.5 |        2.5 |         3 |     3 |       3 |       2 |
+| 格式      | 细粒度控制 | 上手易用性 | 语法 a 简单 | 编辑器支持 | 集成度 | 易于参考 | 多功能性 |
+|-----------+------------+------------+-------------+------------+--------+----------+----------|
+| Word      |          2 |          4 |           4 |          2 |      3 |        2 |        2 |
+| LaTeX     |          4 |          1 |           1 |          3 |      2 |        4 |        3 |
+| Org Mode  |          4 |          2 |         3.5 |          1 |      4 |        4 |        4 |
+| Markdown  |          1 |          3 |           3 |          4 |      3 |        3 |        1 |
+| MD+Pandoc |        2.5 |        2.5 |         2.5 |          3 |      3 |        3 |        2 |
 
 在 =.org= 文件可以包含代码块 (不支持 noweb 模板)，这些代码块可以与专用源代码文件纠缠
 在一起，并通过各种 (可扩展的) 方法编译成文档 (报告、文档、演示文稿等)。这些源块甚至可以
