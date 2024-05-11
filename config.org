@@ -4740,6 +4740,16 @@ macos 中自动化的一门脚本语言
   (add-hook! sh-mode :depth 100 (lsp-bridge-mode +1))
   )
 #+end_src
+*** nushell
+#+begin_src emacs-lisp :tangle (if (executable-find "nu") "packages.el" "no") :noweb-ref none
+(package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode") :built-in 'prefer)
+#+end_src
+#+begin_src emacs-lisp :tangle (if (executable-find "nu") "yes" "no") :noweb-ref none
+(use-package! nushell-mode
+  :defer t
+  :mode ("\\.nu" . nushell-mode))
+#+end_src
+
 ** python
 *** 格式化
 使用 ruff 进行格式化，其他可用的有 black，yapf
