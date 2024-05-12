@@ -6,12 +6,12 @@
 with lib;
 with lib.my;
 let
-  cfm = config.modules;
-  cfg = cfm.$1;
+  cfp = config.modules.$1;
+  cfg = cfp.$2;
 in {
-  options.modules.$1 = {
-    enable = mkEnableOption "$2";
-    $3
+  options.modules.$1.$2 = {
+    enable = mkEnableOption "$3";
+    $4
   };
   config = mkIf cfg.enable {
     $0
