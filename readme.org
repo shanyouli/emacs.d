@@ -6,6 +6,7 @@ git clone --depth 1 git@github.com:hlissner/doo-emacs ~/.emacs.d
 export DOOMDIR=${XDG_CONFIG_HOME:-${HOME}/.config}/doom
 git clone --depth 1  git@github.com/shanyouli/doom-private $DOOMDIR
 mkdir -p $DOOMDIR/lang
+mkdir -p $DOOMDIR/lib
 emacs --batch --eval "(progn (require 'org) (setq org-confirm-babel-evaluate nil) (org-babel-tangle-file (expand-file-name \"config.org\" (getenv \"DOOMDIR\"))))"
 ~/.emacs.d/bin/doom install
 #+end_src

@@ -65,9 +65,21 @@ descendant, GNU Emacs, continues actively as of 2020.
     `(progn
      ,@(mapcar
         (lambda (function)
-          `(autoload ',function ,(expand-file-name "myfun.el" doom-user-dir ) nil t))
+          `(autoload ',function ,(expand-file-name "myfun.el" doom-user-dir) nil t))
         `,functions))))
 #+end_src
+自定义宏，加载对应 doom-user-dir 目录下的 lib 目录下的文件中存在的函数
+#+begin_src emacs-lisp
+(defmacro mylib-autoload (f &rest functions)
+  "Autoload FUNCTIONS the functions from lib/xx.el"
+  (let ((first-element (car-safe functions))
+        (p (f-expand (f-join doom-user-dir "lib" (concat f "el")))))
+    (when (listp first-element) (setq functions (eval first-element)))
+    (when (file-exists-p p)
+      `(progn
+         ,@(mapcar (lambda (function) `(autoload ',function ,p nil t)) `,functions)))))
+#+end_src
+
 在​~doom-user-dir~​目录下创建一个 lang 文件，需要生成代码片段
 #+begin_src emacs-lisp :tangle  yes :noweb-ref none
 (defvar my-loaded-part-el-list nil)
@@ -87,6 +99,50 @@ descendant, GNU Emacs, continues actively as of 2020.
             (load filepath 'noerror 'nomessage))
         nil))))
 #+end_src
+** my/auto-space-mode
+来源: [[https://remacs.fun/posts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%97%B6%E4%BB%A3%E6%88%91%E4%BB%AC%E6%80%8E%E4%B9%88%E7%8E%A9emacs1.-%E4%B8%AD%E8%8B%B1%E6%96%87%E8%BE%93%E5%85%A5%E6%97%B6%E7%9A%84%E7%A9%BA%E6%A0%BC/][大模型时代我们怎么玩Emacs：1. 中英文输入时的空格 | remacs的世界]]
+#+begin_src emacs-lisp :noweb no-export :tangle "lib/my-auto-space.el" :noweb-prefix no :noweb-ref nil
+(defun my-add-space-between-chinese-and-english ()
+  "在中英文之间自动添加空格。"
+  (let ((current-char (char-before))
+        (prev-char (char-before (1- (point)))))
+    (when (and current-char prev-char
+               (or (and (is-chinese-character prev-char) (is-halfwidth-character current-char))
+                   (and (is-halfwidth-character prev-char) (is-chinese-character current-char)))
+               (not (eq prev-char ?\s))) ; 检查前一个字符不是空格
+      (save-excursion
+        (goto-char (1- (point)))
+        (insert " ")))))
+
+(defun my-is-chinese-character (char)
+  "判断字符是否为中文字符。"
+  (and char (or (and (>= char #x4e00) (<= char #x9fff))
+                (and (>= char #x3400) (<= char #x4dbf))
+                (and (>= char #x20000) (<= char #x2a6df))
+                (and (>= char #x2a700) (<= char #x2b73f))
+                (and (>= char #x2b740) (<= char #x2b81f))
+                (and (>= char #x2b820) (<= char #x2ceaf)))))
+
+(defun my-is-halfwidth-character (char)
+  "判断字符是否为半角字符，包括英文字母、数字和标点符号。"
+  (and char (or (and (>= char ?a) (<= char ?z))
+                (and (>= char ?A) (<= char ?Z))
+                (and (>= char ?0) (<= char ?9))
+                )))
+
+(defun my-delayed-add-space-between-chinese-and-english ()
+  "延迟执行，在中英文之间自动添加空格。"
+  (run-with-idle-timer 0 nil 'my-add-space-between-chinese-and-english))
+
+(define-minor-mode my-auto-space-mode
+  "在中英文之间自动添加空格的模式。"
+  :lighter " Auto-Space"
+  :global t
+  (if my-auto-space-mode
+      (add-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english)
+    (remove-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english)))
+#+end_src
+
 ** DONE 自定义函数
 CLOSED: [2023-04-04 Tue 14:55]
 :properties:
@@ -1010,6 +1066,13 @@ yaml              ; JSON, but readable
 ;;twitter           ; twitter client https://twitter.com/vnought
 #+end_src
 ** 杂项
+*** 开启中英文中自动添加空格
+#+begin_src emacs-lisp
+(autoload 'my-auto-space-mode (f-expand (f-join doom-user-dir "lib/my-auto-space.el")) nil t)
+(mylib-autoload "my-auto-space" my-auto-space-mode)
+(when (fboundp 'my-auto-space-mode)
+  (add-hook 'after-init-hook #'my-auto-space-mode))
+#+end_src
 * 包
 ** 加载结构
 :properties:
@@ -4329,17 +4392,19 @@ ligatures 配置,
   (require 'org-roam-logseq))
 
 (use-package! org-roam-ui
-  :after org-roam ;; or :after org
-         ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+  :after org-roam
+;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
 ;;         a hookable mode anymore, you're advised to pick something yourself
 ;;         if you don't care about startup time, use
 ;;  :hook (after-init . org-roam-ui-mode)
-  :config
-  (setq org-roam-ui-sync-theme t
-        org-roam-ui-follow t
-        org-roam-ui-update-on-save t
-        org-roam-ui-open-on-start t))
+  :init
+  (setopt org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
 #+end_src
+
 **** 多个 org-roam-root 目录切换
 在额外的 org-roam-directory 目录下添加如下内容
 #+begin_src emacs-lisp :tangle "no" :noweb-ref none
