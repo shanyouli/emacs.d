@@ -2995,24 +2995,17 @@ Use JK as a shortcut button for <ESC>
 有道翻译工具
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! posframe :built-in 'prefer)
-(package! maple-translate :recipe (:host github :repo "honmaple/emacs-maple-translate"))
+(package! fanyi)
 #+end_src
 #+begin_src emacs-lisp
-(use-package! maple-translate
-  :init
-  (setq maple-translate-engine '(youdao dictcn))
- :general
-  (my/leader :states '(normal visual)
-    "s" '(:ignore t :which-key "search")
-    "s y" '(maple-translate+ :wk "translate"))
-  :config
-  ;; or use multi engines
-  (set-popup-rule! "^\\*maple-translate\\*" :size 0.25 :vslot -4 :select t :quit t :ttl 0)
-  ;; with google translate
-  (setq maple-translate-google-url "https://translate.googleapis.com/translate_a/single")
-  (setq maple-translate-google-proxies
-        '(("http" . "127.0.0.1:10801")
-          ("https" . "127.0.0.1:10801"))))
+(use-package! fanyi
+  :commands (fanyi-dwin fanyi-dwin2 fanyi-from-history)
+  :custom (fanyi-providers '(fanyi-haici-provider fanyi-youdao-thesaurus-provider fanyi-etymon-provider fanyi-longman-provider)))
+
+(map! (:prefix-map ("C-c d" . "define")
+       :desc "fanyi-dwin" "f" #'fanyi-dwin
+       :desc "fanyi postfram" "d" #'fanyi-dwin2
+       :desc "fanyi histoyr" "h" #'fanyi-from-history))
 #+end_src
 **** sdcv
 使用​~sdcv~​命令进行查询
@@ -3455,7 +3448,7 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
           (lambda ()
             (setq-local time-stamp-active t
                         time-stamp-line-limit 18
-                        time-stamp-start "^#\\+LASTMOD: [ \t]*"
+                        time-stamp-start "^#\\+LAST_MODIFIED:\s+[ \t]*"
                         time-stamp-end "$"
                         time-stamp-format "\[%Y-%m-%d %a %H:%M:%S\]")
             (add-hook 'before-save-hook 'time-stamp nil 'local)))
@@ -3856,6 +3849,41 @@ org-capture 模块设置
            "* %U - %:annotation  \n %:initial \n" :immediate-finish t :kill-buffer t)
           ))
   )
+#+end_src
+
+**** org-protocol
+配置 org-protocol
+#+begin_src emacs-lisp
+(use-package org-protocol
+  :config
+  (add-to-list 'org-protocol-protocol-alist
+               '("org-find-file" :protocol "find-file" :function org-protocol-find-file :kill-client nil))
+
+  (defun org-protocol-find-file-fix-wsl-path (path)
+    "If inside WSL, change Windows-style paths to WSL-style paths."
+    (if (not (string-match-p "-[Mm]icrosoft" operating-system-release))
+        path
+      (save-match-data
+        (if (/= 0 (string-match "^\\([a-zA-Z]\\):\\(/.*\\)" path))
+            path
+          (let ((volume (match-string-no-properties 1 path))
+                (abspath (match-string-no-properties 2 path)))
+            (format "/mnt/%s%s" (downcase volume) abspath))))))
+
+  (defun org-protocol-find-file (fname)
+    "Process org-protocol://find-file?path= style URL."
+    (let* ((parsed (org-protocol-parse-parameters fname nil '(:path :anchor)))
+           (f (plist-get parsed :path))
+           (anchor (plist-get parsed :anchor))
+           (anchor-re (and anchor (concat "\\(-\\|\\*\\) " (regexp-quote anchor)))))
+      (find-file (org-protocol-find-file-fix-wsl-path f))
+      (raise-frame)
+      (select-frame-set-input-focus (selected-frame))
+      (unhighlight-regexp t)
+      (highlight-regexp anchor-re)
+      (when anchor
+        (or (re-search-forward anchor-re nil t 1)
+            (re-search-backward anchor-re nil t 1))))))
 #+end_src
 
 **** org-src
@@ -4262,27 +4290,44 @@ ligatures 配置,
 #+end_src
 
 *** org-roam
+:PROPERTIES:
+:ID:       fadf9cb0-7b0d-42eb-b02f-bc76e76b1096
+:END:
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (package! org-roam)
 (unpin! org-roam)
-(package! org-roam-ui)
+;; FIXME: @see https://github.com/org-roam/org-roam-ui/issues/236
+;; Org-roam-ui doesn't show the node's text if in a .dir-locals.el location
+(package! org-roam-ui :recipe (:host github :repo "Keisn1/org-roam-ui"))
+
+;; Automatically synchronize logseq edits to work in org-roam when it's open
+(package! org-roam-logseq :recipe (:host github :repo "idanov/org-roam-logseq.el"))
 #+end_src
 #+begin_src emacs-lisp :tangle "yes" :noweb-ref none
 ;; 使用 org-roam-ui 的配置
 (use-package! websocket :after org-roam)
 (use-package! org-roam
-  :init (setq org-roam-db-location
-              (concat
-               (file-name-as-directory doom-cache-dir)
-               "org-roam.db")
-              org-roam-database-connector 'sqlite-builtin
-              org-id-link-to-org-use-id t)
+  :init
+  (setq my-default-org-roam-directory (f-expand (f-join "~/Documents" "logseq"))
+        my-default-org-roam-page "pages/"
+        my-default-org-roam-location (f-expand (f-join doom-cache-dir "org-roam-personl.db")))
+  (setopt org-roam-directory my-default-org-roam-directory
+          org-roam-database-connector 'sqlite-builtin
+          org-roam-dailies-directory "journals/"
+          org-roam-file-exclude-regexp "\\.st[^/]*\\|logseq/.*$"
+          org-id-link-to-org-use-id t)
   :config
-  (setq org-roam-capture-templates
+  (setopt org-roam-capture-templates
       `(("d" "default" plain "%?" :target
-         (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                    "#+title: ${title}\n#+DATE: %<%Y-%m-%d>\n#+LASTMOD: %U\n\n")
-         :unnarrowed t))))
+         (file+head ,(concat my-default-org-roam-page "${slug}.org")
+                    "#+title: ${title}\n#+DATE: %<%Y-%m-%d>\n#+LAST_MODIFIED: %U\n\n")
+         :unnarrowed t))
+      org-roam-dailies-capture-templates
+      '(("d" "default" plain "%?" :target
+         (file+head "%<%Y_%m_%d>.org"
+                    "#+title: %<%Y-%m-%d>\n\n"))))
+  (require 'org-roam-logseq))
+
 (use-package! org-roam-ui
   :after org-roam ;; or :after org
          ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
