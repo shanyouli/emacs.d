@@ -27,6 +27,7 @@ descendant, GNU Emacs, continues actively as of 2020.
 #+begin_src emacs-lisp
 ;;; If you use NIXOS yourself to generate the configuration, you may need to load it.
 (load! "config.init.el" doom-user-dir 'no-error)
+(load! "private.el" doom-user-dir 'no-error)
 (setopt user-full-name "Shanyou Li"
       user-mail-address "shanyouli6@gmail.com"
       ;; user-gpg-key ""
@@ -73,7 +74,7 @@ descendant, GNU Emacs, continues actively as of 2020.
 (defmacro mylib-autoload (f &rest functions)
   "Autoload FUNCTIONS the functions from lib/xx.el"
   (let ((first-element (car-safe functions))
-        (p (f-expand (f-join doom-user-dir "lib" (concat f "el")))))
+        (p (expand-file-name (concat "lib/" f ".el") doom-user-dir)))
     (when (listp first-element) (setq functions (eval first-element)))
     (when (file-exists-p p)
       `(progn
@@ -100,15 +101,15 @@ descendant, GNU Emacs, continues actively as of 2020.
         nil))))
 #+end_src
 ** my/auto-space-mode
-来源: [[https://remacs.fun/posts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%97%B6%E4%BB%A3%E6%88%91%E4%BB%AC%E6%80%8E%E4%B9%88%E7%8E%A9emacs1.-%E4%B8%AD%E8%8B%B1%E6%96%87%E8%BE%93%E5%85%A5%E6%97%B6%E7%9A%84%E7%A9%BA%E6%A0%BC/][大模型时代我们怎么玩Emacs：1. 中英文输入时的空格 | remacs的世界]]
+来源: [[https://remacs.fun/posts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%97%B6%E4%BB%A3%E6%88%91%E4%BB%AC%E6%80%8E%E4%B9%88%E7%8E%A9emacs1.-%E4%B8%AD%E8%8B%B1%E6%96%87%E8%BE%93%E5%85%A5%E6%97%B6%E7%9A%84%E7%A9%BA%E6%A0%BC/][大模型时代我们怎么玩 Emacs：1. 中英文输入时的空格 | remacs 的世界]]
 #+begin_src emacs-lisp :noweb no-export :tangle "lib/my-auto-space.el" :noweb-prefix no :noweb-ref nil
 (defun my-add-space-between-chinese-and-english ()
   "在中英文之间自动添加空格。"
   (let ((current-char (char-before))
         (prev-char (char-before (1- (point)))))
     (when (and current-char prev-char
-               (or (and (is-chinese-character prev-char) (is-halfwidth-character current-char))
-                   (and (is-halfwidth-character prev-char) (is-chinese-character current-char)))
+               (or (and (my-is-chinese-character prev-char) (my-is-halfwidth-character current-char))
+                   (and (my-is-halfwidth-character prev-char) (my-is-chinese-character current-char)))
                (not (eq prev-char ?\s))) ; 检查前一个字符不是空格
       (save-excursion
         (goto-char (1- (point)))
@@ -536,7 +537,7 @@ autoload
 #+end_src
 
 *** 一些有用的交互函数
-- 重新revert当期buffer
+- 重新 revert 当期 buffer
 #+begin_src emacs-lisp
 (defun my/revert-this-buffer ()
   "Revert the current buffer."
@@ -868,7 +869,7 @@ literate
   我使用 company + vertico
 #+name: doom-completion
 #+begin_src emacs-lisp
-(company +childframe)
+(corfu +icons +orderless)
 ;;helm              ; the *other* search engine for love and life
 ;;ido               ; the other *other* search engine...
 ;;(ivy              ; a search engine for love and life
@@ -941,7 +942,7 @@ vterm             ; the best terminal emulation in Emacs
 - 检测 :: 可以告诉我哪里不对，但我觉得我应该先好好背背单词或者看看 PEP8
   #+name: doom-checkers
  #+begin_src emacs-lisp
-syntax              ; tasing you for every semicolon you forget
+(syntax +flymake +childframe)              ; tasing you for every semicolon you forget
 ;; (:if (or (executable-find "hunspell")
 ;;          (executable-find "aspell")) spell) ; tasing you for misspelling mispelling
 ;;grammar           ; tasing grammar mistake every you make
@@ -1068,7 +1069,6 @@ yaml              ; JSON, but readable
 ** 杂项
 *** 开启中英文中自动添加空格
 #+begin_src emacs-lisp
-(autoload 'my-auto-space-mode (f-expand (f-join doom-user-dir "lib/my-auto-space.el")) nil t)
 (mylib-autoload "my-auto-space" my-auto-space-mode)
 (when (fboundp 'my-auto-space-mode)
   (add-hook 'after-init-hook #'my-auto-space-mode))
@@ -1761,8 +1761,8 @@ see@ https://emacs-china.org/t/native-os-sis/14089
   :autoload (rime--load-dynamic-module)
   :bind (:map rime-mode-map ("C-`" . 'rime-send-keybinding))
   :init
-  (setq default-input-method "rime"
-        rime-show-candidate 'posframe)
+  (setopt default-input-method "rime"
+          rime-show-candidate 'posframe)
   (setq rime-posframe-properties
         (list :font "Unifont-18" :internal-border-with 3))
   (map! "C-\\" #'my-toggle-input-method
@@ -2656,7 +2656,7 @@ popd
     (setq wraplish-python-command lsp-bridge-python-command)))
 #+end_src
 
-**** [[https://github.com/ncaq/auto-sudoedit/tree/master][ncaq/auto-sudoedit]]
+**** [[https://github.com/ncaq/auto-sudoedit/tree/master][auto-sudoedit]]
 允许 sudo 编辑文件, 排除目标路径以 =/nix= 开头的路径
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! auto-sudoedit)
@@ -2717,23 +2717,7 @@ popd
   (setq kill-buffer-query-functions
         (remq 'process-kill-buffer-query-function kill-buffer-query-functions)))
 #+end_src
-*** chatgpt
-**** mind-wave
-一个 chatgpt 的实现,用法创建一个 ~.chat~ 文件，在该文件中执行 ~mind-wave-chat-ask~ 提问，执行​~mind-wave-chat-continue~​继续提问，​~mind-wave-chat-generate-title~ 生成新的标题， 目前作为备选应用尝试, 更多用法详见[[https://emacs-china.org/t/mind-wave-chatgpt-api-emacs-ai/23881][mind-wave -- 基于 ChatGPT API 的 Emacs AI 插件]], 使用第三方 api 存在问题
-#+begin_src emacs-lisp :tangle "packages.el"
-(package! mind-wave
-  :recipe (:host github :repo "manateelazycat/mind-wave"
-           :files ("*.el" "*.py")))
-#+end_src
-#+begin_src emacs-lisp
-(use-package! mind-wave
-  :commands (mind-wave-chat-ask)
-  :mode ("\\.chat\\'" . mind-wave-chat-mode)
-  :config
-  (setq mind-wave-auto-change-title nil))
-#+end_src
-
-**** chatpgt-shell
+*** chatpgt-shell
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! chatgpt-shell)
 #+end_src
@@ -3017,7 +3001,6 @@ Use JK as a shortcut button for <ESC>
              insert-translated-name-insert-original-translation)
   :config
   (setq insert-translated-name-translate-engine "deeplx")
-  (setq insert-translated-name-deeplx-url "https://api.deeplx.org/translate")
   (defun my/change-insert-translate-engine ()
     (interactive)
     (cond ((string-equal insert-translated-name-translate-engine "deeplx")
@@ -3054,7 +3037,7 @@ Use JK as a shortcut button for <ESC>
   :init
   (setq immersive-translate-backend 'trans))
 #+end_src
-**** youdao-dictionary
+**** fanyi
 有道翻译工具
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! posframe :built-in 'prefer)
@@ -3062,13 +3045,13 @@ Use JK as a shortcut button for <ESC>
 #+end_src
 #+begin_src emacs-lisp
 (use-package! fanyi
-  :commands (fanyi-dwin fanyi-dwin2 fanyi-from-history)
+  :commands (fanyi-dwim fanyi-dwim2 fanyi-from-history)
   :custom (fanyi-providers '(fanyi-haici-provider fanyi-youdao-thesaurus-provider fanyi-etymon-provider fanyi-longman-provider)))
 
 (map! (:prefix-map ("C-c d" . "define")
-       :desc "fanyi-dwin" "f" #'fanyi-dwin
-       :desc "fanyi postfram" "d" #'fanyi-dwin2
-       :desc "fanyi histoyr" "h" #'fanyi-from-history))
+       :desc "fanyi-dwin" "f" #'fanyi-dwim
+       :desc "fanyi postfram" "d" #'fanyi-dwim2
+       :desc "fanyi history" "h" #'fanyi-from-history))
 #+end_src
 **** sdcv
 使用​~sdcv~​命令进行查询
@@ -3351,10 +3334,6 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
   (setq treesit-language-source-alist
         '((org . ("https://github.com/milisims/tree-sitter-org")))))
 #+end_src
-- 关闭 pin flycheck
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(unpin! flycheck)
-#+end_src
 - yasnippet 支持 -ts-mode
 #+begin_src emacs-lisp
 (use-package! yasnippet
@@ -3386,7 +3365,7 @@ pip install grip
     :localleader
     :desc "grip-mode" "v" #'grip-mode)
   :config
-  (setq grip-preview-use-webkit (featurep 'xwidget-internal)) ; 如果emacs支持xwidget则，使用xwidget预览
+  (setq grip-preview-use-webkit (featurep 'xwidget-internal)) ; 如果 emacs 支持 xwidget 则，使用 xwidget 预览
   ;; (setq grip-preview-use-webit t) ; Use embedded webkit to previe
   (set-popup-rule! (regexp-quote "*xwidget") :side 'right :size .50 :select nil :quit t))
 #+end_src
@@ -3607,6 +3586,17 @@ org treesit
 ;;
 (my/leader :keymap 'org-mode-map
   "ft" '(my/load-treesit :wk "treesit"))
+#+end_src
+修复 rime 和 org-mode 一起使用的问题
+#+begin_src emacs-lisp
+(setq-hook! 'org-mode-hook rime-show-candidate
+            (if (daemonp)
+                (if (and (bound-and-true-p rime-posframe-buffer)
+                         (fboundp 'posframe--find-existing-posframe)
+                         (posframe--find-existing-posframe (get-buffer rime-posframe-buffer)))
+                    'posframe
+                  'popup)
+              'posframe))
 #+end_src
 **** 零宽空格
 偶尔在用 Org 是你希望将两个分开的块放在一起，这点有点烦人。比如将加​*重*​一个单词
@@ -4365,6 +4355,9 @@ ligatures 配置,
 
 ;; Automatically synchronize logseq edits to work in org-roam when it's open
 (package! org-roam-logseq :recipe (:host github :repo "idanov/org-roam-logseq.el"))
+
+;; https://linux.do/t/topic/111737
+(package! vulpea)
 #+end_src
 #+begin_src emacs-lisp :tangle "yes" :noweb-ref none
 ;; 使用 org-roam-ui 的配置
@@ -4389,7 +4382,79 @@ ligatures 配置,
       '(("d" "default" plain "%?" :target
          (file+head "%<%Y_%m_%d>.org"
                     "#+title: %<%Y-%m-%d>\n\n"))))
-  (require 'org-roam-logseq))
+  (require 'org-roam-logseq)
+
+
+  ;;* dynamic agenda https://github.com/brianmcgillion/doomd/blob/master/config.org
+  ;; https://emacs-china.org/t/org-roam/15659/16
+  ;; https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
+  ;; The 'roam-agenda' tag is used to tell vulpea that there is a todo item in this file
+  (add-to-list 'org-tags-exclude-from-inheritance "roam-agenda")
+
+  (require 'vulpea)
+  (add-hook 'org-roam-db-autosync-mode-hook #'vulpea-db-autosync-enable)
+  (org-roam-db-autosync-mode +1)
+
+  (defun vulpea-buffer-p ()
+    "Return non-nil if the currently visited buffer is a note."
+    (and buffer-file-name
+         (string-prefix-p
+          (expand-file-name (file-name-as-directory org-roam-directory))
+          (file-name-directory buffer-file-name))))
+
+  (defun vulpea-project-p ()
+    "Return non-nil if current buffer has any todo entry.
+
+TODO entries marked as done are ignored, meaning the this
+function returns nil if current buffer contains only completed
+tasks."
+    (seq-find                                 ; (3)
+     (lambda (type)
+       (eq type 'todo))
+     (org-element-map                         ; (2)
+         (org-element-parse-buffer 'headline) ; (1)
+         'headline
+       (lambda (h)
+         (org-element-property :todo-type h)))))
+
+  (defun vulpea-project-update-tag (&optional arg)
+    "Update PROJECT tag in the current buffer."
+    (interactive "P")
+    (when (and (not (active-minibuffer-window))
+               (vulpea-buffer-p))
+      (save-excursion
+        (goto-char (point-min))
+        (let* ((tags (vulpea-buffer-tags-get))
+               (original-tags tags))
+          (if (vulpea-project-p)
+              (setq tags (cons "roam-agenda" tags))
+            (setq tags (remove "roam-agenda" tags)))
+
+          ;; cleanup duplicates
+          (setq tags (seq-uniq tags))
+
+          ;; update tags if changed
+          (when (or (seq-difference tags original-tags)
+                    (seq-difference original-tags tags))
+            (apply #'vulpea-buffer-tags-set tags))))))
+
+  ;; https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/
+  (defun my/org-roam-filter-by-tag (tag-name)
+    (lambda (node)
+      (member tag-name (org-roam-node-tags node))))
+
+  (defun my/org-roam-list-notes-by-tag (tag-name)
+    (mapcar #'org-roam-node-file
+            (seq-filter
+             (my/org-roam-filter-by-tag tag-name)
+             (org-roam-node-list))))
+
+  (defun dynamic-agenda-files-advice (orig-val)
+    (let ((roam-agenda-files (delete-dups (my/org-roam-list-notes-by-tag "roam-agenda"))))
+      (cl-union orig-val roam-agenda-files :test #'equal)))
+
+  (add-hook 'before-save-hook #'vulpea-project-update-tag)
+  (advice-add 'org-agenda-files :filter-return #'dynamic-agenda-files-advice))
 
 (use-package! org-roam-ui
   :after org-roam
@@ -4456,9 +4521,6 @@ media note
 (use-package! elisp-mode
   :ensure nil
   :init
-  (when (modulep! :checkers syntax)
-    ;;Disable the checkdoc checker
-    (setq-hook! 'emacs-lisp-mode-hook flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
   (dont-use-company-mode 'emacs-lisp-mode)
   (my/leader "oe" '(ielm :which-key "Elisp Repl")
     :keymaps 'emacs-lisp-mode-map
@@ -4795,8 +4857,6 @@ macos 中自动化的一门脚本语言
       (pushnew! major-mode-remap-alist '(js-json-mode . json-ts-mode))
       (after! org-src
         (add-to-list 'org-src-lang-modes '("json" . json-ts))))
-  ;; To enable jsonian to work with flycheck
-  (after! (jsonian flycheck) (jsonian-enable-flycheck))
   ;; To disable so-long mode overrides
   (after! (jsonian so-long) (jsonian-no-so-long-mode)))
 #+end_src
@@ -4914,15 +4974,7 @@ yapf
 *** 补全
 #+begin_src emacs-lisp
 (after! python
-  ;; 使用 lsp-bridge 自带的语法诊断功能取代 flycheck-mode
-  (defadvice! +python-use-correct-flycheck-executables-h-a (fn &rest args)
-    :around #'+python-use-correct-flycheck-executables-h
-    nil)
-  (dont-use-company-mode 'python-mode)
-  (setq-hook! python-mode flycheck-checker 'python-mypy)
-  (add-hook! python-mode :depth 100
-    (flycheck-mode -1)
-    (lsp-bridge-mode +1)))
+  (dont-use-company-mode 'python-mode))
 #+end_src
 ** rust
 :PROPERTIES:
@@ -4943,10 +4995,6 @@ yapf
   (setq rustic-lsp-client nil)
   (after! rustic-lsp
     (remove-hook 'rustic-mode-hook 'rustic-setup-lsp))
-  (after! rustic-lsp
-    (remove-hook 'rustic-mode-hook #'flycheck-mode)
-    (remove-hook 'rustic-mode-hook #'flymake-mode-off)
-    (remove-hook 'flycheck-mode-hook #'rustic-flycheck-setup))
   :init
   (after! org-src
     (defalias 'org-babel-execute:rust #'org-babel-execute:rustic)
@@ -4996,13 +5044,15 @@ yapf
 *** 补全
 :PROPERTIES:
 :ID:       dbccbd5e-5f26-4c96-84b4-65fe7631d5eb
-:header-args: :var nix-cmd=(cond ((executable-find "rnix-lsp") "rnix-lsp") ((executable-find "nil") "nil") (t nil))
-:header-args+: :tangle no :noweb-ref nix-config
+:header-args: :tangle no :noweb-ref nix-config
 :END:
-需要安装 rnix-lsp 或者 nil
+需要安装 nixd 或rnix-lsp 或者 nil
 #+begin_src emacs-lisp
 (dont-use-company-mode 'nix-mode)
-(setq lsp-bridge-nix-lsp-server nix-cmd)
+(setopt lsp-bridge-nix-lsp-server (or (bound-and-true-p my-nix-lsp-cmd)
+                                      (and (executable-find "nixd") "nixd")
+                                      (and (executable-find "nil") "nil")
+                                      (and (executable-find "rnix-lsp") "rnix-lsp")))
 (add-hook! nix-mode :depth 100
   (setq-local lsp-bridge-enable-diagnostics nil)
   (lsp-bridge-mode +1))
