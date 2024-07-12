@@ -1995,22 +1995,28 @@ see@ https://emacs-china.org/t/native-os-sis/14089
 #+end_src
 *** Completion
 代码补全
-**** company
 #+begin_src emacs-lisp
-(after! company
-  (setq! company-idle-delay 0.15
-         company-minimum-prefix-length 2
-         comapny-show-numbers t)
-  (custom-set-variables '(company-show-numbers t)))
-  ;; 在某些 mode 中我不使用 company-mode 补全，使用 lsp-bridge 进行补全
-(defun dont-use-company-mode (mode)
+;; 在某些 mode 中我不使用 company-mode 补全，使用 lsp-bridge 进行补全
+(defun dont-use-company-mode (modes)
   "Do not use the company as the `mode' after completion"
-  (if (and (bound-and-true-p company-global-modes) (equal (car company-global-modes) 'not))
-      (add-to-list 'company-global-modes mode t)
-    (setq company-global-modes `(not ,mode erc-mode circe-mode message-mode help-mode gud-mode vterm-mode))))
-
+  (let ((not-modes '(erc-mode circe-mode message-mode help-mode gud-mode vterm-mode))
+        (modes (if (listp modes) modes (list modes))))
+    (require 'cl-seq)
+    (cond ((modulep! :completion corfu)
+           (if (and (bound-and-true-p global-corfu-modes)
+                    (listp global-corfu-modes)
+                    (equal 'not (car-safe (car-safe global-corfu-modes))))
+               (setq global-corfu-modes
+                     `((not ,@(cl-remove-duplicates `(,@modes ,@(cdar global-corfu-modes))
+                               :test 'eq)) t))
+             (setq global-corfu-modes `((not ,@modes ,@not-modes) t))))
+          ((modulep! :completion company)
+           (if (and (bound-and-true-p company-global-modes)
+                    (equal (car-safe company-global-modes) 'not))
+               (setq company-global-modes
+                     `(not ,@(cl-remove-duplicates `(,@(cdr company-global-modes) ,@modes))))
+             (setq company-global-modes `(not ,@modes ,@not-modes)))))))
 #+end_src
-
 **** Vertico
 ***** 中文拼音搜索
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -3150,7 +3156,6 @@ mpd
 ;; Music Player Daemon
 ;; Built-in mpc client
 (use-package! mpc
-  :ensure nil
   :init
   (defun restart-mpd
       (interactive)
@@ -3593,10 +3598,12 @@ org treesit
             (if (daemonp)
                 (if (and (bound-and-true-p rime-posframe-buffer)
                          (fboundp 'posframe--find-existing-posframe)
-                         (posframe--find-existing-posframe (get-buffer rime-posframe-buffer)))
+                         (let ((-posframe-buffer (get-buffer rime-posframe-buffer)))
+                           (and -posframe-buffer (posframe--find-existing-posframe -posframe-buffer))))
                     'posframe
                   'popup)
               'posframe))
+
 #+end_src
 **** 零宽空格
 偶尔在用 Org 是你希望将两个分开的块放在一起，这点有点烦人。比如将加​*重*​一个单词
@@ -4483,18 +4490,6 @@ tasks."
 ((nil . ((org-roam-directory . "/path/to/alt/org-roam-dir")
          (org-roam-db-location . "/path/to/alt/org-roam-dir/org-roam.db"))))
 #+end_src
-*** org-mpv
-使用 org + mpv 记录视频笔记
-#+begin_src bash :tangle "no"
-# archlinx
-yay -S mpv yt-dlp ffmpeg tesseract danmaku2ass-git seam-git xclip
-# brew
-brew install yt-dlp ffmpeg tesseract
-# 需要手动安装 seam, danmaku2ass
-#+end_src
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! mpvi :recipe (:host github :repo "lorniu/mpvi"))
-#+end_src
 *** org-media-note
 media note
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
@@ -4519,7 +4514,6 @@ media note
 #+header: :var *my-treesit-use-elisp-p=(and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'elisp))
 #+begin_src emacs-lisp :noweb no-export :tangle yes :noweb-prefix no :noweb-ref nil
 (use-package! elisp-mode
-  :ensure nil
   :init
   (dont-use-company-mode 'emacs-lisp-mode)
   (my/leader "oe" '(ielm :which-key "Elisp Repl")
@@ -4932,11 +4926,12 @@ macos 中自动化的一门脚本语言
     (if (load-part-el-file "lang/pyfmt")
         (call-interactively #'python-format-region-or-buffer)
       (call-interactively #'indent-region-or-buffer)))
-  (my/leader :keymaps 'python-mode-map
+  (my/leader :keymaps '(python-ts-mode-map python-mode-map)
     "f" '(:ignore t :which-key "file")
     "f p" '(+python-format-region-or-buffer :wk "format"))
-  (map! :map python-mode-map "C-M-\\" :desc "indent" #'+python-format-region-or-buffer))
+  (map! :map (python-mode-map python-ts-mode-map) "C-M-\\" :desc "indent" #'+python-format-region-or-buffer))
 #+end_src
+
 **** 格式化工具
 安装
 #+begin_src bash :tangle "no"
@@ -4974,7 +4969,9 @@ yapf
 *** 补全
 #+begin_src emacs-lisp
 (after! python
-  (dont-use-company-mode 'python-mode))
+  (setq python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
+  (dont-use-company-mode 'python-mode)
+  (dont-use-company-mode 'python-ts-mode))
 #+end_src
 ** rust
 :PROPERTIES:
