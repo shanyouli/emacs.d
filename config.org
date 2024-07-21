@@ -1993,7 +1993,6 @@ see@ https://emacs-china.org/t/native-os-sis/14089
   :init (setq ace-pinyin-use-avy t)
   :config (ace-pinyin-global-mode 1))
 #+end_src
-*** Completion
 代码补全
 #+begin_src emacs-lisp
 ;; 在某些 mode 中我不使用 company-mode 补全，使用 lsp-bridge 进行补全
@@ -3118,9 +3117,8 @@ brew install sdcv
 #+end_src
 *** pass
 #+begin_src emacs-lisp
-(use-package! pass
-  :config
-  (setq password-store-executable "gopass"))
+(when (modulep! :tools pass)
+  (setopt password-store-executable "gopass"))
 #+end_src
 *** 音乐播放
 bongo 一个基于 mpv 或 afplayer 的播放工具
