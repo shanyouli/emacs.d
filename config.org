@@ -1091,39 +1091,39 @@ doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就
 *警告*: 不要禁用 =~/.emacs.d/core/packages.el= 中列出的包。Doom 依赖这些，禁用它们
 可能出现严重问题。
 - 从官方的源 [[https://melpa.org/][MELPA]] / [[http://elpa.gnu.org/][GNU ELPA]] / [[https://emacsmirror.net/][emacsmirror]] 安装
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 (package! some-package)
-  #+end_src
+#+end_src
 - 关闭某些包
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 (package! some-package :disable t)
-  #+end_src
+#+end_src
 - 从 Git Repo 安装
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 ;; github
 (package! github-package :recipe (:host github :repo "username/repo"))
 ;; gitlab
 (package! gitlab-package :recipe (:host gitlab :repo "username/repo"))
 ;; other
 (package! other-package :recipe (:host nil :repo "https://example.com/repo"))
-  #+end_src
+#+end_src
   如果 repo 仅中只有某个 / 某些文件是你需要的
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 (package! some-package
   :recipe (:host github :repo "username/repo"
            :files ("some-file.el" "src/elisp/*.el")))
-  #+end_src
+#+end_src
   如果需要指定某个 =commit= 或某个 =branch=
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 ;; commit
 (package! some-package :pin "abcdefghijk")
 ;; branch
 (package! some-package :recipe (:branch "stable"))
-  #+end_src
+#+end_src
 - 使用本地的 repo
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 (package! some-package :recipe (:local-repo "/path/to/repo"))
-  #+end_src
+#+end_src
 ** 辅助宏
 这些是 doom 添加的一些非常有用的宏
 - ~load!~ 可以相对于本文件进行外部 ~.el~ 文件的加载
@@ -1141,7 +1141,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 + ~doom-unicode-font~: Fallback font for Unicode glyphs ， Unicode ，或者默认字体，目前很多人推荐 [[https://juliamono.netlify.app/][JuliaMono]]， 我应该会尝试
 + 中文字体: LXGW WenKai Mono 备选 "Adobe Heiti Std" 和系统自带的字体
 + 如果你想获得使用等高且等宽的字体，请使用 [[https://github.com/be5invis/Sarasa-Gothic][更纱黑体]] (如果该字体的高度能小一点，我一定会用它，也许后续我会自己调整它的高度)
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 (defadvice! my/use-default-font-a (&rest _)
   "Set `doom-font'!"
   :before #'doom-init-fonts-h
@@ -1213,7 +1213,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
   (add-hook! 'doom-init-ui-hook :append
     (defun my-ligatures-init-h ()
       (add-hook 'after-change-major-mode-hook #'my-ligatures-init-buffer-h))))
-  #+end_src
+#+end_src
 **** nerd-font
 使用​~Sysmbola Nerd Font Mono~​显示 icon 图标字体
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
@@ -3060,57 +3060,79 @@ Use JK as a shortcut button for <ESC>
 另一款好用的翻译插件
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! go-translate)
+(package! plz)
 #+end_src
 使用配置
 #+begin_src emacs-lisp
 (use-package! go-translate
+  :commands (gt-do-translate-prompt gt-do-sdcv gt-do-text-utility)
   :init
   (setopt gt-langs '(en zh)
           gt-buffer-render-follow-p t
           gt-buffer-render-window-config '((display-buffer-reuse-window display-buffer-in-direction)
                                            (direction . bottom)
                                            (window-height . 0.4)))
-  (setopt gt-pop-posframe-forecolor (face-foreground 'tooltip nil t)
-          gt-pop-posframe-backcolor (face-background 'tooltip nil t))
-  (when (facep 'posframe-border)
-    (setopt gt-pin-posframe-bdcolor (face-background 'posframe-border nil t)))
+  (add-hook 'doom-load-theme-hook
+            (lambda ()
+              (setopt gt-pop-posframe-forecolor (face-foreground 'tooltip nil t)
+                      gt-pop-posframe-backcolor (face-background 'tooltip nil t))
+              (when (facep 'posframe-border)
+                (setopt gt-pin-posframe-bdcolor (face-background 'posframe-border nil t)))))
   :config
   (with-no-warnings
-    (setopt gt-preset-translators
+    (setq gt-preset-translators
           `((default . ,(gt-translator
                          :taker (list (gt-taker :pick nil :if 'selection)
                                       (gt-taker :text 'paragraph :if '(Info-mode help-mode helpful-mode devdocs-mode))
                                       (gt-taker :text 'buffer :pick 'fresh-word :if 'read-only)
                                       (gt-taker :text 'word))
-                          :engines (if (display-graphic-p)
-                                       (list (gt-bing-engine :if 'not-word)
-                                             (gt-youdao-dict-engine :if 'word))
-                                     (list (gt-bing-engine :if 'not-word)
-                                           (gt-youdao-dict-engine :if 'word)
-                                           (gt-youdao-suggest-engine :if 'word)
-                                           (gt-google-engine :if 'word)))
-                          :render (list (gt-posframe-pop-render :if (lambda (translator)
-                                                                      (and (display-graphic-p)
-                                                                           (not (dirived-mode-p 'Info-mode 'help-mode 'helpful-mode 'devdocs-mode))
-                                                                           (not (member (buffer-name) '("COMMIT_EDITMSG")))))
-                                          :frame-params (list :accept-focus nil
-                                                          :width 70
-                                                          :height 15
-                                                          :left-fringe 16
-                                                          :right-fringe 16
-                                                          :border-width 1
-                                                          :border-color gt-pin-posframe-bdcolor))
-                                        (gt-overlay-render :if 'read-only)
-                                        (gt-insert-render :if (lambda (translator) (member (buffer-name) '("COMMIT_EDITMSG"))))
-                                        (gt-buffer-render))))
+                         :engines (if (display-graphic-p)
+                                      (list (gt-bing-engine :if 'not-word)
+                                            (gt-youdao-dict-engine :if 'word))
+                                    (list (gt-bing-engine :if 'not-word)
+                                          (gt-youdao-dict-engine :if 'word)
+                                          (gt-youdao-suggest-engine :if 'word)
+                                          (gt-google-engine :if 'word)))
+                         :render (list (gt-posframe-pop-render :if (lambda (translator)
+                                                                     (and (display-graphic-p)
+                                                                          (not (derived-mode-p 'Info-mode 'help-mode 'helpful-mode 'devdocs-mode))
+                                                                          (not (member (buffer-name) '("COMMIT_EDITMSG")))))
+                                                               :frame-params (list :accept-focus nil
+                                                                                   :width 70
+                                                                                   :height 15
+                                                                                   :left-fringe 16
+                                                                                   :right-fringe 16
+                                                                                   :border-width 1
+                                                                                   :border-color gt-pin-posframe-bdcolor))
+                                       (gt-overlay-render :if 'read-only)
+                                       (gt-insert-render :if (lambda (translator) (member (buffer-name) '("COMMIT_EDITMSG"))))
+                                       (gt-buffer-render))))
             (multi-dict . ,(gt-translator :taker (gt-taker :prompt t)
-                             :engines (list (gt-bing-engine)
-                                            (gt-youdao-dict-engine)
-                                            (gt-youdao-suggest-engine :if 'word)
-                                            (gt-google-engine))
-                             :render (gt-buffer-render)))
+                                          :engines (list (gt-bing-engine)
+                                                         (gt-youdao-dict-engine)
+                                                         (gt-youdao-suggest-engine :if 'word)
+                                                         (gt-google-engine))
+                                          :render (gt-buffer-render)))
+            (sdcv . ,(gt-translator
+                      :taker (gt-taker :langs '(en zh) :text 'word)
+                      :engines (list (gt-stardict-engine :if 'word
+                                                         :dir "~/.local/share/stardict"
+                                                         :dict "简明英汉字典增强版"
+                                                         :exact t))
+                      :render (list (gt-posframe-pop-render :if (lambda (translator)
+                                                                  (and (display-graphic-p)
+                                                                       (not (derived-mode-p 'Info-mode 'help-mode 'helpful-mode 'devdocs-mode))
+                                                                       (not (member (buffer-name) '("COMMIT_EDITMSG")))))
+                                                            :frame-params (list :accept-focus nil
+                                                                                :width 70
+                                                                                :height 15
+                                                                                :left-fringe 16
+                                                                                :right-fringe 16
+                                                                                :border-width 1
+                                                                                :border-color gt-pin-posframe-bdcolor))
+                                    (gt-buffer-render))))
             (Text-Utility . ,(gt-text-utility :taker (gt-taker :pick nil)
-                               :render (gt-buffer-render)))))
+                                              :render (gt-buffer-render)))))
 
     (defun gt--do-translate (dict)
       "Translate using DICT from the preset tranlators."
@@ -3124,64 +3146,27 @@ Use JK as a shortcut button for <ESC>
     (defun gt-do-text-utility ()
       "Handle the texts with the utilities."
       (interactive)
-      (gt--do-translate 'Text-Utility))))
-#+end_src
-**** sdcv
-使用​~sdcv~​命令进行查询
-1. sdcv 命令安装
-#+begin_src bash :tangle "no"
-brew install sdcv
-#+end_src
-2. 插件安装
-#+begin_src emacs-lisp :tangle "packages.el"
-(package! sdcv :recipe (:type git :host github :repo "manateelazycat/sdcv"))
-#+end_src
-3. 配置
-#+begin_src emacs-lisp :tangle (if (executable-find "sdcv") "yes" "no")
-(use-package! sdcv
-  :commands (my/sdcv-point)
-  :init
-  :config
-  (setq sdcv-program "sdcv")
-  ;; (setq sdcv-only-data-dir nil)
-  (setq sdcv-dictionary-data-dir
-        (or (getenv "STARDICT_DATA_DIR")
-            (expand-file-name "startdict"
-                              (or (getenv "XDG_DATA_HOME")
-                                  "~/.local/share"))))
-  (setq sdcv-dictionary-simple-list ; setup dictionary list for simple search
-        '("懒虫简明英汉词典"
-          "懒虫简明汉英词典"))
-  (setq sdcv-dictionary-complete-list ; setup dictionary list for complete search
-        '("懒虫简明英汉词典"
-          "懒虫简明汉英词典"
-          "新世纪汉英科技大词典"
-          "牛津现代英汉双解词典"
-          "quick_eng-zh_CN"))
-  (defun my/sdcv-point ()
-    (interactive)
-    (if (display-graphic-p)
-        (call-interactively #'sdcv-search-pointer+)
-      (call-interactively #'sdcv-search-pointer))))
+      (gt--do-translate 'Text-Utility)))
 
-(my/leader :states '(normal visual)
-  "s" '(:ignore t :which-key "search")
-  "s s" '(my/sdcv-point :wk "sdcv"))
+  (defun gt-do-sdcv ()
+    "Translation using the sdcv tool."
+    (interactive)
+    (gt--do-translate 'sdcv)))
 #+end_src
 **** 按键配置
 #+begin_src emacs-lisp
-(map! :leader
-      :desc "zh2en" "it" #'insert-translated-name-insert
-      (:prefix-map ("iT" . "ZH-EN")
-       :desc "underline" "u" #'insert-translated-name-insert-with-underline
-       :desc "line" "l" #'insert-translated-name-insert-with-line
-       :desc "camel" "c" #'insert-translated-name-insert-with-camel
-       :desc "origin" "o" #'insert-translated-name-insert-original-translation)
-      (:prefix-map ("v" . "visual")
-       :desc "fanyi whole buffer" "f"  #'english-teacher-follow-mode
-       :desc "youdao" "y" #'my/youdao-dictionary-point
-       (:when (executable-find "sdcv")
-        :desc "sdcv" "s" #'my/sdcv-point)))
+;; (map! :leader
+;;       :desc "zh2en" "it" #'insert-translated-name-insert
+;;       (:prefix-map ("iT" . "ZH-EN")
+;;        :desc "underline" "u" #'insert-translated-name-insert-with-underline
+;;        :desc "line" "l" #'insert-translated-name-insert-with-line
+;;        :desc "camel" "c" #'insert-translated-name-insert-with-camel
+;;        :desc "origin" "o" #'insert-translated-name-insert-original-translation)
+;;       (:prefix-map ("v" . "visual")
+;;        :desc "fanyi whole buffer" "f"  #'english-teacher-follow-mode
+;;        :desc "youdao" "y" #'my/youdao-dictionary-point
+;;        (:when (executable-find "sdcv")
+;;         :desc "sdcv" "s" #'my/sdcv-point)))
 #+end_src
 *** pass
 #+begin_src emacs-lisp
@@ -4207,8 +4192,13 @@ org 自带的 todo,done,引用块美化
 助。
 #+begin_src emacs-lisp :noweb-ref none :tangle packages.el
 (package! org-modern)
+(package! org-modern-indent :recipe (:host github :repo "jdtsmith/org-modern-indent" :depth 1))
 #+end_src
 #+begin_src emacs-lisp :tangle yes :noweb-ref none
+(use-package! org-modern-indent
+  :defer t
+  :init
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 (use-package! org-modern
   :hook ((org-mode . org-modern-mode) (org-agenda-finalize . org-modern-agenda))
   :config
@@ -4437,6 +4427,7 @@ ligatures 配置,
 (use-package! websocket :after org-roam)
 (use-package! org-roam
   :init
+  (require 'f)
   (setq my-default-org-roam-directory (f-expand (f-join "~/Documents" "logseq"))
         my-default-org-roam-page "pages/"
         my-default-org-roam-location (f-expand (f-join doom-cache-dir "org-roam-personl.db")))
@@ -4570,6 +4561,21 @@ media note
   (setq org-media-note-screenshot-image-dir "~/Pictures/Notes/")  ;; 用于存储视频截图的目录
   )
 #+end_src
+
+*** org-super-links
+:PROPERTIES:
+:ID:       5801cc1e-76d7-4f50-b3c7-27615dec82a4
+:END:
+更好的 org-store-link.
+
+安装
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! org-super-links :recipe (:host github :repo "toshism/org-super-links" :depth 1))
+#+end_src
+配置技巧
+#+begin_src emacs-lisp :tangle yes :noweb-ref none
+(map! [remap org-store-link] #'org-super-links-store-link)
+#+end_src
 ** emacs-lisp
 :properties:
 :CUSTOM_ID: emacs-lisp
@@ -4584,9 +4590,9 @@ media note
   (my/leader "oe" '(ielm :which-key "Elisp Repl")
     :keymaps 'emacs-lisp-mode-map
     "or" '(ielm :which-key "Repl"))
+  (after! corfu
+    (dont-use-company-mode 'emacs-lisp-mode))
   :config
-  (dont-use-company-mode 'emacs-lisp-mode)
-
   (add-hook! emacs-lisp-mode
              (lsp-bridge-mode +1)
              (when *my-treesit-use-elisp-p (treesit-parser-create 'elisp)))
@@ -4659,6 +4665,7 @@ current buffer state and calls REPORT-FN when done."
 
   <<elisp-conf>>)
 #+end_src
+
 *** [[https://github.com/Fanael/highlight-defined][highlight-defined]]
 高亮已经定义的 symbols
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
@@ -5036,14 +5043,19 @@ macos 中自动化的一门脚本语言
   (add-hook! sh-mode :depth 100 (lsp-bridge-mode +1))
   )
 #+end_src
-*** nushell
+** nushell
 #+begin_src emacs-lisp :tangle (if (executable-find "nu") "packages.el" "no") :noweb-ref none
-(package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode") :built-in 'prefer)
+(if (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'nu))
+    (package! nushell-ts-mode :recipe (:host github :repo "herbertjones/nushell-ts-mode"))
+  (package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode") :built-in 'prefer))
+
 #+end_src
 #+begin_src emacs-lisp :tangle (if (executable-find "nu") "yes" "no") :noweb-ref none
-(use-package! nushell-mode
-  :defer t
-  :mode ("\\.nu" . nushell-mode))
+(if (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'nu))
+    (use-package! nushell-ts-mode
+      :mode ("\\.nu" . nushell-ts-mode))
+  (use-package! nushell-mode
+    :mode ("\\.nu" . nushell-mode)))
 #+end_src
 
 ** python
@@ -5178,7 +5190,7 @@ yapf
 :ID:       dbccbd5e-5f26-4c96-84b4-65fe7631d5eb
 :header-args: :tangle no :noweb-ref nix-config
 :END:
-需要安装 nixd 或rnix-lsp 或者 nil
+需要安装 nixd 或 rnix-lsp 或者 nil
 #+begin_src emacs-lisp
 (dont-use-company-mode 'nix-mode)
 (setopt lsp-bridge-nix-lsp-server (or (bound-and-true-p my-nix-lsp-cmd)
