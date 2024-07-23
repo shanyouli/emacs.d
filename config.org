@@ -2131,7 +2131,18 @@ lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服�
   ;;   nil)
   (pushnew! lsp-bridge-single-lang-server-mode-list '(lua-ts-mode . "sumneko"))
   (set-popup-rule! "^\\*lsp-bridge-ref\\*" :size 0.25 :vslot -4 :select t :quit t :ttl 0)
-)
+
+  ;; HACK: 避免在为 org 文件中代码块上色时，激活 lsp-bridge-mode，导致卡顿
+  (after! org-src
+    (defadvice! my/org-src-font-lock-fontify-a (fn &rest args)
+      ""
+      :around #'org-src-font-lock-fontify-block
+      (let ((original-lsp-bridge-mode (symbol-function 'lsp-bridge-mode)))
+        (unwind-protect
+            (progn
+              (fset 'lsp-bridge-mode #'ignore)
+              (apply fn args))
+          (fset 'lsp-bridge-mode original-lsp-bridge-mode))))))
 
 (use-package! acm
   :defer t
@@ -3174,30 +3185,7 @@ Use JK as a shortcut button for <ESC>
   (setopt password-store-executable "gopass"))
 #+end_src
 *** 音乐播放
-bongo 一个基于 mpv 或 afplayer 的播放工具
-#+begin_src emacs-lisp :tangle (if (executable-find "mpd") "packages.el" "no") :nonweb-ref none
-(package! bongo)
-#+end_src
-#+begin_src emacs-lisp :tangle (if (executable-find "mpd") "yes" "no")
-(use-package! bongo
-  :init (setq bongo-mode-line-indicator-mode nil)
-  :config
-  (with-eval-after-load 'dired
-    (with-no-warnings
-      (defun bongo-add-dired-files ()
-        "Add marked files to the Bongo library."
-        (interactive)
-        (bongo-buffer)
-        (let (file (files nil))
-          (dired-map-over-marks
-           (setq file (dired-get-filename)
-                 files (append files (list file)))
-           nil t)
-          (with-bongo-library-buffer
-           (mapc 'bongo-insert-file files)))
-        (bongo-switch-buffers)))))
-#+end_src
-mpd
+**** mpd
 #+begin_src emacs-lisp :tangle (if (executable-find "mpd") "packages.el" "no") :nonweb-ref none
 (package! mingus)
 (package! simple-mpc)
@@ -3324,6 +3312,10 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
       (when (timerp simple-mpc--timer)
         (cancel-timer simple-mpc--timer)))
     (simple-mpc-start-timer)))
+#+end_src
+**** empv
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! empv :recipe (:host github :repo "isamert/empv.el"))
 #+end_src
 *** atomic-chrome
 在浏览器中使用 emacs 作为输入工具, 需要在客户端上安装对应插件如 [[https://github.com/fregante/GhostText][GhostText]]
@@ -4590,11 +4582,11 @@ media note
   (my/leader "oe" '(ielm :which-key "Elisp Repl")
     :keymaps 'emacs-lisp-mode-map
     "or" '(ielm :which-key "Repl"))
-  (after! corfu
-    (dont-use-company-mode 'emacs-lisp-mode))
+  ;; (after! corfu
+  ;;   (dont-use-company-mode 'emacs-lisp-mode))
   :config
   (add-hook! emacs-lisp-mode
-             (lsp-bridge-mode +1)
+             ;; (lsp-bridge-mode +1)
              (when *my-treesit-use-elisp-p (treesit-parser-create 'elisp)))
 
   ;; HACK: Flymake for private-config
@@ -5040,8 +5032,10 @@ macos 中自动化的一门脚本语言
 #+begin_src emacs-lisp
 (after! sh-script
   (dont-use-company-mode 'sh-mode)
-  (add-hook! sh-mode :depth 100 (lsp-bridge-mode +1))
-  )
+  (add-hook! sh-mode :depth 100
+             (message (format "%S" (bound-and-true-p org-src--from-org-mode)))
+             (lsp-bridge-mode +1)
+    ))
 #+end_src
 ** nushell
 #+begin_src emacs-lisp :tangle (if (executable-find "nu") "packages.el" "no") :noweb-ref none
@@ -5117,7 +5111,7 @@ yapf
   (dont-use-company-mode 'python-mode)
   (dont-use-company-mode 'python-ts-mode)
   (add-hook 'python-ts-mode-hook #'lsp-bridge-mode)
-  (add-hook 'python-mode-hook #'lsp-bidge-mode)
+  (add-hook 'python-mode-hook #'lsp-bridge-mode)
   )
 #+end_src
 ** rust
