@@ -1993,29 +1993,6 @@ see@ https://emacs-china.org/t/native-os-sis/14089
   :init (setq ace-pinyin-use-avy t)
   :config (ace-pinyin-global-mode 1))
 #+end_src
-代码补全
-#+begin_src emacs-lisp
-;; 在某些 mode 中我不使用 company-mode 补全，使用 lsp-bridge 进行补全
-(defun dont-use-company-mode (modes)
-  "Do not use the company as the `mode' after completion"
-  (let ((not-modes '(erc-mode circe-mode message-mode help-mode gud-mode vterm-mode))
-        (modes (if (listp modes) modes (list modes))))
-    (require 'cl-seq)
-    (cond ((modulep! :completion corfu)
-           (if (and (bound-and-true-p global-corfu-modes)
-                    (listp global-corfu-modes)
-                    (equal 'not (car-safe (car-safe global-corfu-modes))))
-               (setq global-corfu-modes
-                     `((not ,@(cl-remove-duplicates `(,@modes ,@(cdar global-corfu-modes))
-                               :test 'eq)) t))
-             (setq global-corfu-modes `((not ,@modes ,@not-modes) t))))
-          ((modulep! :completion company)
-           (if (and (bound-and-true-p company-global-modes)
-                    (equal (car-safe company-global-modes) 'not))
-               (setq company-global-modes
-                     `(not ,@(cl-remove-duplicates `(,@(cdr company-global-modes) ,@modes))))
-             (setq company-global-modes `(not ,@modes ,@not-modes)))))))
-#+end_src
 **** Vertico
 ***** 中文拼音搜索
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -3561,7 +3538,6 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 #+begin_src emacs-lisp
 (when (modulep! :config literate)
   (remove-hook 'org-mode-hook #'+literate-enable-recompile-h))
-(dont-use-company-mode 'org-mode)
 #+end_src
 设置打开 org links 的程序
 #+begin_src emacs-lisp
@@ -4582,8 +4558,6 @@ media note
   (my/leader "oe" '(ielm :which-key "Elisp Repl")
     :keymaps 'emacs-lisp-mode-map
     "or" '(ielm :which-key "Repl"))
-  ;; (after! corfu
-  ;;   (dont-use-company-mode 'emacs-lisp-mode))
   :config
   (add-hook! emacs-lisp-mode
              ;; (lsp-bridge-mode +1)
@@ -4903,7 +4877,6 @@ CLOSED: [2023-04-04 Tue 13:02]
       :for "for"
       :null "nil"
       :return "return")
-    (dont-use-company-mode mode)
 
   (my/leader :keymaps mode-map
   "f" '(:ignore t :which-key "file")
@@ -5031,7 +5004,6 @@ macos 中自动化的一门脚本语言
 *** 补全
 #+begin_src emacs-lisp
 (after! sh-script
-  (dont-use-company-mode 'sh-mode)
   (add-hook! sh-mode :depth 100
              (message (format "%S" (bound-and-true-p org-src--from-org-mode)))
              (lsp-bridge-mode +1)
@@ -5108,8 +5080,6 @@ yapf
 #+begin_src emacs-lisp
 (after! python
   (setq python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
-  (dont-use-company-mode 'python-mode)
-  (dont-use-company-mode 'python-ts-mode)
   (add-hook 'python-ts-mode-hook #'lsp-bridge-mode)
   (add-hook 'python-mode-hook #'lsp-bridge-mode)
   )
@@ -5151,8 +5121,6 @@ yapf
   (setq rustic-babel-format-src-block nil
         rustic-format-trigger nil)
 
-  (dont-use-company-mode 'rustic-mode)
-  (dont-use-company-mode 'rust-ts-mode)
   (add-hook 'rustic-mode-hook #'lsp-bridge-mode)
   (add-hook 'rust-ts-mode-hook #'lsp-bridge-mode)
 
@@ -5186,7 +5154,6 @@ yapf
 :END:
 需要安装 nixd 或 rnix-lsp 或者 nil
 #+begin_src emacs-lisp
-(dont-use-company-mode 'nix-mode)
 (setopt lsp-bridge-nix-lsp-server (or (bound-and-true-p my-nix-lsp-cmd)
                                       (and (executable-find "nixd") "nixd")
                                       (and (executable-find "nil") "nil")
