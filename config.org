@@ -535,7 +535,21 @@ autoload
 #+begin_src emacs-lisp :tangle "yes" :noweb-ref none
 (myfun-autoload too-long-file-p)
 #+end_src
-
+*** 内容评分
+#+begin_src emacs-lisp
+(defun rate-item (num)
+  "Rate an item with RATING stars, displaying filled stars and one hollow star if applicable.
+The rating should be a number from 1 to 5."
+  (interactive "nEnter your rating (1-5): ")
+  (let ((filled-stars (min (max num 1) 5))
+        (hollow-star (- 5 num)))
+    (dotimes (_ filled-stars) (insert "★"))
+    (dotimes (_ hollow-star) (insert "☆"))))
+#+end_src
+autoload
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(myfun-autoload rate-item)
+#+end_src
 *** 一些有用的交互函数
 - 重新 revert 当期 buffer
 #+begin_src emacs-lisp
@@ -870,12 +884,12 @@ literate
 #+name: doom-completion
 #+begin_src emacs-lisp
 (corfu +icons +orderless)
+(vertico +icons)    ; the search engine of the future
 ;;helm              ; the *other* search engine for love and life
 ;;ido               ; the other *other* search engine...
 ;;(ivy              ; a search engine for love and life
 ;; +icons           ; ... icons are nice
 ;; +prescient)      ; ... I know what I want(ed)
-(vertico +icons)    ; the search engine of the future
 #+end_src
 - UI ::
   emacs 美化相关配置
@@ -961,7 +975,7 @@ docker
 (eval +overlay)     ; run code, run (also, repls)
 ;;gist              ; interacting with github gists
 lookup              ; navigate your code and its documentation
-;; (lsp +eglot)               ; M-x vscode
+(lsp +eglot)               ; M-x vscode
 magit             ; a git porcelain for Emacs
 ;;make              ; run make tasks from Emacs
 pass              ; password manager for nerds
@@ -1020,7 +1034,7 @@ javascript        ; all(hope(abandon(ye(who(enter(here))))))
 ;;ledger            ; be audit you can be
 markdown          ; writing docs for people to ignore
 ;;nim               ; python + lisp at the speed of c
-nix               ; I hereby declare "nix geht mehr!"
+(nix +lsp)          ; I hereby declare "nix geht mehr!"
 ;;ocaml             ; an objective camel
 (org +hugo
      +roam2
@@ -2062,6 +2076,7 @@ consult-line 在文件过大时，很慢，使用 consult-rg 进行搜索, 参�
       (consult-ripgrep (list (shell-quote-argument buffer-file-name))))))
 #+end_src
 
+*** lsp 配置
 **** lsp-bridge
 lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服务工具
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -2119,7 +2134,14 @@ lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服�
             (progn
               (fset 'lsp-bridge-mode #'ignore)
               (apply fn args))
-          (fset 'lsp-bridge-mode original-lsp-bridge-mode))))))
+          (fset 'lsp-bridge-mode original-lsp-bridge-mode)))))
+
+  (add-hook 'lsp-bridge-mode-hook
+            (lambda ()
+              (cond ((modulep! :completion corfu)
+                     (corfu-mode -1))
+                    ((modulep! :completion company)
+                     (company-mode -1))))))
 
 (use-package! acm
   :defer t
@@ -2133,6 +2155,20 @@ lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服�
     (setq acm-enable-tabnine (not acm-enable-tabnine))
     (when (and acm-enable-tabnine (bound-and-true-p lsp-bridge-mode))
       (lsp-bridge-restart-process))))
+#+end_src
+
+**** eglot 配置
+- 安装
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! eglot-booster :recipe (:host github :repo "jdtsmith/eglot-booster"))
+#+end_src
+- 使用
+#+begin_src emacs-lisp
+(when (modulep! :tools lsp +eglot)
+  (after! eglot
+    (use-package! eglot-booster
+      :autoload eglot-booster-mode
+      :init (eglot-booster-mode +1))))
 #+end_src
 *** term 工具
 **** vterm
@@ -3618,7 +3654,8 @@ org treesit
                 (if (and (bound-and-true-p rime-posframe-buffer)
                          (fboundp 'posframe--find-existing-posframe)
                          (let ((-posframe-buffer (get-buffer rime-posframe-buffer)))
-                           (and -posframe-buffer (posframe--find-existing-posframe -posframe-buffer))))
+                           (and -posframe-buffer
+                                (posframe--find-existing-posframe -posframe-buffer))))
                     'posframe
                   'popup)
               'posframe))
@@ -5254,3 +5291,4 @@ yapf
 (use-package! ass-mode
   :mode (("\\.ass" . ass-mode)))
 #+end_src
+
