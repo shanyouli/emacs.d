@@ -1034,7 +1034,8 @@ javascript        ; all(hope(abandon(ye(who(enter(here))))))
 ;;ledger            ; be audit you can be
 markdown          ; writing docs for people to ignore
 ;;nim               ; python + lisp at the speed of c
-(nix +lsp)          ; I hereby declare "nix geht mehr!"
+;; (nix +lsp)          ; I hereby declare "nix geht mehr!"
+nix
 ;;ocaml             ; an objective camel
 (org +hugo
      +roam2
@@ -1267,7 +1268,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 (map! :leader  :desc "nerd" "in" #'nerd-icons-insert)
 #+end_src
 *** 主题和 modeline
-***** 主题的基本配置
+**** 主题的基本配置
 目前使用主要有 doom-theme ， modus-themes 和 catppuccin-theme
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! ef-themes :built-in 'prefer)
@@ -1433,9 +1434,9 @@ Macos 上借助系统自带的进行主题切换
     (setq doom-theme (car custom-enabled-themes))))
 #+end_src
 
-***** modeline and tab
+**** modeline and tab
 目前使用 [[https://github.com/manateelazycat/awesome-tray][awesome-tray]], 备用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]
-****** modeline 配置
+***** modeline 配置
 + awesome-tray
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! awesome-tray :recipe (:host github :repo "manateelazycat/awesome-tray"))
@@ -1522,22 +1523,23 @@ Macos 上借助系统自带的进行主题切换
                         '(doom-modeline-major-mode-icon t)
                         '(doom-modeline-modal-icon nil)))
   #+end_src
-****** sort-tab 配置
+***** sort-tab 配置
 :PROPERTIES:
 :ID: 2fcbd9b0-f219-4043-8955-b65f343c0a77
 :END:
 使用 sort-tab 时，请不要随意更改字体，如果要更改字体请新关闭 sort-tab
 #+begin_src emacs-lisp :tangle "packages.el"
-(package! sort-tab :recipe (:host github :repo "shanyouli/sort-tab"))
+(package! sort-tab :recipe (:host github :repo "shanyouli/sort-tab" :branch "dev"))
 #+end_src
 #+begin_src emacs-lisp
 ;; @see https://github.com/manateelazycat/sort-tab/issues/13
 (use-package! sort-tab
   ;; :disabled t
-  :hook (doom-first-buffer . sort-tab-mode)
+  :autoload sort-tab-mode
   :init
+  (add-hook! window-setup (unless (daemonp) (sort-tab-mode +1)))
   (setq sort-tab-show-index-number t)
-  (setq sort-tab-buffer-name " *sort-tab*")
+  ;; (setq sort-tab-buffer-name " *sort-tab*")
   :config
   (map! :nvie "s-1" #'sort-tab-select-visible-tab
         :nvie "s-2" #'sort-tab-select-visible-tab
@@ -1801,7 +1803,7 @@ see@ https://emacs-china.org/t/native-os-sis/14089
     "给 `rime--posframe-display-content' 传入的字符串加一个全角空
   格，以解决 `posframe' 偶尔吃字的问题。"
     (cl-destructuring-bind (content) args
-       (let ((newresult (if (string-blank-p content)
+      (let ((newresult (if (string-blank-p content)
                            content
                          (concat content "　"))))
         (list newresult))))
@@ -1882,7 +1884,20 @@ see@ https://emacs-china.org/t/native-os-sis/14089
                  (setq unread-command-events
                        (append (listify-key-sequence code)
                                unread-command-events))))
-              (t (message "`+rime-convert-string-at-point' did nothing.")))))))
+              (t (message "`+rime-convert-string-at-point' did nothing."))))))
+
+  (defadvice! +rime-input-method-a (&rest _)
+    :before #'activate-input-method
+    (when (and (daemonp)
+               (equal default-input-method "rime"))
+      (if (and (bound-and-true-p rime-posframe-buffer)
+               (fboundp 'posframe--find-existing-posframe)
+               (let ((-posframe-buffer (get-buffer rime-posframe-buffer)))
+                 (and -posframe-buffer
+                      (frame-live-p (posframe--find-existing-posframe -posframe-buffer)))))
+          (setq-local rime-show-candidate 'posframe)
+        (setq-local rime-show-candidate 'popup))))
+  )
 (after! evil
   ;; 激活时
   (defvar ime-cursor-insert '(bar "DarkOrange")
@@ -3647,20 +3662,7 @@ org treesit
 (my/leader :keymap 'org-mode-map
   "ft" '(my/load-treesit :wk "treesit"))
 #+end_src
-修复 rime 和 org-mode 一起使用的问题
-#+begin_src emacs-lisp
-(setq-hook! 'org-mode-hook rime-show-candidate
-            (if (daemonp)
-                (if (and (bound-and-true-p rime-posframe-buffer)
-                         (fboundp 'posframe--find-existing-posframe)
-                         (let ((-posframe-buffer (get-buffer rime-posframe-buffer)))
-                           (and -posframe-buffer
-                                (posframe--find-existing-posframe -posframe-buffer))))
-                    'posframe
-                  'popup)
-              'posframe))
 
-#+end_src
 **** 零宽空格
 偶尔在用 Org 是你希望将两个分开的块放在一起，这点有点烦人。比如将加​*重*​一个单词
 的一部分，或者说在内联源码块之前放一些符号。有一个可以解决的方法 --- 零宽空格。
@@ -3915,9 +3917,9 @@ org-capture 模块设置
   (defun my--find-month-daily-tree ()
     (let* ((path (list
                   "Personal"
-                  (format-time-string "%Y年")
-                  (format-time-string "%m月")
-                  (format-time-string "%Y年%m月%d日")))
+                  (format-time-string "%Y 年")
+                  (format-time-string "%m 月")
+                  (format-time-string "%Y 年%m 月%d 日")))
            (level 1)
            end)
       (unless (derived-mode-p 'org-mode)
@@ -4207,8 +4209,12 @@ org 自带的 todo,done,引用块美化
 (use-package! org-modern
   :hook ((org-mode . org-modern-mode) (org-agenda-finalize . org-modern-agenda))
   :config
-  (setq org-modern-block-fringe t
-        org-modern-star '("☯" "☰" "☱" "☲" "☳" "☴" "☵" "☶" "☷"))
+  (setopt org-modern-block-fringe t
+          org-modern-star 'replace
+          ;; org-modern-replace-stars "☯☰☱☲☳☴☵☶☷"
+          ;; org-modern-replace-stars "⚀⚁⚂⚃⚄⚅"
+          org-modern-replace-stars "➀➁➂➃➄➅➆➇➈"
+          )
   (if (modulep! :completion vertico +icons)
       (setq org-modern-checkbox '((88 . "") (45 . "")  (32 . "")))
     (setq org-modern-checkbox
@@ -4922,10 +4928,6 @@ CLOSED: [2023-04-04 Tue 13:02]
 
 #+end_src
 *** lua-mode
-我使用​=lsp-bridge=​进行补全
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! company-lua :disable t)
-#+end_src
 自用的 lua 配置
 #+begin_src emacs-lisp :tangle yes
 (use-package! lua-mode
@@ -5274,8 +5276,8 @@ yapf
     (call-interactively #'indent-region-or-buffer)))
 (my/leader :keymaps 'conf-toml-mode-map
   "f" '(:ignore t :which-key "file")
-  "f p" '(+python-format-region-or-buffer :wk "format"))
-(map! :map conf-toml-mode-map "C-M-\\" :desc "indent" #'+nix-format-region-or-buffer)
+  "f p" '(+toml-format-region-or-buffer :wk "format"))
+(map! :map conf-toml-mode-map "C-M-\\" :desc "indent" #'+toml-format-region-or-buffer)
 #+end_src
 *** 结尾
 #+begin_src emacs-lisp
