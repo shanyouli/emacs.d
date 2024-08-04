@@ -4209,18 +4209,22 @@ org 自带的 todo,done,引用块美化
 (use-package! org-modern
   :hook ((org-mode . org-modern-mode) (org-agenda-finalize . org-modern-agenda))
   :config
-  (setopt org-modern-block-fringe t
-          org-modern-star 'replace
-          ;; org-modern-replace-stars "☯☰☱☲☳☴☵☶☷"
-          ;; org-modern-replace-stars "⚀⚁⚂⚃⚄⚅"
-          org-modern-replace-stars "➀➁➂➃➄➅➆➇➈"
-          )
-  (if (modulep! :completion vertico +icons)
-      (setq org-modern-checkbox '((88 . "") (45 . "")  (32 . "")))
-    (setq org-modern-checkbox
-          '((?X . #("▢✓" 0 2 (composition ((2)))))
-            (?- . #("▢-" 0 2 (composition ((2)))))
-            (?\s . #("▢" 0 1 (composition ((1))))))))
+  ;; org-modern-replace-stars 可用 列表
+  ;; "➀➁➂➃➄➅➆➇➈" "󰉫󰉬󰉭󰉮󰉯󰉰" "✿❀✭✫✦✧◈◇" "⚀⚁⚂⚃⚄⚅"
+  ;; "☯☰☱☲☳☴☵☶☷"
+  (setopt org-modern-star 'replace
+          org-modern-replace-stars "󰉫󰉬󰉭󰉮󰉯󰉰")
+  (setopt org-modern-block-fringe t)
+
+  ;; org-modern-checkbox 配置
+  (defvar my-org-modern-checkbox-type 'box) ; nil, box, circle calendar
+  (setopt org-modern-checkbox (pcase my-org-modern-checkbox-type
+                                ('box '((88 . "") (45 . "")  (32 . "󰄱")))
+                                ('circle '((88 . "") (45 . "")  (32 . "")))
+                                ('calendar '((88 . "") (45 . "")  (32 . "")))
+                                (_ '((?X . #("▢✓" 0 2 (composition ((2)))))
+                                     (?- . #("▢-" 0 2 (composition ((2)))))
+                                     (?\s . #("▢" 0 1 (composition ((1)))))))))
   ;; org-modern-table 存在无法对齐的情况, 我是用其他包管理
   ;; @see https://github.com/minad/org-modern/issues/5
   (setq org-modern-table nil)
