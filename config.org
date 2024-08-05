@@ -1501,8 +1501,7 @@ Macos 上借助系统自带的进行主题切换
                                            ("bash-ts" . "󱆃")
                                            ("sh" . "󱆃"))))
                   (or (alist-get (intern mode-name) change-mode-alist)
-                      mode-name)))
-              ))
+                      mode-name)))))
 #+end_src
 + modeline
   使用 doom-modeline 的一些配置
@@ -1540,7 +1539,6 @@ Macos 上借助系统自带的进行主题切换
   (add-hook! window-setup (unless (daemonp) (sort-tab-mode +1)))
   (setq sort-tab-show-index-number t)
   ;; (setq sort-tab-buffer-name " *sort-tab*")
-  :config
   (map! :nvie "s-1" #'sort-tab-select-visible-tab
         :nvie "s-2" #'sort-tab-select-visible-tab
         :nvie "s-3" #'sort-tab-select-visible-tab
@@ -1550,16 +1548,17 @@ Macos 上借助系统自带的进行主题切换
         :nvie "s-7" #'sort-tab-select-visible-tab
         :nvie "s-8" #'sort-tab-select-visible-tab
         :nvie "s-9" #'sort-tab-select-visible-tab
-    (:unless (modulep! :term vterm)
-     :nvie "s-0" #'sort-tab-select-visible-tab)
-    :leader
-    :desc "close all tabs" "qt" #'sort-tab-close-all-tabs
-    :desc "close current tab" "qc" #'sort-tab-close-current-tab
-    :desc "tab" "tt" #'sort-tab-mode
-    :localleader
-    :map global-map
-    (:prefix-map ("q" . "close")
-     :desc "Close other tabs" "o" #'my-sort-tab-close-all-tabs-without-current-tab))
+        (:unless (modulep! :term vterm)
+         :nvie "s-0" #'sort-tab-select-visible-tab)
+        :leader
+        :desc "close all tabs" "qt" #'sort-tab-close-all-tabs
+        :desc "close current tab" "qc" #'sort-tab-close-current-tab
+        :desc "tab" "tt" #'sort-tab-mode
+        :localleader
+        :map global-map
+        (:prefix-map ("q" . "close")
+         :desc "Close other tabs" "o" #'my-sort-tab-close-all-tabs-without-current-tab))
+  :config
   (defun my-sort-tab-close-all-tabs-without-current-tab ()
     (interactive)
     (let ((visible-buffers sort-tab-visible-buffers))
@@ -1787,6 +1786,10 @@ see@ https://emacs-china.org/t/native-os-sis/14089
   (when (daemonp) (add-hook 'after-init-hook #'rime--load-dynamic-module))
 
   :config
+
+  (defadvice! +rime-do-finalize-after-loading-module (&rest _)
+    :after #'rime--load-dynamic-module
+    (add-hook! kill-emacs-hook #'rime-lib-finalize))
   (defun my-rime-init-f ()
     (unless (boundp rime--lib-loaded)
       (unless (file-exists-p rime--module-path)
@@ -1886,18 +1889,19 @@ see@ https://emacs-china.org/t/native-os-sis/14089
                                unread-command-events))))
               (t (message "`+rime-convert-string-at-point' did nothing."))))))
 
-  (defadvice! +rime-input-method-a (&rest _)
-    :before #'activate-input-method
-    (when (and (daemonp)
-               (equal default-input-method "rime"))
-      (if (and (bound-and-true-p rime-posframe-buffer)
-               (fboundp 'posframe--find-existing-posframe)
-               (let ((-posframe-buffer (get-buffer rime-posframe-buffer)))
-                 (and -posframe-buffer
-                      (frame-live-p (posframe--find-existing-posframe -posframe-buffer)))))
-          (setq-local rime-show-candidate 'posframe)
-        (setq-local rime-show-candidate 'popup))))
-  )
+  (when (daemonp)
+    (defvar my--rime-show-candidate (or (bound-and-true-p rime-show-candidate)
+                                        'posframe))
+    (setq-hook! rime-active-mode rime-show-candidate
+                (if (derived-mode-p 'org-mode)
+                    (if (and (bound-and-true-p rime-posframe-buffer)
+                             (fboundp 'posframe--find-existing-posframe)
+                             (let ((-posframe-buffer (get-buffer rime-posframe-buffer)))
+                               (and -posframe-buffer
+                                    (frame-live-p (posframe--find-existing-posframe -posframe-buffer)))))
+                        'posframe
+                      'popup)
+                  my--rime-show-candidate))))
 (after! evil
   ;; 激活时
   (defvar ime-cursor-insert '(bar "DarkOrange")
@@ -3053,6 +3057,7 @@ Use JK as a shortcut button for <ESC>
            (setq insert-translated-name-translate-engine "deeplx"))
           ))
   (defvar insert--evil-last-status-is-edit-p nil "缓存当前的 evil state 是否为编辑模式")
+  (defvar insert--my-auto-space-mode-p nil "缓存当前的 my-auto-space-mode 的状态")
 
   (defadvice! +insert-translated-name-active (fn &rest args)
     "在调用之前 load rime,防止提示无法激活 rime 输入法"
@@ -3061,6 +3066,8 @@ Use JK as a shortcut button for <ESC>
       (setq insert--evil-last-status-is-edit-p (or (evil-insert-state-p)
                                                    (evil-emacs-state-p)))
       (unless insert--evil-last-status-is-edit-p (evil-insert-state)))
+    (setq insert--my-auto-space-mode-p (bound-and-true-p my-auto-space-mode))
+    (when insert--my-auto-space-mode-p (my-auto-space-mode -1))
     (if (and (not (featurep 'rime))
              (string= "rime" default-input-method))
         (require 'rime nil t)))
@@ -3069,7 +3076,11 @@ Use JK as a shortcut button for <ESC>
     :after
     (when (fboundp 'evil-mode)
       (unless insert--evil-last-status-is-edit-p
-        (evil-change-to-previous-state)))))
+        (evil-change-to-previous-state))))
+
+  (when insert--my-auto-space-mode-p
+    (my-auto-space-mode +1)
+    (setq insert--my-auto-space-mode-p nil)))
 #+end_src
 **** immersive-translate
 [[https://github.com/Elilif/emacs-immersive-translate/blob/main/README_CN.org][emacs-immersive-translate]]是受 immersive-translate/immersive-translate 的启发，在 Emacs 中实现了类似的功能。
@@ -4250,7 +4261,7 @@ org 自带的 todo,done,引用块美化
                                 ("KILL" :inverse-video t :inherit +org-todo-cancel)
                                 ("NO"   :inverse-video t :inherit +org-todo-cancel))
         org-modern-footnote (cons nil (cadr org-script-display))
-        org-modern-progress nil
+        org-modern-progress 12
         org-modern-priority nil
         org-modern-horizontal-rule (make-string 36 ?─)
         ;; 使用 org-modern 自带的取代 org-tag 和 org-agenda-tags
@@ -4543,6 +4554,8 @@ tasks."
 ;;         if you don't care about startup time, use
 ;;  :hook (after-init . org-roam-ui-mode)
   :init
+  ;; Underscore always becomes underline
+  ;; https://github.com/org-roam/org-roam-ui/issues/261
   (setopt org-roam-ui-sync-theme t
           org-roam-ui-follow t
           org-roam-ui-update-on-save t
@@ -5057,14 +5070,29 @@ macos 中自动化的一门脚本语言
 (if (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'nu))
     (package! nushell-ts-mode :recipe (:host github :repo "herbertjones/nushell-ts-mode"))
   (package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode") :built-in 'prefer))
-
 #+end_src
 #+begin_src emacs-lisp :tangle (if (executable-find "nu") "yes" "no") :noweb-ref none
 (if (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'nu))
     (use-package! nushell-ts-mode
-      :mode ("\\.nu" . nushell-ts-mode))
+      :init
+      (after! eglot
+        (add-to-list 'eglot-server-programs
+                     '(nushell-ts-mode . ("nu" "--lsp"))))
+      (add-hook! nushell-ts-mode #'lsp!)
+      :mode ("\\.nu\\'" . nushell-ts-mode)
+      :config
+      (after! org-src
+        (add-to-list 'org-src-lang-modes '("nu" . nushell-ts))))
   (use-package! nushell-mode
-    :mode ("\\.nu" . nushell-mode)))
+    :init
+    (after! eglot
+      (add-to-list 'eglot-server-programs
+                   '(nushell-mode . ("nu" "--lsp"))))
+    (add-hook! nushell-ts-mode #'lsp!)
+    :mode ("\\.nu\\'" . nushell-mode)
+    :config
+    (after! org-src
+      (add-to-list 'org-src-lang-modes '("nu" . nushell)))))
 #+end_src
 
 ** python

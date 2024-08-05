@@ -2,10 +2,15 @@
 # name: my-module nix
 # key: mx
 # --
-{pkgs, lib, config, options, ...}:
+{
+  pkgs,
+  lib,
+  config,
+  options,
+  ...
+}:
 with lib;
-with lib.my;
-let
+with lib.my; let
   cfp = config.modules.$1;
   cfg = cfp.$2;
 in {
