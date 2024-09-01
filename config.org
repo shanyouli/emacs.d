@@ -4155,6 +4155,17 @@ org-capture 模块设置
   (advice-add 'org-babel-execute-src-block :before #'get-attributes-from-src-block-result))
 #+end_src
 
+**** header 补全
+:PROPERTIES:
+:URL:      https://github.com/isamert/corg.el
+:END:
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! corg :recipe (:host github :repo "isamert/corg.el"))
+#+end_src
+#+begin_src emacs-lisp
+(use-package corg
+  :hook (org-mode . corg-setup))
+#+end_src
 *** 美化配置
 **** org 美化的基本配置
 设置合适的标题大小和每一级的行高
