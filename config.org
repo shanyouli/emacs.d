@@ -56,19 +56,6 @@ descendant, GNU Emacs, continues actively as of 2020.
 
 (setopt initial-major-mode 'emacs-lisp-mode)
 #+end_src
-自定义一个宏，加载对应​~doom-user-dir~​目录下​~myfun.el~​文件的函数
-#+begin_src emacs-lisp
-(defmacro myfun-autoload (&rest functions)
-  "Autoload FUNCTIONS. the Functions from myfun.el"
-  (let ((first-element (car-safe functions)))
-    (when (listp first-element)
-      (setq functions (eval first-element)))
-    `(progn
-     ,@(mapcar
-        (lambda (function)
-          `(autoload ',function ,(expand-file-name "myfun.el" doom-user-dir) nil t))
-        `,functions))))
-#+end_src
 自定义宏，加载对应 doom-user-dir 目录下的 lib 目录下的文件中存在的函数
 #+begin_src emacs-lisp
 (defmacro mylib-autoload (f &rest functions)
@@ -100,9 +87,14 @@ descendant, GNU Emacs, continues actively as of 2020.
             (load filepath 'noerror 'nomessage))
         nil))))
 #+end_src
-** my/auto-space-mode
+** autoload 函数
+*** auto-space
 来源: [[https://remacs.fun/posts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%97%B6%E4%BB%A3%E6%88%91%E4%BB%AC%E6%80%8E%E4%B9%88%E7%8E%A9emacs1.-%E4%B8%AD%E8%8B%B1%E6%96%87%E8%BE%93%E5%85%A5%E6%97%B6%E7%9A%84%E7%A9%BA%E6%A0%BC/][大模型时代我们怎么玩 Emacs：1. 中英文输入时的空格 | remacs 的世界]]
-#+begin_src emacs-lisp :noweb no-export :tangle "lib/my-auto-space.el" :noweb-prefix no :noweb-ref nil
+在中文字符和英文字符间自动插入空格
+#+begin_src emacs-lisp :tangle "autoload/init-auto-space.el"
+;; 可以使用零宽字符, "\u200B"
+(defvar my-space-char " " "默认空格格式，")
+
 (defun my-add-space-between-chinese-and-english ()
   "在中英文之间自动添加空格。"
   (let ((current-char (char-before))
@@ -113,7 +105,7 @@ descendant, GNU Emacs, continues actively as of 2020.
                (not (eq prev-char ?\s))) ; 检查前一个字符不是空格
       (save-excursion
         (goto-char (1- (point)))
-        (insert " ")))))
+        (insert my-space-char)))))
 
 (defun my-is-chinese-character (char)
   "判断字符是否为中文字符。"
@@ -135,6 +127,7 @@ descendant, GNU Emacs, continues actively as of 2020.
   "延迟执行，在中英文之间自动添加空格。"
   (run-with-idle-timer 0 nil 'my-add-space-between-chinese-and-english))
 
+;;;###autoload
 (define-minor-mode my-auto-space-mode
   "在中英文之间自动添加空格的模式。"
   :lighter " Auto-Space"
@@ -144,44 +137,341 @@ descendant, GNU Emacs, continues actively as of 2020.
     (remove-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english)))
 #+end_src
 
-** DONE 自定义函数
-CLOSED: [2023-04-04 Tue 14:55]
-:properties:
-:CUSTOM_ID: myfun
-:header-args:emacs-lisp: :tangle no :noweb-ref myfun-conf
-:end:
-:intro:
-将一些自定义的函数放入其中，仅当调用函数时，才会加载该文件
+*** 初始化 frame 大小
+#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
+;;;###autoload
+(defun my-display-width ()
+  "获取当前 display 的 宽度"
+  (nth 3 (assq 'geometry (frame-monitor-attributes))))
 
-#+begin_src emacs-lisp :noweb no-export :tangle "myfun.el" :noweb-prefix no :noweb-ref nil
-;;; myfun.el --- my function -*- lexical-binding: t; -*-
-;;
-;; Copyright (C) 2023 Shanyou Li
-;;
-;; Author: Shanyou Li <shanyouli6@gmail.com>
-;; Maintainer: Shanyou Li <shanyouli6@gmail.com>
-;; Created: April 04, 2023
-;; Modified: April 04, 2023
-;; Version: 0.0.1
-;; Keywords: abbrev bib c calendar comm convenience data docs emulations extensions faces files frames games hardware help hypermedia i18n internal languages lisp local maint mail matching mouse multimedia news outlines processes terminals tex tools unix vc wp
-;; Package-Requires: ((emacs "24.3"))
-;;
-;; This file is not part of GNU Emacs.
-;;
-;;; Commentary:
-;;
-;;  my function
-;;
-;;; Code:
+;;;###autoload
+(defun my-display-height ()
+  "获取当前 display 的 height."
+  (nth 4 (assq 'geometry (frame-monitor-attributes))))
 
-<<myfun-conf>>
+;;;###autoload
+(defun my/init-default-frame (&optional frame wratio hratio)
+  "设置 `frame'的大小"
+  (interactive)
+  (let* ((current-display-size (assq 'geometry (frame-monitor-attributes)))
+         (x-width (or (alist-get 'width default-frame-alist)
+                     (truncate (- (* (nth 3 current-display-size)
+                                     (or wratio 0.5)) 20))))
+        (y-height (or (alist-get 'height default-frame-alist)
+                      (truncate (* (nth 4 current-display-size)
+                                   (or hratio 0.5))))))
+    (set-frame-size (or frame (selected-frame)) x-width y-height (>= x-width 200))))
+#+end_src
 
-(provide 'myfun)
-;;; myfun.el ends here
+*** Emacs-client
+我使用​src_bash{emacs --fg-daemon="main"}​启动 emacs 服务，然后使用
+​src_bash{emacsclient -s main -e '(+create-EmacsClient-frame)'}​
+创建启动 frame
+#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
+;;;###autoload
+(defvar +emacs-client-frame-parameters
+  `((name . "EmacsClient")
+    (width . 90)
+    (height . 26)
+    (transient . t)
+    ,@(when IS-MAC
+        `((window-system . ns)
+          (menu-bar-lines . 1)))
+    ,@(when IS-LINUX
+        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
+          (display . ,(or (getenv "WAYLAND_DISPLAY")
+                          (getenv "DISPLAY")
+                          ":0"))))
+ ;; ,(if IS-MAC '(menu-bar-lines . 1))
+    )
+  "TODO")
+;;;###autoload
+(defun +create-EmacsClient-frame (&optional fn)
+  "创建一个名为 Emacslient 的 frame,如果该 frame 存在则聚焦到它"
+  (interactive)
+  (let* ((frame-title-format "")
+         (preframe (cl-loop for frame in (frame-list)
+                            if (string-prefix-p "EmacsClient" (frame-parameter frame 'name))
+                            return frame))
+         (frame (or preframe (make-frame +emacs-client-frame-parameters))))
+    (select-frame-set-input-focus frame)
+    (when frame
+      (with-selected-frame frame
+        (if fn
+            (call-interactively fn)
+          (with-current-buffer (switch-to-buffer "*scratch*")
+            (text-scale-set 0.2)
+            (when (eq major-mode 'fundamental-mode)
+              (emacs-lisp-mode)))
+          ;; (redisplay)
+          )))))
+
+#+end_src
+
+**** 设置 emacs-client-frame-parameter
+#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
+;;;###autoload
+(defvar my-emacs-client-frame-name "EmacsClient" "emacsclient frame default name")
+;;;###autoload
+(defvar my-emacs-client-frame nil "Store the generated EmacsClient frame")
+;;;###autoload
+(defvar +my-emacs-client-frame-parameters
+  `((name . ,my-emacs-client-frame-name)
+    ;; (transient . t)
+    ,@(when IS-LINUX
+        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
+          (display . ,(or (getenv "WAYLAND_DISPLAY")
+                          (getenv "DISPLAY")
+                          ":0"))))
+    ,(if IS-MAC '(menu-bar-lines . 1)))
+  "TODO")
+#+end_src
+**** 判断 rame 是否是 EmacsClient frame
+#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
+(defun +my-emacs-client-frame-p (&optional frame)
+  "Return t if the current frame is an Emacs-Client frame opened by
+`+my-emacs-client-open-frame'."
+  (and (string-prefix-p (alist-get 'name +my-emacs-client-frame-parameters)
+                        (frame-parameter frame 'name))
+       t
+       ;; (frame-parameter frame 'transient)
+       ))
+;;;###autoload
+(defun emacs-client-frame-is-live-p ()
+    "Return t, if `my-emacs-client-frame' exists"
+    (if (and my-emacs-client-frame (frame-live-p my-emacs-client-frame))
+        t
+      (setq my-emacs-client-frame
+            (cl-find-if (lambda (frame)
+                          (and (frame-live-p frame)
+                               (+my-emacs-client-frame-p frame)))
+                        (frame-list)))
+      (and my-emacs-client-frame (frame-live-p my-emacs-client-frame))))
+#+end_src
+**** 只能打开一个 emacsClient frame
+#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
+;;;###autoload
+(defun +my-emacs-client-open-frame (&optional $file)
+  (interactive)
+  (let* ((frame-title-format "")
+         (frame (if (emacs-client-frame-is-live-p)
+                    my-emacs-client-frame
+                  (make-frame +my-emacs-client-frame-parameters))))
+    (if frame
+        (progn
+          (setq my-emacs-client-frame frame)
+          (select-frame-set-input-focus frame)
+          (when (and $file (file-exists-p $file))
+              (with-selected-frame frame (find-file $file)))
+          t)
+      nil)))
+#+end_src
+**** 自动更新 emacsClient frame 的 Title
+#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
+;;;###autoload
+(defun update-emacs-client-title ()
+  (let* ((frame (selected-frame))
+         (buf-name (buffer-name)))
+    (when (and (string-prefix-p my-emacs-client-frame-name (frame-parameter frame 'name))
+               (not (member buf-name (list " *Minibuf-1*"))))
+      (modify-frame-parameters
+       frame
+       (list (cons 'name
+                   (concat my-emacs-client-frame-name " - " buf-name)))))))
+#+end_src
+*** 记录当前光标位置
+[[https://emacs-china.org/t/topic/24533/9][请问如何记录光标位置 - Emacs-general - Emacs China]]
+#+begin_src emacs-lisp :tangle "autoload/init-remember-cursor.el"
+;;;###autoload
+(defun remember-init ()
+  "记住当前位置."
+  (interactive)
+  (point-to-register 8)
+  (message "Have remember one position"))
+
+;;;###autoload
+(defun remember-jump ()
+  "跳转到最后一次的位置."
+  (interactive)
+  (let ((tmp (point-marker)))
+    (jump-to-register 8)
+    (set-register 8 tmp))
+  (message "Have back to remember position"))
+#+end_src
+
+*** 插入当前日期
+格式为​=%Y-%m-%d %G-%M-%S=​
+#+begin_src emacs-lisp :tangle "autoload/init-common.el"
+;;;###autoload
+(defun insert-datetime ()
+  "Insert date at point."
+    (interactive)
+    (insert (format-time-string "%Y-%m-%d %H:%M:%S")))
+#+end_src
+
+*** treesit
+emacs 内部使用的 语法树（tree-sitter）.
+#+begin_src emacs-lisp :tangle "autoload/init-treesit.el"
+;;;###autoload
+(defun my-use-treesite-p ()
+  "Check whether tree-sitter is available.
+Native tree-sitter is introduced since 29."
+  (and (fboundp 'treesit-available-p) (treesit-available-p)))
+
+
+;;;###autoload
+(defun my-treesit-language-available-p (lang)
+  "Check treesit language available `LANG'."
+  (and (my-use-treesite-p) (treesit-language-available-p lang)))
+
+(defun my--treesit-load-language (lang)
+  "Check treesit language available and load `LANG'."
+  (if (my-treesit-language-available-p lang)
+      (treesit-parser-create lang)
+    (message "Please install %S tressit lib." lang)))
+
+;;;###autoload
+(defun my/load-treesit ()
+  "Load tressit lib on major-mode."
+  (interactive)
+  (pcase major-mode
+      ('emacs-lisp-mode (my--treesit-load-language 'elisp))
+      ('inferior-emacs-lisp-mode (my--treesit-load-language 'elisp))
+      ('lisp-interaction-mode (my--treesit-load-language 'elisp))
+      (_ (let ((sym_mode (intern (nth 0 (string-split (symbol-name major-mode) "-")))))
+           (my--treesit-load-language sym_mode)))))
+#+end_src
+*** 大文件确认
+- buffer-size > 100000 即为大文件
+#+begin_src emacs-lisp :tangle "autoload/init-common.el"
+;;;###autoload
+(defun too-long-file-p ()
+  "Check whether the file is too long."
+  (or (> (buffer-size) 100000)
+      (and (fboundp 'buffer-line-statistics)
+           (> (car (buffer-line-statistics)) 10000))))
+#+end_src
+*** 内容评分
+#+begin_src emacs-lisp :tangle "autoload/init-common.el"
+;;;###autoload
+(defun rate-item (num)
+  "Rate an item with RATING stars.
+displaying filled stars and one hollow star if applicable.
+The rating should be a `NUM' from 1 to 5."
+  (interactive "nEnter your rating (1-5): ")
+  (let ((filled-stars (min (max num 1) 5))
+        (hollow-star (- 5 num)))
+    (dotimes (_ filled-stars) (insert "★"))
+    (dotimes (_ hollow-star) (insert "☆"))))
+#+end_src
+*** 一些有用的交互函数
+- 重新 revert 当期 buffer
+#+begin_src emacs-lisp :tangle "autoload/init-common.el"
+;;;###autoload
+(defun my/revert-this-buffer ()
+  "Revert the current buffer."
+  (interactive)
+  (unless (minibuffer-window-active-p (selected-window))
+    (revert-buffer t t)
+    (message "Reverted this buffer")))
+
+;;;###autoload
+(defun my/delete-this-file ()
+  "Delete the current file, and kill the buffer."
+  (interactive)
+  (unless (buffer-file-name)
+    (error "No file is currently being edited."))
+  (when (yes-or-no-p (format "Really delete '%s'?"
+                             (file-name-nondirectory buffer-file-name)))
+    (delete-file (buffer-file-name))
+    (kill-this-buffer)))
+
+;;;###autoload
+(defun my/rename-this-file (new-name)
+  "Rename both current buffer and file it's visiting to NEW-NAME."
+  (interactive "sNew name: ")
+  (let ((name (buffer-name))
+        (filename (buffer-file-name)))
+    (unless filename
+      (error "Buffer '%s' is not visiting a file!" name))
+    (progn
+      (when (file-exists-p filename)
+        (rename-file filename new-name 1))
+      (set-visited-file-name new-name)
+      (rename-buffer new-name))))
+
+;;;###autoload
+(defun my/browse-this-file ()
+  "Open the current file as a URL using `browse-url'."
+  (interactive)
+  (let ((file-name (buffer-file-name)))
+    (if (and (fboundp 'tramp-tramp-file-p)
+             (tramp-tramp-file-p file-name))
+        (error "Cannot open tramp file")
+      (browse-url (concat "file://" file-name)))))
+
+;;;###autoload
+(defun copy-file-name ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (if filename
+        (progn
+          (kill-new filename)
+          (message "Copied '%s'" filename))
+      (warn "Current buffer is not attached to a file!"))))
+#+end_src
+*** 自动对齐
+自动对齐等号的方法, 代码来源:[[https://github.com/manateelazycat/smart-align/blob/master/smart-align.el#L99][smart-align/smart-align.el]],相关讨论 [[https://emacs-china.org/t/topic/13464][[求助]如何使文字向中间或中间列对齐呢]]
+#+begin_src emacs-lisp :tangle "autoload/init-smart-align.el"
+;;;###autoload
+(defun smart-align ()
+  (interactive)
+  (with-demoted-errors
+      "Something wrong when align."
+    (let ((align-start
+           (save-excursion
+             (backward-up-list)
+             (point)
+             ))
+          (align-end
+           (save-excursion
+             (up-list)
+             (point))))
+      (align-regexp align-start align-end "\\(\\s-*\\)\\(=\\|:\\)" 1 1))))
+#+end_src
+
+*** 函数定义跳转
+lsp-bridge-find-def 和 dumb-jump 的封装
+#+begin_src emacs-lisp :tangle "autoload/init-common.el"
+;;;###autoload
+(defun my/def-jump-go ()
+  (interactive)
+  (cond ((eq major-mode 'emacs-lisp-mode)
+         (when-let ((symb (function-called-at-point)))
+           (find-function symb)))
+        ((bound-and-true-p lsp-bridge-mode)
+         (lsp-bridge-find-def))
+        ((require 'dumb-jump nil t)
+         (dumb-jump-go))
+        (t (message "Please Install dumb-jump"))))
+
+;;;###autoload
+(defun my/def-jump-back ()
+  (interactive)
+  (cond ((bound-and-true-p lsp-bridge-mode)
+         (lsp-bridge-find-def-return))
+        ((require 'dumb-jump nil t)
+         (dumb-jump-back))
+        (t (message "Please install dumb-jump package"))))
+
 #+end_src
 *** 简单的 indent 函数
 参考[[https://emacs-china.org/t/elisp-use-package/23812/10][indent 配置]]
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle "autoload/init-indent.el"
+;;;###autoload
 (defun indent-region-or-buffer()
   "To indent the buffer or region"
   (interactive)
@@ -194,86 +484,12 @@ CLOSED: [2023-04-04 Tue 14:55]
       (message "Indent buffer."))))
 
 #+end_src
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload indent-region-or-buffer)
-(map! "C-M-\\" :desc "indent" #'indent-region-or-buffer)
-#+end_src
-*** 记录光标位置
-#+begin_src emacs-lisp
-(defun remember-init ()
-  "记住当前位置."
-  (interactive)
-  (point-to-register 8)
-  (message "Have remember one position"))
-
-(defun remember-jump ()
-  "跳转到最后一次的位置."
-  (interactive)
-  (let ((tmp (point-marker)))
-    (jump-to-register 8)
-    (set-register 8 tmp))
-  (message "Have back to remember position"))
-#+end_src
-
-*** 函数定义跳转
-lsp-bridge-find-def 和 dumb-jump 的封装
-#+begin_src emacs-lisp
-(defun my/def-jump-go ()
-  (interactive)
-  (cond ((eq major-mode 'emacs-lisp-mode)
-         (when-let ((symb (function-called-at-point)))
-           (find-function symb)))
-        ((bound-and-true-p lsp-bridge-mode)
-         (lsp-bridge-find-def))
-        ((require 'dumb-jump nil t)
-         (dumb-jump-go))
-        (t (message "Please Install dumb-jump"))))
-
-(defun my/def-jump-back ()
-  (interactive)
-  (cond ((bound-and-true-p lsp-bridge-mode)
-         (lsp-bridge-find-def-return))
-        ((require 'dumb-jump nil t)
-         (dumb-jump-back))
-        (t (message "Please install dumb-jump package"))))
-
-#+end_src
-*** 设置 frame 大小
-#+begin_src emacs-lisp
-(defun init-default-frame (&optional frame wratio hratio)
-  "设置 `frame'的大小"
-  (interactive)
-  (let ((x-width (or (alist-get 'width default-frame-alist)
-                     (truncate (- (* (x-display-pixel-width)
-                                     (or wratio 0.5)) 20))))
-        (y-height (or (alist-get 'height default-frame-alist)
-                      (truncate (* (x-display-pixel-height)
-                                   (or hratio 0.5))))))
-    (set-frame-size (or frame (selected-frame)) x-width y-height t)))
-#+end_src
-
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload init-default-frame)
-#+end_src
-*** 插入日期
-格式为​=%Y-%m-%d %G-%M-%S=​
-#+begin_src emacs-lisp
-;; :tangle "yes" :noweb-ref myfun-conf
-(defun insert-datetime ()
-  "Insert date at point."
-    (interactive)
-    (insert (format-time-string "%Y-%m-%d %H:%M:%S")))
-#+end_src
-使用方式
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload insert-datetime)
-#+end_src
-
 *** 系统默认工具打开文件
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle "autoload/init-common.el"
+;;;###autoload
 (defun open-in-external-app (&optional @fname)
   "Open the current file or dired marked files in external app.
-When called in emacs lisp, if @fname is given, open that.
+When called in emacs lisp, if `@FNAME' is given, open that.
 URL `http://xahlee.info/emacs/emacs/emacs_dired_open_file_in_ext_apps.html'
 Version 2022-06-26  8:46:00"
   (interactive)
@@ -301,208 +517,22 @@ Version 2022-06-26  8:46:00"
                      (let ((process-connection-type nil))
                        (start-process "" nil "xdg-open" $fpath))) $file-list))))))
 #+end_src
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload open-in-external-app)
-(map! :leader
-  :desc "open in external app" "os" #'open-in-external-app)
-#+end_src
+
 *** 自动打开文件夹
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle "autoload/init-common.el"
+;;;###autoload
 (defun +find-file-in-project (project)
   "在一个 `project' 中打开文件"
   (unless (file-directory-p project)
+    (message "Warning: not found %S, Will create it." project)
     (make-directory project t))
   (doom-project-find-file project))
 
 #+end_src
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload +find-file-in-project)
-(map! :leader
-  (:prefix-map ("d" . "my prjs")
-  :desc "dotfile" "d" (cmd!
-                       (+find-file-in-project (or (bound-and-true-p mydotfile)
-                                                  (getenv "DOTFILES")
-                                                  (expand-file-name "~/.dotfiles"))))
-  :desc "org" "o" (cmd!
-                   (+find-file-in-project (or (bound-and-true-p org-directory)
-                                              "~/org")))
-  :desc "draft" "t" (cmd! (+find-file-in-project "~/Workspace/Draft"))
-  :desc "flashes" "f" (cmd! (+find-file-in-project "~/flashes"))))
-
-#+end_src
-*** 自动对齐
-自动对齐等号的方法, 代码来源:[[https://github.com/manateelazycat/smart-align/blob/master/smart-align.el#L99][smart-align/smart-align.el]],相关讨论 [[https://emacs-china.org/t/topic/13464][[求助]如何使文字向中间或中间列对齐呢]]
-#+begin_src emacs-lisp
-(defun smart-align ()
-  (interactive)
-  (with-demoted-errors
-      "Something wrong when align."
-    (let ((align-start
-           (save-excursion
-             (backward-up-list)
-             (point)
-             ))
-          (align-end
-           (save-excursion
-             (up-list)
-             (point))))
-      (align-regexp align-start align-end "\\(\\s-*\\)\\(=\\|:\\)" 1 1))))
-#+end_src
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload smart-align)
-#+end_src
-
-*** Emacs-client
-我使用​src_bash{emacs --fg-daemon="main"}​启动 emacs 服务，然后使用
-​src_bash{emacsclient -s main -e '(+create-EmacsClient-frame)'}​
-创建启动 frame
-#+begin_src emacs-lisp
-(defvar +emacs-client-frame-parameters
-  `((name . "EmacsClient")
-    (width . 90)
-    (height . 26)
-    (transient . t)
-    ,@(when IS-MAC
-        `((window-system . ns)
-          (menu-bar-lines . 1)))
-    ,@(when IS-LINUX
-        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
-          (display . ,(or (getenv "WAYLAND_DISPLAY")
-                          (getenv "DISPLAY")
-                          ":0"))))
- ;; ,(if IS-MAC '(menu-bar-lines . 1))
-    )
-  "TODO")
-
-(defun +create-EmacsClient-frame (&optional fn)
-  "创建一个名为 Emacslient 的 frame,如果该 frame 存在则聚焦到它"
-  (interactive)
-  (let* ((frame-title-format "")
-         (preframe (cl-loop for frame in (frame-list)
-                            if (string-prefix-p "EmacsClient" (frame-parameter frame 'name))
-                            return frame))
-         (frame (or preframe (make-frame +emacs-client-frame-parameters))))
-    (select-frame-set-input-focus frame)
-    (when frame
-      (with-selected-frame frame
-        (if fn
-            (call-interactively fn)
-          (with-current-buffer (switch-to-buffer "*scratch*")
-            (text-scale-set 0.2)
-            (when (eq major-mode 'fundamental-mode)
-              (emacs-lisp-mode)))
-          ;; (redisplay)
-          )))))
-
-#+end_src
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload +create-EmacsClient-frame)
-#+end_src
-*** tressit
-emacs 内部的 tree-sitter, 判断是否可以使用 treesit
-#+begin_src emacs-lisp
-(defun my-treesit-available-p ()
-  "Check whether tree-sitter is available. Native tree-sitter is introduced since 29."
-  (and (fboundp 'treesit-available-p) (treesit-available-p)))
-
-(defun my/load-treesit ()
-  (interactive)
-  (let ((fn (lambda (name) (when (treesit-language-available-p name)
-                        (treesit-parser-create name)))))
-    (pcase major-mode
-      ('emacs-lisp-mode (funcall fn 'elisp))
-      ('org-mode (funcall fn 'org))
-      (_ (message "major There is no corresponding treesit")))))
-#+end_src
-
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload my-treesit-available-p my/load-treesit)
-#+end_src
-
-*** EmacsClient 配置函数
-设置 emacs-client-frame-parameter
-#+begin_src emacs-lisp
-;;;###autoload
-(defvar my-emacs-client-frame-name "EmacsClient" "emacsclient frame default name")
-;;;###autoload
-(defvar my-emacs-client-frame nil "Store the generated EmacsClient frame")
-;;;###autoload
-(defvar +my-emacs-client-frame-parameters
-  `((name . ,my-emacs-client-frame-name)
-    ;; (transient . t)
-    ,@(when IS-LINUX
-        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
-          (display . ,(or (getenv "WAYLAND_DISPLAY")
-                          (getenv "DISPLAY")
-                          ":0"))))
-    ,(if IS-MAC '(menu-bar-lines . 1)))
-  "TODO")
-#+end_src
-判断 rame 是否是 EmacsClient frame
-#+begin_src emacs-lisp
-(defun +my-emacs-client-frame-p (&optional frame)
-  "Return t if the current frame is an Emacs-Client frame opened by
-`+my-emacs-client-open-frame'."
-  (and (string-prefix-p (alist-get 'name +my-emacs-client-frame-parameters)
-                        (frame-parameter frame 'name))
-       t
-       ;; (frame-parameter frame 'transient)
-       ))
-;;;###autoload
-(defun emacs-client-frame-is-live-p ()
-    "Return t, if `my-emacs-client-frame' exists"
-    (if (and my-emacs-client-frame (frame-live-p my-emacs-client-frame))
-        t
-      (setq my-emacs-client-frame
-            (cl-find-if (lambda (frame)
-                          (and (frame-live-p frame)
-                               (+my-emacs-client-frame-p frame)))
-                        (frame-list)))
-      (and my-emacs-client-frame (frame-live-p my-emacs-client-frame))))
-#+end_src
-打开一个 emacs-client，只能打开一个 emacsClient frame
-#+begin_src emacs-lisp
-;;;###autoload
-(defun +my-emacs-client-open-frame (&optional $file)
-  (interactive)
-  (let* ((frame-title-format "")
-         (frame (if (emacs-client-frame-is-live-p)
-                    my-emacs-client-frame
-                  (make-frame +my-emacs-client-frame-parameters))))
-    (if frame
-        (progn
-          (setq my-emacs-client-frame frame)
-          (select-frame-set-input-focus frame)
-          (when (and $file (file-exists-p $file))
-              (with-selected-frame frame (find-file $file)))
-          t)
-      nil)))
-#+end_src
-自动更新 emacsClient frame 的 Title
-#+begin_src emacs-lisp
-;;;###autoload
-(defun update-emacs-client-title ()
-  (let* ((frame (selected-frame)))
-    (when (string-prefix-p my-emacs-client-frame-name (frame-parameter frame 'name))
-      (modify-frame-parameters
-       frame
-       (list (cons 'name
-                   (concat my-emacs-client-frame-name " - " (buffer-name))))))))
-#+end_src
-autoload
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload update-emacs-client-title +my-emacs-client-open-frame emacs-client-frame-is-live-p)
-(add-hook 'doom-first-file-hook
-          (lambda ()
-            (run-with-idle-timer
-             1 nil
-             (lambda ()
-               (add-hook 'doom-switch-buffer-hook
-                         #'update-emacs-client-title)))))
-#+end_src
 
 *** create fontset
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle "autoload/init-common.el"
+;;;###autoload
 (defmacro my-create-fontset-m (name ascii-font han-font &rest font-list)
   "Create fontset named NAME with given ASCII-FONT and HAN-FONT."
   `(let ((registry (concat "fontset-variable " ,name)))
@@ -517,92 +547,6 @@ autoload
                 (lambda (alist)
                   `(set-fontset-font registry (car-safe ,alist) (car-safe (cdr-safe ,alist))))
                 font-list)))))
-#+end_src
-- autoload
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload my-create-fontset-m)
-#+end_src
-*** 大文件确认
-- buffer-size > 100000 即为大文件
-#+begin_src emacs-lisp
-(defun too-long-file-p ()
-  "Check whether the file is too long."
-  (or (> (buffer-size) 100000)
-      (and (fboundp 'buffer-line-statistics)
-           (> (car (buffer-line-statistics)) 10000))))
-#+end_src
-- autoload
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload too-long-file-p)
-#+end_src
-*** 内容评分
-#+begin_src emacs-lisp
-(defun rate-item (num)
-  "Rate an item with RATING stars, displaying filled stars and one hollow star if applicable.
-The rating should be a number from 1 to 5."
-  (interactive "nEnter your rating (1-5): ")
-  (let ((filled-stars (min (max num 1) 5))
-        (hollow-star (- 5 num)))
-    (dotimes (_ filled-stars) (insert "★"))
-    (dotimes (_ hollow-star) (insert "☆"))))
-#+end_src
-autoload
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload rate-item)
-#+end_src
-*** 一些有用的交互函数
-- 重新 revert 当期 buffer
-#+begin_src emacs-lisp
-(defun my/revert-this-buffer ()
-  "Revert the current buffer."
-  (interactive)
-  (unless (minibuffer-window-active-p (selected-window))
-    (revert-buffer t t)
-    (message "Reverted this buffer")))
-
-(defun my/delete-this-file ()
-  "Delete the current file, and kill the buffer."
-  (interactive)
-  (unless (buffer-file-name)
-    (error "No file is currently being edited."))
-  (when (yes-or-no-p (format "Really delete '%s'?"
-                             (file-name-nondirectory buffer-file-name)))
-    (delete-file (buffer-file-name))
-    (kill-this-buffer)))
-
-(defun my/rename-this-file (new-name)
-  "Rename both current buffer and file it's visiting to NEW-NAME."
-  (interactive "sNew name: ")
-  (let ((name (buffer-name))
-        (filename (buffer-file-name)))
-    (unless filename
-      (error "Buffer '%s' is not visiting a file!" name))
-    (progn
-      (when (file-exists-p filename)
-        (rename-file filename new-name 1))
-      (set-visited-file-name new-name)
-      (rename-buffer new-name))))
-
-(defun my/browse-this-file ()
-  "Open the current file as a URL using `browse-url'."
-  (interactive)
-  (let ((file-name (buffer-file-name)))
-    (if (and (fboundp 'tramp-tramp-file-p)
-             (tramp-tramp-file-p file-name))
-        (error "Cannot open tramp file")
-      (browse-url (concat "file://" file-name)))))
-
-(defun copy-file-name ()
-  "Copy the current buffer file name to the clipboard."
-  (interactive)
-  (let ((filename (if (equal major-mode 'dired-mode)
-                      default-directory
-                    (buffer-file-name))))
-    (if filename
-        (progn
-          (kill-new filename)
-          (message "Copied '%s'" filename))
-      (warn "Current buffer is not attached to a file!"))))
 #+end_src
 
 ** 设置一些常用的默认值
@@ -699,8 +643,8 @@ autoload
 (add-hook 'after-make-frame-functions
           (lambda (frame)
             (pcase (frame-parameter nil 'name)
-              ("scratch" (init-default-frame frame))
-              ("org-protocol" (init-default-frame frame 0.618 0.618)))))
+              ("scratch" (my/init-default-frame frame))
+              ("org-protocol" (my/init-default-frame frame 0.618 0.618)))))
 #+end_src
 ** 最近文件的管理
 #+begin_src emacs-lisp
@@ -1084,10 +1028,40 @@ yaml              ; JSON, but readable
 ** 杂项
 *** 开启中英文中自动添加空格
 #+begin_src emacs-lisp
-(mylib-autoload "my-auto-space" my-auto-space-mode)
-(when (fboundp 'my-auto-space-mode)
-  (add-hook 'after-init-hook #'my-auto-space-mode))
+(add-hook 'after-init-hook #'my-auto-space-mode)
 #+end_src
+*** 自动更新标题
+#+begin_src emacs-lisp
+(add-hook 'doom-first-file-hook
+          (lambda ()
+            (run-with-idle-timer
+             1 nil
+             (lambda ()
+               (add-hook 'doom-switch-buffer-hook
+                         #'update-emacs-client-title)))))
+#+end_src
+*** autoload 对应快捷按键
+#+begin_src emacs-lisp
+(map! "C-M-\\" :desc "indent" #'indent-region-or-buffer
+      "C->"  #'remember-init ; 记录光标位置
+      "C-<" #'remember-jump ; 跳转到最后记录关闭的位置
+      :leader
+      :desc "open in external app" "os" #'open-in-external-app
+      (:prefix-map ("d" . "my prjs")
+       :desc "dotfile" "d" (cmd!
+                            (+find-file-in-project (or (bound-and-true-p mydotfile)
+                                                       (getenv "DOTFILES")
+                                                       (expand-file-name "~/.dotfiles"))))
+       :desc "org" "o" (cmd!
+                        (+find-file-in-project (or (bound-and-true-p org-directory)
+                                                   "~/org")))
+       :desc "draft" "t" (cmd! (+find-file-in-project "~/Workspace/Draft"))
+       :desc "flashes" "f" (cmd! (+find-file-in-project "~/flashes"))))
+
+;; 发现函数的定义
+(define-key! lsp-bridge-mode-map [remap evil-jump-to-tag] 'my/def-jump-go)
+#+end_src
+
 * 包
 ** 加载结构
 :properties:
@@ -1382,11 +1356,6 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 (map! (:leader (:desc "load theme" "h t" #'my/random-theme))) ;; workspace load keybind
 #+end_src
 
-#+RESULTS:
-#+begin_results
-my/random-theme
-#+end_results
-
 ****** 自动切换主题
 ******* auto-dark
 Macos 上借助系统自带的进行主题切换
@@ -1498,14 +1467,14 @@ Macos 上借助系统自带的进行主题切换
                                            (python-ts . "")
                                            (lua . "󰢱")
                                            (lua-ts . "󰢱")
-                                           ("bash-ts" . "󱆃")
-                                           ("sh" . "󱆃"))))
+                                           (bash-ts . "󱆃")
+                                           (sh . "󱆃"))))
                   (or (alist-get (intern mode-name) change-mode-alist)
                       mode-name)))))
 #+end_src
 + modeline
   使用 doom-modeline 的一些配置
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
 (after! doom-modeline
   (remove-function after-focus-change-function #'doom-modeline-focus-change)
   ;; NOTE: 修复使用 awesome-tray 时，由于 (require 'doom-modeline-core) 而引起的 BUG
@@ -1521,12 +1490,12 @@ Macos 上借助系统自带的进行主题切换
   (custom-set-variables '(doom-modeline-buffer-file-name-style 'relative-to-project)
                         '(doom-modeline-major-mode-icon t)
                         '(doom-modeline-modal-icon nil)))
-  #+end_src
+#+end_src
 ***** sort-tab 配置
 :PROPERTIES:
 :ID: 2fcbd9b0-f219-4043-8955-b65f343c0a77
 :END:
-使用 sort-tab 时，请不要随意更改字体，如果要更改字体请新关闭 sort-tab
+使用 sort-tab 时，请不要随意更改字体，如果要更改字体请关闭 sort-tab
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! sort-tab :recipe (:host github :repo "shanyouli/sort-tab" :branch "dev"))
 #+end_src
@@ -1645,7 +1614,7 @@ Dashboard 是打开 Emacs 的主页，在这里添加一些常用命令是很舒
 *** eros
 emacs 使用 C-x C-e 执行代码时，内联效果
 #+begin_src emacs-lisp
-(setq eros-eval-result-prefix "==>") ; default =>
+(setq! eros-eval-result-prefix "==>") ; default =>
 #+end_src
 *** rainbow-mode
 显示 "#232323" 对应的色彩
@@ -1963,7 +1932,12 @@ see@ https://emacs-china.org/t/native-os-sis/14089
     "C" #'dired-async-do-copy
     "H" #'dired-async-do-hardlink
     "R" #'dired-async-do-rename
-    "S" #'dired-async-do-symlink))
+    "S" #'dired-async-do-symlink)
+  (when IS-MAC
+    (when-let (ls (executable-find "ls"))
+      (unless (string-prefix-p "/bin/ls" ls)
+        (setq dired-listing-switches (string-join (list "-ahl" "-v" "--group-directories-first") " "))
+        (setq insert-directory-program ls)))))
 
 (use-package! dirvish
   :defer t
@@ -1976,27 +1950,27 @@ see@ https://emacs-china.org/t/native-os-sis/14089
         dirvish-hide-details nil)
   (set-popup-rule! "^ ?\\*Dirvish.*" :ignore t)
   (map! :map dirvish-mode-map
-          :n  "?"   #'dirvish-dispatch
-          :n  "q"   #'dirvish-quit
-          :ng "a"   #'dirvish-quick-access
-          :ng "f"   #'dirvish-file-info-menu
-          :ng "y"   #'dirvish-yank-menu
-          :ng "s"   #'dirvish-quicksort
-          :ng "TAB" #'dirvish-subtree-toggle
-          :ng "M-t" #'dirvish-layout-toggle
-          :ng "M-b" #'dirvish-history-go-backward
-          :ng "M-f" #'dirvish-history-go-forward
-          :ng "M-n" #'dirvish-narrow
-          :ng "M-m" #'dirvish-mark-menu
-          :ng "M-s" #'dirvish-setup-menu
-          :ng "M-e" #'dirvish-emerge-menu
-          :map dired-mode-map
-          "C-c C-r" #'dirvish-rsync)
-   (setq dirvish-attributes '(file-size collapse nerd-icons)) ; git-msg
-   (when (modulep! :ui vc-gutter)
-     (push 'vc-state dirvish-attributes))
-   (when (featurep 'diredfl)
-     (add-hook 'dirvish-directory-view-mode-hook #'diredfl-mode)))
+        :n  "?"   #'dirvish-dispatch
+        :n  "q"   #'dirvish-quit
+        :ng "a"   #'dirvish-quick-access
+        :ng "f"   #'dirvish-file-info-menu
+        :ng "y"   #'dirvish-yank-menu
+        :ng "s"   #'dirvish-quicksort
+        :ng "TAB" #'dirvish-subtree-toggle
+        :ng "M-t" #'dirvish-layout-toggle
+        :ng "M-b" #'dirvish-history-go-backward
+        :ng "M-f" #'dirvish-history-go-forward
+        :ng "M-n" #'dirvish-narrow
+        :ng "M-m" #'dirvish-mark-menu
+        :ng "M-s" #'dirvish-setup-menu
+        :ng "M-e" #'dirvish-emerge-menu
+        :map dired-mode-map
+        "C-c C-r" #'dirvish-rsync)
+  (setq dirvish-attributes '(file-size collapse nerd-icons)) ; git-msg
+  (when (modulep! :ui vc-gutter)
+    (push 'vc-state dirvish-attributes))
+  (when (featurep 'diredfl)
+    (add-hook 'dirvish-directory-view-mode-hook #'diredfl-mode)))
 #+end_src
 更好的使用 emacs 编辑文件名
 #+begin_src emacs-lisp
@@ -2677,13 +2651,6 @@ popd
           (cl-remove-if (lambda (elt) (equal '(nix-mode) elt)) +file-templates-alist))))
 #+end_src
 
-**** 记录光标位置
-[[https://emacs-china.org/t/topic/24533/9][请问如何记录光标位置 - Emacs-general - Emacs China]]
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(myfun-autoload remember-jump remember-init)
-(map! "C->"  #'remember-init
-      "C-<" #'remember-jump)
-#+end_src
 **** 在 Unicode 与英文之间插入空格
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! wraplish
@@ -2696,9 +2663,9 @@ popd
   :commands (wraplish-mode)
   :init
   (my/leader "t s" '(wraplish-mode :wk "auto insert space"))
-  (unless (daemonp)
-    (dolist (hook '(org-mode-hook gfw-mode-hook markdown-mode-hook))
-      (add-hook hook #'wraplish-mode)))
+  ;; (unless (daemonp)
+  ;;   (dolist (hook '(org-mode-hook gfw-mode-hook markdown-mode-hook))
+  ;;     (add-hook hook #'wraplish-mode)))
   :config
   (when (boundp 'lsp-bridge-python-command)
     (setq wraplish-python-command lsp-bridge-python-command)))
@@ -3408,11 +3375,6 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
 #+end_src
 * 编程语言配置
 ** 公共配置
-- 发现函数的定义
-#+begin_src emacs-lisp :tangle "yes"
-(myfun-autoload my/def-jump-go my/def-jump-back)
-(define-key! lsp-bridge-mode-map [remap evil-jump-to-tag] 'my/def-jump-go)
-#+end_src
 - treesit 相关配置
 #+begin_src emacs-lisp
 (use-package! treesit
@@ -3512,6 +3474,7 @@ Emacs 可以显示 ANSI 颜色代码。然而，在 Emacs 28 之前，如果不�
 :properties:
 :CUSTOM_ID: org
 :header-args:emacs-lisp: :tangle no :noweb-ref org-conf
+:ID:       0e0772ec-cfbd-4e7f-8838-0991d7ccdbd1
 :end:
 :intro:
 Org Mode 无疑是 Emacs 的杀手级应用，其扩展能力以及 Emacs 的契合，让它吊打一众
@@ -3682,7 +3645,7 @@ org treesit
 ;; (map! :map org-mode-map
 ;;       :leader
 ;;       :desc "zero-width-space" "SPC" (cmd! (insert "\u200B")))
-(define-key! org-mode-map "S-SPC" (cmd! (insert "\u200B")))
+;; (define-key! org-mode-map "S-SPC" (cmd! (insert "\u200B")))
 #+end_src
 我不希望零宽字符被导出
 #+begin_src emacs-lisp
@@ -3748,29 +3711,6 @@ org treesit
 #+begin_src emacs-lisp :tangle no :noweb-ref none
 (use-package! org-pandoc-import
   :after org)
-#+end_src
-
-**** TODO 标题结构
-说起标题行，我注意到了一个非常棒的包，它可以浏览并管理标题结构。
-#+begin_src emacs-lisp :tangle packages.el :comments no :noweb-ref none
-(package! org-ol-tree :recipe (:host github :repo "Townk/org-ol-tree"))
-#+end_src
-
-#+begin_src emacs-lisp :tangle no :noweb-ref none
-(use-package! org-ol-tree
-  :defer t
-  :after org
-  :commands org-ol-tree
-  :config
-  ;; (setq org-ol-tree-ui-icon-set
-  ;;       (if (and (display-graphic-p)
-  ;;                (fboundp 'all-the-icons-material))
-  ;;           'all-the-icons
-  ;;         'unicode))
-  ;; (org-ol-tree-ui--update-icon-set)
-  (map! :map org-mode-map
-        :localleader
-        :desc "Outline" "O" #'org-ol-tree))
 #+end_src
 
 **** agenda
@@ -5079,11 +5019,11 @@ macos 中自动化的一门脚本语言
 ** nushell
 #+begin_src emacs-lisp :tangle (if (executable-find "nu") "packages.el" "no") :noweb-ref none
 (if (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'nu))
-    (package! nushell-ts-mode :recipe (:host github :repo "herbertjones/nushell-ts-mode"))
+    (package! nushell-ts-mode :recipe (:host github :repo "herbertjones/nushell-ts-mode") :built-in 'prefer)
   (package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode") :built-in 'prefer))
 #+end_src
 #+begin_src emacs-lisp :tangle (if (executable-find "nu") "yes" "no") :noweb-ref none
-(if (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'nu))
+(if (my-treesit-language-available-p 'nu)
     (use-package! nushell-ts-mode
       :init
       (after! eglot
@@ -5189,7 +5129,7 @@ yapf
   (after! org-src
     (defalias 'org-babel-execute:rust #'org-babel-execute:rustic)
     (add-to-list 'org-src-lang-modes '("rust" . rustic)))
-  (when (my-treesit-available-p)
+  (when (my-treesit-language-available-p 'rust)
     (pushnew! major-mode-remap-alist '(rustic-mode . rust-ts-mode)))
   :config
   (add-hook 'rustic-mode-hook #'rainbow-delimiters-mode)
@@ -5334,6 +5274,6 @@ yapf
 #+end_src
 #+begin_src emacs-lisp
 (use-package! ass-mode
-  :mode (("\\.ass" . ass-mode)))
+  :mode (("\\.ass\\'" . ass-mode)))
 #+end_src
 

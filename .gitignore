@@ -16,3 +16,4 @@ lang/
 filycheck_*.el
 /lib/
 /private.el
+/autoload/init*.el
