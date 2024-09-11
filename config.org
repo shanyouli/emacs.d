@@ -327,8 +327,16 @@ Native tree-sitter is introduced since 29."
 (defun my--treesit-load-language (lang)
   "Check treesit language available and load `LANG'."
   (if (my-treesit-language-available-p lang)
-      (treesit-parser-create lang)
-    (message "Please install %S tressit lib." lang)))
+      (progn
+        (treesit-parser-create lang)
+        (message "load %S treesit success." lang))
+    (if (require 'treesit-auto nil t)
+        (let ((treesit-language-source-alist (treesit-auto--build-treesit-source-alist)))
+          (treesit-auto--prompt-to-install-package lang)
+          (if (ignore-errors (treesit-parser-create lang))
+              (message "load %S treesit success." lang)
+            (message "load %S error. Please %S treesit exists." lang lang)))
+      (message "Please manual install %S tressit lib." lang))))
 
 ;;;###autoload
 (defun my/load-treesit ()
@@ -2086,7 +2094,7 @@ lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服�
 (use-package! lsp-bridge
   ;; :hook (doom-first-buffer . enable-lsp-bridge-for-modes)
   ;; :init (require 'acm) ;; Fix acm-silent is a void function error
-  :defer t
+  :defer 1
   :config
   ;; (setq lsp-bridge-enable-log nil)
   ;; (setq lsp-bridge-enable-diagnostics nil)
