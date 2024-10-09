@@ -7,10 +7,11 @@
   lib,
   config,
   options,
+  my,
   ...
 }:
 with lib;
-with lib.my; let
+with my; let
   cfp = config.modules.$1;
   cfg = cfp.$2;
 in {

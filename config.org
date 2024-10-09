@@ -3560,6 +3560,8 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 ;; FIXME: https://github.com/doomemacs/doomemacs/issues/6741
 ;; org-roam-capture show Warn Zombie snippet
 (set-file-template! 'org-mode :ignore t)
+
+(setq! org-id-locations-file (expand-file-name ".org-id-locations" doom-cache-dir))
 #+end_src
 我不喜欢编写​=org-mode=​时，自动化换行
 #+begin_src emacs-lisp
@@ -3642,9 +3644,6 @@ org link 快捷方法
 #+end_src
 org treesit
 #+begin_src emacs-lisp
-;; (when (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'org))
-;;   (add-hook! org-mode (treesit-parser-create 'org)))
-;;
 (my/leader :keymap 'org-mode-map
   "ft" '(my/load-treesit :wk "treesit"))
 #+end_src
@@ -4566,6 +4565,56 @@ media note
 配置技巧
 #+begin_src emacs-lisp :tangle yes :noweb-ref none
 (map! [remap org-store-link] #'org-super-links-store-link)
+#+end_src
+
+*** org-transclusion
+通过文件链接或 org-id 链接插入文件副本内容
+**** 基本操作
+通过在链接前加入: ~#+transclude:~ 得到一个 transclude 链接。在链接后可以加上额外配置:
++ ~:only-contents~ 仅嵌入内容
++ ~:exclude-elements~ 排除某些元素
++ ~:src python~ 嵌入文件到代码块，也可以为代码块添加额外参数 ~:src python :rest ":session :results value"~
++ ~:lines 3-5~ transclude 链接的 3 到 5 行内容
++ ~:level 4~ 仅显示到第 4 级目录的内容
+**** 基本命令
+- ~org-transclusion-mode~: 将自动应用translate 到当前buffer, 快捷按键，org-mode, ~<leader>nt~
+- ~org-transclusion-add-all~: 将所有 =#+transclude:= 链接转换为嵌入内容
+- ~org-transclusion-add~: 将当前的 =#+transclude:= 链接转换为嵌入内容，光标需要在 ~#+transclude:~ 上
+- ~org-transclude-remove~: 取消当前嵌入内容的显示
+- ~org-transclude-remove-all~: 取消当前 buffer 所有嵌入内容的显示
+- ~org-transclude-make-from-link~: 将档期光标所在的普通链接转换为 ~#+transclude:~ 链接
+- ~org-transclude-refresh~: 刷新当前 buffer 嵌入内容的改动
+- ~org-transclude-live-syc-start~: 进入同步嵌入内容可以修改它(不支持对代码块的修改,默认无法修改)
+- ~org-transclude-live-sync-exit~: 退出同步修改嵌入内容模式
+
+**** 配置
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! org-transclusion)
+#+end_src
+相关配置
+#+begin_src emacs-lisp :tangle yes :noweb-ref none
+(map! :map org-mode-map
+  :leader
+  :desc "org transclusion mode" "nt" #'org-transclusion-mode)
+(my/leader :keymap 'org-mode-map
+  "tt" '(org-transclusion-mode :wk "Toggle org transclusion"))
+#+end_src
+使用 org-transclusion 进行 org 导出操作，不考虑递归问题
+#+begin_src emacs-lisp :tangle yes :noweb-ref none
+(defun my/org-roam-to-html ()
+  "Export org to html covert org-roam-node to org-transclude."
+  (interactive)
+  (goto-char (point-min))
+  (while (search-forward "[[id:" nil t)
+    (progn (replace-match "\n#+transclude: [[id:")
+           ))
+  (org-transclusion-add-all)
+  (org-html-export-to-html)
+  (org-transclusion-remove-all)
+  (goto-char (point-min))
+  (sit-for 1)
+  (while (search-forward "\n#+transclude: [[id:" nil t)
+    (replace-match "[[id:")))
 #+end_src
 ** emacs-lisp
 :properties:
