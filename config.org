@@ -557,6 +557,208 @@ Version 2022-06-26  8:46:00"
                 font-list)))))
 #+end_src
 
+*** org headline 移动到指定文件
+#+begin_src emacs-lisp :tangle "autoload/init-my-org.el"
+;; 需要 require 的内置包
+
+(require 'outline)
+(require 'org-id)
+(require 'seq)
+
+;; daily
+;; weekly + date
+;; month + weekly + ate
+;; year + month + weekly + date
+(defcustom my-org-groups-level 1 "my org groups level."
+  :type 'integer
+  :options '(1 2 3 4))
+
+(defcustom my-org-groups-second-type '(daily weekly month year) "my org groups level."
+  :type 'list)
+
+(defun my-org-extract-date-from-filename (filename)
+  "Extract date from FILENAME if it matches the pattern YYYY_MM_DD.org or YYYY-MM-DD.org.
+Return the date in the format YYYY-MM-DD, or current-date if it doesn't match."
+  (if (string-match "\\([0-9]\\{4\\}\\)[_-]\\([0-9]\\{2\\}\\)[_-]\\([0-9]\\{2\\}\\)\\.org$" filename)
+      (format "%s-%s-%s"
+              (match-string 1 filename)
+              (match-string 2 filename)
+              (match-string 3 filename))
+    (format-time-string "%Y-%m-%d")))
+
+
+(defun my-org-adjust-headline-levels (content &optional level)
+  "Adjust headline levels based on `LEVEL'"
+  (let ((level-adjust (or level my-org-groups-level)))
+    (replace-regexp-in-string "^\\(\\*+\\)" (lambda (m) (concat m (make-string level-adjust ?*))) content)))
+
+(defun my-org-get-group-heading (time &optional level)
+  "Get the group heading based on `date' and `level'"
+  (pcase level
+    ('year (format-time-string "%Y 年" time))
+    ('month (format-time-string "%Y 年 %m 月" time))
+    ('weekly (format-time-string "%Y 年 %W 周" time))
+    (_ (format-time-string "%Y 年 %m 月 %d 日" time))))
+
+;;;###autoload
+(defun my-org-get-group-list (date &optional level types)
+  "Generate a list based on `DATE'.
+LEVEL is interge, TYPES is list"
+  (let ((time (date-to-time date))
+        (level (or level my-org-groups-level))
+        (types (or types my-org-groups-second-type))
+        rlist '())
+    (dotimes (i level)
+      (push (my-org-get-group-heading  time (nth i types)) rlist))
+    rlist))
+
+
+(defsubst my-org--create-headline-tree (path-list)
+  "Create  headline tree by `PATH-LIST'."
+  (let ((level 1) end notfound)
+    (unless (derived-mode-p 'org-mode)
+      (error "Target buffer \"%s\" should be in Org mode" (current-buffer)))
+    (goto-char (point-min))
+    ;; 从 1 级 headline 定位到 n 级 headline
+    (dolist (heading path-list)
+      (let* ((heading (concat (make-string level ?*) " " heading))
+             (re (concat "^" (regexp-quote heading) "$")))
+        (if notfound
+            (insert "\n" heading "\n")
+          (if (re-search-forward re end t)
+              (progn
+                (goto-char (match-beginning 0)) ;如果找到了 headline 就移动到对应的位置
+                (setq end (save-excursion (org-end-of-subtree t t) (point))))
+            (setq notfound t)
+            (if (= level 1)
+                (if (re-search-forward "^\\* .+" nil t)
+                    (goto-char (match-beginning 0))
+                  (goto-char (point-max)))
+              (outline-next-heading))
+            (let ((p (point)))
+              (insert heading "\n")
+              (goto-char p)
+              (goto-char (pos-eol)))))
+        (setq level (1+ level))))
+    (outline-next-heading)))
+
+;;;###autoload
+(defun my-org-move-headline-to-target (source-file target-file pattern level types)
+  "Move `PATTERN' headlines from SOURCE-FILE to TARGET-FILE.
+LEVEL Indicates groups."
+  (let ((current-date (my-org-extract-date-from-filename
+                       (file-name-nondirectory source-file)))
+        (level (or level my-org-groups-level))
+        (types (or types my-org-groups-second-type)))
+    (save-excursion
+      (with-current-buffer (find-file-noselect source-file)
+        (goto-char (point-min))
+        (while (re-search-forward pattern nil t)
+          (let ((start (match-beginning 0))
+                oid content end)
+            ;; Ensure the headline has an org-id
+            (goto-char start)
+            (setq oid (org-id-get-create))
+            ;; Get end
+            (setq end (progn (org-end-of-subtree t t) (point)))
+            ;; Copy the headline and its subtree, and adjust the levels of the headlines
+            (setq content (my-org-adjust-headline-levels
+                           (buffer-substring-no-properties start end)
+                           level))
+
+            (with-current-buffer (find-file-noselect target-file)
+              ;; (goto-char (point-min))
+              (my-org--create-headline-tree (my-org-get-group-list current-date level types))
+              ;; Insert the TODO item
+              (insert "\n\n" content "\n")
+              (save-buffer))
+            ;; Insert a link to the new location
+            (goto-char start)
+            (delete-region start end)
+            (insert (format "#+transclude: [[id:%s][%s]] :level 1\n" oid
+                            (replace-regexp-in-string "\\*+ TODO " "" (car (split-string content "\n")))))
+            (save-buffer)
+            (my-org-remove-extra-blank-lines)
+            (save-buffer)))))
+    ))
+;;;###autoload
+(defun my-org-remove-extra-blank-lines ()
+  "Remove extra blank lines in the current Org buffer, keeping at most one."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (while (re-search-forward "\n\\{2,\\}" nil t)
+      (replace-match "\n"))))
+#+end_src
+*** 结合 org-roam 的动态 agenda file
+#+begin_src emacs-lisp :tangle "autoload/vulpea-agenda.el"
+;;* dynamic agenda https://github.com/brianmcgillion/doomd/blob/master/config.org
+;; https://emacs-china.org/t/org-roam/15659/16
+;; https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
+;; The 'roam-agenda' tag is used to tell vulpea that there is a todo item in this file
+(unless (require 'vulpea nil t)
+  (error "Please install vulpea package."))
+(require 'org)
+
+(add-to-list 'org-tags-exclude-from-inheritance "roam-agenda")
+
+(defun vulpea-buffer-p ()
+  "Return non-nil if the currently visited buffer is a note."
+  (and buffer-file-name
+       (string-prefix-p
+        (expand-file-name (file-name-as-directory org-roam-directory))
+        (file-name-directory buffer-file-name))))
+
+(defun vulpea-project-p ()
+  "Return non-nil if current buffer has any todo entry.
+
+TODO entries marked as done are ignored, meaning the this
+function returns nil if current buffer contains only completed
+tasks."
+  (seq-find                                 ; (3)
+   (lambda (type) (eq type 'todo))
+   (org-element-map                         ; (2)
+       (org-element-parse-buffer 'headline) ; (1)
+       'headline
+     (lambda (h) (org-element-property :todo-type h)))))
+
+;;;###autoload
+(defun vulpea-project-update-tag (&optional arg)
+  "Update PROJECT tag in the current buffer."
+  (interactive "P")
+  (when (and (not (active-minibuffer-window))
+             (vulpea-buffer-p))
+    (save-excursion
+      (goto-char (point-min))
+      (let* ((tags (vulpea-buffer-tags-get))
+             (original-tags tags))
+        (if (vulpea-project-p)
+            (setq tags (cons "roam-agenda" tags))
+          (setq tags (remove "roam-agenda" tags)))
+
+        ;; cleanup duplicates
+        (setq tags (seq-uniq tags))
+
+        ;; update tags if changed
+        (when (or (seq-difference tags original-tags)
+                  (seq-difference original-tags tags))
+          (apply #'vulpea-buffer-tags-set tags))))))
+
+;; https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/
+(defun my/org-roam-filter-by-tag (tag-name)
+  (lambda (node) (member tag-name (org-roam-node-tags node))))
+
+(defun my/org-roam-list-notes-by-tag (tag-name)
+  (mapcar #'org-roam-node-file
+          (seq-filter
+           (my/org-roam-filter-by-tag tag-name)
+           (org-roam-node-list))))
+
+;;;###autoload
+(defun dynamic-agenda-files-advice (orig-val)
+  (let ((roam-agenda-files (delete-dups (my/org-roam-list-notes-by-tag "roam-agenda"))))
+    (cl-union orig-val roam-agenda-files :test #'equal)))
+#+end_src
 ** 设置一些常用的默认值
 #+begin_src emacs-lisp
 (setq-default delete-by-moving-to-trash t ; 文件删除到回收站
@@ -949,7 +1151,7 @@ tty               ; improve the terminal Emacs experience
 最爽的事情就是，我可以在 Emacs 中编写任何语言 (的 =Hello World=)
 #+name: doom-lang
 #+begin_src emacs-lisp  :noweb-ref none
-(:unless (my-use-ts-mode-p 'lua) lua)
+(lua +fennel)
 ;;agda              ; types of types of types of types...
 ;;beancount         ; mind the GAAP
 ;;(cc +lsp)         ; C > C++ == 1
@@ -3682,7 +3884,432 @@ org treesit
   (define-key! markdown-mode-map "C-c M-t" #'toc-org-insert-toc))
 #+end_src
 =toc-org=​会清空带有​~TOC~​标签的 heading，并生成目录。
-**** TODO 加密块
+*** 美化配置
+***** org 美化的基本配置
+设置合适的标题大小和每一级的行高
+#+begin_src emacs-lisp
+(custom-set-faces! '(org-document-title :height 1.75 :weight bold)
+  '(org-level-1 :height 1.25 :weight bold)
+  '(org-level-2 :height 1.2 :weight bold)
+  '(org-level-3 :height 1.15 :weight bold)
+  '(org-level-4 :height 1.1 :weight bold)
+  '(org-level-5 :height 1.05 :weight bold)
+  '(org-level-6 :height 1.025 :weight bold)
+  '(org-level-7 :height 1.0 :weight bold)
+  '(org-level-8 :height 1.0 :weight bold))
+
+(setq org-priority-faces '((?A . error)
+                           (?B . warning)
+                           (?C . success)))
+#+end_src
+代码块使用上下边线包裹
+#+begin_src emacs-lisp
+(custom-set-faces! '(org-block-begin-line :underline t :background unspecified)
+  '(org-block-end-line :overline t :underline nil :background unspecified))
+#+end_src
+提升 latex 预览的图片清晰度
+#+begin_src emacs-lisp
+(plist-put! org-format-latex-options :scale 1.8)
+#+end_src
+设置标题行之间总是空格;列表之间根据情况自动加空格
+#+begin_src emacs-lisp
+(setq! org-blank-before-new-entry '((heading . t) (plain-list-item . auto)))
+#+end_src
+设置
+org 自带的 todo,done,引用块美化
+#+begin_src emacs-lisp
+(setq org-fontify-todo-headline t
+      org-fontify-done-headline t
+      org-fontify-quote-and-verse-blocks t)
+#+end_src
+隐藏宏标记
+#+begin_src emacs-lisp
+(setq org-hide-macro-markers t)
+#+end_src
+高亮 latex 语法
+#+begin_src emacs-lisp
+(setq org-highlight-latex-and-related '(native script entities))
+#+end_src
+默认使用 overview 的模式展示标题行
+#+begin_src emacs-lisp
+(setq org-startup-folded 'overview)
+#+end_src
+***** org-modern
+使 =org-mode= buffer 尽可能漂亮是很重要的，Minad 的 =org-modern= 在这方面大有帮
+助。
+#+begin_src emacs-lisp :noweb-ref none :tangle packages.el
+(package! org-modern)
+(package! org-modern-indent :recipe (:host github :repo "jdtsmith/org-modern-indent" :depth 1))
+#+end_src
+#+begin_src emacs-lisp :tangle yes :noweb-ref none
+(use-package! org-modern-indent
+  :defer t
+  :init
+  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
+(use-package! org-modern
+  :hook ((org-mode . org-modern-mode) (org-agenda-finalize . org-modern-agenda))
+  :config
+  ;; org-modern-replace-stars 可用 列表
+  ;; "➀➁➂➃➄➅➆➇➈" "󰉫󰉬󰉭󰉮󰉯󰉰" "✿❀✭✫✦✧◈◇" "⚀⚁⚂⚃⚄⚅"
+  ;; "☯☰☱☲☳☴☵☶☷"
+  (setopt org-modern-star 'replace
+          org-modern-replace-stars "󰉫󰉬󰉭󰉮󰉯󰉰")
+  (setopt org-modern-block-fringe t)
+
+  ;; org-modern-checkbox 配置
+  (defvar my-org-modern-checkbox-type 'box) ; nil, box, circle calendar
+  (setopt org-modern-checkbox (pcase my-org-modern-checkbox-type
+                                ('box '((88 . "") (45 . "")  (32 . "󰄱")))
+                                ('circle '((88 . "") (45 . "")  (32 . "")))
+                                ('calendar '((88 . "") (45 . "")  (32 . "")))
+                                (_ '((?X . #("▢✓" 0 2 (composition ((2)))))
+                                     (?- . #("▢-" 0 2 (composition ((2)))))
+                                     (?\s . #("▢" 0 1 (composition ((1)))))))))
+  ;; org-modern-table 存在无法对齐的情况, 我是用其他包管理
+  ;; @see https://github.com/minad/org-modern/issues/5
+  (setq org-modern-table nil)
+  ;; (setq org-modern-table-horizontal 0.3
+  ;;       org-modern-table-vertical 2)
+
+  ;; tag 边框宽度，还可以设置为 `auto' 即自动计算
+  (setq org-modern-label-border 'auto)
+  (setq org-modern-list (if (doom-font-exists-p "PragmataPro Liga")
+                            '((43 . "➤")
+                              (45 . "♫")
+                              (42 . "•"))
+                          '((43 . "➤")
+                            (45 . "–")
+                            (42 . "•")))
+        org-modern-todo-faces '(("TODO" :inverse-video t :inherit org-todo)
+                                ("PROJ" :inverse-video t :inherit +org-todo-project)
+                                ("STRT" :inverse-video t :inherit +org-todo-active)
+                                ("[-]"  :inverse-video t :inherit +org-todo-active)
+                                ("HOLD" :inverse-video t :inherit +org-todo-onhold)
+                                ("WAIT" :inverse-video t :inherit +org-todo-onhold)
+                                ("[?]"  :inverse-video t :inherit +org-todo-onhold)
+                                ("KILL" :inverse-video t :inherit +org-todo-cancel)
+                                ("NO"   :inverse-video t :inherit +org-todo-cancel))
+        org-modern-footnote (cons nil (cadr org-script-display))
+        org-modern-progress 12
+        org-modern-priority nil
+        org-modern-horizontal-rule (make-string 36 ?─)
+        ;; 使用 org-modern 自带的取代 org-tag 和 org-agenda-tags
+        org-tags-column 0
+        org-agenda-tags-column 0)
+
+  (setq org-modern-keyword '((t . t)))
+  (when (fboundp 'nerd-icons-mdicon)
+    (setq org-modern-keyword
+          `((t . t)
+            ("title" . ,(nerd-icons-mdicon "nf-md-format_title"))
+            ("email" . ,(nerd-icons-mdicon "nf-md-email"))
+            ("date" . ,(nerd-icons-octicon "nf-oct-calendar"))
+            ("author" . ,(nerd-icons-mdicon "nf-md-account"))
+            ("subtitle" . ,(nerd-icons-mdicon "nf-md-subtitles"))
+            ("property" . ,(nerd-icons-codicon "nf-cod-symbol_property"))
+            ("options" . ,(nerd-icons-codicon "nf-cod-settings"))
+            ("startup" . ,(nerd-icons-mdicon "nf-md-power"))
+            ("macro" . ,(nerd-icons-faicon "nf-fa-maxcdn"))
+            ("bind" . ,(nerd-icons-mdicon "nf-md-link"))
+            ("include" . ,(nerd-icons-mdicon "nf-md-code_braces"))
+            ("setupfile" . ,(nerd-icons-mdicon "nf-md-hammer_wrench"))
+            ("name" . ,(nerd-icons-mdicon "nf-md-alpha_n_box_outline"))
+            ("result" . ,(nerd-icons-mdicon "nf-md-alpha_r_box_outline"))
+            ("attr_latex" . ,(nerd-icons-mdicon "nf-md-alpha_l_circle_outline"))
+            ("attr_org" . ,(nerd-icons-mdicon "nf-md-alpha_o_circle_outline"))
+            ("attr_html" . ,(nerd-icons-mdicon "nf-md-alpha_h_circle_outline"))
+            ("html_head" . ,(nerd-icons-faicon "nf-fa-header"))
+            ("header" . ,(nerd-icons-mdicon "nf-md-format_header_increase"))
+            ("caption" . ,(nerd-icons-mdicon "nf-md-closed_caption"))
+            ("RESULTS" . ,(nerd-icons-mdicon "nf-md-read")))))
+  (custom-set-faces! '(org-modern-statistics :inherit org-checkbox-statistics-todo)))
+#+end_src
+由于 =org-modern= 的标签面取代了 Org 的标签面，我们需要调整拼写检查面忽略列表。
+#+begin_src emacs-lisp :tangle yes :noweb-ref none
+(after! spell-fu
+  (cl-pushnew 'org-modern-tag (alist-get 'org-mode +spell-excluded-faces-alist)))
+#+end_src
+***** 强调标记
+虽然 ~org-hide-emphasis-markers~ 非常好，但有时它会使边界处的编辑变得更加繁琐。
+我们可以使用 =org-appear= 包在不牺牲视觉便利的情况下改善这种情况。
+
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! org-appear :recipe (:type git :host github :repo "awth13/org-appear"))
+#+end_src
+
+#+begin_src emacs-lisp  :noweb-ref none :tangle "yes"
+(use-package! org-appear
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-appear-autolinks t)
+  (setq org-appear-autosubmarkers t)
+  (setq org-appear-autoentities t)
+  (setq org-appear-autokeywords t)
+  (setq org-appear-inside-latex t))
+#+end_src
+***** 符号配置
+用来更改于折叠项目的字符
+#+begin_src emacs-lisp
+(setq! org-elispsis " ▾ "
+       org-hide-leading-stars t
+       org-priority-highest ?A
+       org-priority-lowest ?E)
+#+end_src
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! org-fancy-priorities :pin "7f677c6c14ecf05eab8e0efbfe7f1b00ae68eb1d")
+#+end_src
+#+begin_src emacs-lisp  :noweb-ref none :tangle "yes"
+(use-package! org-fancy-priorities ; priority icons
+  :hook (org-mode . org-fancy-priorities-mode)
+  :hook (org-agenda-mode . org-fancy-priorities-mode)
+  :config
+  (custom-set-variables '(org-lowest-priority ?E))
+  (setq! org-fancy-priorities-list '("⚡" "↑" "↓" "☕" "❓")))
+#+end_src
+ligatures 配置,
+#+begin_src emacs-lisp :noweb-ref none :tangle "yes"
+(appendq! +ligatures-extra-symbols
+          (list :list_property "::" :em_dash "-"))
+(when (modulep! :lang org)
+  (defadvice! +org-init-appearance-h--no-ligatures-a ()
+    :after #'+org-init-appearance-h
+    (set-ligatures! 'org-mode nil)
+    (set-ligatures! 'org-mode
+      :list_property "::"
+      :em_dash       "---"
+      :ellipsis      "..."
+      :arrow_right   "->"
+      :arrow_left    "<-"
+      :arrow_lr      "<->"
+      :idcard        ":ID:"
+      :idcard        ":id:"
+      :properties    ":properties:"
+      :properties    ":PROPERTIES:"
+      :crypt         ":cryptkey:"
+      :end           ":end:"
+      :end ":END:")))
+#+end_src
+****** table
+使用 valign 对齐 org-table
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! valign :recipe (:host github :repo "casouri/valign"))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! valign
+  :hook (org-mode . valign-mode)
+  :config (setq valign-fancy-bar t))
+#+end_src
+
+***** iscroll-mode
+更平滑的滚动图片
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! iscroll)
+#+end_src
+#+begin_src emacs-lisp
+(add-hook! org-mode #'iscroll-mode)
+#+end_src
+*** org-roam
+:PROPERTIES:
+:ID:       fadf9cb0-7b0d-42eb-b02f-bc76e76b1096
+:END:
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! org-roam)
+(unpin! org-roam)
+;; FIXME: @see https://github.com/org-roam/org-roam-ui/issues/236
+;; Org-roam-ui doesn't show the node's text if in a .dir-locals.el location
+(package! org-roam-ui :recipe (:host github :repo "Keisn1/org-roam-ui"))
+
+;; Automatically synchronize logseq edits to work in org-roam when it's open
+(package! org-roam-logseq :recipe (:host github :repo "idanov/org-roam-logseq.el"))
+
+;; https://linux.do/t/topic/111737
+(package! vulpea)
+#+end_src
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+;; 使用 org-roam-ui 的配置
+(use-package! websocket :after org-roam)
+(use-package! org-roam
+  :init
+  (require 'f)
+  (setq my-default-org-roam-directory (f-expand (f-join "~/Documents" "logseq"))
+        my-default-org-roam-page "pages/"
+        my-default-org-roam-location (f-expand (f-join doom-cache-dir "org-roam-personl.db"))
+        my-default-org-agenda-file (f-expand
+                                    (f-join "~/Documents" "logseq" "pages/gtds.org")))
+  (setopt org-roam-directory my-default-org-roam-directory
+          org-roam-database-connector 'sqlite-builtin
+          org-roam-dailies-directory "journals/"
+          org-roam-file-exclude-regexp "\\.st[^/]*\\|logseq/.*$"
+          org-id-link-to-org-use-id t)
+  :config
+  (setopt org-roam-capture-templates
+      `(("d" "default" plain "%?" :target
+         (file+head ,(concat my-default-org-roam-page "${slug}.org")
+                    "#+title: ${title}\n#+DATE: %<%Y-%m-%d>\n#+LAST_MODIFIED: %U\n\n")
+         :unnarrowed t))
+      org-roam-dailies-capture-templates
+      '(("d" "default" plain "%?" :target
+         (file+head "%<%Y_%m_%d>.org"
+                    "#+title: %<%Y-%m-%d>\n\n"))))
+  (require 'org-roam-logseq)
+  (org-roam-db-autosync-mode +1)
+  (if my-default-org-agenda-file
+      (progn
+        (unless (file-exists-p my-default-org-agenda-file)
+          (make-empty-file my-default-org-agenda-file t))
+        (defun my-move-todo-on-save-h ()
+          (let ((filename (buffer-file-name)))
+            (when (and filename
+                       (derived-mode-p 'org-mode)
+                       (string-prefix-p (expand-file-name org-roam-directory) filename)
+                       (not (string= my-default-org-agenda-file filename)))
+              (my-org-move-headline-to-target filename
+                                              my-default-org-agenda-file
+                                              "^\\* TODO .*"
+                                              4
+                                              '(daily weekly month year)))))
+        (add-hook 'before-save-hook #'my-move-todo-on-save-h))
+    (add-hook 'org-roam-db-autosync-mode-hook #'vulpea-db-autosync-enable)
+    (add-hook 'before-save-hook #'vulpea-project-update-tag)
+    (advice-add 'org-agenda-files :filter-return #'dynamic-agenda-files-advice)))
+
+(use-package! org-roam-ui
+  :after org-roam
+;; or :after org
+;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+;;         a hookable mode anymore, you're advised to pick something yourself
+;;         if you don't care about startup time, use
+;;  :hook (after-init . org-roam-ui-mode)
+  :init
+  ;; Underscore always becomes underline
+  ;; https://github.com/org-roam/org-roam-ui/issues/261
+  (setopt org-roam-ui-sync-theme t
+          org-roam-ui-follow t
+          org-roam-ui-update-on-save t
+          org-roam-ui-open-on-start t))
+#+end_src
+
+**** 多个 org-roam-root 目录切换
+在额外的 org-roam-directory 目录下添加如下内容
+#+begin_src emacs-lisp :tangle "no" :noweb-ref none
+((nil . ((eval . (setq-local
+                  org-roam-directory (expand-file-name (locate-dominating-file
+                                                        default-directory ".dir-locals.el"))))
+         (eval . (setq-local
+                  org-roam-db-location (expand-file-name "org-roam.db"
+                                                         org-roam-directory))))))
+;; 或者
+((nil . ((org-roam-directory . "/path/to/alt/org-roam-dir")
+         (org-roam-db-location . "/path/to/alt/org-roam-dir/org-roam.db"))))
+#+end_src
+*** org-transclusion
+通过文件链接或 org-id 链接插入文件副本内容
+**** 基本操作
+通过在链接前加入: ~#+transclude:~ 得到一个 transclude 链接。在链接后可以加上额外配置:
++ ~:only-contents~ 仅嵌入内容
++ ~:exclude-elements~ 排除某些元素
++ ~:src python~ 嵌入文件到代码块，也可以为代码块添加额外参数 ~:src python :rest ":session :results value"~
++ ~:lines 3-5~ transclude 链接的 3 到 5 行内容
++ ~:level 4~ 仅显示到第 4 级目录的内容
+**** 基本命令
+- ~org-transclusion-mode~: 将自动应用translate 到当前buffer, 快捷按键，org-mode, ~<leader>nt~
+- ~org-transclusion-add-all~: 将所有 =#+transclude:= 链接转换为嵌入内容
+- ~org-transclusion-add~: 将当前的 =#+transclude:= 链接转换为嵌入内容，光标需要在 ~#+transclude:~ 上
+- ~org-transclude-remove~: 取消当前嵌入内容的显示
+- ~org-transclude-remove-all~: 取消当前 buffer 所有嵌入内容的显示
+- ~org-transclude-make-from-link~: 将档期光标所在的普通链接转换为 ~#+transclude:~ 链接
+- ~org-transclude-refresh~: 刷新当前 buffer 嵌入内容的改动
+- ~org-transclude-live-syc-start~: 进入同步嵌入内容可以修改它(不支持对代码块的修改,默认无法修改)
+- ~org-transclude-live-sync-exit~: 退出同步修改嵌入内容模式
+
+**** 配置
+:PROPERTIES:
+:ID:       4bb9fdda-85b8-46cd-8cb8-45af533602a6
+:END:
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! org-transclusion)
+#+end_src
+相关配置
+#+begin_src emacs-lisp :tangle yes :noweb-ref none
+(with-eval-after-load 'org-transclusion
+  (add-to-list 'org-transclusion-extensions 'org-transclusion-indent-mode)
+  (require 'org-transclusion-indent-mode))
+(map! :map org-mode-map
+  :leader
+  :desc "org transclusion mode" "nt" #'org-transclusion-mode)
+(my/leader :keymap 'org-mode-map
+  "tt" '(org-transclusion-mode :wk "Toggle org transclusion"))
+#+end_src
+使用 org-transclusion 进行 org 导出操作，不考虑递归问题
+#+begin_src emacs-lisp :tangle yes :noweb-ref none
+(defun my/org-roam-to-html ()
+  "Export org to html covert org-roam-node to org-transclude."
+  (interactive)
+  (goto-char (point-min))
+  (while (search-forward "[[id:" nil t)
+    (progn (replace-match "\n#+transclude: [[id:")
+           ))
+  (org-transclusion-add-all)
+  (org-html-export-to-html)
+  (org-transclusion-remove-all)
+  (goto-char (point-min))
+  (sit-for 1)
+  (while (search-forward "\n#+transclude: [[id:" nil t)
+    (replace-match "[[id:")))
+#+end_src
+*** org 图片处理
++ 参考
+  + [[https://remacs.cc/posts/%E9%9D%A2%E5%90%91%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86%E7%9A%84emacs%E6%95%99%E7%A8%8B18.-org-mode%E5%86%99%E6%96%87%E6%A1%A3%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B0%8F%E6%8A%80%E5%B7%A7/][面向产品经理的 Emacs 教程： 18. Org mode 写文档的一些小技巧 | Randolph 的博客]]
+  + [[https://emacs-china.org/t/org-download/1672/6][Org-download 不错 - Org-mode - Emacs China]]
+#+begin_src emacs-lisp
+(if (modulep! :lang org +dragndrop)
+    (after! org-download
+      ;; 如果 org-download-method 设为 'attach 的话，用下面这个就可以去掉标题里的 ATTACH 标签了
+      (setq org-attach-auto-tag nil)
+      (setq org-download-display-inline-images 'postformae)
+      ;; 默认不显示图片
+      (advice-remove #'org-download-insert-link #'+org--dragndrop-then-display-inline-images-a)
+      )
+  (defun my/org-insert-clipboard-image (width)
+    "Crteate a time stamped unique-named file from the clipboard in the sub-directory
+(%filename.assets) as the org-buffer and insert a link to this file."
+    (interactive (list
+                  (read-string (format "input image width, default is 800: ")
+                               nil nil "800")))
+
+    (let* (;; 设置存放图片的位置为当前 org 同名的.assets 下
+           (foldername (concat (file-name-base (buffer-file-name)) ".assets/"))
+           ;; 图片名称
+           (img-name (concat "img_" (format-time-string "%Y%m%d_%H%M%S") ".png"))
+           ;; 图片文件的相对路径
+           (relative-file-name (concat (file-name-base (buffer-name)) ".assets/" img-name)))
+
+      (unless (file-exists-p foldername)
+        (mkdir foldername))
+      ;; 根据不同操作系统设置不同的命令行工具
+      (cond (IS-LINUX
+             (shell-command (concat "xclip -selection clipboard -t image/png -o > " relative-file-name)))
+            (IS-MAC
+             (shell-command (concat "pngpaste " relative-file-name))))
+      ;; 给粘贴好的图片链接加上宽度属性，方便导出
+      (insert (concat "\n#+DOWNLOADED: screenshot @ "
+                      (format-time-string "%Y-%m-%d %a %H:%M:%S" (current-time))
+                      "\n#+CAPTION: \n#+ATTR_ORG: :width "
+                      width
+                      "\n#+ATTR_LATEX: :width "
+                      (if (>= (/ (string-to-number width) 800.0) 1.0)
+                          "1.0"
+                        (number-to-string (/ (string-to-number width) 800.0)))
+                      "\\linewidth :float nil\n"
+                      "#+ATTR_HTML: :width "
+                      width
+                      "\n[[file:" relative-file-name "]]\n"))
+      ;; 重新显示一下图片
+      (org-redisplay-inline-images)))
+  (map! "s-V" #'my/org-insert-clipboard-image))
+#+end_src
+
+*** TODO 加密块
 目前还不太了解，后续添加
 =org-crypt= 可以用 =GPG= 加密 Org Mode 的某些 heading，当然是带有 ~crypt~ 标签的。
 现在来设置一下。
@@ -3711,7 +4338,7 @@ org treesit
 :cryptkey: 0x0123456789012345678901234567890123456789
 :end:
 #+end_example
-**** TODO 从 Pandoc 导入
+*** TODO 从 Pandoc 导入
 有时我不得不使用 Org-mode 文件，但幸运的是，Pandoc 提供了处理非 Org-mode 文件的
 方法。
 #+begin_src emacs-lisp :tangle packages.el :comments no :noweb-ref none
@@ -3724,28 +4351,10 @@ org treesit
   :after org)
 #+end_src
 
-**** agenda
+*** agenda
 org todo 相关配置
 #+begin_src emacs-lisp
-;; (setq org-todo-keywords
-;;       '((sequence
-;;          "TODO(t)" ; A task that needs doing & is ready to do
-;;          "WIP(i)" ; 正在做的事
-;;          "HOLD(h)" ; This is paused/on hold because of me
-;;          "WAIT(w)" ; 等待
-;;          "PROJ(p)"  ; A project, which usually contains other tasks
-;;          "LOOP(l)"  ; A recurring task
-;;          "IDEA(i)"  ; An unconfirmed and unapproved task or notion
-;;          "|"
-;;          "DONE(d)" ; 完成
-;;          "KILL(k)") ; 终止任务，TASK was cancelled，
-;;         (sequence ; 代码相关
-;;          "REPORT(r)"
-;;          "BUG(b)"
-;;          "KNOWNCAUSE(k)"
-;;          "|"
-;;          "FIXED(f)")
-;;         ))
+;;        ))
 (setq org-todo-keywords
       '((sequence "TODO(t)" "HOLD(h!)" "WIP(i!)" "WAIT(w!)" "|" "DONE(d!)" "CANCELLED(c@/!)")
         (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f!)")))
@@ -3860,78 +4469,20 @@ org todo 相关配置
          org-agenda-include-deadlines t
          org-agenda-block-separator nil
          org-agenda-tags-column 100 ;; from testing this seems to be a good value
-         org-agenda-compact-blocks t))
-#+end_src
-
-**** org-capture
-org-capture 模块设置
-#+begin_src emacs-lisp :noweb-ref none :tangle yes
-(after! org-capture
-  (setq! org-capture-dir (expand-file-name "capture" org-directory)
-         org-capture-snippet-file (expand-file-name "snippets.org" org-capture-dir)
-         org-capture-book-file (expand-file-name "books.org" org-capture-dir)
-         org-capture-movie-file (expand-file-name "movie.org" org-capture-dir)
-         org-capture-note-file (expand-file-name "notes.org" org-capture-dir)
-         ;; 这个应该会被删除，之后使用 org-roam 取代
-         org-capture-blog-file (expand-file-name "blog.org" org-capture-dir)
-         ;; 保存书签，
-         org-capture-bookmark-file (expand-file-name "bookmark.org" org-capture-dir))
-  (defun my--find-month-daily-tree ()
-    (let* ((path (list
-                  "Personal"
-                  (format-time-string "%Y 年")
-                  (format-time-string "%m 月")
-                  (format-time-string "%Y 年%m 月%d 日")))
-           (level 1)
-           end)
-      (unless (derived-mode-p 'org-mode)
-        (error "Target buffer \"%s\" should be in Org mode" (current-buffer)))
-      (goto-char (point-min))             ;移动到 buffer 的开始位置
-      ;; 先定位表示年份的 headline，再定位表示月份的 headline
-      (dolist (heading path)
-        (let ((re (format org-complex-heading-regexp-format
-                          (regexp-quote heading)))
-              (cnt 0))
-          (if (re-search-forward re end t)
-              (goto-char (point-at-bol))  ;如果找到了 headline 就移动到对应的位置
-            (progn                        ;否则就新建一个 headline
-              (or (bolp) (insert "\n"))
-              (if (/= (point) (point-min)) (org-end-of-subtree t t))
-              (insert (make-string level ?*) " " heading "\n"))))
-        (setq level (1+ level))
-        (setq end (save-excursion (org-end-of-subtree t t))))
-      (org-end-of-subtree)))
-  (setq org-capture-templates
-        `(("j" "Journal" entry (file+datetree ,(concat org-directory "/journal.org"))
-           "* %U - %^{heading}\n  %?")
-          ("c" "Comment")
-          ("cb" "Book" entry (file+weektree ,org-capture-book-file)
-           "* %^{book} :book:%\\1:\n%?" :empty-lines 1)
-          ("cm" "Movie" entry (file+weektree ,org-capture-movie-file)
-           "* %^{movie} :movie:%\\1:\n%?" :empty-lines 1)
-          ("g" "GTD")
-          ("gt" "Todo" entry (file+headline ,org-agenda-todo-file "TODOS")
-           "* TODO [#%^{priority|B|A|C|D|E}] %^{task} \n SCHEDULED: %^T DEADLINE: %^T\n:properties:\n:end:\n%?")
-          ("gd" "Daily" entry (file+olp ,org-agenda-todo-file "Habit" "Daily")
-           "* TODO [#%^{priority|C|A|B|D|E}] %^{task}\n :properties:\n:end:\n SCHEDULED:  %<<%Y-%m-%d %a %H:%M ++1d>>\n%?"
-           :empty-lines 1)
-          ("gw" "Weekly" entry (file+olp ,org-agenda-todo-file "Habit" "Weekly")
-           "* TODO [#%^{priority|B|A|C|D|E}] %^{task}\n:properties:\n:end:\n SCHEDULED: %<<%Y-%m-%d %a %H:%M ++1w>>\n%?"
-           :empty-lines 1)
-          ("gm" "Monthly" entry (file+olp ,org-agenda-todo-file "Habit" "Monthly")
-           "* TODO [#%^{priority|C|A|B|D|E}] %^{task}\n:properties:\n:end:\n SCHEDULED: %<<%Y-%m-%d %a %H:%M ++1m>>\n%?"
-           :empty-lines 1)
-          ("t" "Todo" plain (file+function ,org-agenda-todo-file my--find-month-daily-tree)
-           "***** TODO [#%^{priority|B|A|C|D|E}] %^{task} \n SCHEDULED: %<<%Y-%m-%d %a %H:%M>> DEADLINE: %<<%Y-%m-%d %a 23:59>>\n:properties:\n:end:\n%?"
-           :empty-lines 1)
-          ;; org-bookmark
-          ("pn" "Protocol Bookmarks" entry (file+headline ,org-capture-bookmark-file "Bookmark")
-           "* %U - %:annotation  \n %:initial \n" :immediate-finish t :kill-buffer t)
-          ))
+         org-agenda-compact-blocks t)
+  (when (bound-and-true-p my-default-org-agenda-file)
+    (push my-default-org-agenda-file org-agenda-files))
   )
 #+end_src
 
-**** org-protocol
+*** org-capture
+org-capture 模块设置
+#+begin_src emacs-lisp :noweb-ref none :tangle yes
+(after! org-capture
+  )
+#+end_src
+
+*** org-protocol
 配置 org-protocol
 #+begin_src emacs-lisp
 (use-package org-protocol
@@ -3966,7 +4517,7 @@ org-capture 模块设置
             (re-search-backward anchor-re nil t 1))))))
 #+end_src
 
-**** org-src
+*** org-src
 设置代码块的默认参数
 #+begin_src emacs-lisp
 (use-package! org-src
@@ -4106,7 +4657,7 @@ org-capture 模块设置
   (advice-add 'org-babel-execute-src-block :before #'get-attributes-from-src-block-result))
 #+end_src
 
-**** header 补全
+*** header 补全
 :PROPERTIES:
 :URL:      https://github.com/isamert/corg.el
 :END:
@@ -4116,426 +4667,6 @@ org-capture 模块设置
 #+begin_src emacs-lisp
 (use-package corg
   :hook (org-mode . corg-setup))
-#+end_src
-*** 美化配置
-**** org 美化的基本配置
-设置合适的标题大小和每一级的行高
-#+begin_src emacs-lisp
-(custom-set-faces! '(org-document-title :height 1.75 :weight bold)
-  '(org-level-1 :height 1.25 :weight bold)
-  '(org-level-2 :height 1.2 :weight bold)
-  '(org-level-3 :height 1.15 :weight bold)
-  '(org-level-4 :height 1.1 :weight bold)
-  '(org-level-5 :height 1.05 :weight bold)
-  '(org-level-6 :height 1.025 :weight bold)
-  '(org-level-7 :height 1.0 :weight bold)
-  '(org-level-8 :height 1.0 :weight bold))
-
-(setq org-priority-faces '((?A . error)
-                           (?B . warning)
-                           (?C . success)))
-#+end_src
-代码块使用上下边线包裹
-#+begin_src emacs-lisp
-(custom-set-faces! '(org-block-begin-line :underline t :background unspecified)
-  '(org-block-end-line :overline t :underline nil :background unspecified))
-#+end_src
-提升 latex 预览的图片清晰度
-#+begin_src emacs-lisp
-(plist-put! org-format-latex-options :scale 1.8)
-#+end_src
-设置标题行之间总是空格;列表之间根据情况自动加空格
-#+begin_src emacs-lisp
-(setq! org-blank-before-new-entry '((heading . t) (plain-list-item . auto)))
-#+end_src
-设置
-org 自带的 todo,done,引用块美化
-#+begin_src emacs-lisp
-(setq org-fontify-todo-headline t
-      org-fontify-done-headline t
-      org-fontify-quote-and-verse-blocks t)
-#+end_src
-隐藏宏标记
-#+begin_src emacs-lisp
-(setq org-hide-macro-markers t)
-#+end_src
-高亮 latex 语法
-#+begin_src emacs-lisp
-(setq org-highlight-latex-and-related '(native script entities))
-#+end_src
-默认使用 overview 的模式展示标题行
-#+begin_src emacs-lisp
-(setq org-startup-folded 'overview)
-#+end_src
-**** org-modern
-使 =org-mode= buffer 尽可能漂亮是很重要的，Minad 的 =org-modern= 在这方面大有帮
-助。
-#+begin_src emacs-lisp :noweb-ref none :tangle packages.el
-(package! org-modern)
-(package! org-modern-indent :recipe (:host github :repo "jdtsmith/org-modern-indent" :depth 1))
-#+end_src
-#+begin_src emacs-lisp :tangle yes :noweb-ref none
-(use-package! org-modern-indent
-  :defer t
-  :init
-  (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
-(use-package! org-modern
-  :hook ((org-mode . org-modern-mode) (org-agenda-finalize . org-modern-agenda))
-  :config
-  ;; org-modern-replace-stars 可用 列表
-  ;; "➀➁➂➃➄➅➆➇➈" "󰉫󰉬󰉭󰉮󰉯󰉰" "✿❀✭✫✦✧◈◇" "⚀⚁⚂⚃⚄⚅"
-  ;; "☯☰☱☲☳☴☵☶☷"
-  (setopt org-modern-star 'replace
-          org-modern-replace-stars "󰉫󰉬󰉭󰉮󰉯󰉰")
-  (setopt org-modern-block-fringe t)
-
-  ;; org-modern-checkbox 配置
-  (defvar my-org-modern-checkbox-type 'box) ; nil, box, circle calendar
-  (setopt org-modern-checkbox (pcase my-org-modern-checkbox-type
-                                ('box '((88 . "") (45 . "")  (32 . "󰄱")))
-                                ('circle '((88 . "") (45 . "")  (32 . "")))
-                                ('calendar '((88 . "") (45 . "")  (32 . "")))
-                                (_ '((?X . #("▢✓" 0 2 (composition ((2)))))
-                                     (?- . #("▢-" 0 2 (composition ((2)))))
-                                     (?\s . #("▢" 0 1 (composition ((1)))))))))
-  ;; org-modern-table 存在无法对齐的情况, 我是用其他包管理
-  ;; @see https://github.com/minad/org-modern/issues/5
-  (setq org-modern-table nil)
-  ;; (setq org-modern-table-horizontal 0.3
-  ;;       org-modern-table-vertical 2)
-
-  ;; tag 边框宽度，还可以设置为 `auto' 即自动计算
-  (setq org-modern-label-border 'auto)
-  (setq org-modern-list (if (doom-font-exists-p "PragmataPro Liga")
-                            '((43 . "➤")
-                              (45 . "♫")
-                              (42 . "•"))
-                          '((43 . "➤")
-                            (45 . "–")
-                            (42 . "•")))
-        org-modern-todo-faces '(("TODO" :inverse-video t :inherit org-todo)
-                                ("PROJ" :inverse-video t :inherit +org-todo-project)
-                                ("STRT" :inverse-video t :inherit +org-todo-active)
-                                ("[-]"  :inverse-video t :inherit +org-todo-active)
-                                ("HOLD" :inverse-video t :inherit +org-todo-onhold)
-                                ("WAIT" :inverse-video t :inherit +org-todo-onhold)
-                                ("[?]"  :inverse-video t :inherit +org-todo-onhold)
-                                ("KILL" :inverse-video t :inherit +org-todo-cancel)
-                                ("NO"   :inverse-video t :inherit +org-todo-cancel))
-        org-modern-footnote (cons nil (cadr org-script-display))
-        org-modern-progress 12
-        org-modern-priority nil
-        org-modern-horizontal-rule (make-string 36 ?─)
-        ;; 使用 org-modern 自带的取代 org-tag 和 org-agenda-tags
-        org-tags-column 0
-        org-agenda-tags-column 0)
-
-  (setq org-modern-keyword '((t . t)))
-  (when (fboundp 'nerd-icons-mdicon)
-    (setq org-modern-keyword
-          `((t . t)
-            ("title" . ,(nerd-icons-mdicon "nf-md-format_title"))
-            ("email" . ,(nerd-icons-mdicon "nf-md-email"))
-            ("date" . ,(nerd-icons-octicon "nf-oct-calendar"))
-            ("author" . ,(nerd-icons-mdicon "nf-md-account"))
-            ("subtitle" . ,(nerd-icons-mdicon "nf-md-subtitles"))
-            ("property" . ,(nerd-icons-codicon "nf-cod-symbol_property"))
-            ("options" . ,(nerd-icons-codicon "nf-cod-settings"))
-            ("startup" . ,(nerd-icons-mdicon "nf-md-power"))
-            ("macro" . ,(nerd-icons-faicon "nf-fa-maxcdn"))
-            ("bind" . ,(nerd-icons-mdicon "nf-md-link"))
-            ("include" . ,(nerd-icons-mdicon "nf-md-code_braces"))
-            ("setupfile" . ,(nerd-icons-mdicon "nf-md-hammer_wrench"))
-            ("name" . ,(nerd-icons-mdicon "nf-md-alpha_n_box_outline"))
-            ("result" . ,(nerd-icons-mdicon "nf-md-alpha_r_box_outline"))
-            ("attr_latex" . ,(nerd-icons-mdicon "nf-md-alpha_l_circle_outline"))
-            ("attr_org" . ,(nerd-icons-mdicon "nf-md-alpha_o_circle_outline"))
-            ("attr_html" . ,(nerd-icons-mdicon "nf-md-alpha_h_circle_outline"))
-            ("html_head" . ,(nerd-icons-faicon "nf-fa-header"))
-            ("header" . ,(nerd-icons-mdicon "nf-md-format_header_increase"))
-            ("caption" . ,(nerd-icons-mdicon "nf-md-closed_caption"))
-            ("RESULTS" . ,(nerd-icons-mdicon "nf-md-read")))))
-  (custom-set-faces! '(org-modern-statistics :inherit org-checkbox-statistics-todo)))
-#+end_src
-由于 =org-modern= 的标签面取代了 Org 的标签面，我们需要调整拼写检查面忽略列表。
-#+begin_src emacs-lisp :tangle yes :noweb-ref none
-(after! spell-fu
-  (cl-pushnew 'org-modern-tag (alist-get 'org-mode +spell-excluded-faces-alist)))
-#+end_src
-**** 强调标记
-虽然 ~org-hide-emphasis-markers~ 非常好，但有时它会使边界处的编辑变得更加繁琐。
-我们可以使用 =org-appear= 包在不牺牲视觉便利的情况下改善这种情况。
-
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! org-appear :recipe (:type git :host github :repo "awth13/org-appear"))
-#+end_src
-
-#+begin_src emacs-lisp  :noweb-ref none :tangle "yes"
-(use-package! org-appear
-  :hook (org-mode . org-appear-mode)
-  :config
-  (setq org-appear-autolinks t)
-  (setq org-appear-autosubmarkers t)
-  (setq org-appear-autoentities t)
-  (setq org-appear-autokeywords t)
-  (setq org-appear-inside-latex t))
-#+end_src
-**** 符号配置
-用来更改于折叠项目的字符
-#+begin_src emacs-lisp
-(setq! org-elispsis " ▾ "
-       org-hide-leading-stars t
-       org-priority-highest ?A
-       org-priority-lowest ?E)
-#+end_src
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! org-fancy-priorities :pin "7f677c6c14ecf05eab8e0efbfe7f1b00ae68eb1d")
-#+end_src
-#+begin_src emacs-lisp  :noweb-ref none :tangle "yes"
-(use-package! org-fancy-priorities ; priority icons
-  :hook (org-mode . org-fancy-priorities-mode)
-  :hook (org-agenda-mode . org-fancy-priorities-mode)
-  :config
-  (custom-set-variables '(org-lowest-priority ?E))
-  (setq! org-fancy-priorities-list '("⚡" "↑" "↓" "☕" "❓")))
-#+end_src
-ligatures 配置,
-#+begin_src emacs-lisp :noweb-ref none :tangle "yes"
-(appendq! +ligatures-extra-symbols
-          (list :list_property "::" :em_dash "-"))
-(when (modulep! :lang org)
-  (defadvice! +org-init-appearance-h--no-ligatures-a ()
-    :after #'+org-init-appearance-h
-    (set-ligatures! 'org-mode nil)
-    (set-ligatures! 'org-mode
-      :list_property "::"
-      :em_dash       "---"
-      :ellipsis      "..."
-      :arrow_right   "->"
-      :arrow_left    "<-"
-      :arrow_lr      "<->"
-      :idcard        ":ID:"
-      :idcard        ":id:"
-      :properties    ":properties:"
-      :properties    ":PROPERTIES:"
-      :crypt         ":cryptkey:"
-      :end           ":end:"
-      :end ":END:")))
-#+end_src
-***** table
-使用 valign 对齐 org-table
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! valign :recipe (:host github :repo "casouri/valign"))
-#+end_src
-#+begin_src emacs-lisp
-(use-package! valign
-  :hook (org-mode . valign-mode)
-  :config (setq valign-fancy-bar t))
-#+end_src
-
-**** iscroll-mode
-更平滑的滚动图片
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! iscroll)
-#+end_src
-#+begin_src emacs-lisp
-(add-hook! org-mode #'iscroll-mode)
-#+end_src
-*** org 图片处理
-+ 参考
-  + [[https://remacs.cc/posts/%E9%9D%A2%E5%90%91%E4%BA%A7%E5%93%81%E7%BB%8F%E7%90%86%E7%9A%84emacs%E6%95%99%E7%A8%8B18.-org-mode%E5%86%99%E6%96%87%E6%A1%A3%E7%9A%84%E4%B8%80%E4%BA%9B%E5%B0%8F%E6%8A%80%E5%B7%A7/][面向产品经理的 Emacs 教程： 18. Org mode 写文档的一些小技巧 | Randolph 的博客]]
-  + [[https://emacs-china.org/t/org-download/1672/6][Org-download 不错 - Org-mode - Emacs China]]
-#+begin_src emacs-lisp
-(if (modulep! :lang org +dragndrop)
-    (after! org-download
-      ;; 如果 org-download-method 设为 'attach 的话，用下面这个就可以去掉标题里的 ATTACH 标签了
-      (setq org-attach-auto-tag nil)
-      (setq org-download-display-inline-images 'postformae)
-      ;; 默认不显示图片
-      (advice-remove #'org-download-insert-link #'+org--dragndrop-then-display-inline-images-a)
-      )
-  (defun my/org-insert-clipboard-image (width)
-    "Crteate a time stamped unique-named file from the clipboard in the sub-directory
-(%filename.assets) as the org-buffer and insert a link to this file."
-    (interactive (list
-                  (read-string (format "input image width, default is 800: ")
-                               nil nil "800")))
-
-    (let* (;; 设置存放图片的位置为当前 org 同名的.assets 下
-           (foldername (concat (file-name-base (buffer-file-name)) ".assets/"))
-           ;; 图片名称
-           (img-name (concat "img_" (format-time-string "%Y%m%d_%H%M%S") ".png"))
-           ;; 图片文件的相对路径
-           (relative-file-name (concat (file-name-base (buffer-name)) ".assets/" img-name)))
-
-      (unless (file-exists-p foldername)
-        (mkdir foldername))
-      ;; 根据不同操作系统设置不同的命令行工具
-      (cond (IS-LINUX
-             (shell-command (concat "xclip -selection clipboard -t image/png -o > " relative-file-name)))
-            (IS-MAC
-             (shell-command (concat "pngpaste " relative-file-name))))
-      ;; 给粘贴好的图片链接加上宽度属性，方便导出
-      (insert (concat "\n#+DOWNLOADED: screenshot @ "
-                      (format-time-string "%Y-%m-%d %a %H:%M:%S" (current-time))
-                      "\n#+CAPTION: \n#+ATTR_ORG: :width "
-                      width
-                      "\n#+ATTR_LATEX: :width "
-                      (if (>= (/ (string-to-number width) 800.0) 1.0)
-                          "1.0"
-                        (number-to-string (/ (string-to-number width) 800.0)))
-                      "\\linewidth :float nil\n"
-                      "#+ATTR_HTML: :width "
-                      width
-                      "\n[[file:" relative-file-name "]]\n"))
-      ;; 重新显示一下图片
-      (org-redisplay-inline-images)))
-  (map! "s-V" #'my/org-insert-clipboard-image))
-#+end_src
-
-*** org-roam
-:PROPERTIES:
-:ID:       fadf9cb0-7b0d-42eb-b02f-bc76e76b1096
-:END:
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! org-roam)
-(unpin! org-roam)
-;; FIXME: @see https://github.com/org-roam/org-roam-ui/issues/236
-;; Org-roam-ui doesn't show the node's text if in a .dir-locals.el location
-(package! org-roam-ui :recipe (:host github :repo "Keisn1/org-roam-ui"))
-
-;; Automatically synchronize logseq edits to work in org-roam when it's open
-(package! org-roam-logseq :recipe (:host github :repo "idanov/org-roam-logseq.el"))
-
-;; https://linux.do/t/topic/111737
-(package! vulpea)
-#+end_src
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-;; 使用 org-roam-ui 的配置
-(use-package! websocket :after org-roam)
-(use-package! org-roam
-  :init
-  (require 'f)
-  (setq my-default-org-roam-directory (f-expand (f-join "~/Documents" "logseq"))
-        my-default-org-roam-page "pages/"
-        my-default-org-roam-location (f-expand (f-join doom-cache-dir "org-roam-personl.db")))
-  (setopt org-roam-directory my-default-org-roam-directory
-          org-roam-database-connector 'sqlite-builtin
-          org-roam-dailies-directory "journals/"
-          org-roam-file-exclude-regexp "\\.st[^/]*\\|logseq/.*$"
-          org-id-link-to-org-use-id t)
-  :config
-  (setopt org-roam-capture-templates
-      `(("d" "default" plain "%?" :target
-         (file+head ,(concat my-default-org-roam-page "${slug}.org")
-                    "#+title: ${title}\n#+DATE: %<%Y-%m-%d>\n#+LAST_MODIFIED: %U\n\n")
-         :unnarrowed t))
-      org-roam-dailies-capture-templates
-      '(("d" "default" plain "%?" :target
-         (file+head "%<%Y_%m_%d>.org"
-                    "#+title: %<%Y-%m-%d>\n\n"))))
-  (require 'org-roam-logseq)
-
-
-  ;;* dynamic agenda https://github.com/brianmcgillion/doomd/blob/master/config.org
-  ;; https://emacs-china.org/t/org-roam/15659/16
-  ;; https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html
-  ;; The 'roam-agenda' tag is used to tell vulpea that there is a todo item in this file
-  (add-to-list 'org-tags-exclude-from-inheritance "roam-agenda")
-
-  (require 'vulpea)
-  (add-hook 'org-roam-db-autosync-mode-hook #'vulpea-db-autosync-enable)
-  (org-roam-db-autosync-mode +1)
-
-  (defun vulpea-buffer-p ()
-    "Return non-nil if the currently visited buffer is a note."
-    (and buffer-file-name
-         (string-prefix-p
-          (expand-file-name (file-name-as-directory org-roam-directory))
-          (file-name-directory buffer-file-name))))
-
-  (defun vulpea-project-p ()
-    "Return non-nil if current buffer has any todo entry.
-
-TODO entries marked as done are ignored, meaning the this
-function returns nil if current buffer contains only completed
-tasks."
-    (seq-find                                 ; (3)
-     (lambda (type)
-       (eq type 'todo))
-     (org-element-map                         ; (2)
-         (org-element-parse-buffer 'headline) ; (1)
-         'headline
-       (lambda (h)
-         (org-element-property :todo-type h)))))
-
-  (defun vulpea-project-update-tag (&optional arg)
-    "Update PROJECT tag in the current buffer."
-    (interactive "P")
-    (when (and (not (active-minibuffer-window))
-               (vulpea-buffer-p))
-      (save-excursion
-        (goto-char (point-min))
-        (let* ((tags (vulpea-buffer-tags-get))
-               (original-tags tags))
-          (if (vulpea-project-p)
-              (setq tags (cons "roam-agenda" tags))
-            (setq tags (remove "roam-agenda" tags)))
-
-          ;; cleanup duplicates
-          (setq tags (seq-uniq tags))
-
-          ;; update tags if changed
-          (when (or (seq-difference tags original-tags)
-                    (seq-difference original-tags tags))
-            (apply #'vulpea-buffer-tags-set tags))))))
-
-  ;; https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/
-  (defun my/org-roam-filter-by-tag (tag-name)
-    (lambda (node)
-      (member tag-name (org-roam-node-tags node))))
-
-  (defun my/org-roam-list-notes-by-tag (tag-name)
-    (mapcar #'org-roam-node-file
-            (seq-filter
-             (my/org-roam-filter-by-tag tag-name)
-             (org-roam-node-list))))
-
-  (defun dynamic-agenda-files-advice (orig-val)
-    (let ((roam-agenda-files (delete-dups (my/org-roam-list-notes-by-tag "roam-agenda"))))
-      (cl-union orig-val roam-agenda-files :test #'equal)))
-
-  (add-hook 'before-save-hook #'vulpea-project-update-tag)
-  (advice-add 'org-agenda-files :filter-return #'dynamic-agenda-files-advice))
-
-(use-package! org-roam-ui
-  :after org-roam
-;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-;;  :hook (after-init . org-roam-ui-mode)
-  :init
-  ;; Underscore always becomes underline
-  ;; https://github.com/org-roam/org-roam-ui/issues/261
-  (setopt org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
-#+end_src
-
-**** 多个 org-roam-root 目录切换
-在额外的 org-roam-directory 目录下添加如下内容
-#+begin_src emacs-lisp :tangle "no" :noweb-ref none
-((nil . ((eval . (setq-local
-                  org-roam-directory (expand-file-name (locate-dominating-file
-                                                        default-directory ".dir-locals.el"))))
-         (eval . (setq-local
-                  org-roam-db-location (expand-file-name "org-roam.db"
-                                                         org-roam-directory))))))
-;; 或者
-((nil . ((org-roam-directory . "/path/to/alt/org-roam-dir")
-         (org-roam-db-location . "/path/to/alt/org-roam-dir/org-roam.db"))))
 #+end_src
 *** org-media-note
 media note
@@ -4567,55 +4698,6 @@ media note
 (map! [remap org-store-link] #'org-super-links-store-link)
 #+end_src
 
-*** org-transclusion
-通过文件链接或 org-id 链接插入文件副本内容
-**** 基本操作
-通过在链接前加入: ~#+transclude:~ 得到一个 transclude 链接。在链接后可以加上额外配置:
-+ ~:only-contents~ 仅嵌入内容
-+ ~:exclude-elements~ 排除某些元素
-+ ~:src python~ 嵌入文件到代码块，也可以为代码块添加额外参数 ~:src python :rest ":session :results value"~
-+ ~:lines 3-5~ transclude 链接的 3 到 5 行内容
-+ ~:level 4~ 仅显示到第 4 级目录的内容
-**** 基本命令
-- ~org-transclusion-mode~: 将自动应用translate 到当前buffer, 快捷按键，org-mode, ~<leader>nt~
-- ~org-transclusion-add-all~: 将所有 =#+transclude:= 链接转换为嵌入内容
-- ~org-transclusion-add~: 将当前的 =#+transclude:= 链接转换为嵌入内容，光标需要在 ~#+transclude:~ 上
-- ~org-transclude-remove~: 取消当前嵌入内容的显示
-- ~org-transclude-remove-all~: 取消当前 buffer 所有嵌入内容的显示
-- ~org-transclude-make-from-link~: 将档期光标所在的普通链接转换为 ~#+transclude:~ 链接
-- ~org-transclude-refresh~: 刷新当前 buffer 嵌入内容的改动
-- ~org-transclude-live-syc-start~: 进入同步嵌入内容可以修改它(不支持对代码块的修改,默认无法修改)
-- ~org-transclude-live-sync-exit~: 退出同步修改嵌入内容模式
-
-**** 配置
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! org-transclusion)
-#+end_src
-相关配置
-#+begin_src emacs-lisp :tangle yes :noweb-ref none
-(map! :map org-mode-map
-  :leader
-  :desc "org transclusion mode" "nt" #'org-transclusion-mode)
-(my/leader :keymap 'org-mode-map
-  "tt" '(org-transclusion-mode :wk "Toggle org transclusion"))
-#+end_src
-使用 org-transclusion 进行 org 导出操作，不考虑递归问题
-#+begin_src emacs-lisp :tangle yes :noweb-ref none
-(defun my/org-roam-to-html ()
-  "Export org to html covert org-roam-node to org-transclude."
-  (interactive)
-  (goto-char (point-min))
-  (while (search-forward "[[id:" nil t)
-    (progn (replace-match "\n#+transclude: [[id:")
-           ))
-  (org-transclusion-add-all)
-  (org-html-export-to-html)
-  (org-transclusion-remove-all)
-  (goto-char (point-min))
-  (sit-for 1)
-  (while (search-forward "\n#+transclude: [[id:" nil t)
-    (replace-match "[[id:")))
-#+end_src
 ** emacs-lisp
 :properties:
 :CUSTOM_ID: emacs-lisp
@@ -5006,15 +5088,9 @@ macos 中自动化的一门脚本语言
 :ID: 23b63cd8-aeb1-4ff8-a406-3fa884524f3a
 :END:
 一个性能更好的​=json-mode= 工具，29 版本的 emacs 有​~json-ts-mode~​​这个选择所以不安装它
-#+NAME: use-json-p
-#+begin_src emacs-lisp :tangle "no"
-(and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'json))
-#+end_src
 
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none :var us-treesit=use-json-p
-(unless (string= us-treesit "t")
-  (package! jsonian :recipe (:host github :repo "iwahbe/jsonian"))
-  (package! json-mode :disable t))
+(package! jsonian :recipe (:host github :repo "iwahbe/jsonian") :built-in 'prefer)
 #+end_src
 
 #+begin_src emacs-lisp :tangle "yes" :noweb-ref none :var us-treesit=use-json-p
@@ -5025,6 +5101,13 @@ macos 中自动化的一门脚本语言
         (add-to-list 'org-src-lang-modes '("json" . json-ts))))
   ;; To disable so-long mode overrides
   (after! (jsonian so-long) (jsonian-no-so-long-mode)))
+
+(use-package! jsonian
+  :mode "\\.js\\(?:on\\|[hl]int\\(?:rc\\)?\\)\\'"
+  :init
+  (when )
+  )
+
 #+end_src
 ** sh
 *** org mode 中使用代码块
