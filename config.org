@@ -312,6 +312,8 @@ descendant, GNU Emacs, continues actively as of 2020.
 *** treesit
 emacs 内部使用的 语法树（tree-sitter）.
 #+begin_src emacs-lisp :tangle "autoload/init-treesit.el"
+(require 'cl-seq)
+
 ;;;###autoload
 (defun my-use-treesite-p ()
   "Check whether tree-sitter is available.
@@ -348,6 +350,12 @@ Native tree-sitter is introduced since 29."
       ('lisp-interaction-mode (my--treesit-load-language 'elisp))
       (_ (let ((sym_mode (intern (nth 0 (string-split (symbol-name major-mode) "-")))))
            (my--treesit-load-language sym_mode)))))
+
+;;;###autoload
+(defun my-treesit-get-recipe (lang)
+  (when (require 'treesit-auto nil t)
+    (cl-find-if (lambda (x) (eq (treesit-auto-recipe-lang x) lang))
+                (treesit-auto--selected-recipes))))
 #+end_src
 *** 大文件确认
 - buffer-size > 100000 即为大文件
@@ -559,8 +567,7 @@ Version 2022-06-26  8:46:00"
 
 *** org headline 移动到指定文件
 #+begin_src emacs-lisp :tangle "autoload/init-my-org.el"
-;; 需要 require 的内置包
-
+;; 需要的包
 (require 'outline)
 (require 'org-id)
 (require 'seq)
@@ -624,7 +631,7 @@ LEVEL is interge, TYPES is list"
       (let* ((heading (concat (make-string level ?*) " " heading))
              (re (concat "^" (regexp-quote heading) "$")))
         (if notfound
-            (insert "\n" heading "\n")
+            (insert "\n" heading)
           (if (re-search-forward re end t)
               (progn
                 (goto-char (match-beginning 0)) ;如果找到了 headline 就移动到对应的位置
@@ -670,15 +677,13 @@ LEVEL Indicates groups."
               ;; (goto-char (point-min))
               (my-org--create-headline-tree (my-org-get-group-list current-date level types))
               ;; Insert the TODO item
-              (insert "\n\n" content "\n")
+              (insert content)
               (save-buffer))
             ;; Insert a link to the new location
             (goto-char start)
             (delete-region start end)
             (insert (format "#+transclude: [[id:%s][%s]] :level 1\n" oid
                             (replace-regexp-in-string "\\*+ TODO " "" (car (split-string content "\n")))))
-            (save-buffer)
-            (my-org-remove-extra-blank-lines)
             (save-buffer)))))
     ))
 ;;;###autoload
@@ -1208,7 +1213,7 @@ python              ; beautiful is better than ugly
 ;; rust             ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
 ;;scala             ; java, but good
 ;;(scheme +guile)   ; a fully conniving family of lisps
-sh                ; she sells {ba,z,fi}sh shells on the C xor
+(sh +fish)                ; she sells {ba,z,fi}sh shells on the C xor
 ;;sml
 ;;solidity          ; do you need a blockchain? No.
 ;;swift             ; who asked for emoji variables?
@@ -1425,6 +1430,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 (use-package! nerd-icons
   :autoload (nerd-icons-mdicon nerd-icons-codicon)
   :init
+  (map! :leader  :desc "nerd" "in" #'nerd-icons-insert)
   (defadvice! +my-set-ligatures-a (&rest _)
     :before #'set-ligatures!
     (appendq! +ligatures-extra-symbols
@@ -1448,14 +1454,16 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
   :config
   (when (and (display-graphic-p)
              (not (doom-font-exists-p nerd-icons-font-family)))
-    (nerd-icons-install-fonts t)))
-(map! :leader  :desc "nerd" "in" #'nerd-icons-insert)
+    (nerd-icons-install-fonts t))
+  (add-to-list 'nerd-icons-extension-icon-alist
+               '("fnl" nerd-icons-sucicon "nf-custom-fennel" :face nerd-icons-purple)))
 #+end_src
 *** 主题和 modeline
 **** 主题的基本配置
 目前使用主要有 doom-theme ， modus-themes 和 catppuccin-theme
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! ef-themes :built-in 'prefer)
+(package! base16-theme :built-in 'prefer)
 #+end_src
 #+begin_src emacs-lisp
 (setq doom-theme nil) ;; 使用 autodark 自动切换主题
@@ -1545,15 +1553,22 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
         (setq theme (nth (random (length themes)) themes)))
       theme)))
 
+(defun my--load-theme (theme)
+  "Load theme."
+  (if (modulep! :completion vertico)
+      (consult-theme theme)
+    (unless (eq theme (car custom-enabled-themes))
+      (when theme
+        (if (custom-theme-p theme)
+            (enable-theme theme)
+          (load-theme theme :no-confirm))))))
+
 (defun my--pickup-random-color-theme (themes)
   "Pickup random color theme from THEMES."
   (let* ((ctheme (or (car custom-enabled-themes) doom-theme))
          (available-themes (mapcar 'symbol-name themes))
          (theme (my--random-theme-f available-themes ctheme)))
-    (if (modulep! :completion vertico)
-        (consult-theme (intern theme))
-      (disable-theme (car custom-enabled-themes))
-      (load-theme (intern theme) t t))
+    (my--load-theme (intern theme))
     (message "Color theme [%s] loaded." theme)))
 
 (defun my/random-theme ()
@@ -1566,14 +1581,16 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 (map! (:leader (:desc "load theme" "h t" #'my/random-theme))) ;; workspace load keybind
 #+end_src
 
-****** 自动切换主题
-******* auto-dark
+***** 自动切换主题
+****** auto-dark
 Macos 上借助系统自带的进行主题切换
 #+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "packages.el" "no")
 (package! auto-dark :recipe (:type git :host github :repo "emacsmirror/auto-dark"))
 #+end_src
 #+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "yes" "no")
 (use-package! auto-dark
+  :hook ((auto-dark-light-mode . (lambda () (my--load-theme auto-dark-light-theme)))
+         (auto-dark-dark-mode . (lambda () (my--load-theme auto-dark-dark-theme))))
   :init
   (defadvice! my/doom-init-theme-a (fn &rest args)
     "Using circadoam config"
@@ -1586,11 +1603,12 @@ Macos 上借助系统自带的进行主题切换
       (setq doom-theme (my--random-theme-f my-light-themes))
       (apply fn args)))
   :config
+  (fset 'auto-dark--enable-themes #'ignore)
   (setq auto-dark-dark-theme (my--random-theme-f my-dark-themes)
         auto-dark-light-theme  (my--random-theme-f my-light-themes)))
 #+end_src
 
-******* 使用经纬度切换
+****** 使用经纬度切换
 #+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "no" "packages.el")
 (package! circadian)
 #+end_src
@@ -1628,7 +1646,7 @@ Macos 上借助系统自带的进行主题切换
   (setq awesome-tray-date-format "%H:%M")
   (setq awesome-tray-active-modules
         '("word-count" "location" "belong" "file-path" "mode-name" "battery" "date" "evil"))
-  (add-hook 'doom-after-init-hook #'awesome-tray-mode 100)
+ (add-hook 'doom-after-init-hook #'awesome-tray-mode 100)
   (setq awesome-tray-info-padding-right 2)
   (add-hook! 'doom-load-theme-hook :depth 100
     (when (bound-and-true-p awesome-tray-mode)
@@ -1829,29 +1847,15 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 *** rainbow-mode
 显示 "#232323" 对应的色彩
 #+begin_src emacs-lisp :tangle "packages.el"
-(package! rainbow-mode :built-in 'prefer)
+(package! colorful-mode :built-in 'prefer)
 #+end_src
 只在 prog-mode  中开启, 参考: [[https://github.com/seagle0128/.emacs.d/blob/master/lisp/init-highlight.el][.emacs.d/lisp/init-highlight.el at master · seagle0128/.emacs.d]]
 #+begin_src emacs-lisp
-(use-package! rainbow-mode
-  :hook (( prog-mode helpful-mode) . rainbow-mode)
+(use-package! colorful-mode
+  :hook (prog-mode text-mode)
   :config
-  (with-no-warnings
-    ;; HACK: Use overlay instead of text properties to override `hl-line' faces.
-    ;; @see https://emacs.stackexchange.com/questions/36420
-    (defun my-rainbow-colorize-match (color &optional match)
-      (let* ((match (or match 0))
-             (ov (make-overlay (match-beginning match) (match-end match))))
-        (overlay-put ov 'ovrainbow t)
-        (overlay-put ov 'face `((:foreground ,(if (> 0.5 (rainbow-x-color-luminance color))
-                                                  "white" "black"))
-                                (:background ,color)))))
-    (advice-add #'rainbow-colorize-match :override #'my-rainbow-colorize-match)
-
-    (defun my-rainbow-clear-overlays ()
-      "Clear all rainbow overlays."
-      (remove-overlays (point-min) (point-max) 'ovrainbow t))
-    (advice-add #'rainbow-turn-off :after #'my-rainbow-clear-overlays)))
+  (setopt colorful-use-prefix t)
+  (setopt colorful-allow-mouse-clicks nil))
 #+end_src
 *** 高亮关键字
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -2187,13 +2191,9 @@ see@ https://emacs-china.org/t/native-os-sis/14089
 (use-package! wdired
   :commands  (wdired-change-to-wdired-mode)
   :config
-  (defadvice! my--wdired-exit-a (&rest _)
-    :after  #'wdired-exit
+  (defadvice! my-wdired-exit-a (&rest _)
+    :after  '(wdired-abort-changes wdired-finish-edit)
     (dired-hide-details-mode -1))
-
-  (defadvice! my*wdired-change-to-wdired-mode-a (&rest _)
-    :after #'wdired-finish-edit
-    (dired-hide-details-mode 1))
 
   (defadvice! my*wdired-change-to-wdired-mode-a (&rest _)
     :before #'wdired-change-to-wdired-mode
@@ -3693,13 +3693,13 @@ Emacs 可以显示 ANSI 颜色代码。然而，在 Emacs 28 之前，如果不�
 :intro:
 Org Mode 无疑是 Emacs 的杀手级应用，其扩展能力以及 Emacs 的契合，让它吊打一众
 标记语言和富文本格式。当然 LaTeX 除外。
-| 格式      | 细粒度控制 | 上手易用性 | 语法 a 简单 | 编辑器支持 | 集成度 | 易于参考 | 多功能性 |
-|-----------+------------+------------+-------------+------------+--------+----------+----------|
-| Word      |          2 |          4 |           4 |          2 |      3 |        2 |        2 |
-| LaTeX     |          4 |          1 |           1 |          3 |      2 |        4 |        3 |
-| Org Mode  |          4 |          2 |         3.5 |          1 |      4 |        4 |        4 |
-| Markdown  |          1 |          3 |           3 |          4 |      3 |        3 |        1 |
-| MD+Pandoc |        2.5 |        2.5 |         2.5 |          3 |      3 |        3 |        2 |
+| 格式      | 细粒度控制 | 上手易用性 | 语法简单 | 编辑器支持 | 集成度 | 易于参考 | 多功能性 |
+|-----------+------------+------------+----------+------------+--------+----------+----------|
+| Word      |          2 |          4 |        4 |          2 |      3 |        2 |        2 |
+| LaTeX     |          4 |          1 |        1 |          3 |      2 |        4 |        3 |
+| Org Mode  |          4 |          2 |      3.5 |          1 |      4 |        4 |        4 |
+| Markdown  |          1 |          3 |        3 |          4 |      3 |        3 |        1 |
+| MD+Pandoc |        2.5 |        2.5 |      2.5 |          3 |      3 |        3 |        2 |
 
 在 =.org= 文件可以包含代码块 (不支持 noweb 模板)，这些代码块可以与专用源代码文件纠缠
 在一起，并通过各种 (可扩展的) 方法编译成文档 (报告、文档、演示文稿等)。这些源块甚至可以
@@ -5062,6 +5062,12 @@ CLOSED: [2023-04-04 Tue 13:02]
   (+my-init-lua-mode)
   (setq lua-ts-indent-offset 4))
 #+end_src
+*** fennel
+#+begin_src emacs-lisp
+(after! (:and fennel-mode eglog)
+  (add-hook! fennel-mode #'lsp! 'append)
+  (add-to-list 'eglot-server-programs '(fennel-mode . ("fennel-ls"))))
+#+end_src
 ** nxml-mode
 配合​~smartparen~​有一个小问题，无法正确匹配​“<”和“>”, 下面时是修改代码
 #+begin_src emacs-lisp
@@ -5089,25 +5095,50 @@ macos 中自动化的一门脚本语言
 :END:
 一个性能更好的​=json-mode= 工具，29 版本的 emacs 有​~json-ts-mode~​​这个选择所以不安装它
 
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none :var us-treesit=use-json-p
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (package! jsonian :recipe (:host github :repo "iwahbe/jsonian") :built-in 'prefer)
 #+end_src
 
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none :var us-treesit=use-json-p
-(if (string= us-treesit "t")
-    (progn
-      (pushnew! major-mode-remap-alist '(js-json-mode . json-ts-mode))
-      (after! org-src
-        (add-to-list 'org-src-lang-modes '("json" . json-ts))))
-  ;; To disable so-long mode overrides
-  (after! (jsonian so-long) (jsonian-no-so-long-mode)))
-
-(use-package! jsonian
-  :mode "\\.js\\(?:on\\|[hl]int\\(?:rc\\)?\\)\\'"
-  :init
-  (when )
-  )
-
+#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
+(let ((use-json-treesit-p (my-treesit-language-available-p 'json)))
+  (use-package! jsonian
+    :defer 0.5
+    :init
+    (add-hook 'jsonian-mode-hook #'lsp! 'append)
+    (add-to-list 'auto-mode-alist '("\\.js\\(?:on\\|[hl]int\\(?:rc\\)?\\)\\'" . jsonian-mode))
+    (unless use-json-treesit-p
+      (after! org-src (add-to-list 'org-src-lang-modes '("json" . jsonian))))
+    :config
+    (set-electric! 'jsonian-mode :chars '(?\n ?: ?{ ?}))
+    (after! (jsonian so-long) (jsonian-no-so-long-mode))
+    (map! :after jsonian
+          :map jsonian-mode-map
+          :localleader
+          :desc "Copy path" "p" #'jsonian-path
+          "f" #'jsonian-format-region))
+  (when use-json-treesit-p
+    (use-package! json-ts-mode
+    :defer t
+    :init
+    (after! treesit-auto
+      (let*
+          ((old-json-recipe (my-treesit-get-recipe 'json))
+           (old-json-remap (treesit-auto-recipe-remap old-json-recipe))
+           (json-remap
+            (if (listp old-json-remap) (push 'jsonian-mode old-json-remap)
+              (list 'jsonian-mode old-json-remap))))
+        (add-to-list 'treesit-auto-recipe-list
+                     (make-treesit-auto-recipe
+                      :lang 'json
+                      :ts-mode 'json-ts-mode
+                      :url (treesit-auto-recipe-url old-json-recipe)
+                      :remap json-remap
+                      :revision (treesit-auto-recipe-revision old-json-recipe)
+                      :source-dir (treesit-auto-recipe-source-dir old-json-recipe)
+                      :ext "\\.js\\(?:on\\|[hl]int\\(?:rc\\)?\\)\\'"))))
+    :config
+    (after! jsonian (setq json-ts-mode-hook jsonian-mode-hook))
+    (after! org-src (add-to-list 'org-src-lang-modes '("json" . jsonian))))))
 #+end_src
 ** sh
 *** org mode 中使用代码块
@@ -5162,32 +5193,24 @@ macos 中自动化的一门脚本语言
 #+end_src
 ** nushell
 #+begin_src emacs-lisp :tangle (if (executable-find "nu") "packages.el" "no") :noweb-ref none
-(if (and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'nu))
-    (package! nushell-ts-mode :recipe (:host github :repo "herbertjones/nushell-ts-mode") :built-in 'prefer)
-  (package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode") :built-in 'prefer))
+(package! nushell-ts-mode :recipe (:host github :repo "herbertjones/nushell-ts-mode") :built-in 'prefer)
+(package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode") :built-in 'prefer)
 #+end_src
 #+begin_src emacs-lisp :tangle (if (executable-find "nu") "yes" "no") :noweb-ref none
-(if (my-treesit-language-available-p 'nu)
+(let ((use-nushell-treesit-p (my-treesit-language-available-p 'nu)))
+  (use-package! nushell-mode
+    :mode "\\.nu\\'"
+    :init
+    (unless use-nushell-treesit-p
+      (after! org-src (add-to-list 'org-src-lang-modes '("nu" . nushell))))
+    (after! eglot (add-to-list 'eglot-server-programs '(nushell-mode . ("nu" "--lsp")))))
+  (when use-nushell-treesit-p
     (use-package! nushell-ts-mode
       :init
-      (after! eglot
-        (add-to-list 'eglot-server-programs
-                     '(nushell-ts-mode . ("nu" "--lsp"))))
+      (after! eglot (add-to-list 'eglot-server-programs '(nushell-ts-mode . ("nu" "--lsp"))))
       (add-hook! nushell-ts-mode #'lsp!)
-      :mode ("\\.nu\\'" . nushell-ts-mode)
-      :config
-      (after! org-src
-        (add-to-list 'org-src-lang-modes '("nu" . nushell-ts))))
-  (use-package! nushell-mode
-    :init
-    (after! eglot
-      (add-to-list 'eglot-server-programs
-                   '(nushell-mode . ("nu" "--lsp"))))
-    (add-hook! nushell-ts-mode #'lsp!)
-    :mode ("\\.nu\\'" . nushell-mode)
-    :config
-    (after! org-src
-      (add-to-list 'org-src-lang-modes '("nu" . nushell)))))
+      (after! org-src (add-to-list 'org-src-lang-modes '("nu" . nushell-ts)))))
+  (add-hook! '(nushell-ts-mode-hook nushell-mode-hook) #'lsp!))
 #+end_src
 
 ** python
