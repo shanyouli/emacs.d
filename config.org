@@ -308,7 +308,18 @@ descendant, GNU Emacs, continues actively as of 2020.
     (interactive)
     (insert (format-time-string "%Y-%m-%d %H:%M:%S")))
 #+end_src
-
+*** 判断当前 frame 是否支持 child-frame
+#+begin_src emacs-lisp :tangle "autoload/init-common.el"
+;;;###autoload
+(defun childframe-workable-p ()
+  "Whether childframe is workable."
+  (and (>= emacs-major-version 26)
+       (not noninteractive)
+       (not emacs-basic-display)
+       (or (display-graphic-p)
+           (featurep 'tty-child-frames))
+       (eq (frame-parameter (selected-frame) 'minibuffer) 't)))
+#+end_src
 *** treesit
 emacs 内部使用的 语法树（tree-sitter）.
 #+begin_src emacs-lisp :tangle "autoload/init-treesit.el"
@@ -1254,6 +1265,9 @@ yaml              ; JSON, but readable
              (lambda ()
                (add-hook 'doom-switch-buffer-hook
                          #'update-emacs-client-title)))))
+
+(setq blink-matching-paren-highlight-offscreen t
+      show-paren-context-when-offscreen (if (childframe-workable-p) 'child-frame 'overlay))
 #+end_src
 *** autoload 对应快捷按键
 #+begin_src emacs-lisp
@@ -1370,7 +1384,6 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
   (when (doom-font-exists-p "Unifont")
     (set-fontset-font t '(#x262f . #x2637) "Unifont")
     (set-fontset-font t '(#x2460 . #x2468) "Unifont")))
-
 ;; ligatures
 (when (modulep! :ui ligatures +extra)
   (plist-put! +ligatures-extra-symbols :pipe "‖")
@@ -3769,8 +3782,7 @@ Protesilaos 写了一篇 [[https://protesilaos.com/codelog/2021-01-26-git-diff-h
 #+begin_src emacs-lisp
 (setq-hook! 'org-mode-hook truncate-lines nil
             fill-column 100
-            ;; visual-fill-column-center-text t
-
+            visual-fill-column-center-text t
             ;; disable <> auto pairing in electric-pair-mode for org-mode
             electric-pair-inhibit-predicate
             `(lambda (c) (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))
@@ -5270,8 +5282,7 @@ yapf
 (after! python
   (setq python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
   (add-hook 'python-ts-mode-hook #'lsp-bridge-mode)
-  (add-hook 'python-mode-hook #'lsp-bridge-mode)
-  )
+  (add-hook 'python-mode-hook #'lsp-bridge-mode))
 #+end_src
 ** rust
 :PROPERTIES:
