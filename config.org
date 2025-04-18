@@ -136,7 +136,12 @@ descendant, GNU Emacs, continues actively as of 2020.
       (add-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english)
     (remove-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english)))
 #+end_src
-
+*** width-face-mode
+在当前 buffer 中使用中英文等宽又等高的字体。目前已知的等宽又等高的字体有：
+1. [[https://github.com/laishulu/Sarasa-Term-SC-Nerd][Sarasa Term]] 字体不错(但相同字号下，总觉得英文字体太小了
+2. [[https://github.com/subframe7536/maple-font][maple-font]] 中的 maple-mono-cn 字体, 字体太宽了，我不喜欢。
+一些其他的相同字体大小下等宽且等高的字体有
+1. ioskeva font + LXWG WenKai Mono (当放大到一定程度后字体不再等宽)
 *** 初始化 frame 大小
 #+begin_src emacs-lisp :tangle "autoload/init-frame.el"
 ;;;###autoload
@@ -1190,7 +1195,7 @@ emacs-lisp        ; drown in parentheses
 ;;fsharp            ; ML stands for Microsoft's Language
 ;;fstar             ; (dependent) types and (monadic) effects and Z3
 ;;gdscript          ; the language you waited for
-;;(go +lsp)         ; the hipster dialect
+(go +lsp)         ; the hipster dialect
 ;;(haskell +lsp)    ; a language that's lazier than I am
 ;;hy                ; readability of scheme w/ speed of python
 ;;idris             ; a language you can depend on
@@ -1276,6 +1281,11 @@ yaml              ; JSON, but readable
       "C-<" #'remember-jump ; 跳转到最后记录关闭的位置
       :leader
       :desc "open in external app" "os" #'open-in-external-app
+      :desc "open doom user file" "fp" (cmd!
+                                   (let (($f (expand-file-name "config.org" doom-user-dir)))
+                                     (if (file-exists-p $f)
+                                         (find-file $f)
+                                       (doom/find-file-in-private-config))))
       (:prefix-map ("d" . "my prjs")
        :desc "dotfile" "d" (cmd!
                             (+find-file-in-project (or (bound-and-true-p mydotfile)
@@ -1958,6 +1968,128 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 (package! psearch :recipe (:host github :repo "twlz0ne/psearch.el"
                            :files ( "psearch.el" )))
 #+end_src
+*** 拼音配置
+**** lib 包
+[[https://github.com/cute-jumper/pinyinlib.el][pinyinlib]] 基本上所有通过拼音首字母搜索字符的都是通过该包实现的
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! pinyinlib)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! pinyinlib
+  :autoload (pinyinlib-build-regexp-char pinyinlib-build-regexp-string))
+
+(defcustom my-pinyin-search-prefix-char ?:
+     "The prefix character when using consult/ivy/orderless.etc to search Pinyin."
+     :group 'pinyin
+     :type 'character)
+#+end_src
+**** avy
+使用 [[https://github.com/cute-jumper/ace-pinyin][ace-pinyin]] 为 avy-mode 添加跳转中文字符配置
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! ace-pinyin)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! ace-pinyin
+  :after avy
+  :init (setq ace-pinyin-use-avy t)
+  :config (ace-pinyin-global-mode 1))
+#+end_src
+**** evil-pinyin
+[[https://github.com/laishulu/evil-pinyin/tree/master][evil-pinyin]]：支持 ~f/F/t/T~ 行内定位汉字和英文，也支持 ~evil-snipe~ 中的 ~s/S~ 进行汉字和双字母定位, 同时可以使用 evil-search 进行拼音搜索
+[[https://github.com/cute-jumper/evil-find-char-pinyin][evil-find-char-pinyin]]: 仅支持 ~f/F/t/T~ 的汉字和英文，通过 ~(evil-find-char-pinyin-toggle-snipe-integration t)~ 来开启对 evil-snipe 的支持，不支持 ~/?~ 进行搜索。
+#+begin_src emacs-lisp :tangle "packages.el"
+(when (modulep! :editor evil +everywhere)
+  ;; evil-find-char-pinyin 如果仅希望在使用 Ff tT Ss 时可以进行拼音搜索，请使用它
+  ;; (package! evil-find-char-pinyin)
+  (package! evil-pinyin
+    :recipe (:build (:not autoloads))))
+#+end_src
+evil-find-char-pinyin 配置
+#+begin_src emacs-lisp :tangle "no"
+(use-package! evil-find-char-pinyin
+  :when (modulep! :editor evil +everywhere)
+  :after evil
+  :defer 2
+  :config
+  (evil-find-char-pinyin-mode +1)
+  (evil-find-char-pinyin-toggle-snipe-integration t))
+#+end_src
+evil-pinyin
+#+begin_src emacs-lisp
+(use-package! evil-pinyin
+  :when (modulep! :editor evil +everywhere)
+  :after evil
+  :config
+  (setq-default evil-pinyin-with-search-rule 'always)
+  (global-evil-pinyin-mode 1))
+#+end_src
+**** 搜索模块 pinyin 搜索
+让 ivy/vertico 支持 pinyin 首字母搜索
+参考:
+1. [[https://emacs-china.org/t/consult-advice-lambda/23130/5][consult 构建正则的函数不再在外部接收参数后，如何使用 advice 处理其在内部 lambda 接收的参数]]
+#+begin_src emacs-lisp
+(cond ((modulep! :completion vertico)
+       (defadvice! +my--consult-py-regexp-compiler-a (input type ignore-case)
+         "Compile the INPUT string to a list of regular expressions.
+
+The function should return a pair, the list of regular expressions and a
+highlight function. The highlight function should take a single
+argument, the string to highlight given the INPUT. TYPE is the desired
+type of regular expression, which can be `basic', `extended', `emacs' or
+`pcre'. If IGNORE-CASE is non-nil return a highlight function which
+matches case insensitively."
+         :override #'consult--default-regexp-compiler
+         (setq input
+               (consult--split-escaped
+                (if (char-equal my-pinyin-search-prefix-char (string-to-char input))
+                    ;; Detect the first entered character. If it matches
+                    ;; `my-consult-py-prefix', convert the subsequent
+                    ;; characters into Pinyin regexp.
+                    (pinyinlib-build-regexp-string (substring input 1))
+                  input)))
+         (cons
+          (mapcar (lambda (x) (consult--convert-regexp x type)) input)
+          (when-let (regexps
+                     (seq-filter #'consult--valid-regexp-p input))
+            (apply-partially #'consult--highlight-regexps regexps ignore-case))))
+       (after! orderless
+         (defun my-orderless-pinyin-regexp (component)
+           (orderless-regexp (pinyinlib-build-regexp-string component)))
+         (add-to-list 'orderless-affix-dispatch-alist (cons `,my-pinyin-search-prefix-char 'my-orderless-pinyin-regexp))
+         )
+       )
+      ((modulep! :completion ivy)
+       (after! ivy
+         (defun my-ivy-re-builder-pinyin (str)
+           (or (my-ivy-pinyin-to-utf8 str)
+             (ivy--regex-plus str)
+             (ivy-regex-ignore-order)))
+         (setq ivy-re-builders-alist '((t . re-builder-pinyin)))
+         (defun my-ivy-pinyin-regexp-string (str)
+           (progn (cond ((equal str ".*")
+                       ".*")
+                      (t (pinyinlib-build-regexp-string str t)))))
+         (defun my-ivy-pinyin-regexp-helper (str)
+           (cond ((equal str "")
+                ".*")
+               ((equal str "")
+                nil)
+               (t str)))
+
+         ;; this function can remove `pinyin' match
+         ;; (defun my-ivy-pinyin-to-utf8 (str) nil)
+         (defun my-ivy-pinyin-to-utf8 (str)
+           (cond ((equal o (length str))
+                nil)
+               ((char-equal my-pinyin-search-prefix (string-to-char str))
+                (mapconcat 'my-ivy-pinyin-regexp-string
+                           (remove nil (mapcar 'my-ivy-pinyin-regexp-helper
+                                               (split-string (substring str 1) "")))
+                           ""))
+               nil))
+         )))
+#+end_src
+
 *** Input
 **** Emacs-rime
 我用 [[https://github.com/DogLooksGood/emacs-rime][emacs-rime]] 作为 emacs 的输入法
@@ -1983,9 +2115,9 @@ see@ https://emacs-china.org/t/native-os-sis/14089
 
   :config
 
-  (defadvice! +rime-do-finalize-after-loading-module (&rest _)
-    :after #'rime--load-dynamic-module
-    (add-hook! kill-emacs-hook #'rime-lib-finalize))
+  ;; (defadvice! +rime-do-finalize-after-loading-module (&rest _)
+  ;;   :after #'rime--load-dynamic-module
+  ;;   (add-hook! kill-emacs #'rime-lib-finalize))
   (defun my-rime-init-f ()
     (unless (boundp rime--lib-loaded)
       (unless (file-exists-p rime--module-path)
@@ -2020,7 +2152,7 @@ see@ https://emacs-china.org/t/native-os-sis/14089
           (let ((inhibit-message t))
             (apply fn args)))
       (apply fn args))
-    (add-hook! kill-emacs-hook #'rime-lib-finalize))
+    (add-hook! kill-emacs #'rime-lib-finalize))
 
   (defun my-toggle-input-method ()
     "避免误触开启输入法."
@@ -2141,10 +2273,6 @@ see@ https://emacs-china.org/t/native-os-sis/14089
 #+end_src
 
 **** Dired
-#+begin_src emacs-lisp :tangle "packages.el"
-(unpin! dirvish)
-(package! dirvish)
-#+end_src
 #+begin_src emacs-lisp
 (after! dired
   (use-package! dired-async
@@ -2212,62 +2340,11 @@ see@ https://emacs-china.org/t/native-os-sis/14089
     :before #'wdired-change-to-wdired-mode
     (dired-hide-details-mode 1)))
 #+end_src
-**** avy
-让 avy 支持拼音搜索
-#+begin_src emacs-lisp :tangle "packages.el"
-(package! ace-pinyin)
-#+end_src
-#+begin_src emacs-lisp
-(use-package! ace-pinyin
-  :after avy
-  :init (setq ace-pinyin-use-avy t)
-  :config (ace-pinyin-global-mode 1))
-#+end_src
 **** Vertico
-***** 中文拼音搜索
-#+begin_src emacs-lisp :tangle "packages.el"
-(package! pinyinlib)
-#+end_src
-+ [[https://emacs-china.org/t/consult-advice-lambda/23130/5][consult 构建正则的函数不再在外部接收参数后，如何使用 advice 处理其在内部 lambda 接收的参数]]
-#+begin_src emacs-lisp
-(use-package! pinyinlib :autoload pinyinlib-build-regexp-string)
+#+begin_src emacs-lisp :tangle "no"
 (when (modulep! :completion vertico)
-  (after! vertico (setq vertico-count 12))
-  (after! orderless
-   (defun completion--regex-pinyin (str)
-     (orderless-regexp (pinyinlib-build-regexp-string str)))
-   (add-to-list 'orderless-matching-styles 'completion--regex-pinyin))
-  (after! consult
-   (defcustom my-consult-py-prefix ?:
-     "The prefix character when using consult to search Pinyin."
-     :group 'consult
-     :type 'character)
-
-   (defadvice! +my--consult-py-regexp-compiler-a (input type ignore-case)
-    "Compile the INPUT string to a list of regular expressions.
-
-The function should return a pair, the list of regular expressions and a
-highlight function. The highlight function should take a single
-argument, the string to highlight given the INPUT. TYPE is the desired
-type of regular expression, which can be `basic', `extended', `emacs' or
-`pcre'. If IGNORE-CASE is non-nil return a highlight function which
-matches case insensitively."
-    :override #'consult--default-regexp-compiler
-    (setq input
-          (consult--split-escaped
-           (if (char-equal my-consult-py-prefix (string-to-char input))
-               ;; Detect the first entered character. If it matches
-               ;; `my-consult-py-prefix', convert the subsequent
-               ;; characters into Pinyin regexp.
-               (pinyinlib-build-regexp-string (substring input 1))
-             input)))
-    (cons
-     (mapcar (lambda (x) (consult--convert-regexp x type)) input)
-     (when-let (regexps
-                (seq-filter #'consult--valid-regexp-p input))
-       (apply-partially #'consult--highlight-regexps regexps ignore-case))))))
+  (after! vertico (setq vertico-count 12)))
 #+end_src
-
 ***** 大文件搜索
 consult-line 在文件过大时，很慢，使用 consult-rg 进行搜索, 参考
 - [[https://emacs-china.org/t/emacs-rg-buffer/8347/17][emacs-china swiper-grep-or-line]]
@@ -2858,14 +2935,6 @@ popd
   :config
   (setq emt-lib-path (concat user-emacs-directory "modules/libEMT.dylib")))
 #+end_src
-**** 自动删除空白
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! ws-butler :recipe (:host github :repo "lewang/ws-butler"))
-#+end_src
-#+begin_src emacs-lisp
-(use-package! ws-butler
-  :hook (doom-first-file . ws-butler-global-mode))
-#+end_src
 **** file-temple
 #+begin_src emacs-lisp
 (when (modulep! :editor file-templates)
@@ -3111,14 +3180,16 @@ emacs 中模拟 vim 按键风格的神器
 **** evil-pinyin
 使用 pinyin 首字母进行搜索，用法使用冒号：开启
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-;;(package! evil-pinyin)
+(package! evil-pinyin)
 #+end_src
 之前在安装过程中出现问题，不再使用。
-#+begin_src emacs-lisp :tangle "no"
-;;(use-package! evil-pinyin
-;;  :after evil
-;;  :config
-;;  (global-evil-pinyin-mode +1))
+#+begin_src emacs-lisp :tangle "yes"
+(use-package! evil-pinyin
+  :after evil
+  :when (modulep! :editor evil +everywhere)
+  :config
+  (setq-default evil-pinyin-with-search-rule 'always)
+ (global-evil-pinyin-mode +1))
 #+end_src
 **** evil-escape
 Use JK as a shortcut button for <ESC>
