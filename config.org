@@ -31,7 +31,7 @@ descendant, GNU Emacs, continues actively as of 2020.
 (setopt user-full-name "Shanyou Li"
       user-mail-address "shanyouli6@gmail.com"
       ;; user-gpg-key ""
-      org-directory (file-truename "~/org")
+      org-directory (file-truename "~/Documents/logseq")
       my-workdir (expand-file-name "~/Workspace")
       ;; My Blog Dir
       user-blog-dir (concat my-workdir "/Blog"))
@@ -4217,8 +4217,7 @@ ligatures 配置,
   (setq my-default-org-roam-directory (f-expand (f-join "~/Documents" "logseq"))
         my-default-org-roam-page "pages/"
         my-default-org-roam-location (f-expand (f-join doom-cache-dir "org-roam-personl.db"))
-        my-default-org-agenda-file (f-expand
-                                    (f-join "~/Documents" "logseq" "pages/gtds.org")))
+        my-default-org-agenda-file (f-join my-default-org-roam-directory my-default-org-roam-page "summary/gtds.org"))
   (setopt org-roam-directory my-default-org-roam-directory
           org-roam-database-connector 'sqlite-builtin
           org-roam-dailies-directory "journals/"
@@ -5147,9 +5146,10 @@ CLOSED: [2023-04-04 Tue 13:02]
 #+end_src
 *** fennel
 #+begin_src emacs-lisp
-(after! (:and fennel-mode eglog)
-  (add-hook! fennel-mode #'lsp! 'append)
-  (add-to-list 'eglot-server-programs '(fennel-mode . ("fennel-ls"))))
+(after! fennel-mode (add-hook! fennel-mode #'lsp! 'append))
+(when (modulep! :tools lsp +eglot)
+  (after! eglot
+    (add-to-list 'eglot-server-programs '(fennel-mode . ("fennel-ls")))))
 #+end_src
 ** nxml-mode
 配合​~smartparen~​有一个小问题，无法正确匹配​“<”和“>”, 下面时是修改代码
