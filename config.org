@@ -1387,7 +1387,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
   :after #'doom-init-fonts-h
   (cl-loop for font in '("LXGW WenKai Mono" "Adobe Heiti Std" "STXihei" "Microsoft Yahei"
                          "Hiragino Sans GB W6" "WenQuanYi Micro Hei Mono")
-           when (doom-font-exists-p font)
+           when (and (doom-font-exists-p font) (find-font (font-spec :family (font-get doom-font :family) :script 'han)))
            return (dolist (charset '(kana han cjk-misc bopomofo))
                     (set-fontset-font t charset font)))
   ;; org modern header 字体配置
@@ -1441,6 +1441,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
     (defun my-ligatures-init-h ()
       (add-hook 'after-change-major-mode-hook #'my-ligatures-init-buffer-h))))
 #+end_src
+
 **** nerd-font
 使用​~Sysmbola Nerd Font Mono~​显示 icon 图标字体
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
@@ -3370,12 +3371,12 @@ Use JK as a shortcut button for <ESC>
 **** go-translate
 另一款好用的翻译插件
 #+begin_src emacs-lisp :tangle "packages.el"
-(package! go-translate)
+(package! gt)
 (package! plz)
 #+end_src
 使用配置
 #+begin_src emacs-lisp
-(use-package! go-translate
+(use-package! gt
   :commands (gt-do-translate-prompt gt-do-sdcv gt-do-text-utility)
   :init
   (setopt gt-langs '(en zh)
@@ -5145,6 +5146,9 @@ CLOSED: [2023-04-04 Tue 13:02]
   (setq lua-ts-indent-offset 4))
 #+end_src
 *** fennel
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! monroe)
+#+end_src
 #+begin_src emacs-lisp
 (after! fennel-mode (add-hook! fennel-mode #'lsp! 'append))
 (when (modulep! :tools lsp +eglot)
@@ -5489,7 +5493,7 @@ yapf
 ;;; lang/pyfmt.el -*- lexical-binding: t; -*-
 
 (reformatter-define toml-format :program "taplo" :args '("format"))
-(defun nix-format-region-or-buffer ()
+(defun toml-format-region-or-buffer ()
     "python format region or buffer."
     (interactive)
     (save-excursion
@@ -5526,3 +5530,13 @@ yapf
   :mode (("\\.ass\\'" . ass-mode)))
 #+end_src
 
+** just-mode
+[[https://github.com/casey/just/blob/master/README.%E4%B8%AD%E6%96%87.md][just]] 一个简单的命令合集工具，类似 make 但比 make 简单
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! just-mode :built-in 'prefer)
+(package! justl :built-in 'prefer)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! just-mode
+  :mode (("/[Jj]ustfile\\'" . just-mode)))
+#+end_src
