@@ -1055,7 +1055,7 @@ literate
 ;;layout            ; auie,ctsrnm is the superior home row
 #+end_src
 - 补全 ::
-  我使用 company + vertico
+  我使用 corfu + vertico
 #+name: doom-completion
 #+begin_src emacs-lisp
 (corfu +icons +orderless)
@@ -1879,6 +1879,7 @@ emacs 使用 C-x C-e 执行代码时，内联效果
   :hook (prog-mode text-mode)
   :config
   (setopt colorful-use-prefix t)
+  (setopt colorful-prefix-string "")
   (setopt colorful-allow-mouse-clicks nil))
 #+end_src
 *** 高亮关键字
@@ -2443,7 +2444,7 @@ lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服�
   (setq acm-enable-quick-access t
         acm-backend-yas-match-by-trigger-keyword t
         acm-enable-tabnine nil
-        acm-enable-codeium t)
+        acm-enable-codeium nil)
   (defun my/acm-toggle-tabnine ()
     (interactive)
     (setq acm-enable-tabnine (not acm-enable-tabnine))
@@ -3105,9 +3106,14 @@ popd
   (defun my/dwim-shell-commands-unzip ()
     "Unzip all marked archives (of any kind) using `atool'."
     (interactive)
-    (dwim-shell-command-on-marked-files
-     "Unzip" "atool --extract --explain '<<f>>'"
-     :utils "atool"))
+    (cond ((executable-find "atool")
+           (dwim-shell-command-on-marked-files
+            "Unzip" "atool --extract --explain '<<f>>'"
+            :utils "atool"))
+          ((executable-find "ouch")
+           (dwim-shell-command-on-marked-files "Unzip" "ouch decompress '<<f>>' --dir '<<fne>>'"
+                                               :utils "ouch"))
+          (_ (warn "Please install ouch or atool"))))
 
   (defun my/dwim-shell-commands-zip (file)
     "zip all marked archives (of any kind) to `file' using `atools'"
@@ -3118,50 +3124,7 @@ popd
                    (list  (read-string (format "Archive Name: " )))))
     (dwim-shell-command-on-marked-files
      "zip" (format "atool -F .tar.xz --add %s '<<*>>'" file)
-     :utils "atool"))
-
-  (defun my/dwim-shell-command-kill-process ()
-    "Select and kill process."
-    (interactive)
-    (let* ((pid-width 5)
-            (comm-width 25)
-           (user-width 10)
-           (processes (proced-process-attributes))
-           (candidates
-            (mapcar (lambda (attributes)
-                      (let* ((process (cdr attributes))
-                             (pid (format (format "%%%ds" pid-width) (map-elt process 'pid)))
-                             (user (format (format "%%-%ds" user-width)
-                                           (truncate-string-to-width
-                                            (map-elt process 'user) user-width nil nil t)))
-                             (comm (format (format "%%-%ds" comm-width)
-                                           (truncate-string-to-width
-                                            (map-elt process 'comm) comm-width nil nil t)))
-                             (args-width (- (window-width) (+ pid-width user-width comm-width 3)))
-                             (args (map-elt process 'args)))
-                        (cons (if args
-                                  (format "%s %s %s %s" pid user comm (truncate-string-to-width args args-width nil nil t))
-                                (format "%s %s %s" pid user comm))
-                              process)))
-                    processes))
-           (selection (map-elt candidates
-                               (completing-read "kill process: "
-                                                (seq-sort
-                                                 (lambda (p1 p2)
-                                                   (string-lessp (nth 2 (split-string (string-trim (car p1))))
-                                                                 (nth 2 (split-string (string-trim (car p2))))))
-                                                 candidates) nil t)))
-           (prompt-title (format "%s %s %s"
-                                 (map-elt selection 'pid)
-                                 (map-elt selection 'user)
-                                 (map-elt selection 'comm))))
-      (when (y-or-n-p (format "Kill? %s" prompt-title))
-        (dwim-shell-command-on-marked-files
-         (format "Kill %s" prompt-title)
-         (format "kill -9 %d" (map-elt selection 'pid))
-         :utils "kill"
-         :error-autofocus t
-         :silent-success t)))))
+     :utils "atool")))
 #+end_src
 *** 格式化工具
 doom 有自己的格式化模块，但我习惯使用[[https://github.com/purcell/emacs-reformatter][reformatter]]
