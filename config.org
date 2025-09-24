@@ -586,136 +586,6 @@ Version 2022-06-26  8:46:00"
                 font-list)))))
 #+end_src
 
-*** org headline 移动到指定文件
-#+begin_src emacs-lisp :tangle "autoload/init-my-org.el"
-;; 需要的包
-(require 'outline)
-(require 'org-id)
-(require 'seq)
-
-;; daily
-;; weekly + date
-;; month + weekly + ate
-;; year + month + weekly + date
-(defcustom my-org-groups-level 1 "my org groups level."
-  :type 'integer
-  :options '(1 2 3 4))
-
-(defcustom my-org-groups-second-type '(daily weekly month year) "my org groups level."
-  :type 'list)
-
-(defun my-org-extract-date-from-filename (filename)
-  "Extract date from FILENAME if it matches the pattern YYYY_MM_DD.org or YYYY-MM-DD.org.
-Return the date in the format YYYY-MM-DD, or current-date if it doesn't match."
-  (if (string-match "\\([0-9]\\{4\\}\\)[_-]\\([0-9]\\{2\\}\\)[_-]\\([0-9]\\{2\\}\\)\\.org$" filename)
-      (format "%s-%s-%s"
-              (match-string 1 filename)
-              (match-string 2 filename)
-              (match-string 3 filename))
-    (format-time-string "%Y-%m-%d")))
-
-
-(defun my-org-adjust-headline-levels (content &optional level)
-  "Adjust headline levels based on `LEVEL'"
-  (let ((level-adjust (or level my-org-groups-level)))
-    (replace-regexp-in-string "^\\(\\*+\\)" (lambda (m) (concat m (make-string level-adjust ?*))) content)))
-
-(defun my-org-get-group-heading (time &optional level)
-  "Get the group heading based on `date' and `level'"
-  (pcase level
-    ('year (format-time-string "%Y 年" time))
-    ('month (format-time-string "%Y 年 %m 月" time))
-    ('weekly (format-time-string "%Y 年 %W 周" time))
-    (_ (format-time-string "%Y 年 %m 月 %d 日" time))))
-
-;;;###autoload
-(defun my-org-get-group-list (date &optional level types)
-  "Generate a list based on `DATE'.
-LEVEL is interge, TYPES is list"
-  (let ((time (date-to-time date))
-        (level (or level my-org-groups-level))
-        (types (or types my-org-groups-second-type))
-        rlist '())
-    (dotimes (i level)
-      (push (my-org-get-group-heading  time (nth i types)) rlist))
-    rlist))
-
-
-(defsubst my-org--create-headline-tree (path-list)
-  "Create  headline tree by `PATH-LIST'."
-  (let ((level 1) end notfound)
-    (unless (derived-mode-p 'org-mode)
-      (error "Target buffer \"%s\" should be in Org mode" (current-buffer)))
-    (goto-char (point-min))
-    ;; 从 1 级 headline 定位到 n 级 headline
-    (dolist (heading path-list)
-      (let* ((heading (concat (make-string level ?*) " " heading))
-             (re (concat "^" (regexp-quote heading) "$")))
-        (if notfound
-            (insert "\n" heading)
-          (if (re-search-forward re end t)
-              (progn
-                (goto-char (match-beginning 0)) ;如果找到了 headline 就移动到对应的位置
-                (setq end (save-excursion (org-end-of-subtree t t) (point))))
-            (setq notfound t)
-            (if (= level 1)
-                (if (re-search-forward "^\\* .+" nil t)
-                    (goto-char (match-beginning 0))
-                  (goto-char (point-max)))
-              (outline-next-heading))
-            (let ((p (point)))
-              (insert heading "\n")
-              (goto-char p)
-              (goto-char (pos-eol)))))
-        (setq level (1+ level))))
-    (outline-next-heading)))
-
-;;;###autoload
-(defun my-org-move-headline-to-target (source-file target-file pattern level types)
-  "Move `PATTERN' headlines from SOURCE-FILE to TARGET-FILE.
-LEVEL Indicates groups."
-  (let ((current-date (my-org-extract-date-from-filename
-                       (file-name-nondirectory source-file)))
-        (level (or level my-org-groups-level))
-        (types (or types my-org-groups-second-type)))
-    (save-excursion
-      (with-current-buffer (find-file-noselect source-file)
-        (goto-char (point-min))
-        (while (re-search-forward pattern nil t)
-          (let ((start (match-beginning 0))
-                oid content end)
-            ;; Ensure the headline has an org-id
-            (goto-char start)
-            (setq oid (org-id-get-create))
-            ;; Get end
-            (setq end (progn (org-end-of-subtree t t) (point)))
-            ;; Copy the headline and its subtree, and adjust the levels of the headlines
-            (setq content (my-org-adjust-headline-levels
-                           (buffer-substring-no-properties start end)
-                           level))
-
-            (with-current-buffer (find-file-noselect target-file)
-              ;; (goto-char (point-min))
-              (my-org--create-headline-tree (my-org-get-group-list current-date level types))
-              ;; Insert the TODO item
-              (insert content)
-              (save-buffer))
-            ;; Insert a link to the new location
-            (goto-char start)
-            (delete-region start end)
-            (insert (format "#+transclude: [[id:%s][%s]] :level 1\n" oid
-                            (replace-regexp-in-string "\\*+ TODO " "" (car (split-string content "\n")))))
-            (save-buffer)))))
-    ))
-;;;###autoload
-(defun my-org-remove-extra-blank-lines ()
-  "Remove extra blank lines in the current Org buffer, keeping at most one."
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (while (re-search-forward "\n\\{2,\\}" nil t)
-      (replace-match "\n"))))
-#+end_src
 *** 结合 org-roam 的动态 agenda file
 #+begin_src emacs-lisp :tangle "autoload/vulpea-agenda.el"
 ;;* dynamic agenda https://github.com/brianmcgillion/doomd/blob/master/config.org
@@ -1306,7 +1176,6 @@ yaml              ; JSON, but readable
 (define-key! lsp-bridge-mode-map [remap evil-jump-to-tag] 'my/def-jump-go)
 #+end_src
 
-
 * 包
 ** 加载结构
 :properties:
@@ -1847,27 +1716,6 @@ Macos 上借助系统自带的进行主题切换
 (advice-add 'org-babel-execute-src-block
             :around #'(lambda (orig-fn &rest args)
                         (quiet! (apply orig-fn args))))
-#+end_src
-*** dashboard
-Dashboard 是打开 Emacs 的主页，在这里添加一些常用命令是很舒服的。
-#+begin_src emacs-lisp
-(map! :map +doom-dashboard-mode-map
-      :desc "org agenda" "a" #'org-agenda
-      :desc "find file" "f" #'find-file
-      :desc "recent session" "R" #'doom/quickload-session
-      :desc "recent files" "r" #'counsel-recentf
-      :desc "config dir" "C" #'doom/open-private-config
-      :desc "open config.org" "c" (cmd! (find-file (expand-file-name "config.org" doom-private-dir)))
-      ;; :desc "open dotfile" "." (cmd! (doom-project-find-file "~/.config/"))
-      :desc "notes (roam)" "n" #'org-roam-node-find
-      :desc "switch buffer" "b" #'+vertico/switch-workspace-buffer
-      ;; :desc "switch buffers (all)" "B" #'consult-buffer
-      :desc "ibuffer" "i" #'ibuffer
-      :desc "open project" "p" #'counsel-projectile-switch-project
-      ;; :desc "set theme" "t" #'consult-theme
-      :desc "quit" "q" #'save-buffers-kill-terminal
-      :desc "documentation" "H" #'doom/help
-      :desc "show keybindings" "h" (cmd! (which-key-show-major-mode)))
 #+end_src
 *** eros
 emacs 使用 C-x C-e 执行代码时，内联效果
@@ -2540,16 +2388,16 @@ CLOSED: [2023-05-24 Wed 12:24]
 (package! calibredb)
 #+end_src
 #+begin_src emacs-lisp
-(use-package! calibredb
-  :config
-  (setq calibredb-root-dir "~/Documents/mybook"
-        calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)
-        calibredb-library-alist '(("~/Documents/mybook")
-                                  ("~/Documents/netbooks")
-                                  ("~/Documents/archiveRead"))
-        sql-sqlite-program "sqlite3")
-  (when IS-MAC
-    (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")))
+;; (use-package! calibredb
+;;   :config
+;;   (setq calibredb-root-dir "~/Documents/mybook"
+;;         calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)
+;;         calibredb-library-alist '(("~/Documents/mybook")
+;;                                   ("~/Documents/netbooks")
+;;                                   ("~/Documents/archiveRead"))
+;;         sql-sqlite-program "sqlite3")
+;;   (when IS-MAC
+;;     (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")))
 #+end_src
 **** DONE epub 阅读工具
 CLOSED: [2023-05-24 Wed 13:13]
@@ -3132,19 +2980,6 @@ popd
      "zip" (format "atool -F .tar.xz --add %s '<<*>>'" file)
      :utils "atool")))
 #+end_src
-*** 格式化工具
-doom 有自己的格式化模块，但我习惯使用[[https://github.com/purcell/emacs-reformatter][reformatter]]
-#+begin_src emacs-lisp :tangle "packages.el"
-(package! reformatter)
-#+end_src
-使用方法
-#+begin_src emacs-lisp :tangle "no"
-(reformatter-define python-format :program "black" :args '("-"))
-#+end_src
-#+begin_src emacs-lisp
-(after! reformatter
-  (set-popup-rule! "^\\*.*format errors\\*" :size 0.25 :vslot -4 :select t :quit t :ttl 0))
-#+end_src
 *** evil
 emacs 中模拟 vim 按键风格的神器
 **** evil-pinyin
@@ -3604,6 +3439,27 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
     (setq atomic-chrome-url-major-mode-alist
           '(("github\\.com" . gfm-mode)
             ("gitlab\\.com" . gfm-mode)))))
+#+end_src
+
+*** denote
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! denote :built-in 'prefer)
+#+end_src
+#+begin_src emacs-lisp
+;; 使用 denote 进行笔记记录
+(use-package! denote
+  :hook (dired-mode . denote-dired-mode)
+  :init
+  (map! :leader
+        (:prefix ("nr" . "denote")
+         :desc "open denote" "f" #'denote
+         :desc "denote rename file" "r" #'denote-rename-file
+         :desc "denote link" "l" #'denote-link
+         :desc "denote backlink" "b" #'denote-backlinks
+         :desc "denote dired" "d" #'denote-dired
+         :desc "denote grep" "g" #'denote-grep))
+  :config
+  (denote-rename-buffer-mode 1))
 #+end_src
 
 ** 窗口管理
@@ -4160,99 +4016,6 @@ ligatures 配置,
 #+end_src
 #+begin_src emacs-lisp
 (add-hook! org-mode #'iscroll-mode)
-#+end_src
-*** org-roam
-:PROPERTIES:
-:ID:       fadf9cb0-7b0d-42eb-b02f-bc76e76b1096
-:END:
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! org-roam)
-(unpin! org-roam)
-;; FIXME: @see https://github.com/org-roam/org-roam-ui/issues/236
-;; Org-roam-ui doesn't show the node's text if in a .dir-locals.el location
-(package! org-roam-ui :recipe (:host github :repo "Keisn1/org-roam-ui"))
-
-;; Automatically synchronize logseq edits to work in org-roam when it's open
-(package! org-roam-logseq :recipe (:host github :repo "idanov/org-roam-logseq.el"))
-
-;; https://linux.do/t/topic/111737
-(package! vulpea)
-#+end_src
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-;; 使用 org-roam-ui 的配置
-(use-package! websocket :after org-roam)
-(use-package! org-roam
-  :init
-  (require 'f)
-  (setq my-default-org-roam-directory (f-expand (f-join "~/Documents" "logseq"))
-        my-default-org-roam-page "pages/"
-        my-default-org-roam-location (f-expand (f-join doom-cache-dir "org-roam-personl.db"))
-        my-default-org-agenda-file (f-join my-default-org-roam-directory my-default-org-roam-page "summary/gtds.org"))
-  (setopt org-roam-directory my-default-org-roam-directory
-          org-roam-database-connector 'sqlite-builtin
-          org-roam-dailies-directory "journals/"
-          org-roam-file-exclude-regexp "\\.st[^/]*\\|logseq/.*$"
-          org-id-link-to-org-use-id t)
-  :config
-  (setopt org-roam-capture-templates
-      `(("d" "default" plain "%?" :target
-         (file+head ,(concat my-default-org-roam-page "${slug}.org")
-                    "#+title: ${title}\n#+DATE: %<%Y-%m-%d>\n#+LAST_MODIFIED: %U\n\n")
-         :unnarrowed t))
-      org-roam-dailies-capture-templates
-      '(("d" "default" plain "%?" :target
-         (file+head "%<%Y_%m_%d>.org"
-                    "#+title: %<%Y-%m-%d>\n\n"))))
-  (require 'org-roam-logseq)
-  (org-roam-db-autosync-mode +1)
-  (if my-default-org-agenda-file
-      (progn
-        (unless (file-exists-p my-default-org-agenda-file)
-          (make-empty-file my-default-org-agenda-file t))
-        (defun my-move-todo-on-save-h ()
-          (let ((filename (buffer-file-name)))
-            (when (and filename
-                       (derived-mode-p 'org-mode)
-                       (string-prefix-p (expand-file-name org-roam-directory) filename)
-                       (not (string= my-default-org-agenda-file filename)))
-              (my-org-move-headline-to-target filename
-                                              my-default-org-agenda-file
-                                              "^\\* TODO .*"
-                                              4
-                                              '(daily weekly month year)))))
-        (add-hook 'before-save-hook #'my-move-todo-on-save-h))
-    (add-hook 'org-roam-db-autosync-mode-hook #'vulpea-db-autosync-enable)
-    (add-hook 'before-save-hook #'vulpea-project-update-tag)
-    (advice-add 'org-agenda-files :filter-return #'dynamic-agenda-files-advice)))
-
-(use-package! org-roam-ui
-  :after org-roam
-;; or :after org
-;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-;;         a hookable mode anymore, you're advised to pick something yourself
-;;         if you don't care about startup time, use
-;;  :hook (after-init . org-roam-ui-mode)
-  :init
-  ;; Underscore always becomes underline
-  ;; https://github.com/org-roam/org-roam-ui/issues/261
-  (setopt org-roam-ui-sync-theme t
-          org-roam-ui-follow t
-          org-roam-ui-update-on-save t
-          org-roam-ui-open-on-start t))
-#+end_src
-
-**** 多个 org-roam-root 目录切换
-在额外的 org-roam-directory 目录下添加如下内容
-#+begin_src emacs-lisp :tangle "no" :noweb-ref none
-((nil . ((eval . (setq-local
-                  org-roam-directory (expand-file-name (locate-dominating-file
-                                                        default-directory ".dir-locals.el"))))
-         (eval . (setq-local
-                  org-roam-db-location (expand-file-name "org-roam.db"
-                                                         org-roam-directory))))))
-;; 或者
-((nil . ((org-roam-directory . "/path/to/alt/org-roam-dir")
-         (org-roam-db-location . "/path/to/alt/org-roam-dir/org-roam.db"))))
 #+end_src
 *** org-transclusion
 通过文件链接或 org-id 链接插入文件副本内容
@@ -5035,95 +4798,6 @@ Lisp function does not specify a special indentation."
 #+end_src
 
 ** Lua
-*** DONE 自动格式化
-#+begin_src emacs-lisp :tangle (if (executable-find "stylua") "lang/luafmt.el" "no")
-;;; lang/luafmt.el -*- lexical-binding: t; -*-
-(reformatter-define lua-format
-  :program "stylua"
-  :args '("--search-parent-directories" "-v" "-")
-  :group 'lua)
-
-(defun lua-format-region-or-buffer ()
-  "Lua format region or buffer."
-  (interactive)
-  (save-excursion
-    (if (region-active-p)
-        (call-interactively #'lua-format-region)
-      (call-interactively #'lua-format-buffer))))
-#+end_src
-
-CLOSED: [2023-04-04 Tue 13:02]
-#+begin_src emacs-lisp
-(defun +lua-format-region-or-buffer ()
-  "使用`stylua'对 lua 文件进行格式化，如果`stylua'不存在，
-则使用默认的 `indent-region' 进行 indent 格式化"
-  (interactive)
-  (if (load-part-el-file "lang/luafmt")
-      (call-interactively #'lua-format-region-or-buffer)
-    (call-interactively #'indent-region-or-buffer)))
-#+end_src
-*** 公共
-#+begin_src emacs-lisp :tangle yes
-(defun +my-lsp-bridge-with-lua ()
-  (setq-local lsp-bridge-enable-diagnostics nil)
-  (lsp-bridge-mode +1))
-
-(defun +my-init-lua-mode ()
-  (let (mode mode-map)
-    (if (modulep! :lang lua)
-        (setq mode 'lua-mode
-              mode-map 'lua-mode-map)
-      (setq mode 'lua-ts-mode
-            mode-map 'lua-ts-mode-map))
-    (set-ligatures! mode
-      :def "function"
-      :true "true" :false "false"
-      :not "not" :and "and" :or "or"
-      :in "in"
-      :for "for"
-      :null "nil"
-      :return "return")
-
-  (my/leader :keymaps mode-map
-  "f" '(:ignore t :which-key "file")
-  "f p" '(+lua-format-region-or-buffer :wk "format"))
-  (map! :map mode-map "C-M-\\" :desc "indent" #'+lua-format-region-or-buffer)))
-
-#+end_src
-*** lua-mode
-自用的 lua 配置
-#+begin_src emacs-lisp :tangle yes
-(use-package! lua-mode
-  :if (modulep! :lang lua)
-  :hook (lua-mode . +my-lsp-bridge-with-lua)
-  :config
-  ;;我一般使用 4 个空格
-  (setq lua-indent-level 4)
-  (+my-init-lua-mode))
-#+end_src
-*** lua-ts-mode
-#+begin_src emacs-lisp
-(use-package! lua-ts-mode
-  :unless (modulep! :lang lua)
-  :mode ("\\.lua\\'" . lua-ts-mode)
-  :init
-  (after! org-src
-    (add-to-list 'org-src-lang-modes '("lua" . lua-ts)))
-  :hook (lua-ts-mode . +my-lsp-bridge-with-lua)
-  :config
-  (+my-init-lua-mode)
-  (setq lua-ts-indent-offset 4))
-#+end_src
-*** fennel
-#+begin_src emacs-lisp :tangle "packages.el"
-(package! monroe)
-#+end_src
-#+begin_src emacs-lisp
-(after! fennel-mode (add-hook! fennel-mode #'lsp! 'append))
-(when (modulep! :tools lsp +eglot)
-  (after! eglot
-    (add-to-list 'eglot-server-programs '(fennel-mode . ("fennel-ls")))))
-#+end_src
 ** nxml-mode
 配合​~smartparen~​有一个小问题，无法正确匹配​“<”和“>”, 下面时是修改代码
 #+begin_src emacs-lisp
@@ -5145,57 +4819,6 @@ macos 中自动化的一门脚本语言
   :config
   (setq as-indent-offset 2))
 #+end_src
-** json 配置
-:PROPERTIES:
-:ID: 23b63cd8-aeb1-4ff8-a406-3fa884524f3a
-:END:
-一个性能更好的​=json-mode= 工具，29 版本的 emacs 有​~json-ts-mode~​​这个选择所以不安装它
-
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! jsonian :recipe (:host github :repo "iwahbe/jsonian") :built-in 'prefer)
-#+end_src
-
-#+begin_src emacs-lisp :tangle "yes" :noweb-ref none
-(let ((use-json-treesit-p (my-treesit-language-available-p 'json)))
-  (use-package! jsonian
-    :defer 0.5
-    :init
-    (add-hook 'jsonian-mode-hook #'lsp! 'append)
-    (add-to-list 'auto-mode-alist '("\\.js\\(?:on\\|[hl]int\\(?:rc\\)?\\)\\'" . jsonian-mode))
-    (unless use-json-treesit-p
-      (after! org-src (add-to-list 'org-src-lang-modes '("json" . jsonian))))
-    :config
-    (set-electric! 'jsonian-mode :chars '(?\n ?: ?{ ?}))
-    (after! (jsonian so-long) (jsonian-no-so-long-mode))
-    (map! :after jsonian
-          :map jsonian-mode-map
-          :localleader
-          :desc "Copy path" "p" #'jsonian-path
-          "f" #'jsonian-format-region))
-  (when use-json-treesit-p
-    (use-package! json-ts-mode
-    :defer t
-    :init
-    (after! treesit-auto
-      (let*
-          ((old-json-recipe (my-treesit-get-recipe 'json))
-           (old-json-remap (treesit-auto-recipe-remap old-json-recipe))
-           (json-remap
-            (if (listp old-json-remap) (push 'jsonian-mode old-json-remap)
-              (list 'jsonian-mode old-json-remap))))
-        (add-to-list 'treesit-auto-recipe-list
-                     (make-treesit-auto-recipe
-                      :lang 'json
-                      :ts-mode 'json-ts-mode
-                      :url (treesit-auto-recipe-url old-json-recipe)
-                      :remap json-remap
-                      :revision (treesit-auto-recipe-revision old-json-recipe)
-                      :source-dir (treesit-auto-recipe-source-dir old-json-recipe)
-                      :ext "\\.js\\(?:on\\|[hl]int\\(?:rc\\)?\\)\\'"))))
-    :config
-    (after! jsonian (setq json-ts-mode-hook jsonian-mode-hook))
-    (after! org-src (add-to-list 'org-src-lang-modes '("json" . jsonian))))))
-#+end_src
 ** sh
 *** org mode 中使用代码块
 #+begin_src emacs-lisp :tangle "yes" :noweb-ref none
@@ -5205,40 +4828,6 @@ macos 中自动化的一门脚本语言
     '((:results . "output")
       (:tangle  . "no"))))
 #+end_src
-*** 格式化
-#+begin_src emacs-lisp :tangle (if (executable-find "shfmt") "lang/shfmt.el" "no") :noweb-ref none
-(reformatter-define bash-format :program "shfmt"
-  :args
-  (list "-filename"
-        (or
-         (buffer-file-name)
-         input-file)
-        "-i" "4")
-  :group 'shfmt)
-(defun bash-format-region-or-buffer ()
-  "bash format region or buffer."
-  (interactive)
-  (save-excursion
-    (if (region-active-p)
-        (call-interactively #'bash-format-region)
-      (call-interactively #'bash-format-buffer))))
-#+end_src
-#+begin_src emacs-lisp
-(after! sh-script
-  (defun +bash-format-region-or-buffer ()
-    "使用`shfmt'对 lua 文件进行格式化，如果`shfmt'不存在，
-则使用默认的 `indent-region' 进行 indent 格式化"
-    (interactive)
-    (if (load-part-el-file "lang/shfmt")
-        (call-interactively #'bash-format-region-or-buffer)
-      (call-interactively #'indent-region-or-buffer)))
-
-  (my/leader :keymaps 'bash-mode-map
-    "f" '(:ignore t :which-key "file")
-    "f p" '(+bash-format-region-or-buffer :wk "format"))
-  (map! :map bash-mode-map "C-M-\\" :desc "indent" #'+bash-format-region-or-buffer))
-#+end_src
-
 *** 补全
 #+begin_src emacs-lisp
 (after! sh-script
@@ -5269,24 +4858,8 @@ macos 中自动化的一门脚本语言
   (add-hook! '(nushell-ts-mode-hook nushell-mode-hook) #'lsp!))
 #+end_src
 
-** python
+** TODO python
 *** 格式化
-使用 ruff 进行格式化，其他可用的有 black，yapf
-#+begin_src emacs-lisp
-(after! python
-  (defun +python-format-region-or-buffer ()
-    "使用`black' or`yap' 对 python 文件进行格式化，如果都不存在，
-则使用默认的 `indent-region' 进行 indent 格式化"
-    (interactive)
-    (if (load-part-el-file "lang/pyfmt")
-        (call-interactively #'python-format-region-or-buffer)
-      (call-interactively #'indent-region-or-buffer)))
-  (my/leader :keymaps '(python-ts-mode-map python-mode-map)
-    "f" '(:ignore t :which-key "file")
-    "f p" '(+python-format-region-or-buffer :wk "format"))
-  (map! :map (python-mode-map python-ts-mode-map) "C-M-\\" :desc "indent" #'+python-format-region-or-buffer))
-#+end_src
-
 **** 格式化工具
 安装
 #+begin_src bash :tangle "no"
@@ -5321,175 +4894,13 @@ yapf
         (when (fboundp 'py-isort-buffer) (py-isort-buffer))
         (call-interactively #'python-format-buffer))))
 #+end_src
-*** 补全
-#+begin_src emacs-lisp
-(after! python
-  (setq python-flymake-command '("ruff" "--quiet" "--stdin-filename=stdin" "-"))
-  (add-hook 'python-ts-mode-hook #'lsp-bridge-mode)
-  (add-hook 'python-mode-hook #'lsp-bridge-mode))
-#+end_src
-** rust
-:PROPERTIES:
-:ID:       b8fb23b1-ec93-4bbb-a32c-e3606dba0346
-:END:
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! rustic)
-#+end_src
-#+begin_src emacs-lisp
-(after! projectile
-  (add-to-list 'projectile-project-root-files "Cargo.toml"))
-
-(use-package! rustic
-  :mode ("\\.rs$" . rustic-mode)
-  :preface
-  ;; HACK `rustic' sets up some things too early. I'd rather disable it and let
-  ;;    our respective modules standardize how they're initialized.
-  (setq rustic-lsp-client nil)
-  (after! rustic-lsp
-    (remove-hook 'rustic-mode-hook 'rustic-setup-lsp))
-  :init
-  (after! org-src
-    (defalias 'org-babel-execute:rust #'org-babel-execute:rustic)
-    (add-to-list 'org-src-lang-modes '("rust" . rustic)))
-  (when (my-treesit-language-available-p 'rust)
-    (pushnew! major-mode-remap-alist '(rustic-mode . rust-ts-mode)))
-  :config
-  (add-hook 'rustic-mode-hook #'rainbow-delimiters-mode)
-  (set-docsets! 'rustic-mode "Rust")
-  (set-popup-rule! "^\\*rustic-compilation" :vslot -1)
-
-  ;; Conflicts with (and is redundant with) :ui ligatures
-  (setq rust-prettify-symbols-alist nil)
-
-  ;; Leave automatic reformatting to the :editor format module.
-  (setq rustic-babel-format-src-block nil
-        rustic-format-trigger nil)
-
-  (add-hook 'rustic-mode-hook #'lsp-bridge-mode)
-  (add-hook 'rust-ts-mode-hook #'lsp-bridge-mode)
-
-  (map! :map rustic-mode-map
-        :localleader
-        (:prefix ("b" . "build")
-         :desc "cargo audit"      "a" #'+rust/cargo-audit
-         :desc "cargo build"      "b" #'rustic-cargo-build
-         :desc "cargo bench"      "B" #'rustic-cargo-bench
-         :desc "cargo check"      "c" #'rustic-cargo-check
-         :desc "cargo clippy"     "C" #'rustic-cargo-clippy
-         :desc "cargo doc"        "d" #'rustic-cargo-build-doc
-         :desc "cargo doc --open" "D" #'rustic-cargo-doc
-         :desc "cargo fmt"        "f" #'rustic-cargo-fmt
-         :desc "cargo new"        "n" #'rustic-cargo-new
-         :desc "cargo outdated"   "o" #'rustic-cargo-outdated
-         :desc "cargo run"        "r" #'rustic-cargo-run)
-        (:prefix ("t" . "cargo test")
-         :desc "all"              "a" #'rustic-cargo-test
-         :desc "current test"     "t" #'rustic-cargo-current-test)))
-#+end_src
-** nix
-*** 开头
-#+begin_src emacs-lisp
-(after! nix-mode
-#+end_src
-*** 补全
-:PROPERTIES:
-:ID:       dbccbd5e-5f26-4c96-84b4-65fe7631d5eb
-:header-args: :tangle no :noweb-ref nix-config
-:END:
-需要安装 nixd 或 rnix-lsp 或者 nil
-#+begin_src emacs-lisp
-(setopt lsp-bridge-nix-lsp-server (or (bound-and-true-p my-nix-lsp-cmd)
-                                      (and (executable-find "nixd") "nixd")
-                                      (and (executable-find "nil") "nil")
-                                      (and (executable-find "rnix-lsp") "rnix-lsp")))
-(add-hook! nix-mode :depth 100
-  (setq-local lsp-bridge-enable-diagnostics nil)
-  (lsp-bridge-mode +1))
-#+end_src
-*** 使用 treesit
-:PROPERTIES:
-:ID:       5bd62ba4-cb9b-4149-9f79-ca0efc0af6c9
-:header-args: :var us-treesit=(and (fboundp 'treesit-language-available-p) (treesit-language-available-p 'nix))
-:END:
-#+begin_src emacs-lisp
-(when us-treesit
-  (add-hook! nix-mode (treesit-parser-create 'nix)))
-#+end_src
-*** 格式化
-使用 doom 自带的 format 函数
-#+begin_src emacs-lisp :tangle (if (executable-find "alejandra") "yes" "no")
-(set-formatter! 'alejandra '("alejandra --quiet") :modes '(nix-mode))
-
-(defun +nix-format-region-or-buffer ()
-  "使用`alejandra' 对 nix 文件进行格式化，如果都不存在，
-则使用默认的 `indent-region' 进行 indent 格式化"
-  (interactive)
-  (if (load-part-el-file "lang/nixfmt")
-      (call-interactively #'nix-format-region-or-buffer)
-    (call-interactively #'indent-region-or-buffer)))
-(my/leader :keymaps 'nix-mode-map
-  "f" '(:ignore t :which-key "file")
-  "f p" '(+nix-format-region-or-buffer :wk "format"))
-(map! :map nix-mode-map "C-M-\\" :desc "indent" #'+nix-format-region-or-buffer)
-#+end_src
-**** [[https://github.com/kamadorueda/alejandra][alejandra]]
-#+begin_src emacs-lisp :tangle (if (executable-find "alejandra") "lang/nixfmt.el" "no") :comments no
-;;; lang/pyfmt.el -*- lexical-binding: t; -*-
-
-(reformatter-define nix-format :program "alejandra" :args '("--quiet"))
-(defun nix-format-region-or-buffer ()
-    "python format region or buffer."
-    (interactive)
-    (save-excursion
-      (if (region-active-p)
-          (call-interactively #'nix-format-region)
-        (call-interactively #'nix-format-buffer))))
-#+end_src
-
-*** nix 结尾括号
-#+begin_src emacs-lisp
-)
-#+end_src
-
+** TODO nix
 ** conf 配置文件
-#+begin_src emacs-lisp
+- toml 格式化
+#+begin_src emacs-lisp :tangle (if (executable-find "taplo") "yes" "no")
 (after! conf-mode
+  (set-formatter! 'taplo '("taplo" "format") :modes '(conf-toml-mode)))
 #+end_src
-*** toml
-[[https://emacs-china.org/t/emacs-toml/21254][emacs 中，如何实现对 toml 文件的格式化啊？ - Programming - Emacs China]]
-使用 taplo 工具
-#+begin_src emacs-lisp :tangle (if (executable-find "taplo") "lang/tomlfmt.el" "no") :comments no
-;;; lang/pyfmt.el -*- lexical-binding: t; -*-
-
-(reformatter-define toml-format :program "taplo" :args '("format"))
-(defun toml-format-region-or-buffer ()
-    "python format region or buffer."
-    (interactive)
-    (save-excursion
-      (if (region-active-p)
-          (call-interactively #'toml-format-region)
-        (call-interactively #'toml-format-buffer))))
-#+end_src
-#+begin_src emacs-lisp
-(set-formatter! 'taplo '("taplo" "format") :modes '(conf-toml-mode))
-(defun +toml-format-region-or-buffer ()
-  "使用`alejandra' 对 nix 文件进行格式化，如果都不存在，
-则使用默认的 `indent-region' 进行 indent 格式化"
-  (interactive)
-  (if (load-part-el-file "lang/tomlfmt")
-      (call-interactively #'toml-format-region-or-buffer)
-    (call-interactively #'indent-region-or-buffer)))
-(my/leader :keymaps 'conf-toml-mode-map
-  "f" '(:ignore t :which-key "file")
-  "f p" '(+toml-format-region-or-buffer :wk "format"))
-(map! :map conf-toml-mode-map "C-M-\\" :desc "indent" #'+toml-format-region-or-buffer)
-#+end_src
-*** 结尾
-#+begin_src emacs-lisp
-  )
-
-#+end_src
-
 ** ass-mode
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! ass-mode :recipe (:host github :repo "disbeliever/ass-mode"))
