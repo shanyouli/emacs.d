@@ -11,7 +11,7 @@ emacs --batch --eval "(progn (require 'org) (setq org-confirm-babel-evaluate nil
 ~/.emacs.d/bin/doom install
 #+end_src
 
-* TODO 待办 [/]
+* TODO 待办 [5/6]
 ** DONE 参考[[https://github.com/GinShio/doom-private][GinShio doom 配置]] 重写 config.org
 CLOSED: [2023-06-11 Sun 17:13]
 :LOGBOOK:
@@ -36,4 +36,10 @@ CLOSED: [2023-11-09 Thu 20:47]
 - State "DONE"       from "TODO"       [2023-11-09 Thu 20:47]
 :END:
 
-** TODO 移除 org-roam 配置
+** DONE 移除 org-roam 配置
+CLOSED: [2025-09-24 Wed 16:34]
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2025-09-24 Wed 16:34]
+:END:
+
+** TODO 优化细分包
