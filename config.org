@@ -61,18 +61,6 @@ descendant, GNU Emacs, continues actively as of 2020.
 (when (not IS-WINDOWS)
   (setq shell-file-name (executable-find (if IS-MAC "zsh" "bash"))))
 #+end_src
-自定义宏，加载对应 doom-user-dir 目录下的 lib 目录下的文件中存在的函数
-#+begin_src emacs-lisp
-(defmacro mylib-autoload (f &rest functions)
-  "Autoload FUNCTIONS the functions from lib/xx.el"
-  (let ((first-element (car-safe functions))
-        (p (expand-file-name (concat "lib/" f ".el") doom-user-dir)))
-    (when (listp first-element) (setq functions (eval first-element)))
-    (when (file-exists-p p)
-      `(progn
-         ,@(mapcar (lambda (function) `(autoload ',function ,p nil t)) `,functions)))))
-#+end_src
-
 在​~doom-user-dir~​目录下创建一个 lang 文件，需要生成代码片段
 #+begin_src emacs-lisp :tangle  yes :noweb-ref none
 (defvar my-loaded-part-el-list nil)
@@ -93,60 +81,6 @@ descendant, GNU Emacs, continues actively as of 2020.
         nil))))
 #+end_src
 ** autoload 函数
-*** auto-space
-来源: [[https://remacs.fun/posts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%97%B6%E4%BB%A3%E6%88%91%E4%BB%AC%E6%80%8E%E4%B9%88%E7%8E%A9emacs1.-%E4%B8%AD%E8%8B%B1%E6%96%87%E8%BE%93%E5%85%A5%E6%97%B6%E7%9A%84%E7%A9%BA%E6%A0%BC/][大模型时代我们怎么玩 Emacs：1. 中英文输入时的空格 | remacs 的世界]]
-在中文字符和英文字符间自动插入空格
-#+begin_src emacs-lisp :tangle "autoload/init-auto-space.el"
-;; 可以使用零宽字符, "\u200B"
-(defvar my-space-char " " "默认空格格式，")
-
-(defun my-add-space-between-chinese-and-english ()
-  "在中英文之间自动添加空格。"
-  (let ((current-char (char-before))
-        (prev-char (char-before (1- (point)))))
-    (when (and current-char prev-char
-               (or (and (my-is-chinese-character prev-char) (my-is-halfwidth-character current-char))
-                   (and (my-is-halfwidth-character prev-char) (my-is-chinese-character current-char)))
-               (not (eq prev-char ?\s))) ; 检查前一个字符不是空格
-      (save-excursion
-        (goto-char (1- (point)))
-        (insert my-space-char)))))
-
-(defun my-is-chinese-character (char)
-  "判断字符是否为中文字符。"
-  (and char (or (and (>= char #x4e00) (<= char #x9fff))
-                (and (>= char #x3400) (<= char #x4dbf))
-                (and (>= char #x20000) (<= char #x2a6df))
-                (and (>= char #x2a700) (<= char #x2b73f))
-                (and (>= char #x2b740) (<= char #x2b81f))
-                (and (>= char #x2b820) (<= char #x2ceaf)))))
-
-(defun my-is-halfwidth-character (char)
-  "判断字符是否为半角字符，包括英文字母、数字和标点符号。"
-  (and char (or (and (>= char ?a) (<= char ?z))
-                (and (>= char ?A) (<= char ?Z))
-                (and (>= char ?0) (<= char ?9))
-                )))
-
-(defun my-delayed-add-space-between-chinese-and-english ()
-  "延迟执行，在中英文之间自动添加空格。"
-  (run-with-idle-timer 0 nil 'my-add-space-between-chinese-and-english))
-
-;;;###autoload
-(define-minor-mode my-auto-space-mode
-  "在中英文之间自动添加空格的模式。"
-  :lighter " Auto-Space"
-  :global t
-  (if my-auto-space-mode
-      (add-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english)
-    (remove-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english)))
-#+end_src
-*** width-face-mode
-在当前 buffer 中使用中英文等宽又等高的字体。目前已知的等宽又等高的字体有：
-1. [[https://github.com/laishulu/Sarasa-Term-SC-Nerd][Sarasa Term]] 字体不错(但相同字号下，总觉得英文字体太小了
-2. [[https://github.com/subframe7536/maple-font][maple-font]] 中的 maple-mono-cn 字体, 字体太宽了，我不喜欢。
-一些其他的相同字体大小下等宽且等高的字体有
-1. ioskeva font + LXWG WenKai Mono (当放大到一定程度后字体不再等宽)
 *** 初始化 frame 大小
 #+begin_src emacs-lisp :tangle "autoload/init-frame.el"
 ;;;###autoload
@@ -173,122 +107,6 @@ descendant, GNU Emacs, continues actively as of 2020.
     (set-frame-size (or frame (selected-frame)) x-width y-height (>= x-width 200))))
 #+end_src
 
-*** Emacs-client
-我使用​src_bash{emacs --fg-daemon="main"}​启动 emacs 服务，然后使用
-​src_bash{emacsclient -s main -e '(+create-EmacsClient-frame)'}​
-创建启动 frame
-#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
-;;;###autoload
-(defvar +emacs-client-frame-parameters
-  `((name . "EmacsClient")
-    (width . 90)
-    (height . 26)
-    (transient . t)
-    ,@(when IS-MAC
-        `((window-system . ns)
-          (menu-bar-lines . 1)))
-    ,@(when IS-LINUX
-        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
-          (display . ,(or (getenv "WAYLAND_DISPLAY")
-                          (getenv "DISPLAY")
-                          ":0"))))
- ;; ,(if IS-MAC '(menu-bar-lines . 1))
-    )
-  "TODO")
-;;;###autoload
-(defun +create-EmacsClient-frame (&optional fn)
-  "创建一个名为 Emacslient 的 frame,如果该 frame 存在则聚焦到它"
-  (interactive)
-  (let* ((frame-title-format "")
-         (preframe (cl-loop for frame in (frame-list)
-                            if (string-prefix-p "EmacsClient" (frame-parameter frame 'name))
-                            return frame))
-         (frame (or preframe (make-frame +emacs-client-frame-parameters))))
-    (select-frame-set-input-focus frame)
-    (when frame
-      (with-selected-frame frame
-        (if fn
-            (call-interactively fn)
-          (with-current-buffer (switch-to-buffer "*scratch*")
-            (text-scale-set 0.2)
-            (when (eq major-mode 'fundamental-mode)
-              (emacs-lisp-mode)))
-          ;; (redisplay)
-          )))))
-
-#+end_src
-
-**** 设置 emacs-client-frame-parameter
-#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
-;;;###autoload
-(defvar my-emacs-client-frame-name "EmacsClient" "emacsclient frame default name")
-;;;###autoload
-(defvar my-emacs-client-frame nil "Store the generated EmacsClient frame")
-;;;###autoload
-(defvar +my-emacs-client-frame-parameters
-  `((name . ,my-emacs-client-frame-name)
-    ;; (transient . t)
-    ,@(when IS-LINUX
-        `((window-system . ,(if (boundp 'pgtk-initialized) 'pgtk 'x))
-          (display . ,(or (getenv "WAYLAND_DISPLAY")
-                          (getenv "DISPLAY")
-                          ":0"))))
-    ,(if IS-MAC '(menu-bar-lines . 1)))
-  "TODO")
-#+end_src
-**** 判断 rame 是否是 EmacsClient frame
-#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
-(defun +my-emacs-client-frame-p (&optional frame)
-  "Return t if the current frame is an Emacs-Client frame opened by
-`+my-emacs-client-open-frame'."
-  (and (string-prefix-p (alist-get 'name +my-emacs-client-frame-parameters)
-                        (frame-parameter frame 'name))
-       t
-       ;; (frame-parameter frame 'transient)
-       ))
-;;;###autoload
-(defun emacs-client-frame-is-live-p ()
-    "Return t, if `my-emacs-client-frame' exists"
-    (if (and my-emacs-client-frame (frame-live-p my-emacs-client-frame))
-        t
-      (setq my-emacs-client-frame
-            (cl-find-if (lambda (frame)
-                          (and (frame-live-p frame)
-                               (+my-emacs-client-frame-p frame)))
-                        (frame-list)))
-      (and my-emacs-client-frame (frame-live-p my-emacs-client-frame))))
-#+end_src
-**** 只能打开一个 emacsClient frame
-#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
-;;;###autoload
-(defun +my-emacs-client-open-frame (&optional $file)
-  (interactive)
-  (let* ((frame-title-format "")
-         (frame (if (emacs-client-frame-is-live-p)
-                    my-emacs-client-frame
-                  (make-frame +my-emacs-client-frame-parameters))))
-    (if frame
-        (progn
-          (setq my-emacs-client-frame frame)
-          (select-frame-set-input-focus frame)
-          (when (and $file (file-exists-p $file))
-              (with-selected-frame frame (find-file $file)))
-          t)
-      nil)))
-#+end_src
-**** 自动更新 emacsClient frame 的 Title
-#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
-;;;###autoload
-(defun update-emacs-client-title ()
-  (let* ((frame (selected-frame))
-         (buf-name (buffer-name)))
-    (when (and (string-prefix-p my-emacs-client-frame-name (frame-parameter frame 'name))
-               (not (member buf-name (list " *Minibuf-1*"))))
-      (modify-frame-parameters
-       frame
-       (list (cons 'name
-                   (concat my-emacs-client-frame-name " - " buf-name)))))))
-#+end_src
 *** 记录当前光标位置
 [[https://emacs-china.org/t/topic/24533/9][请问如何记录光标位置 - Emacs-general - Emacs China]]
 #+begin_src emacs-lisp :tangle "autoload/init-remember-cursor.el"
@@ -329,54 +147,6 @@ descendant, GNU Emacs, continues actively as of 2020.
        (or (display-graphic-p)
            (featurep 'tty-child-frames))
        (eq (frame-parameter (selected-frame) 'minibuffer) 't)))
-#+end_src
-*** treesit
-emacs 内部使用的 语法树（tree-sitter）.
-#+begin_src emacs-lisp :tangle "autoload/init-treesit.el"
-(require 'cl-seq)
-
-;;;###autoload
-(defun my-use-treesite-p ()
-  "Check whether tree-sitter is available.
-Native tree-sitter is introduced since 29."
-  (and (fboundp 'treesit-available-p) (treesit-available-p)))
-
-
-;;;###autoload
-(defun my-treesit-language-available-p (lang)
-  "Check treesit language available `LANG'."
-  (and (my-use-treesite-p) (treesit-language-available-p lang)))
-
-(defun my--treesit-load-language (lang)
-  "Check treesit language available and load `LANG'."
-  (if (my-treesit-language-available-p lang)
-      (progn
-        (treesit-parser-create lang)
-        (message "load %S treesit success." lang))
-    (if (require 'treesit-auto nil t)
-        (let ((treesit-language-source-alist (treesit-auto--build-treesit-source-alist)))
-          (treesit-auto--prompt-to-install-package lang)
-          (if (ignore-errors (treesit-parser-create lang))
-              (message "load %S treesit success." lang)
-            (message "load %S error. Please %S treesit exists." lang lang)))
-      (message "Please manual install %S tressit lib." lang))))
-
-;;;###autoload
-(defun my/load-treesit ()
-  "Load tressit lib on major-mode."
-  (interactive)
-  (pcase major-mode
-      ('emacs-lisp-mode (my--treesit-load-language 'elisp))
-      ('inferior-emacs-lisp-mode (my--treesit-load-language 'elisp))
-      ('lisp-interaction-mode (my--treesit-load-language 'elisp))
-      (_ (let ((sym_mode (intern (nth 0 (string-split (symbol-name major-mode) "-")))))
-           (my--treesit-load-language sym_mode)))))
-
-;;;###autoload
-(defun my-treesit-get-recipe (lang)
-  (when (require 'treesit-auto nil t)
-    (cl-find-if (lambda (x) (eq (treesit-auto-recipe-lang x) lang))
-                (treesit-auto--selected-recipes))))
 #+end_src
 *** 大文件确认
 - buffer-size > 100000 即为大文件
@@ -676,7 +446,7 @@ tasks."
 ;; (add-hook 'text-mode-hook #'auto-fill-mode)  ;; 自动换行，按照 fill-column 设置
 (add-hook 'text-mode-hook #'toggle-word-wrap) ;; 自动视觉换行
 
-(global-subword-mode 1)             ; 识别驼峰，而不是傻瓜前进
+(add-hook! 'doom-first-buffer (global-subword-mode 1))             ; 识别驼峰，而不是傻瓜前进
 (global-unset-key (kbd "C-z"))      ; 关闭 "C-z" 最小化
 
 (define-key! global-map "C-s" #'+default/search-buffer)
@@ -752,7 +522,7 @@ tasks."
               ("scratch" (my/init-default-frame frame))
               ("org-protocol" (my/init-default-frame frame 0.618 0.618)))))
 #+end_src
-** 最近文件的管理
+- 最近文件的管理
 #+begin_src emacs-lisp
 (setq recentf-max-saved-items 200
       recentf-exclude
@@ -770,7 +540,7 @@ tasks."
 (after! recentf
   (push (expand-file-name recentf-save-file) recentf-exclude))
 #+end_src
-** 自动保存文件
+- 自动保存文件
 使用 ~auto-save-visited-mode~ ,相关讨论[[https://emacs-china.org/t/macos-save-silently-t/24086][关于在 macOS 上设置了 save-silently 为 t ，自动保存时仍然会显示消息的问题]]
 #+begin_src emacs-lisp
 (use-package! emacs
@@ -799,14 +569,7 @@ tasks."
 
   (when IS-MAC
     (setq inhibit-message-regexps '("^Saving" "^Wrote")
-          set-message-functions '(inhibit-message))
-    ;; (defadvice! +auto-save-visited-mode (fn &rest args)
-    ;;   :after #'auto-save-visited-mode
-    ;;   (if (bound-and-true-p auto-save-visited-mode)
-    ;;     (setq inhitbit-message-regexps nil
-    ;;           set-message-functions '(set-minibuffer-message))))
-    )
-  )
+          set-message-functions '(inhibit-message))))
 #+end_src
 ** 日历配置
 #+begin_src emacs-lisp
@@ -1014,7 +777,7 @@ vterm             ; the best terminal emulation in Emacs
 - 工具 :: workflow in Emacs!
 #+name: doom-tools
 #+begin_src emacs-lisp
-;; tree-sitter
+tree-sitter
 ;;ansible
 ;;biblio            ; Writes a PhD for you (citation needed)
 ;;debugger          ; FIXME stepping through code, to help you add bugs
@@ -1132,23 +895,6 @@ yaml              ; JSON, but readable
 ;;twitter           ; twitter client https://twitter.com/vnought
 #+end_src
 ** 杂项
-*** 开启中英文中自动添加空格
-#+begin_src emacs-lisp
-(add-hook 'after-init-hook #'my-auto-space-mode)
-#+end_src
-*** 自动更新标题
-#+begin_src emacs-lisp
-(add-hook 'doom-first-file-hook
-          (lambda ()
-            (run-with-idle-timer
-             1 nil
-             (lambda ()
-               (add-hook 'doom-switch-buffer-hook
-                         #'update-emacs-client-title)))))
-
-(setq blink-matching-paren-highlight-offscreen t
-      show-paren-context-when-offscreen (if (childframe-workable-p) 'child-frame 'overlay))
-#+end_src
 *** autoload 对应快捷按键
 #+begin_src emacs-lisp
 (map! "C-M-\\" :desc "indent" #'indent-region-or-buffer
@@ -1171,72 +917,87 @@ yaml              ; JSON, but readable
                                                    "~/org")))
        :desc "draft" "t" (cmd! (+find-file-in-project "~/Workspace/Draft"))
        :desc "flashes" "f" (cmd! (+find-file-in-project "~/flashes"))))
-
-;; 发现函数的定义
-(define-key! lsp-bridge-mode-map [remap evil-jump-to-tag] 'my/def-jump-go)
 #+end_src
 
-* 包
-** 加载结构
-:properties:
-:header-args:emacs-lisp: :tangle no
-:end:
-doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就可以安装。
-需要注意，不应该将该文件编译为字节码。
-#+begin_src emacs-lisp :tangle "packages.el" :comments no
-;; -*- no-byte-compile: t; -*-
-;;; $DOOMDIR/packages.el
-;;; Load NIXOS automatically generated configuration.
-(load! "packages.init.el" doom-user-dir 'no-error)
-;; (disable-packages! smartparens)
+* lib 包配置
+** lib 配置加载函数
+#+begin_src emacs-lisp
+(defmacro lib-load (f &rest functions)
+  "Autoload FUNCTIONS the functions from lib/xx.el"
+  (let ((first-element (car-safe functions))
+        (p (expand-file-name (concat "lib/" f ".el") doom-user-dir)))
+    (when (listp first-element) (setq functions (eval first-element)))
+    (when (file-exists-p p)
+      `(progn
+         ,@(mapcar (lambda (function) `(autoload ',function ,p nil t)) `,functions)))))
 #+end_src
+使用方法
+#+begin_src emacs-lisp :tangle "no"
+(lib-load "auto-space" my-auto-space-mode my-is-chinese-character)
+#+end_src
+** auto space
+在进行中英文输入时，自动在中英文间添加空格，来源: [[https://remacs.fun/posts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%97%B6%E4%BB%A3%E6%88%91%E4%BB%AC%E6%80%8E%E4%B9%88%E7%8E%A9emacs1.-%E4%B8%AD%E8%8B%B1%E6%96%87%E8%BE%93%E5%85%A5%E6%97%B6%E7%9A%84%E7%A9%BA%E6%A0%BC/][大模型时代我们怎么玩 Emacs：1. 中英文输入时的空格 | remacs 的世界]].  基本用法: 加载 lib/auto-space 包
+#+begin_src emacs-lisp :tangle "no"
+(add-hook 'doom-first-buffer-hook #'my-auto-space-mode)
+#+end_src
+** initframe
+处理 初始化过程中 emacs 大小库，并添加一个函数用来正确创建 frame 来自 ~emacsclient~
+基本用法，加载对应包
+#+begin_src bash :tangle "no"
+emacsclient -e "(initframe-open-client-frame)"
+#+end_src
+#+begin_src emacs-lisp
+(lib-load "initframe" initframe-init-default-frame initframe-open-client-frame)
+#+end_src
+** initfont
+- NOTE: 用来暂时处理 中英文字体问题的尝试。路径 ~lib/initfont~
+* autoload 库
+最终归宿为 lib 中的一个库。一些有用但不确定是否归档的函数合集。
+** initfont
+用来处理初始化字体的问题, 当默认字体不存在时，加载该库。 ~autoload/initfont~
 
-*警告*: 不要禁用 =~/.emacs.d/core/packages.el= 中列出的包。Doom 依赖这些，禁用它们
-可能出现严重问题。
-- 从官方的源 [[https://melpa.org/][MELPA]] / [[http://elpa.gnu.org/][GNU ELPA]] / [[https://emacsmirror.net/][emacsmirror]] 安装
-#+begin_src emacs-lisp
-(package! some-package)
-#+end_src
-- 关闭某些包
-#+begin_src emacs-lisp
-(package! some-package :disable t)
-#+end_src
-- 从 Git Repo 安装
-#+begin_src emacs-lisp
-;; github
-(package! github-package :recipe (:host github :repo "username/repo"))
-;; gitlab
-(package! gitlab-package :recipe (:host gitlab :repo "username/repo"))
-;; other
-(package! other-package :recipe (:host nil :repo "https://example.com/repo"))
-#+end_src
-  如果 repo 仅中只有某个 / 某些文件是你需要的
-#+begin_src emacs-lisp
-(package! some-package
-  :recipe (:host github :repo "username/repo"
-           :files ("some-file.el" "src/elisp/*.el")))
-#+end_src
-  如果需要指定某个 =commit= 或某个 =branch=
-#+begin_src emacs-lisp
-;; commit
-(package! some-package :pin "abcdefghijk")
-;; branch
-(package! some-package :recipe (:branch "stable"))
-#+end_src
-- 使用本地的 repo
-#+begin_src emacs-lisp
-(package! some-package :recipe (:local-repo "/path/to/repo"))
-#+end_src
-** 辅助宏
-这些是 doom 添加的一些非常有用的宏
-- ~load!~ 可以相对于本文件进行外部 ~.el~ 文件的加载
-- ~use-package!~ 用于配置包
-- ~add-load-path!~ 将指定目录添加到 ~load-path~ 中，可以让 Emacs 在使用
-  ~require~ 和 ~use-package~ 时在 ~load-path~ 中进行查找
-- ~map!~ 用于绑定新的快捷键
-** UI
+* UI
 字体，等主题 ui 配置
-*** 字体配置
+** 基本配置
+- 为一些特定的 frame 设置默认大小, 使用平铺类窗口管理器，更推荐他们自带的管理。
+#+begin_src emacs-lisp
+(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (pcase (frame-parameter nil 'name)
+              ("scratch" (initframe-init-default-frame frame))
+              ("org-protocol" (initframe-init-default-frame frame 0.618 0.618)))))
+#+end_src
+- 强制修改所有用 emacsclient 创建的窗口名，初始为 ~EmacsClient~
+#+begin_src emacs-lisp
+(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (when (frame-parameter frame 'client)
+              (modify-frame-parameters
+               frame '((title . "EmacsClient")))))
+          100)
+#+end_src
+- 更好的标题规则
+#+begin_src emacs-lisp
+(setq frame-title-format
+      '(:eval (let ((client (frame-parameter nil 'client))
+                    (prj-name (projectile-project-name)))
+                (concat (if client "EmacsClient - " "DoomEmacs - ")
+                        "%b"
+                        (unless (string= "-" prj-name) (format " - [%s]" prj-name))))))
+(setq doom-fallback-buffer-name "► Doom"
+      +doom-dashboard-name "► Doom")
+#+end_src
+- 更好的显示超出部分
+#+begin_src emacs-lisp
+(setq blink-matching-paren-highlight-offscreen t
+      show-paren-context-when-offscreen (if (childframe-workable-p) 'child-frame 'overlay))
+#+end_src
+- 当你编写字符超过 80 列时，提示你该换行了
+#+begin_src emacs-lisp
+(setopt display-fill-column-indicator-column 79)
+(add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
+#+end_src
+** 字体配置
 Doom exposes five (optional) variables or controlling fonts in Doom.
 + ~doom-font~ : set default font, 我使用 "Cascadia Code", size 为 12 ，备选字体: Fantasque Sans Mono, size 为 13
 + ~doom-variable-pitch-font~: Set Serif font, 目前没有喜欢的
@@ -1244,87 +1005,17 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 + ~doom-unicode-font~: Fallback font for Unicode glyphs ， Unicode ，或者默认字体，目前很多人推荐 [[https://juliamono.netlify.app/][JuliaMono]]， 我应该会尝试
 + 中文字体: LXGW WenKai Mono 备选 "Adobe Heiti Std" 和系统自带的字体
 + 如果你想获得使用等高且等宽的字体，请使用 [[https://github.com/be5invis/Sarasa-Gothic][更纱黑体]] (如果该字体的高度能小一点，我一定会用它，也许后续我会自己调整它的高度)
+  在当前 buffer 中使用中英文等宽又等高的字体。目前已知的等宽又等高的字体有：
+1. [[https://github.com/laishulu/Sarasa-Term-SC-Nerd][Sarasa Term]] 字体不错(但相同字号下，总觉得英文字体太小了
+2. [[https://github.com/subframe7536/maple-font][maple-font]] 中的 maple-mono-cn 字体, 字体太宽了，我不喜欢。
+
 #+begin_src emacs-lisp
-(defadvice! my/use-default-font-a (&rest _)
-  "Set `doom-font'!"
-  :before #'doom-init-fonts-h
-  (cl-loop for font in '("PragmataPro Liga" "Cascadia Code" "Fantasque Sans Mono")
-           when (doom-font-exists-p font)
-           return (setq doom-font (font-spec :family font :size 13)))
-  (unless doom-font
-    (cl-loop for font in '("JetBrains Mono" "Fira Code" "Source Code Pro" "Menlo" "monospace")
-             when (doom-font-exists-p font)
-             return (setq doom-font (font-spec :family font :size 12))))
-  (advice-remove #'doom-init-fonts-h #'my/use-default-font-a))
-
-(defadvice! my/use-chinese-font-a (&rest _)
-  "Set Chinese fonts"
-  :after #'doom-init-fonts-h
-  (cl-loop for font in '("LXGW WenKai Mono" "Adobe Heiti Std" "STXihei" "Microsoft Yahei"
-                         "Hiragino Sans GB W6" "WenQuanYi Micro Hei Mono")
-           when (and (doom-font-exists-p font) (find-font (font-spec :family (font-get doom-font :family) :script 'han)))
-           return (dolist (charset '(kana han cjk-misc bopomofo))
-                    (set-fontset-font t charset font)))
-  ;; org modern header 字体配置
-  (when (doom-font-exists-p "Unifont")
-    (set-fontset-font t '(#x262f . #x2637) "Unifont")
-    (set-fontset-font t '(#x2460 . #x2468) "Unifont")))
-;; ligatures
-(when (modulep! :ui ligatures +extra)
-  (plist-put! +ligatures-extra-symbols :pipe "‖")
-  (add-hook 'after-setting-font-hook
-            (lambda ()
-              (when (and (display-graphic-p)
-                         (string-equal (font-get doom-font :family) "Fantasque Sans Mono"))
-                (set-fontset-font t '(#X03bb . #X03bb) "Fantasque Sans Mono") ;; :lambda
-                (set-fontset-font t '(#X2022 . #X2022) "Fantasque Sans Mono")) ;; dot
-
-              (cl-loop for font in '("STIX Two Math" "Latin Modern Math")
-                       when (doom-font-exists-p font)
-                       return (dolist (charset (list #X2218 ;; composition
-                                                     #X21a6 ;; map
-                                                     #X2205 ;; null
-                                                     #X1d54b ;; true
-                                                     #X1d53d ;; false
-                                                     #X2124 ;; int
-                                                     #X211d ;; float
-                                                     #X1d54a ;; str
-                                                     #X1d539 ;; bool
-                                                     #X1d543 ;; list
-                                                     #X22c3 ;; union
-                                                     #X2229 ;; intersect
-                                                     #X2216 ;; diff
-                                                     #X2a02 ;; tuple
-                                                     ))
-                                ;; (set-fontset-font t (cons charset charset) font)
-                                (set-fontset-font t `(,charset . ,charset) font))))))
-
-(defun my-ligatures-init-buffer-h ()
-  (when after-init-time
-    (let ((in-mode-extras-p (+ligatures--enable-p +ligatures-extras-in-modes)))
-      (when in-mode-extras-p
-        (prependq! prettify-symbols-alist
-                   (alist-get major-mode +ligatures-extra-alist)))
-      (when (and in-mode-extras-p
-                 prettify-symbols-alist)
-        (when prettify-symbols-mode
-          (prettify-symbols-mode -1))
-        (prettify-symbols-mode +1)))))
-(when (and (modulep! :ui ligatures)
-           (not (modulep! :ui ligatures +extra)))
-  (add-hook! 'doom-init-ui-hook :append
-    (defun my-ligatures-init-h ()
-      (add-hook 'after-change-major-mode-hook #'my-ligatures-init-buffer-h))))
+(setq doom-font (font-spec :family "Pragma Sevka SC NF" :size 13))
+(unless (doom-font-exists-p doom-font)
+  (my-init-font))
 #+end_src
-
-**** nerd-font
+*** nerd-font
 使用​~Sysmbola Nerd Font Mono~​显示 icon 图标字体
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! nerd-icons
-  :recipe (:host github
-           :repo "rainstormstudio/nerd-icons.el"
-           :files (:defaults "data")))
-#+end_src
 #+begin_src emacs-lisp
 (use-package! nerd-icons
   :autoload (nerd-icons-mdicon nerd-icons-codicon)
@@ -1342,12 +1033,6 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
                     :crypt (nerd-icons-mdicon "nf-md-key")
                     :idcard (nerd-icons-mdicon "nf-md-id_card")))
     (advice-remove #'set-ligatures! '+my-set-ligatures-a))
-  ;; (add-hook 'after-setting-font-hook #'nerd-icons-set-font) ;为对应字符绑定字体
-  ;; (defadvice! my/use-nerd-font-a (&rest _)
-  ;;   "Set Chinese fonts"
-  ;;   :after #'doom-init-fonts-h
-  ;;   ;; org modern header 字体配置
-  ;;   )
   :custom
   (nerd-icons-font-family "Symbols Nerd Font Mono")
   :config
@@ -1357,7 +1042,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
   (add-to-list 'nerd-icons-extension-icon-alist
                '("fnl" nerd-icons-sucicon "nf-custom-fennel" :face nerd-icons-purple)))
 #+end_src
-*** 主题和 modeline
+** 主题和 modeline
 **** 主题的基本配置
 目前使用主要有 doom-theme ， modus-themes 和 catppuccin-theme
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -1397,7 +1082,6 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 - [[https://github.com/redguardtoo/emacs.d/blob/182b37a488f3e091b0f5754f79e92421b1be6482/lisp/init-theme.el#L81][自动随机切换主题]]
 #+begin_src emacs-lisp
 (setq my-light-themes '(doom-solarized-light
-                        doom-ayu-light
                         doom-gruvbox-light
                         doom-one-light
                         doom-nord-light
@@ -1536,7 +1220,7 @@ Macos 上借助系统自带的进行主题切换
 + awesome-tray
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! awesome-tray :recipe (:host github :repo "manateelazycat/awesome-tray"))
-(package! solaire-mode :disable t)
+;; (package! solaire-mode :disable t)
 #+end_src
 #+begin_src emacs-lisp
 (use-package! awesome-tray
@@ -1544,7 +1228,7 @@ Macos 上借助系统自带的进行主题切换
   :init
   (setq awesome-tray-date-format "%H:%M")
   (setq awesome-tray-active-modules
-        '("word-count" "location" "belong" "file-path" "mode-name" "battery" "date" "evil"))
+        '("word-count" "location" "belong" "file-path" "mode-name" "date" "evil"))
  (add-hook 'doom-after-init-hook #'awesome-tray-mode 100)
   (setq awesome-tray-info-padding-right 2)
   (add-hook! 'doom-load-theme-hook :depth 100
@@ -1578,11 +1262,13 @@ Macos 上借助系统自带的进行主题切换
   (defadvice! +awesome-tray-enable-a (fn &rest args)
     :around #'awesome-tray-enable
     (when (bound-and-true-p doom-modeline-mode) (doom-modeline-mode -1))
+    (when (bound-and-true-p  solaire-mode) (solaire-mode -1))
     (apply fn args)
     (set-face-attribute 'header-line nil :inherit 'unspecified))
 
   (defadvice! +awesome-tray-disable-a (&rest _)
     :after #'awesome-tray-disable
+    (when (fboundp  'solaire-mode) (solaire-mode 1))
     (when (fboundp 'doom-modeline-mode) (doom-modeline-mode)))
 
   (advice-add 'awesome-tray-module-mode-name-info :filter-return
@@ -1680,26 +1366,11 @@ Macos 上借助系统自带的进行主题切换
             ((string-prefix-p "► Doom" bname) t)
             (t (funcall fn buf))))))
 #+end_src
-*** 杂项
-#+begin_src emacs-lisp
-(setq doom-fallback-buffer-name "► Doom"
-      +doom-dashboard-name "► Doom")
-
-;; 当不使用 daemon 启动 EMACS 时，我喜欢窗口展示缓冲区的名字，然后是项目文件夹 (如果可用)。
-(when (daemonp)
-  (setq! frame-title-format
-         '("%b – Doom Emacs"
-           (:eval
-            (let ((project-name (projectile-project-name)))
-              (unless (string= "-" project-name)
-                (format "  -  [%s]" project-name)))))))
-#+end_src
-
-*** 默认 ~scratch~ buffer 不显示信息
+** 默认 ~scratch~ buffer 不显示信息
 #+begin_src emacs-lisp
 (setq-default initial-scratch-message nil)
 #+end_src
-*** 允许 CLI 运行 org-babel 程序
+** 允许 CLI 运行 org-babel 程序
 在 Org 中有时会写一点代码，[[https://orgmode.org/worg/org-contrib/babel][Org-Babel]] 就是各个语言在 Org-mode 中的巴别塔。大家都
 可以通过它来直接运行。
 
@@ -1717,12 +1388,12 @@ Macos 上借助系统自带的进行主题切换
             :around #'(lambda (orig-fn &rest args)
                         (quiet! (apply orig-fn args))))
 #+end_src
-*** eros
+** eros
 emacs 使用 C-x C-e 执行代码时，内联效果
 #+begin_src emacs-lisp
 (setq! eros-eval-result-prefix "==>") ; default =>
 #+end_src
-*** rainbow-mode
+** rainbow-mode
 显示 "#232323" 对应的色彩
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! colorful-mode :built-in 'prefer)
@@ -1736,7 +1407,7 @@ emacs 使用 C-x C-e 执行代码时，内联效果
   (setopt colorful-prefix-string "")
   (setopt colorful-allow-mouse-clicks nil))
 #+end_src
-*** 高亮关键字
+** 高亮关键字
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! symbol-overlay)
 #+end_src
@@ -1781,7 +1452,7 @@ emacs 使用 C-x C-e 执行代码时，内联效果
         (symbol-overlay-mode 1)))
     (advice-add #'deactivate-mark :after #'turn-on-symbol-overlay)))
 #+end_src
-*** olivetti
+** olivetti
 一个文本居中工具
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! olivetti :recipe (:host github :repo "rnkn/olivetti"))
@@ -1801,7 +1472,7 @@ emacs 使用 C-x C-e 执行代码时，内联效果
         (olivetti-mode +1)
         (olivetti-set-width 100)))))
 #+end_src
-*** 换行
+** 换行
 [[https://codeberg.org/joostkremers/visual-fill-column][visual-fill-column]] [[https://ruib.in/posts/enable-line-wrapping-for-org-mode/][为 Org Mode 开启自动换行 - 没事瞎扯]]
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! visual-fill-column)
@@ -1818,6 +1489,73 @@ emacs 使用 C-x C-e 执行代码时，内联效果
     "k" #'evil-previous-visual-line))
 #+end_src
 
+* edit
+编辑技巧相关的配置细节
+** 基本
+不运用第三方包，仅运用自己编写的库和基本包
+- 为中英文自动添加空格
+#+begin_src emacs-lisp
+(lib-load "auto-space" my-auto-space-mode)
+(add-hook! doom-first-buffer #'my-auto-space-mode)
+#+end_src
+* 包
+** 加载结构
+:properties:
+:header-args:emacs-lisp: :tangle no
+:end:
+doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就可以安装。
+需要注意，不应该将该文件编译为字节码。
+#+begin_src emacs-lisp :tangle "packages.el" :comments no
+;; -*- no-byte-compile: t; -*-
+;;; $DOOMDIR/packages.el
+;;; Load NIXOS automatically generated configuration.
+(load! "packages.init.el" doom-user-dir 'no-error)
+;; (disable-packages! smartparens)
+#+end_src
+
+*警告*: 不要禁用 =~/.emacs.d/core/packages.el= 中列出的包。Doom 依赖这些，禁用它们
+可能出现严重问题。
+- 从官方的源 [[https://melpa.org/][MELPA]] / [[http://elpa.gnu.org/][GNU ELPA]] / [[https://emacsmirror.net/][emacsmirror]] 安装
+#+begin_src emacs-lisp
+(package! some-package)
+#+end_src
+- 关闭某些包
+#+begin_src emacs-lisp
+(package! some-package :disable t)
+#+end_src
+- 从 Git Repo 安装
+#+begin_src emacs-lisp
+;; github
+(package! github-package :recipe (:host github :repo "username/repo"))
+;; gitlab
+(package! gitlab-package :recipe (:host gitlab :repo "username/repo"))
+;; other
+(package! other-package :recipe (:host nil :repo "https://example.com/repo"))
+#+end_src
+  如果 repo 仅中只有某个 / 某些文件是你需要的
+#+begin_src emacs-lisp
+(package! some-package
+  :recipe (:host github :repo "username/repo"
+           :files ("some-file.el" "src/elisp/*.el")))
+#+end_src
+  如果需要指定某个 =commit= 或某个 =branch=
+#+begin_src emacs-lisp
+;; commit
+(package! some-package :pin "abcdefghijk")
+;; branch
+(package! some-package :recipe (:branch "stable"))
+#+end_src
+- 使用本地的 repo
+#+begin_src emacs-lisp
+(package! some-package :recipe (:local-repo "/path/to/repo"))
+#+end_src
+** 辅助宏
+这些是 doom 添加的一些非常有用的宏
+- ~load!~ 可以相对于本文件进行外部 ~.el~ 文件的加载
+- ~use-package!~ 用于配置包
+- ~add-load-path!~ 将指定目录添加到 ~load-path~ 中，可以让 Emacs 在使用
+  ~require~ 和 ~use-package~ 时在 ~load-path~ 中进行查找
+- ~map!~ 用于绑定新的快捷键
 ** 工具
 *** common
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -2388,16 +2126,16 @@ CLOSED: [2023-05-24 Wed 12:24]
 (package! calibredb)
 #+end_src
 #+begin_src emacs-lisp
-;; (use-package! calibredb
-;;   :config
-;;   (setq calibredb-root-dir "~/Documents/mybook"
-;;         calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)
-;;         calibredb-library-alist '(("~/Documents/mybook")
-;;                                   ("~/Documents/netbooks")
-;;                                   ("~/Documents/archiveRead"))
-;;         sql-sqlite-program "sqlite3")
-;;   (when IS-MAC
-;;     (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")))
+(use-package! calibredb
+  :config
+  (setq calibredb-root-dir "~/Documents/mybook"
+        calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir)
+        calibredb-library-alist '(("~/Documents/mybook")
+                                  ("~/Documents/netbooks")
+                                  ("~/Documents/archiveRead"))
+        sql-sqlite-program "sqlite3")
+  (when IS-MAC
+    (setq calibredb-program "/Applications/calibre.app/Contents/MacOS/calibredb")))
 #+end_src
 **** DONE epub 阅读工具
 CLOSED: [2023-05-24 Wed 13:13]
@@ -3495,30 +3233,6 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
 #+end_src
 * 编程语言配置
 ** 公共配置
-*** treesit
-使用语法树， treesit
-- 安装方法
-#+begin_src emacs-lisp :tangle (if (and (fboundp 'treesit-available-p) (treesit-available-p)) "packages.el" "no")
-(package! treesit-auto :built-in 'prefer)
-#+end_src
-- treesit 相关配置
-#+begin_src emacs-lisp :tangle (if (and (fboundp 'treesit-available-p) (treesit-available-p)) "yes" "no")
-(use-package! treesit-auto
-  :hook (after-init . global-treesit-auto-mode)
-  :init
-  (setopt treesit-font-lock-level 4
-          treesit-auto-install 'prompt))
-
-;; yasnippet 支持 -ts-mode
-(use-package! yasnippet
-  :defer t
-  :config
-  (advice-add 'yas--modes-to-activate :around
-              (defun yas--get-snippet-tables@tree-sitter (orig-fn &optional mode)
-                (funcall orig-fn
-                         (or (car (rassq (or mode major-mode) major-mode-remap-alist))
-                             mode)))))
-#+end_src
 *** grip
 - 描述: markdown-mode, org-mode 预览配置
 - 安装
@@ -3752,11 +3466,6 @@ org link 快捷方法
 (pushnew! org-link-abbrev-alist
           '("doubanmovie" . "https://movie.douban.com/subject/%s")
           '("qidian" . "https://book.qidian.com/info/%s/"))
-#+end_src
-org treesit
-#+begin_src emacs-lisp
-(my/leader :keymap 'org-mode-map
-  "ft" '(my/load-treesit :wk "treesit"))
 #+end_src
 
 **** 零宽空格
@@ -4836,12 +4545,12 @@ macos 中自动化的一门脚本语言
              (lsp-bridge-mode +1)
     ))
 #+end_src
-** nushell
-#+begin_src emacs-lisp :tangle (if (executable-find "nu") "packages.el" "no") :noweb-ref none
+** TODO nushell
+#+begin_src emacs-lisp :tangle "no" :noweb-ref none
 (package! nushell-ts-mode :recipe (:host github :repo "herbertjones/nushell-ts-mode") :built-in 'prefer)
 (package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode") :built-in 'prefer)
 #+end_src
-#+begin_src emacs-lisp :tangle (if (executable-find "nu") "yes" "no") :noweb-ref none
+#+begin_src emacs-lisp :tangle "no" :noweb-ref none
 (let ((use-nushell-treesit-p (my-treesit-language-available-p 'nu)))
   (use-package! nushell-mode
     :mode "\\.nu\\'"

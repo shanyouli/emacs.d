@@ -14,6 +14,5 @@ lang/
 /config.html
 /config.md
 filycheck_*.el
-/lib/
 /private.el
 /autoload/*.el
