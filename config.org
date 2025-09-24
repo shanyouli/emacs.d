@@ -56,6 +56,11 @@ descendant, GNU Emacs, continues actively as of 2020.
 
 (setopt initial-major-mode 'emacs-lisp-mode)
 #+end_src
+强制 shell-file-name 为 bash 或 zsh，避免卡顿
+#+begin_src emacs-lisp
+(when (not IS-WINDOWS)
+  (setq shell-file-name (executable-find (if IS-MAC "zsh" "bash"))))
+#+end_src
 自定义宏，加载对应 doom-user-dir 目录下的 lib 目录下的文件中存在的函数
 #+begin_src emacs-lisp
 (defmacro mylib-autoload (f &rest functions)
@@ -1300,6 +1305,7 @@ yaml              ; JSON, but readable
 ;; 发现函数的定义
 (define-key! lsp-bridge-mode-map [remap evil-jump-to-tag] 'my/def-jump-go)
 #+end_src
+
 
 * 包
 ** 加载结构
