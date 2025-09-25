@@ -26,9 +26,12 @@
                          (truncate (- (* (cadr display-size) 0.5)))))))
     (set-frame-size (or frame (selected-frame)) x-width y-height (>= width 200))))
 
+
 ;; EmacsClient 配置
 (defvar initframe-client-frame nil "Store the generated EmacsClient frame")
 (defconst initframe-client-frame-prefix-name "EmacsClient" "指定emacs client 名称。")
+(defconst initframe-client-param 'my-client "指定属性名称")
+
 
 (defvar initframe-client-frame-parameters
   `((name . ,initframe-client-frame-prefix-name)
@@ -44,10 +47,14 @@
                           ":0")))))
   "emacs client 默认 frame 参数")
 
+(defun initframe-make-client-frame (&optional params)
+  "构建一个有 my-client 属性的 frame。`Params' frame 的额外属性。"
+  (make-frame (append `((,initframe-client-param . t)) params)))
+
 (defun initframe-frame-is-client-frame-p (&optional frame)
   "Return t 如果当前 frame 就是 Emacs-Client"
-  (string-prefix-p initframe-client-frame-prefix-name (frame-parameter frame 'name)))
-
+  (string-prefix-p initframe-client-frame-prefix-name
+                   (frame-parameter (or frame (selected-frame)) 'name)))
 (defun initframe-client-frame-is-live-p ()
   "判断是否存在以 EmacsClient 开头的 frame 存活。"
   (if (and initframe-client-frame (frame-live-p initframe-client-frame))
@@ -60,12 +67,12 @@
 ;;;###autoload
 (defun initframe-open-client-frame (&optional $file)
   "打开或聚焦到 client-frame。如果存在路径，则打开该文件。"
-  (let* ((frame-title-format "")
-         (frame (or (initframe-client-frame-is-live-p)
-                    (make-frame initframe-client-frame-parameters))))
+  (let ((frame (or (initframe-client-frame-is-live-p)
+                   (initframe-make-client-frame initframe-client-frame-parameters))))
     (if frame
         (progn
           (select-frame-set-input-focus frame)
+          (with-selected-frame frame (set-frame-parameter frame 'name nil))
           (when (and $file (file-exist-p $file))
             (with-selected-frame frame (find-file $file)))
           t)

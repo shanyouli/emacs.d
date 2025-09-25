@@ -81,32 +81,6 @@ descendant, GNU Emacs, continues actively as of 2020.
         nil))))
 #+end_src
 ** autoload 函数
-*** 初始化 frame 大小
-#+begin_src emacs-lisp :tangle "autoload/init-frame.el"
-;;;###autoload
-(defun my-display-width ()
-  "获取当前 display 的 宽度"
-  (nth 3 (assq 'geometry (frame-monitor-attributes))))
-
-;;;###autoload
-(defun my-display-height ()
-  "获取当前 display 的 height."
-  (nth 4 (assq 'geometry (frame-monitor-attributes))))
-
-;;;###autoload
-(defun my/init-default-frame (&optional frame wratio hratio)
-  "设置 `frame'的大小"
-  (interactive)
-  (let* ((current-display-size (assq 'geometry (frame-monitor-attributes)))
-         (x-width (or (alist-get 'width default-frame-alist)
-                     (truncate (- (* (nth 3 current-display-size)
-                                     (or wratio 0.5)) 20))))
-        (y-height (or (alist-get 'height default-frame-alist)
-                      (truncate (* (nth 4 current-display-size)
-                                   (or hratio 0.5))))))
-    (set-frame-size (or frame (selected-frame)) x-width y-height (>= x-width 200))))
-#+end_src
-
 *** 记录当前光标位置
 [[https://emacs-china.org/t/topic/24533/9][请问如何记录光标位置 - Emacs-general - Emacs China]]
 #+begin_src emacs-lisp :tangle "autoload/init-remember-cursor.el"
@@ -291,40 +265,6 @@ lsp-bridge-find-def 和 dumb-jump 的封装
       (message "Indent buffer."))))
 
 #+end_src
-*** 系统默认工具打开文件
-#+begin_src emacs-lisp :tangle "autoload/init-common.el"
-;;;###autoload
-(defun open-in-external-app (&optional @fname)
-  "Open the current file or dired marked files in external app.
-When called in emacs lisp, if `@FNAME' is given, open that.
-URL `http://xahlee.info/emacs/emacs/emacs_dired_open_file_in_ext_apps.html'
-Version 2022-06-26  8:46:00"
-  (interactive)
-  (let* (($file-list (if @fname
-                         (progn (list @fname))
-                       (if (or
-                            (string-equal major-mode "dired-mode")
-                            (string-equal major-mode "dirvish-mode"))
-                           (dired-get-marked-files)
-                         (list (buffer-file-name)))))
-         ($do-it-p (if (<= (length $file-list) 5)
-                       t
-                     (y-or-n-p "Open more than 5 files? "))))
-    (when $do-it-p
-      (cond ((string-equal system-type "windows-nt")
-             (mapc (lambda ($fpath)
-                     (shell-command (concat "PowserShell -Command \"Invoke-Item -LiteralPath\" " "'"
-                                            (shell-quote-argument (expand-file-name $fpath)) "'")))
-                   $file-list))
-            ((string-equal system-type "darwin")
-             (mapc (lambda ($fpath)
-                     (shell-command (concat "open " (shell-quote-argument $fpath)))) $file-list))
-            ((string-equal system-type "gnu/linux")
-             (mapc (lambda ($fpath)
-                     (let ((process-connection-type nil))
-                       (start-process "" nil "xdg-open" $fpath))) $file-list))))))
-#+end_src
-
 *** 自动打开文件夹
 #+begin_src emacs-lisp :tangle "autoload/init-common.el"
 ;;;###autoload
@@ -334,7 +274,6 @@ Version 2022-06-26  8:46:00"
     (message "Warning: not found %S, Will create it." project)
     (make-directory project t))
   (doom-project-find-file project))
-
 #+end_src
 
 *** create fontset
@@ -507,20 +446,6 @@ tasks."
   "C-<down>"   #'+evil/window-move-down
   "C-<up>"     #'+evil/window-move-up
   "C-<right>"  #'+evil/window-move-right)
-#+end_src
-修复当在终端使用​src_bash{emacs -T title} 启动时，emacs 标题不变的问题,目前应该没有效果了
-#+begin_src emacs-lisp
-(add-hook! doom-after-init-modules
-  (let ((title (assoc 'title default-frame-alist)))
-    (delq! title default-frame-alist)))
-#+end_src
-为不同的 frame 设置不同的窗口大小，目前使用系统功能代替, 依赖​~myfun.el~​中的​=init-default-frame=​函数
-#+begin_src emacs-lisp :tangle "no"
-(add-hook 'after-make-frame-functions
-          (lambda (frame)
-            (pcase (frame-parameter nil 'name)
-              ("scratch" (my/init-default-frame frame))
-              ("org-protocol" (my/init-default-frame frame 0.618 0.618)))))
 #+end_src
 - 最近文件的管理
 #+begin_src emacs-lisp
@@ -716,7 +641,7 @@ doom-dashboard    ; a nifty splash screen for Emacs
 hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
 ;;hydra
 indent-guides     ; highlighted indent columns
-(ligatures +extra +pragmata-pro)         ; ligatures and symbols to make your code pretty again
+(ligatures +extra)         ; ligatures and symbols to make your code pretty again
 ;;minimap           ; show a map of the code on the side
 modeline          ; snazzy, Atom-inspired modeline, plus API
 ;;nav-flash         ; blink cursor line after big motions
@@ -738,8 +663,7 @@ workspaces        ; tab emulation, persistence & separate workspaces
 (evil +everywhere); come to the dark side, we have cookies
 file-templates    ; auto-snippets for empty files
 fold              ; (nigh) universal code folding
-format
-;;(format +onsave)  ; automated prettiness
+format            ; automated prettiness
 ;;god               ; run Emacs commands without modifier keys
 ;;lispy             ; vim for lisp, for people who don't like vim
 multiple-cursors  ; editing in many places at once
@@ -810,7 +734,7 @@ tty               ; improve the terminal Emacs experience
 最爽的事情就是，我可以在 Emacs 中编写任何语言 (的 =Hello World=)
 #+name: doom-lang
 #+begin_src emacs-lisp  :noweb-ref none
-(lua +fennel)
+(lua +fennel +tree-sitter)
 ;;agda              ; types of types of types of types...
 ;;beancount         ; mind the GAAP
 ;;(cc +lsp)         ; C > C++ == 1
@@ -839,7 +763,7 @@ emacs-lisp        ; drown in parentheses
 ;;idris             ; a language you can depend on
 ;; json              ; At least it ain't XML
 ;;(java +lsp)       ; the poster child for carpal tunnel syndrome
-javascript        ; all(hope(abandon(ye(who(enter(here))))))
+(javascript +lsp)        ; all(hope(abandon(ye(who(enter(here))))))
 ;;julia             ; a better, faster MATLAB
 ;;kotlin            ; a better, slicker Java(Script)
 ;;latex             ; writing papers in Emacs has never been so fun
@@ -850,14 +774,11 @@ markdown          ; writing docs for people to ignore
 ;; (nix +lsp)          ; I hereby declare "nix geht mehr!"
 nix
 ;;ocaml             ; an objective camel
-(org +hugo
-     +roam2
-     +dragndrop
-     )           ;organize your plain life in plain text
+(org +hugo +dragndrop)           ;organize your plain life in plain text
 ;;php               ; perl's insecure younger brother
 ;;plantuml          ; diagrams for confusing people more
 ;;purescript        ; javascript, but functional
-python              ; beautiful is better than ugly
+(python +lsp +tree-sitter)              ; beautiful is better than ugly
 ;;qt                ; the 'cutest' gui framework ever
 ;;racket            ; a DSL for DSLs
 ;;raku              ; the artist formerly known as perl6
@@ -867,7 +788,7 @@ python              ; beautiful is better than ugly
 ;; rust             ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
 ;;scala             ; java, but good
 ;;(scheme +guile)   ; a fully conniving family of lisps
-(sh +fish)                ; she sells {ba,z,fi}sh shells on the C xor
+(sh +fish +tree-sitter)                ; she sells {ba,z,fi}sh shells on the C xor
 ;;sml
 ;;solidity          ; do you need a blockchain? No.
 ;;swift             ; who asked for emoji variables?
@@ -955,37 +876,115 @@ emacsclient -e "(initframe-open-client-frame)"
 最终归宿为 lib 中的一个库。一些有用但不确定是否归档的函数合集。
 ** initfont
 用来处理初始化字体的问题, 当默认字体不存在时，加载该库。 ~autoload/initfont~
+** 未分类
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle no :noweb-ref init-common
+:END:
+#+begin_src emacs-lisp :tangle "autoload/init-common.el" :noweb no-export :comments no :noweb-ref nil :noweb-prefix no
+<<init-common>>
+#+end_src
+- 提供我习惯的标题命令风格
+#+begin_src emacs-lisp
+(defun my-get-parent-directory-name ()
+  "获取当前编辑 buffer 的父目录名"
+  (format "%s" (file-name-nondirectory (directory-file-name default-directory))))
+;;;###autoload
+(defun my-title-stye (name)
+  "`name' tilte 的前缀，优先使用项目名作为结尾，如果项目名不可用将使用父目录结尾"
+  (let ((prj-name (and (fboundp 'projectile-project-name)
+                      (projectile-project-name))))
+    (concat name "- %b"
+            (if (and prj-name (not (string= "-" prj-name)))
+                (format " - [P:%s]" prj-name)
+              (format " - [D:]" (my-get-parent-directory-name))))))
+#+end_src
+- 获取 GUI 窗口数量
+#+begin_src emacs-lisp
+;;;###autoload
+(defun my-get-all-display-frame ()
+  "获取当前 GUI 窗口数量"
+  (length (seq-filter #'display-graphic-p (frame-list))))
+#+end_src
+* 包
+** 加载结构
+:properties:
+:header-args:emacs-lisp: :tangle no
+:end:
+doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就可以安装。
+需要注意，不应该将该文件编译为字节码。
+#+begin_src emacs-lisp :tangle "packages.el" :comments no
+;; -*- no-byte-compile: t; -*-
+;;; $DOOMDIR/packages.el
+;;; Load NIXOS automatically generated configuration.
+(load! "packages.init.el" doom-user-dir 'no-error)
+;; (disable-packages! smartparens)
+#+end_src
 
+*警告*: 不要禁用 =~/.emacs.d/core/packages.el= 中列出的包。Doom 依赖这些，禁用它们
+可能出现严重问题。
+- 从官方的源 [[https://melpa.org/][MELPA]] / [[http://elpa.gnu.org/][GNU ELPA]] / [[https://emacsmirror.net/][emacsmirror]] 安装
+#+begin_src emacs-lisp
+(package! some-package)
+#+end_src
+- 关闭某些包
+#+begin_src emacs-lisp
+(package! some-package :disable t)
+#+end_src
+- 从 Git Repo 安装
+#+begin_src emacs-lisp
+;; github
+(package! github-package :recipe (:host github :repo "username/repo"))
+;; gitlab
+(package! gitlab-package :recipe (:host gitlab :repo "username/repo"))
+;; other
+(package! other-package :recipe (:host nil :repo "https://example.com/repo"))
+#+end_src
+  如果 repo 仅中只有某个 / 某些文件是你需要的
+#+begin_src emacs-lisp
+(package! some-package
+  :recipe (:host github :repo "username/repo"
+           :files ("some-file.el" "src/elisp/*.el")))
+#+end_src
+  如果需要指定某个 =commit= 或某个 =branch=
+#+begin_src emacs-lisp
+;; commit
+(package! some-package :pin "abcdefghijk")
+;; branch
+(package! some-package :recipe (:branch "stable"))
+#+end_src
+- 使用本地的 repo
+#+begin_src emacs-lisp
+(package! some-package :recipe (:local-repo "/path/to/repo"))
+#+end_src
+** 辅助宏
+这些是 doom 添加的一些非常有用的宏
+- ~load!~ 可以相对于本文件进行外部 ~.el~ 文件的加载
+- ~use-package!~ 用于配置包
+- ~add-load-path!~ 将指定目录添加到 ~load-path~ 中，可以让 Emacs 在使用
+  ~require~ 和 ~use-package~ 时在 ~load-path~ 中进行查找
+- ~map!~ 用于绑定新的快捷键
 * UI
 字体，等主题 ui 配置
 ** 基本配置
+- 默认标题规则
+#+begin_src emacs-lisp
+(setq frame-title-format
+      '(:eval (if (frame-parameter nil 'my-client)
+                  (my-title-stye "EmacsClient")
+                  (my-title-stye "DoomEmacs")))
+      icon-title-format t)
+(setq doom-fallback-buffer-name "► Doom"
+      +doom-dashboard-name "► Doom")
+#+end_src
 - 为一些特定的 frame 设置默认大小, 使用平铺类窗口管理器，更推荐他们自带的管理。
 #+begin_src emacs-lisp
 (add-hook 'after-make-frame-functions
           (lambda (frame)
-            (pcase (frame-parameter nil 'name)
+            (pcase (frame-parameter frame 'name)
               ("scratch" (initframe-init-default-frame frame))
-              ("org-protocol" (initframe-init-default-frame frame 0.618 0.618)))))
-#+end_src
-- 强制修改所有用 emacsclient 创建的窗口名，初始为 ~EmacsClient~
-#+begin_src emacs-lisp
-(add-hook 'after-make-frame-functions
-          (lambda (frame)
-            (when (frame-parameter frame 'client)
-              (modify-frame-parameters
-               frame '((title . "EmacsClient")))))
-          100)
-#+end_src
-- 更好的标题规则
-#+begin_src emacs-lisp
-(setq frame-title-format
-      '(:eval (let ((client (frame-parameter nil 'client))
-                    (prj-name (projectile-project-name)))
-                (concat (if client "EmacsClient - " "DoomEmacs - ")
-                        "%b"
-                        (unless (string= "-" prj-name) (format " - [%s]" prj-name))))))
-(setq doom-fallback-buffer-name "► Doom"
-      +doom-dashboard-name "► Doom")
+              ("org-protocol" (initframe-init-default-frame frame 0.618 0.618)))
+            (when (and (frame-parameter frame 'client) (< 1 (my-get-all-display-frame)))
+              (set-frame-parameter frame 'my-client t))))
 #+end_src
 - 更好的显示超出部分
 #+begin_src emacs-lisp
@@ -1042,8 +1041,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
   (add-to-list 'nerd-icons-extension-icon-alist
                '("fnl" nerd-icons-sucicon "nf-custom-fennel" :face nerd-icons-purple)))
 #+end_src
-** 主题和 modeline
-**** 主题的基本配置
+** 主题的基本配置
 目前使用主要有 doom-theme ， modus-themes 和 catppuccin-theme
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! ef-themes :built-in 'prefer)
@@ -1214,9 +1212,9 @@ Macos 上借助系统自带的进行主题切换
     (setq doom-theme (car custom-enabled-themes))))
 #+end_src
 
-**** modeline and tab
+** modeline and tab
 目前使用 [[https://github.com/manateelazycat/awesome-tray][awesome-tray]], 备用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]
-***** modeline 配置
+*** modeline 配置
 + awesome-tray
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! awesome-tray :recipe (:host github :repo "manateelazycat/awesome-tray"))
@@ -1304,7 +1302,7 @@ Macos 上借助系统自带的进行主题切换
                         '(doom-modeline-major-mode-icon t)
                         '(doom-modeline-modal-icon nil)))
 #+end_src
-***** sort-tab 配置
+*** sort-tab 配置
 :PROPERTIES:
 :ID: 2fcbd9b0-f219-4043-8955-b65f343c0a77
 :END:
@@ -1319,7 +1317,7 @@ Macos 上借助系统自带的进行主题切换
   :autoload sort-tab-mode
   :init
   (add-hook! window-setup (unless (daemonp) (sort-tab-mode +1)))
-  (setq sort-tab-show-index-number t)
+  (setq sort-tab-show-index-number nil)
   ;; (setq sort-tab-buffer-name " *sort-tab*")
   (map! :nvie "s-1" #'sort-tab-select-visible-tab
         :nvie "s-2" #'sort-tab-select-visible-tab
@@ -1452,6 +1450,21 @@ emacs 使用 C-x C-e 执行代码时，内联效果
         (symbol-overlay-mode 1)))
     (advice-add #'deactivate-mark :after #'turn-on-symbol-overlay)))
 #+end_src
+- ~hl-todo~ 允许你设置一些关键字，这些关键字将高亮并且便于查找。往往用于代码注释中
+强调某些内容。
+#+begin_src emacs-lisp
+(custom-set-variables
+ '(hl-todo-keyword-faces '(("NOTE" font-lock-builtin-face bold) ;; needs discussion or further investigation.
+                           ("REVIEW" font-lock-keyword-face bold) ;; review was conducted.
+                           ("HACK" font-lock-variable-name-face bold) ;; workaround a known problem.
+                           ("DEPRECATED" region bold) ;; why it was deprecated and to suggest an alternative.
+                           ("XXX+" font-lock-constant-face bold) ;; warn other programmers of problematic or misguiding code.
+                           ("TODO" font-lock-function-name-face bold) ;; tasks/features to be done.
+                           ("FIXME" font-lock-warning-face bold) ;; problematic or ugly code needing refactoring or cleanup.
+                           ("KLUDGE" font-lock-preprocessor-face bold )
+                           ("BUG" error bold) ;; a known bug that should be corrected.
+                           )))
+#+end_src
 ** olivetti
 一个文本居中工具
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -1498,65 +1511,18 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 (lib-load "auto-space" my-auto-space-mode)
 (add-hook! doom-first-buffer #'my-auto-space-mode)
 #+end_src
-* 包
-** 加载结构
-:properties:
-:header-args:emacs-lisp: :tangle no
-:end:
-doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就可以安装。
-需要注意，不应该将该文件编译为字节码。
-#+begin_src emacs-lisp :tangle "packages.el" :comments no
-;; -*- no-byte-compile: t; -*-
-;;; $DOOMDIR/packages.el
-;;; Load NIXOS automatically generated configuration.
-(load! "packages.init.el" doom-user-dir 'no-error)
-;; (disable-packages! smartparens)
-#+end_src
 
-*警告*: 不要禁用 =~/.emacs.d/core/packages.el= 中列出的包。Doom 依赖这些，禁用它们
-可能出现严重问题。
-- 从官方的源 [[https://melpa.org/][MELPA]] / [[http://elpa.gnu.org/][GNU ELPA]] / [[https://emacsmirror.net/][emacsmirror]] 安装
-#+begin_src emacs-lisp
-(package! some-package)
+* 搜索
+** color-rg
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! color-rg :recipe (:host github :repo "manateelazycat/color-rg" :files ("*.el") :build (:not compile native-compile)))
 #+end_src
-- 关闭某些包
 #+begin_src emacs-lisp
-(package! some-package :disable t)
+(use-package! color-rg
+  :defer t
+  :init (setq color-rg-mac-load-path-from-shell nil))
 #+end_src
-- 从 Git Repo 安装
-#+begin_src emacs-lisp
-;; github
-(package! github-package :recipe (:host github :repo "username/repo"))
-;; gitlab
-(package! gitlab-package :recipe (:host gitlab :repo "username/repo"))
-;; other
-(package! other-package :recipe (:host nil :repo "https://example.com/repo"))
-#+end_src
-  如果 repo 仅中只有某个 / 某些文件是你需要的
-#+begin_src emacs-lisp
-(package! some-package
-  :recipe (:host github :repo "username/repo"
-           :files ("some-file.el" "src/elisp/*.el")))
-#+end_src
-  如果需要指定某个 =commit= 或某个 =branch=
-#+begin_src emacs-lisp
-;; commit
-(package! some-package :pin "abcdefghijk")
-;; branch
-(package! some-package :recipe (:branch "stable"))
-#+end_src
-- 使用本地的 repo
-#+begin_src emacs-lisp
-(package! some-package :recipe (:local-repo "/path/to/repo"))
-#+end_src
-** 辅助宏
-这些是 doom 添加的一些非常有用的宏
-- ~load!~ 可以相对于本文件进行外部 ~.el~ 文件的加载
-- ~use-package!~ 用于配置包
-- ~add-load-path!~ 将指定目录添加到 ~load-path~ 中，可以让 Emacs 在使用
-  ~require~ 和 ~use-package~ 时在 ~load-path~ 中进行查找
-- ~map!~ 用于绑定新的快捷键
-** 工具
+* 工具
 *** common
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! psearch :recipe (:host github :repo "twlz0ne/psearch.el"
@@ -2273,22 +2239,6 @@ OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能�
   :after #'emojify-set-emoji-data
   (dolist (emoji emojify-disabled-emojis)
     (remhash emoji emojify-emojis)))
-#+end_src
-*** hl todo
-~hl-todo~ 允许你设置一些关键字，这些关键字将高亮并且便于查找。往往用于代码注释中
-强调某些内容。
-#+begin_src emacs-lisp
-(custom-set-variables
- '(hl-todo-keyword-faces '(("NOTE" font-lock-builtin-face bold) ;; needs discussion or further investigation.
-                           ("REVIEW" font-lock-keyword-face bold) ;; review was conducted.
-                           ("HACK" font-lock-variable-name-face bold) ;; workaround a known problem.
-                           ("DEPRECATED" region bold) ;; why it was deprecated and to suggest an alternative.
-                           ("XXX+" font-lock-constant-face bold) ;; warn other programmers of problematic or misguiding code.
-                           ("TODO" font-lock-function-name-face bold) ;; tasks/features to be done.
-                           ("FIXME" font-lock-warning-face bold) ;; problematic or ugly code needing refactoring or cleanup.
-                           ("KLUDGE" font-lock-preprocessor-face bold )
-                           ("BUG" error bold) ;; a known bug that should be corrected.
-                           )))
 #+end_src
 *** edit
 **** Puni
@@ -3190,7 +3140,7 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
   :init
   (map! :leader
         (:prefix ("nr" . "denote")
-         :desc "open denote" "f" #'denote
+         :desc "open denote" "f" #'denote-open-or-create
          :desc "denote rename file" "r" #'denote-rename-file
          :desc "denote link" "l" #'denote-link
          :desc "denote backlink" "b" #'denote-backlinks
@@ -3199,8 +3149,7 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
   :config
   (denote-rename-buffer-mode 1))
 #+end_src
-
-** 窗口管理
+* 窗口管理
 #+begin_src emacs-lisp
 (after! ace-window
   (set-face-attribute

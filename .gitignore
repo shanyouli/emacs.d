@@ -15,4 +15,4 @@ lang/
 /config.md
 filycheck_*.el
 /private.el
-/autoload/*.el
+/autoload/init-*.el
