@@ -896,7 +896,7 @@ emacsclient -e "(initframe-open-client-frame)"
     (concat name "- %b"
             (if (and prj-name (not (string= "-" prj-name)))
                 (format " - [P:%s]" prj-name)
-              (format " - [D:]" (my-get-parent-directory-name))))))
+              (format " - [D:%s]" (my-get-parent-directory-name))))))
 #+end_src
 - 获取 GUI 窗口数量
 #+begin_src emacs-lisp
@@ -1514,6 +1514,7 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 
 * 搜索
 ** color-rg
+当你需要使用 多文件搜索替换时，推荐使用 color-rg
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! color-rg :recipe (:host github :repo "manateelazycat/color-rg" :files ("*.el") :build (:not compile native-compile)))
 #+end_src
