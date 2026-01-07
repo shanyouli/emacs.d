@@ -905,6 +905,17 @@ emacsclient -e "(initframe-open-client-frame)"
   "获取当前 GUI 窗口数量"
   (length (seq-filter #'display-graphic-p (frame-list))))
 #+end_src
+- 裁剪 -mode
+#+begin_src emacs-lisp
+(defun major-mode->string (mode)
+  "Convert MODE ending in -mode to a plain string without -mode.
+
+Eg: 'bash-ts-mode -> \"bash-ts\"."
+  (replace-regexp-in-string "-mode$" ""
+                            (if (symbolp mode)
+                                (symbol-name mode)
+                              mode)))
+#+end_src
 * 包
 ** 加载结构
 :properties:
@@ -1009,7 +1020,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 2. [[https://github.com/subframe7536/maple-font][maple-font]] 中的 maple-mono-cn 字体, 字体太宽了，我不喜欢。
 
 #+begin_src emacs-lisp
-(setq doom-font (font-spec :family "Pragma Sevka SC NF" :size 13))
+(setq doom-font (font-spec :family "Pragma Sevka SC" :size 13))
 (unless (doom-font-exists-p doom-font)
   (my-init-font))
 #+end_src
@@ -1162,8 +1173,8 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
 (map! (:leader (:desc "load theme" "h t" #'my/random-theme))) ;; workspace load keybind
 #+end_src
 
-***** 自动切换主题
-****** auto-dark
+*** 自动切换主题
+**** auto-dark
 Macos 上借助系统自带的进行主题切换
 #+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "packages.el" "no")
 (package! auto-dark :recipe (:type git :host github :repo "emacsmirror/auto-dark"))
@@ -1189,7 +1200,7 @@ Macos 上借助系统自带的进行主题切换
         auto-dark-light-theme  (my--random-theme-f my-light-themes)))
 #+end_src
 
-****** 使用经纬度切换
+**** 使用经纬度切换
 #+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "no" "packages.el")
 (package! circadian)
 #+end_src
@@ -1212,8 +1223,9 @@ Macos 上借助系统自带的进行主题切换
     (setq doom-theme (car custom-enabled-themes))))
 #+end_src
 
-** modeline and tab
-目前使用 [[https://github.com/manateelazycat/awesome-tray][awesome-tray]], 备用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]
+** modeline
+目前我的使用方法为：GUI 下使用  [[https://github.com/manateelazycat/awesome-tray][awesome-tray]]， TUI 下使用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]，
+期待 [[https://github.com/eki3z/mini-echo.el/][mini-echo]] 完善后，统一使用 mini-echo。或者借鉴 mini-echo 完善 awesome-tray。
 *** modeline 配置
 + awesome-tray
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -1227,8 +1239,10 @@ Macos 上借助系统自带的进行主题切换
   (setq awesome-tray-date-format "%H:%M")
   (setq awesome-tray-active-modules
         '("word-count" "location" "belong" "file-path" "mode-name" "date" "evil"))
- (add-hook 'doom-after-init-hook #'awesome-tray-mode 100)
   (setq awesome-tray-info-padding-right 2)
+  (add-transient-hook! #'doom-init-theme-h
+    (when (display-graphic-p)
+      (awesome-tray-mode +1)))
   (add-hook! 'doom-load-theme-hook :depth 100
     (when (bound-and-true-p awesome-tray-mode)
       (awesome-tray-enable)
@@ -1283,8 +1297,6 @@ Macos 上借助系统自带的进行主题切换
                   (or (alist-get (intern mode-name) change-mode-alist)
                       mode-name)))))
 #+end_src
-+ modeline
-  使用 doom-modeline 的一些配置
 #+begin_src emacs-lisp
 (after! doom-modeline
   (remove-function after-focus-change-function #'doom-modeline-focus-change)
@@ -1302,11 +1314,13 @@ Macos 上借助系统自带的进行主题切换
                         '(doom-modeline-major-mode-icon t)
                         '(doom-modeline-modal-icon nil)))
 #+end_src
-*** sort-tab 配置
+** tabbar
 :PROPERTIES:
 :ID: 2fcbd9b0-f219-4043-8955-b65f343c0a77
 :END:
-使用 sort-tab 时，请不要随意更改字体，如果要更改字体请关闭 sort-tab
+sort-tab 现在存在缺陷
+1. 不支持多个 frame 使用
+2. 更改字体会导致 sort-tab 故障。
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! sort-tab :recipe (:host github :repo "shanyouli/sort-tab" :branch "dev"))
 #+end_src
@@ -1505,11 +1519,89 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 * edit
 编辑技巧相关的配置细节
 ** 基本
-不运用第三方包，仅运用自己编写的库和基本包
-- 为中英文自动添加空格
+不运用第三方包，仅运用自己编写的库和 doom 基本包
+- 在 Unicode 与 英文之间自动插入中文
 #+begin_src emacs-lisp
 (lib-load "auto-space" my-auto-space-mode)
 (add-hook! doom-first-buffer #'my-auto-space-mode)
+#+end_src
+- 创建 nix 文件时，不导入自动模板
+#+begin_src emacs-lisp
+(when (modulep! :editor file-templates)
+  (defer-until! (boundp '+file-templates-alist)
+    (setq +file-templates-alist
+          (cl-remove-if (lambda (elt) (equal '(nix-mode) elt)) +file-templates-alist))))
+#+end_src
+
+** 在 Unicode 与英文之间自动插入中文
+- 你也可以使用 ~wraplish~ 来进行当前 buffer 所有内容自动插入空格
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! wraplish
+  :recipe (:host github :repo "manateelazycat/wraplish"
+           :files ("*.el" "*.py") :build (:not compile native-compile)))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! wraplish
+  :commands (wraplish-mode)
+  :init
+  (my/leader "t s" '(wraplish-mode :wk "auto insert space"))
+  :config
+  (when (boundp 'lsp-bridge-python-command)
+    (setq wraplish-python-command lsp-bridge-python-command)))
+#+end_src
+** 自动使用 root 编辑文件
+使用 [[https://github.com/ncaq/auto-sudoedit][auto-sudoedit]] 包来实现允许 root 编辑
+1. 排除 ~/nix~ 开头的路径
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! auto-sudoedit)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! auto-sudoedit
+  :hook (doom-first-file . auto-sudoedit-mode)
+  :config
+  (defvar my--user-login-name-v nil "user-login-name")
+  (defadvice! +my/auto-sudoedit-current-user (path)
+    :override #'auto-sudoedit-current-user
+    (if (tramp-tramp-file-p path)
+        ;; We can't just go by the user in the tramp filename, because it may have been omitted
+        (tramp-get-remote-uid (tramp-dissect-file-name path) 'string)
+      (if IS-MAC
+          (if-let (result (bound-and-true-p my--user-login-name-v))
+              result
+            (setq my--user-login-name-v (replace-regexp-in-string "[ \t\n]+$" "" (shell-command-to-string "id -un"))
+                  result my--user-login-name-v)
+            result)
+        (user-login-name))))
+  ;; 以/nix/store 开头的文件不进入`auto-sudoedit-mode‘模式
+  (defadvice! +auto-sudoedit-current-path-a (fn &rest args)
+    :around #'auto-sudoedit-current-path
+    (let ((current-path (apply fn args)))
+      (if (and current-path (string-prefix-p "/nix/" (file-truename current-path)))
+          nil
+        current-path))))
+#+end_src
+
+** 中文结巴分词
+目前 [[https://github.com/roife/emt][emt]] ，[[https://github.com/kanglmf/emacs-chinese-word-segmentation][emacs-chinese-word-segmentation]] 和[[https://github.com/cireu/jieba.el][jieba]]三种方式，其中
+emt 最初仅支持 macos 但经过扩展支持全部平台，jieba 全平台支持，但很久没有更新了。
+我推荐使用 emt
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! emt :recipe (:host github :repo "roife/emt" :files ("*.el" )))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! emt
+  :when IS-MAC
+  :commands (emt-mode)
+  ;; :hook (doom-first-file . emt-mode)
+  :config
+  (setq emt-lib-path (concat user-emacs-directory "modules/libEMT.dylib")))
+#+end_src
+** 统计字数
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
+(package! advance-words-count :recipe (:host github :repo "LdBeth/advance-words-count.el" :files ("*.el")))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! advance-words-count :commands (advance-words-count))
 #+end_src
 
 * 搜索
@@ -2467,11 +2559,6 @@ popd
 )
 #+end_src
 ***** macos
-#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! emt
-  :disable (not IS-MAC)
-  :recipe (:host github :repo "roife/emt" :files ("*.el" "module/*" "module")))
-#+end_src
 #+begin_src emacs-lisp
 (use-package! emt
   :when IS-MAC
@@ -2479,64 +2566,6 @@ popd
   ;; :hook (doom-first-file . emt-mode)
   :config
   (setq emt-lib-path (concat user-emacs-directory "modules/libEMT.dylib")))
-#+end_src
-**** file-temple
-#+begin_src emacs-lisp
-(when (modulep! :editor file-templates)
-  (defer-until! (boundp '+file-templates-alist)
-    (setq +file-templates-alist
-          (cl-remove-if (lambda (elt) (equal '(nix-mode) elt)) +file-templates-alist))))
-#+end_src
-
-**** 在 Unicode 与英文之间插入空格
-#+begin_src emacs-lisp :tangle "packages.el"
-(package! wraplish
-  :recipe (:host github :repo "manateelazycat/wraplish"
-           :files ("*.el" "*.py")
-           :build (:not compile native-compile)))
-#+end_src
-#+begin_src emacs-lisp
-(use-package! wraplish
-  :commands (wraplish-mode)
-  :init
-  (my/leader "t s" '(wraplish-mode :wk "auto insert space"))
-  ;; (unless (daemonp)
-  ;;   (dolist (hook '(org-mode-hook gfw-mode-hook markdown-mode-hook))
-  ;;     (add-hook hook #'wraplish-mode)))
-  :config
-  (when (boundp 'lsp-bridge-python-command)
-    (setq wraplish-python-command lsp-bridge-python-command)))
-#+end_src
-
-**** [[https://github.com/ncaq/auto-sudoedit/tree/master][auto-sudoedit]]
-允许 sudo 编辑文件, 排除目标路径以 =/nix= 开头的路径
-#+begin_src emacs-lisp :tangle "packages.el"
-(package! auto-sudoedit)
-#+end_src
-#+begin_src emacs-lisp
-(use-package! auto-sudoedit
-  :hook (doom-first-file . auto-sudoedit-mode)
-  :config
-  (defvar my--user-login-name-v nil "user-login-name")
-  (defadvice! +my/auto-sudoedit-current-user (path)
-    :override #'auto-sudoedit-current-user
-    (if (tramp-tramp-file-p path)
-        ;; We can't just go by the user in the tramp filename, because it may have been omitted
-        (tramp-get-remote-uid (tramp-dissect-file-name path) 'string)
-      (if IS-MAC
-          (if-let (result (bound-and-true-p my--user-login-name-v))
-              result
-            (setq my--user-login-name-v (replace-regexp-in-string "[ \t\n]+$" "" (shell-command-to-string "id -un"))
-                  result my--user-login-name-v)
-            result)
-        (user-login-name))))
-  ;; 以/nix/store 开头的文件不进入`auto-sudoedit-mode‘模式
-  (defadvice! +auto-sudoedit-current-path-a (fn &rest args)
-    :around #'auto-sudoedit-current-path
-    (let ((current-path (apply fn args)))
-      (if (and current-path (string-prefix-p "/nix/" (file-truename current-path)))
-          nil
-        current-path))))
 #+end_src
 *** disable mouse
 不用鼠标操作 emacs
@@ -3150,6 +3179,13 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
   :config
   (denote-rename-buffer-mode 1))
 #+end_src
+
+*** ssh-agency
+ssh-agen 让 ssh 仅输入一次密码
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! ssh-agency)
+#+end_src
+
 * 窗口管理
 #+begin_src emacs-lisp
 (after! ace-window
@@ -3535,9 +3571,15 @@ org 自带的 todo,done,引用块美化
                                      (?\s . #("▢" 0 1 (composition ((1)))))))))
   ;; org-modern-table 存在无法对齐的情况, 我是用其他包管理
   ;; @see https://github.com/minad/org-modern/issues/5
-  (setq org-modern-table nil)
-  ;; (setq org-modern-table-horizontal 0.3
-  ;;       org-modern-table-vertical 2)
+  (setq org-modern-table (member (if (fontp doom-font) (font-get doom-font :family)
+                                   doom-font)
+                                 '("Pragma Sevka SC"
+                                   "Pragma Sevka SC NF"
+                                   "Sarasa Term SC Nerd"
+                                   "Sarasa Term SC"
+                                   "Sarasa Mono SC")))
+  (setq org-modern-table-horizontal 0.3
+        org-modern-table-vertical 2)
 
   ;; tag 边框宽度，还可以设置为 `auto' 即自动计算
   (setq org-modern-label-border 'auto)
@@ -3664,7 +3706,11 @@ ligatures 配置,
 #+end_src
 #+begin_src emacs-lisp
 (use-package! valign
-  :hook (org-mode . valign-mode)
+  :defer t
+  :init (add-hook! org-mode
+                   :depth 100
+                   (unless (bound-and-true-p org-modern-table)
+                     (valign-mode +1)))
   :config (setq valign-fancy-bar t))
 #+end_src
 
@@ -4495,26 +4541,36 @@ macos 中自动化的一门脚本语言
              (lsp-bridge-mode +1)
     ))
 #+end_src
-** TODO nushell
-#+begin_src emacs-lisp :tangle "no" :noweb-ref none
+** nushell
+#+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (package! nushell-ts-mode :recipe (:host github :repo "herbertjones/nushell-ts-mode") :built-in 'prefer)
 (package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode") :built-in 'prefer)
 #+end_src
-#+begin_src emacs-lisp :tangle "no" :noweb-ref none
-(let ((use-nushell-treesit-p (my-treesit-language-available-p 'nu)))
-  (use-package! nushell-mode
-    :mode "\\.nu\\'"
-    :init
-    (unless use-nushell-treesit-p
-      (after! org-src (add-to-list 'org-src-lang-modes '("nu" . nushell))))
-    (after! eglot (add-to-list 'eglot-server-programs '(nushell-mode . ("nu" "--lsp")))))
-  (when use-nushell-treesit-p
-    (use-package! nushell-ts-mode
-      :init
-      (after! eglot (add-to-list 'eglot-server-programs '(nushell-ts-mode . ("nu" "--lsp"))))
-      (add-hook! nushell-ts-mode #'lsp!)
-      (after! org-src (add-to-list 'org-src-lang-modes '("nu" . nushell-ts)))))
-  (add-hook! '(nushell-ts-mode-hook nushell-mode-hook) #'lsp!))
+#+begin_src emacs-lisp  :noweb-ref none
+(defun +nushell-common-config (mode)
+  (set-repl-handler! mode #'+nushell/open-repl)
+  (when (modulep! :tools lsp)
+    (add-hook (intern (format "%s-hook" mode)) #'lsp! 'append)
+    (when (modulep! :tools lsp +eglot)
+      (set-eglot-client! mode '("nu" "--lsp")))))
+
+(defun +nushell/open-repl ()
+  (interactive))
+
+(use-package! nushell-mode
+  :init
+  (after! org-src
+    (add-to-list 'org-src-lang-modes '("nu" . nushell)))
+  :config (+nushell-common-config 'nushell-mode))
+
+(use-package! nushell-ts-mode
+  :when (modulep! :tools tree-sitter)
+  :init
+  (after! org-src
+    (add-to-list 'org-src-lang-modes '("nu" . nushell-ts)))
+  (set-tree-sitter! 'nushell-mode 'nushell-ts-mode
+    `((nu :url "https://github.com/nushell/tree-sitter-nu")))
+  :config (+nushell-common-config 'nushell-mode))
 #+end_src
 
 ** TODO python
@@ -4578,4 +4634,9 @@ yapf
 #+begin_src emacs-lisp
 (use-package! just-mode
   :mode (("/[Jj]ustfile\\'" . just-mode)))
+#+end_src
+
+** ssh-config-mode
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! ssh-config-mode)
 #+end_src
