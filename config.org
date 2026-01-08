@@ -1007,6 +1007,11 @@ doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就
 (setopt display-fill-column-indicator-column 79)
 (add-hook 'prog-mode-hook #'display-fill-column-indicator-mode)
 #+end_src
+- hl-line-mode 的相关配置
+#+begin_src emacs-lisp
+(setopt hl-line-sticky-flag nil) ;; 高亮 hl-line 仅在当前 window 中
+(setopt global-hl-line-sticky-flag nil)
+#+end_src
 ** 字体配置
 Doom exposes five (optional) variables or controlling fonts in Doom.
 + ~doom-font~ : set default font, 我使用 "Cascadia Code", size 为 12 ，备选字体: Fantasque Sans Mono, size 为 13
@@ -1053,7 +1058,7 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
                '("fnl" nerd-icons-sucicon "nf-custom-fennel" :face nerd-icons-purple)))
 #+end_src
 ** 主题的基本配置
-目前使用主要有 doom-theme ， modus-themes 和 catppuccin-theme
+目前使用主要有 doom-theme ， modus-themes 和 base16-theme
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! ef-themes :built-in 'prefer)
 (package! base16-theme :built-in 'prefer)
@@ -1088,7 +1093,38 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
                                          #b00001110
                                          #b00001110])
 #+end_src
-- [[https://github.com/redguardtoo/emacs.d/blob/182b37a488f3e091b0f5754f79e92421b1be6482/lisp/init-theme.el#L81][自动随机切换主题]]
+- base16 theme 的色彩找寻
+#+begin_src emacs-lisp
+(after! base16-theme
+  (defun base16-theme-select-color-list ()
+    (pcase base16-theme-256-color-source
+      ('terminal      base16-theme-shell-colors)
+      ("terminal"     base16-theme-shell-colors)
+      ('base16-shell  base16-theme-shell-colors-256)
+      ("base16-shell" base16-theme-shell-colors-256)))
+
+  (defun base16-theme-find-base-by-color-name (color-list target)
+    (let ((target-str (if (symbolp target) (symbol-name target) target)))
+      (cl-loop for (key value) on color-list by #'cddr
+               when (equal value target-str)
+               return key)))
+  (defun base16-get-color (color &optional theme)
+    (let* ((ctheme (or theme (car custom-enabled-themes)))
+           (ctheme-name (symbol-name ctheme)))
+      (if (string-prefix-p "base16" ctheme-name)
+          (when-let ((theme-color-list (symbol-value (intern (concat ctheme-name "-theme-colors"))))
+                     (base-color (or (base16-theme-find-base-by-color-name
+                                      (base16-theme-select-color-list)
+                                      color)
+                                     color)))
+            (or (plist-get theme-color-list base-color)
+                color))
+        (warn "only support base16-themes.")
+        color))))
+
+
+#+end_src
+*** [[https://github.com/redguardtoo/emacs.d/blob/182b37a488f3e091b0f5754f79e92421b1be6482/lisp/init-theme.el#L81][自动随机切换主题]]
 #+begin_src emacs-lisp
 (setq my-light-themes '(doom-solarized-light
                         doom-gruvbox-light
@@ -1172,7 +1208,72 @@ Doom exposes five (optional) variables or controlling fonts in Doom.
     (my--pickup-random-color-theme themes)))
 (map! (:leader (:desc "load theme" "h t" #'my/random-theme))) ;; workspace load keybind
 #+end_src
-
+*** 转换主题时，自动切换某些 face
+#+begin_src emacs-lisp
+(add-hook!
+ 'doom-load-theme-hook
+ :depth -100
+ (when-let* ((ctheme (car custom-enabled-themes))
+             (theme-prefix (car (string-split (symbol-name ctheme) "-"))))
+   (pcase theme-prefix
+     ("doom"
+      (custom-set-faces!
+        `(mini-echo-red :foreground ,(doom-color 'red))
+        `(mini-echo-blue :foreground ,(doom-color 'blue))
+        `(mini-echo-green :foreground ,(doom-color 'green))
+        `(mini-echo-yellow :foreground ,(doom-color 'yellow))
+        `(mini-echo-magenta :foreground ,(doom-color 'magenta))
+        `(mini-echo-cyan :foreground ,(doom-color 'cyan))
+        `(mini-echo-gray :foreground ,(doom-color 'dark-blue)))
+)
+     ("ef"
+      (custom-set-faces!
+        ;; mini-echo
+        `(mini-echo-red :foreground ,(ef-themes-get-color-value 'red))
+        `(mini-echo-blue :foreground ,(ef-themes-get-color-value 'blue))
+        `(mini-echo-green :foreground ,(ef-themes-get-color-value 'green))
+        `(mini-echo-yellow :foreground ,(ef-themes-get-color-value 'yellow))
+        `(mini-echo-magenta :foreground ,(ef-themes-get-color-value 'magenta))
+        `(mini-echo-cyan :foreground ,(ef-themes-get-color-value 'cyan))
+        `(mini-echo-gray :foreground ,(ef-themes-get-color-value 'bg-graph-blue-1))))
+     ("modus"
+      (custom-set-faces!
+        ;; mini-echo
+        `(mini-echo-red :foreground ,(modus-themes-get-color-value 'red))
+        `(mini-echo-blue :foreground ,(modus-themes-get-color-value 'blue))
+        `(mini-echo-green :foreground ,(modus-themes-get-color-value 'green))
+        `(mini-echo-yellow :foreground ,(modus-themes-get-color-value 'yellow))
+        `(mini-echo-magenta :foreground ,(modus-themes-get-color-value 'magenta))
+        `(mini-echo-cyan :foreground ,(modus-themes-get-color-value 'cyan))
+        `(mini-echo-gray :foreground ,(modus-themes-get-color-value 'bg-graph-blue-1)))
+      ;; (custom-set-faces
+      ;;  ;; mini-echo
+      ;;  `(mini-echo-red ((t (:foreground ,(modus-themes-get-color-value 'red)))))
+      ;;  `(mini-echo-green
+      ;;    ((t (:foreground ,(modus-themes-get-color-value 'green)))))
+      ;;  `(mini-echo-blue
+      ;;    ((t (:foreground ,(modus-themes-get-color-value 'blue)))))
+      ;;  `(mini-echo-yellow
+      ;;    ((t (:foreground ,(modus-themes-get-color-value 'yellow-faint)))))
+      ;;  `(mini-echo-magenta
+      ;;    ((t (:foreground ,(modus-themes-get-color-value 'magenta)))))
+      ;;  `(mini-echo-cyan
+      ;;    ((t (:foreground ,(modus-themes-get-color-value 'cyan)))))
+      ;;  `(mini-echo-gray
+      ;;    ((t (:foreground ,(modus-themes-get-color-value 'bg-graph-blue-1))))))
+      )
+     ("base16"
+      (custom-set-faces!
+        ;; mini-echo
+        `(mini-echo-red :foreground ,(base16-get-color 'red))
+        `(mini-echo-blue :foreground ,(base16-get-color 'blue))
+        `(mini-echo-green :foreground ,(base16-get-color 'green))
+        `(mini-echo-yellow :foreground ,(base16-get-color 'yellow))
+        `(mini-echo-magenta :foreground ,(base16-get-color 'magenta))
+        `(mini-echo-cyan :foreground ,(base16-get-color 'cyan))
+        `(mini-echo-gray :foreground ,(base16-get-color 'brightblue)))
+      ))))
+#+end_src
 *** 自动切换主题
 **** auto-dark
 Macos 上借助系统自带的进行主题切换
@@ -1182,22 +1283,20 @@ Macos 上借助系统自带的进行主题切换
 #+begin_src emacs-lisp :tangle (if (eq system-type 'darwin) "yes" "no")
 (use-package! auto-dark
   :hook ((auto-dark-light-mode . (lambda () (my--load-theme auto-dark-light-theme)))
-         (auto-dark-dark-mode . (lambda () (my--load-theme auto-dark-dark-theme))))
+        (auto-dark-dark-mode . (lambda () (my--load-theme auto-dark-dark-theme))))
   :init
-  (defadvice! my/doom-init-theme-a (fn &rest args)
-    "Using circadoam config"
-    :around #'doom-init-theme-h
-    (require 'ef-themes)
+  (defadvice! my/doom-init-theme-a (fn &rest args) "Using circadoam config"
+    :around #'doom-init-theme-h (require 'ef-themes)
     (if (display-graphic-p)
-        (progn
-         (auto-dark-mode +1)
-         (setq doom-theme (car custom-enabled-themes)))
-      (setq doom-theme (my--random-theme-f my-light-themes))
-      (apply fn args)))
+      (progn
+        (auto-dark-mode +1)
+        (setq doom-theme (car custom-enabled-themes)))
+    (setq doom-theme (my--random-theme-f my-light-themes))
+    (apply fn args)))
   :config
   (fset 'auto-dark--enable-themes #'ignore)
   (setq auto-dark-dark-theme (my--random-theme-f my-dark-themes)
-        auto-dark-light-theme  (my--random-theme-f my-light-themes)))
+        auto-dark-light-theme (my--random-theme-f my-light-themes)))
 #+end_src
 
 **** 使用经纬度切换
@@ -1226,14 +1325,72 @@ Macos 上借助系统自带的进行主题切换
 ** modeline
 目前我的使用方法为：GUI 下使用  [[https://github.com/manateelazycat/awesome-tray][awesome-tray]]， TUI 下使用 [[https://github.com/seagle0128/doom-modeline][doom-modeline]]，
 期待 [[https://github.com/eki3z/mini-echo.el/][mini-echo]] 完善后，统一使用 mini-echo。或者借鉴 mini-echo 完善 awesome-tray。
-*** modeline 配置
-+ awesome-tray
+***  mini-echo
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! mini-echo)
+#+end_src
+#+begin_src emacs-lisp
+(use-package mini-echo
+ :defer t
+  :commands (mini-echo-mode)
+ :init
+ (add-transient-hook! #'doom-init-theme-h
+   (when (display-graphic-p)
+    (mini-echo-mode +1)))
+ :config
+ (setq
+  mode-line-position-column-line-format '("%l:%c,%p")
+  mini-echo-right-padding 1
+  mini-echo-mise-show-always nil
+  mini-echo-persistent-rule
+  '(:log
+    ("evil"
+     "shrink-path"
+     "vsc"
+     "buffer-position"
+     "buffer-size"
+     "flymake"
+     "mise"
+     "envrc")
+    :short ("evil" "buffer-name" "buffer-position" "flymake"))
+  mini-echo-persistent-function #'my-mini-echo-persistent-detect)
+ (defun my-mini-echo-persistent-detect ()
+   (with-current-buffer (current-buffer)
+     (pcase major-mode
+       ((guard (and (fboundp 'org-src-edit-buffer-p) (org-src-edit-buffer-p)))
+        '(:both ("evil" "org-src" "buffer-position" "buffer-size" "flymake")))
+       ((guard (bound-and-true-p atomic-chrome-edit-mode))
+        '(:both
+          ("evil" "atomic-chrome" "buffer-name" "buffer-position" "flymake")))
+       ((guard (bound-and-true-p magit-blob-mode))
+        '(:both ("evil" "magit-blob" "buffer-position" "buffer-size")))
+       ((guard
+         (or (memq major-mode '(git-commit-elisp-text-mode git-rebase-mode))
+             (string-match-p "\\`magit-.*-mode\\'" (symbol-name major-mode))))
+        '(:both ("evil" "major-mode" "project")))
+       ((guard
+         (and (fboundp 'popper-display-control-p)
+              (popper-display-control-p (current-buffer))))
+        '(:both ("evil" "popper")))
+       ('profiler-report-mode '(:both ("evil" "major-mode" "profiler-report")))
+       ('rg-mode '(:both ("evil" "major-mode")))
+       ('diff-mode '(:both ("evil" "major-mode")))
+       ('ibuffer-mode '(:both ("evil" "major-mode")))
+       ('dired-mode '(:both ("evil" "major-mode" "dired")))
+       ('helpful-mode '(:both ("evil" "major-mode" "helpful")))
+       ('treesit--explorer-tree-mode
+        '(:both ("evil" "major-mode" "treesit-explorer")))
+       ('xwidget-webkit-mode '(:both ("evil" "major-mode" "xwidget")))
+       (_ nil)))))
+#+end_src
+*** awesome-tray
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! awesome-tray :recipe (:host github :repo "manateelazycat/awesome-tray"))
 ;; (package! solaire-mode :disable t)
 #+end_src
 #+begin_src emacs-lisp
 (use-package! awesome-tray
+  :disabled t
   :commands (awesome-tray-mode awesome-tray-enable awesome-tray-disable)
   :init
   (setq awesome-tray-date-format "%H:%M")
@@ -1297,6 +1454,7 @@ Macos 上借助系统自带的进行主题切换
                   (or (alist-get (intern mode-name) change-mode-alist)
                       mode-name)))))
 #+end_src
+*** doom-line
 #+begin_src emacs-lisp
 (after! doom-modeline
   (remove-function after-focus-change-function #'doom-modeline-focus-change)
@@ -1312,7 +1470,7 @@ Macos 上借助系统自带的进行主题切换
         (apply fn arg))))
   (custom-set-variables '(doom-modeline-buffer-file-name-style 'relative-to-project)
                         '(doom-modeline-major-mode-icon t)
-                        '(doom-modeline-modal-icon nil)))
+                        '(doom-modeline-modal-icon t)))
 #+end_src
 ** tabbar
 :PROPERTIES:
@@ -1330,7 +1488,7 @@ sort-tab 现在存在缺陷
   ;; :disabled t
   :autoload sort-tab-mode
   :init
-  (add-hook! window-setup (unless (daemonp) (sort-tab-mode +1)))
+  ;; (add-hook! window-setup (unless (daemonp) (sort-tab-mode +1)))
   (setq sort-tab-show-index-number nil)
   ;; (setq sort-tab-buffer-name " *sort-tab*")
   (map! :nvie "s-1" #'sort-tab-select-visible-tab
