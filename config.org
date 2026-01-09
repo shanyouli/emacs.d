@@ -1343,14 +1343,13 @@ Macos 上借助系统自带的进行主题切换
   mini-echo-right-padding 1
   mini-echo-mise-show-always nil
   mini-echo-persistent-rule
-  '(:log
+  '(:long
     ("evil"
      "shrink-path"
      "vsc"
      "buffer-position"
      "buffer-size"
-     "flymake"
-     "mise"
+     "flymake" "mise"
      "envrc")
     :short ("evil" "buffer-name" "buffer-position" "flymake"))
   mini-echo-persistent-function #'my-mini-echo-persistent-detect)
