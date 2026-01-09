@@ -774,7 +774,7 @@ markdown          ; writing docs for people to ignore
 ;; (nix +lsp)          ; I hereby declare "nix geht mehr!"
 nix
 ;;ocaml             ; an objective camel
-(org +hugo +dragndrop)           ;organize your plain life in plain text
+(org +hugo +dragndrop +pretty)           ;organize your plain life in plain text
 ;;php               ; perl's insecure younger brother
 ;;plantuml          ; diagrams for confusing people more
 ;;purescript        ; javascript, but functional
@@ -795,7 +795,7 @@ nix
 ;;terra             ; Earth and Moon in alignment for performance.
 web               ; the tubes
 yaml              ; JSON, but readable
-;;zig               ; C, but simpler
+zig               ; C, but simpler
 #+end_src
 **** everything in Emacs
 - 邮件 :: 我不会在 EMacs 中使用邮件🙃
@@ -805,7 +805,7 @@ yaml              ; JSON, but readable
 ;;notmuch
 ;;(wanderlust +gmail)
 #+end_src
-- app :: 可以在 emacs 中查看 RSS ， 上 irc
+- app :: 可以在 emacs 中查看 RSS ，上 irc
 #+name: doom-app
 #+begin_src emacs-lisp
 ;;calendar
@@ -3646,7 +3646,7 @@ org link 快捷方法
 #+end_src
 =toc-org=​会清空带有​~TOC~​标签的 heading，并生成目录。
 *** 美化配置
-***** org 美化的基本配置
+**** org 美化的基本配置
 设置合适的标题大小和每一级的行高
 #+begin_src emacs-lisp
 (custom-set-faces! '(org-document-title :height 1.75 :weight bold)
@@ -3695,11 +3695,11 @@ org 自带的 todo,done,引用块美化
 #+begin_src emacs-lisp
 (setq org-startup-folded 'overview)
 #+end_src
-***** org-modern
+**** org-modern
+在 doom 配置 org 时加上 +pretty， ~org-modern~ 会自动安装
 使 =org-mode= buffer 尽可能漂亮是很重要的，Minad 的 =org-modern= 在这方面大有帮
 助。
 #+begin_src emacs-lisp :noweb-ref none :tangle packages.el
-(package! org-modern)
 (package! org-modern-indent :recipe (:host github :repo "jdtsmith/org-modern-indent" :depth 1))
 #+end_src
 #+begin_src emacs-lisp :tangle yes :noweb-ref none
@@ -3708,13 +3708,14 @@ org 自带的 todo,done,引用块美化
   :init
   (add-hook 'org-mode-hook #'org-modern-indent-mode 90))
 (use-package! org-modern
-  :hook ((org-mode . org-modern-mode) (org-agenda-finalize . org-modern-agenda))
+  :defer t
   :config
   ;; org-modern-replace-stars 可用 列表
   ;; "➀➁➂➃➄➅➆➇➈" "󰉫󰉬󰉭󰉮󰉯󰉰" "✿❀✭✫✦✧◈◇" "⚀⚁⚂⚃⚄⚅"
   ;; "☯☰☱☲☳☴☵☶☷"
   (setopt org-modern-star 'replace
-          org-modern-replace-stars "󰉫󰉬󰉭󰉮󰉯󰉰")
+          ;; org-modern-replace-stars "󰉫󰉬󰉭󰉮󰉯󰉰"
+          org-modern-replace-stars "󰎦󰎩󰎬󰎮󰎰󰎵󰎸󰎻󰎾󰽾")
   (setopt org-modern-block-fringe t)
 
   ;; org-modern-checkbox 配置
@@ -3796,7 +3797,7 @@ org 自带的 todo,done,引用块美化
 (after! spell-fu
   (cl-pushnew 'org-modern-tag (alist-get 'org-mode +spell-excluded-faces-alist)))
 #+end_src
-***** 强调标记
+**** 强调标记
 虽然 ~org-hide-emphasis-markers~ 非常好，但有时它会使边界处的编辑变得更加繁琐。
 我们可以使用 =org-appear= 包在不牺牲视觉便利的情况下改善这种情况。
 
@@ -3814,7 +3815,7 @@ org 自带的 todo,done,引用块美化
   (setq org-appear-autokeywords t)
   (setq org-appear-inside-latex t))
 #+end_src
-***** 符号配置
+**** 符号配置
 用来更改于折叠项目的字符
 #+begin_src emacs-lisp
 (setq! org-elispsis " ▾ "
@@ -3871,7 +3872,7 @@ ligatures 配置,
   :config (setq valign-fancy-bar t))
 #+end_src
 
-***** iscroll-mode
+**** iscroll-mode
 更平滑的滚动图片
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (package! iscroll)
