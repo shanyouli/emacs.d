@@ -119,4 +119,5 @@
     (if exists
         (setcdr exists props)
       (push (cons lang-sym props) my-scratch-language-configs)))
-  (message "配置已更新: %s" lang-sym))
+  ;; (message "配置已更新: %s" lang-sym)
+  )
