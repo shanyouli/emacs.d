@@ -18,14 +18,375 @@ it as "the extensible, customizable, self-documenting, real-time display editor"
 Develoment of the first Emacs began in the mid-1970s, and work on its direct
 descendant, GNU Emacs, continues actively as of 2020.
 
+* doom 配置
+:properties:
+:header-args:emacs-lisp: :tangle no
+:end:
+
+拉取 doom-emacs 仓库的分支
+- emacs-version: *29.0.60*
+#+name: init.el
+#+attr_html: :collapsed t
+#+begin_src emacs-lisp :tangle "init.el" :noweb no-export :comments no
+;;; init.el -*- lexical-binding: t; -*-
+
+;; This file controls what Doom modules are enabled and what order they load
+;; in. Remember to run 'doom sync' after modifying it!
+
+;; NOTE Press 'SPC h d h' (or 'C-h d h' for non-vim users) to access Doom's
+;;      documentation. There you'll find a link to Doom's Module Index where all
+;;      of our modules are listed, including what flags they support.
+
+;; NOTE Move your cursor over a module's name (or its flags) and press 'K' (or
+;;      'C-c c k' for non-vim users) to view its documentation. This works on
+;;      flags as well (those symbols that start with a plus).
+;;
+;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
+;;      directory (for easy access to its source code).
+(defadvice! my-remove-environment-value-a (&rest _)
+  :before #'doom-load-envvars-file
+  (delete "EMACSLOADPATH=" process-environment))
+
+;; Determine if there is an available lang-ts-mode
+(defun my-use-ts-mode-p (lang)
+  (let ((mode (intern (format "%s-ts-mode" (symbol-name lang)))))
+    (and (fboundp 'treesit-language-available-p)
+         (treesit-language-available-p lang)
+         (fboundp mode))))
+
+(doom! :input
+       <<doom-input>>
+
+       :completion
+       <<doom-completion>>
+
+       :ui
+       <<doom-ui>>
+
+       :editor
+       <<doom-editor>>
+
+       :emacs
+       <<doom-emacs>>
+
+       :term
+       <<doom-term>>
+
+       :checkers
+       <<doom-checkers>>
+
+       :tools
+       <<doom-tools>>
+
+       :os
+       <<doom-os>>
+
+       :lang
+       <<doom-lang>>
+
+       :email
+       <<doom-email>>
+
+       :app
+       <<doom-app>>
+
+       :config
+       <<doom-config>>
+       )
+#+end_src
+** 文学编程配置
+这是一篇文学编程，同时也是 Doom Emacs 的配置文件。 Doom 对其支持良好，更多详情
+可以通过 ~literate~ (文学) 模块了解。
+
+#+name: doom-config
+#+begin_src emacs-lisp
+literate
+(default +bindings)
+#+end_src
+** 接口
+可以用来增强 emacs 功能的配置
+- 输入法 ::
+#+name: doom-input
+#+begin_src emacs-lisp
+;;chinese     ; 使用自己定义的配置
+;;japanese
+;;layout            ; auie,ctsrnm is the superior home row
+#+end_src
+- 补全 ::
+  我使用 corfu + vertico
+#+name: doom-completion
+#+begin_src emacs-lisp
+(corfu +icons +orderless)
+(vertico +icons)    ; the search engine of the future
+;;helm              ; the *other* search engine for love and life
+;;ido               ; the other *other* search engine...
+;;(ivy              ; a search engine for love and life
+;; +icons           ; ... icons are nice
+;; +prescient)      ; ... I know what I want(ed)
+#+end_src
+- UI ::
+  emacs 美化相关配置
+  #+name: doom-ui
+  #+begin_src emacs-lisp
+;;deft              ; notational velocity for Emacs
+doom              ; what makes DOOM look the way it does
+doom-dashboard    ; a nifty splash screen for Emacs
+;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
+(emoji +unicode +github)  ; 🙂
+hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
+;;hydra
+indent-guides     ; highlighted indent columns
+(ligatures +extra)         ; ligatures and symbols to make your code pretty again
+;;minimap           ; show a map of the code on the side
+modeline          ; snazzy, Atom-inspired modeline, plus API
+;;nav-flash         ; blink cursor line after big motions
+;;neotree           ; a project drawer, like NERDTree for vim
+ophints           ; highlight the region an operation acts on
+(popup +defaults)   ; tame sudden yet inevitable temporary windows
+;;tabs              ; a tab bar for Emacs
+;;treemacs          ; a project drawer, like neotree but cooler
+;;unicode           ; extended unicode support for various languages
+vc-gutter         ; vcs diff in the fringe
+vi-tilde-fringe   ; fringe tildes to mark beyond EOB
+window-select     ; visually switch windows
+workspaces        ; tab emulation, persistence & separate workspaces
+;;zen               ; distraction-free coding or writing
+  #+end_src
+- 文本编辑相关功能 :: *VI VI VI EDitor of the Beast*
+  #+name: doom-editor
+  #+begin_src emacs-lisp
+(evil +everywhere); come to the dark side, we have cookies
+file-templates    ; auto-snippets for empty files
+fold              ; (nigh) universal code folding
+format            ; automated prettiness
+;;god               ; run Emacs commands without modifier keys
+;;lispy             ; vim for lisp, for people who don't like vim
+multiple-cursors  ; editing in many places at once
+;;objed             ; text object editing for the innocent
+;;parinfer          ; turn lisp into python, sort of
+;;rotate-text       ; cycle region at point between text candidates
+snippets          ; my elves. They type so I don't have to
+;;word-wrap         ; soft wrapping with language-aware indent
+  #+end_src
+- Emacs 内置功能增强 ::
+#+name: doom-emacs
+ #+begin_src emacs-lisp
+dired             ; making dired pretty [functional]
+electric          ; smarter, keyword-based electric-indent
+(ibuffer +icons)        ; interactive buffer management
+undo             ; persistent, smarter undo for your inevitable mistakes
+vc                ; version-control and Emacs, sitting in a tree
+ #+end_src
+- 终端功能 ::
+  #+name: doom-term
+#+begin_src emacs-lisp
+;; eshell            ; the elisp shell that works everywhere
+;;shell             ; simple shell REPL for Emacs
+;;term              ; basic terminal emulator for Emacs
+vterm             ; the best terminal emulation in Emacs
+#+end_src
+- 检测 :: 可以告诉我哪里不对，但我觉得我应该先好好背背单词或者看看 PEP8
+  #+name: doom-checkers
+ #+begin_src emacs-lisp
+(syntax +flymake +childframe)              ; tasing you for every semicolon you forget
+;; (:if (or (executable-find "hunspell")
+;;          (executable-find "aspell")) spell) ; tasing you for misspelling mispelling
+;;grammar           ; tasing grammar mistake every you make
+  #+end_src
+- 工具 :: workflow in Emacs!
+#+name: doom-tools
+#+begin_src emacs-lisp
+tree-sitter
+;;ansible
+;;biblio            ; Writes a PhD for you (citation needed)
+;;debugger          ; FIXME stepping through code, to help you add bugs
+direnv
+docker
+;;editorconfig      ; let someone else argue about tabs vs spaces
+;;ein               ; tame Jupyter notebooks with emacs
+(eval +overlay)     ; run code, run (also, repls)
+;;gist              ; interacting with github gists
+lookup              ; navigate your code and its documentation
+(lsp +eglot)               ; M-x vscode
+magit             ; a git porcelain for Emacs
+;;make              ; run make tasks from Emacs
+pass              ; password manager for nerds
+pdf               ; pdf enhancements
+;;prodigy           ; FIXME managing external services & code builders
+;;rgb               ; creating color strings
+;;taskrunner        ; taskrunner for all your projects
+;;terraform         ; infrastructure as code
+;;tmux              ; an API for interacting with tmux
+;;upload            ; map local to remote projects via ssh/ftp
+#+end_src
+- OS ::
+#+name: doom-os
+#+begin_src emacs-lisp
+(:if IS-MAC macos)  ; improve compatibility with macOS
+tty               ; improve the terminal Emacs experience
+#+end_src
+** 编程语言支持
+最爽的事情就是，我可以在 Emacs 中编写任何语言 (的 =Hello World=)
+#+name: doom-lang
+#+begin_src emacs-lisp  :noweb-ref none
+(lua +fennel +tree-sitter)
+;;agda              ; types of types of types of types...
+;;beancount         ; mind the GAAP
+;;(cc +lsp)         ; C > C++ == 1
+;;clojure           ; java with a lisp
+;;common-lisp       ; if you've seen one lisp, you've seen them all
+;;coq               ; proofs-as-programs
+;;crystal           ; ruby at the speed of c
+;;csharp            ; unity, .NET, and mono shenanigans
+data              ; config/data formats
+;;(dart +flutter)   ; paint ui and not much else
+;;dhall
+;;elixir            ; erlang done right
+;;elm               ; care for a cup of TEA?
+emacs-lisp        ; drown in parentheses
+;;erlang            ; an elegant language for a more civilized age
+;;ess               ; emacs speaks statistics
+;;factor
+;;faust             ; dsp, but you get to keep your soul
+;;fortran           ; in FORTRAN, GOD is REAL (unless declared INTEGER)
+;;fsharp            ; ML stands for Microsoft's Language
+;;fstar             ; (dependent) types and (monadic) effects and Z3
+;;gdscript          ; the language you waited for
+(go +lsp)         ; the hipster dialect
+;;(haskell +lsp)    ; a language that's lazier than I am
+;;hy                ; readability of scheme w/ speed of python
+;;idris             ; a language you can depend on
+;; json              ; At least it ain't XML
+;;(java +lsp)       ; the poster child for carpal tunnel syndrome
+(javascript +lsp)        ; all(hope(abandon(ye(who(enter(here))))))
+;;julia             ; a better, faster MATLAB
+;;kotlin            ; a better, slicker Java(Script)
+;;latex             ; writing papers in Emacs has never been so fun
+;;lean              ; for folks with too much to prove
+;;ledger            ; be audit you can be
+markdown          ; writing docs for people to ignore
+;;nim               ; python + lisp at the speed of c
+;; (nix +lsp)          ; I hereby declare "nix geht mehr!"
+nix
+;;ocaml             ; an objective camel
+(org +hugo +dragndrop +pretty)           ;organize your plain life in plain text
+;;php               ; perl's insecure younger brother
+;;plantuml          ; diagrams for confusing people more
+;;purescript        ; javascript, but functional
+(python +lsp +tree-sitter)              ; beautiful is better than ugly
+;;qt                ; the 'cutest' gui framework ever
+;;racket            ; a DSL for DSLs
+;;raku              ; the artist formerly known as perl6
+;;rest              ; Emacs as a REST client
+;;rst               ; ReST in peace
+;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
+;; rust             ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+;;scala             ; java, but good
+;;(scheme +guile)   ; a fully conniving family of lisps
+(sh +fish +tree-sitter)                ; she sells {ba,z,fi}sh shells on the C xor
+;;sml
+;;solidity          ; do you need a blockchain? No.
+;;swift             ; who asked for emoji variables?
+;;terra             ; Earth and Moon in alignment for performance.
+web               ; the tubes
+yaml              ; JSON, but readable
+zig               ; C, but simpler
+#+end_src
+** everything in Emacs
+- 邮件 :: 我不会在 EMacs 中使用邮件🙃
+#+name: doom-email
+#+begin_src emacs-lisp
+;;(mu4e +org +gmail)
+;;notmuch
+;;(wanderlust +gmail)
+#+end_src
+- app :: 可以在 emacs 中查看 RSS ，上 irc
+#+name: doom-app
+#+begin_src emacs-lisp
+;;calendar
+;;emms
+;;everywhere        ; *leave* Emacs!? You must be joking
+;;irc               ; how neckbeards socialize
+;; (rss +org)        ; emacs as an RSS reader
+;;twitter           ; twitter client https://twitter.com/vnought
+#+end_src
+
+* doom 包
+** 加载结构
+:properties:
+:header-args:emacs-lisp: :tangle no
+:end:
+doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就可以安装。
+需要注意，不应该将该文件编译为字节码。
+#+begin_src emacs-lisp :tangle "packages.el" :comments no
+;; -*- no-byte-compile: t; -*-
+;;; $DOOMDIR/packages.el
+;;; Load NIXOS automatically generated configuration.
+(load! "packages.init.el" doom-user-dir 'no-error)
+;; (disable-packages! smartparens)
+#+end_src
+
+*警告*: 不要禁用 =~/.emacs.d/core/packages.el= 中列出的包。Doom 依赖这些，禁用它们
+可能出现严重问题。
+- 从官方的源 [[https://melpa.org/][MELPA]] / [[http://elpa.gnu.org/][GNU ELPA]] / [[https://emacsmirror.net/][emacsmirror]] 安装
+#+begin_src emacs-lisp
+(package! some-package)
+#+end_src
+- 关闭某些包
+#+begin_src emacs-lisp
+(package! some-package :disable t)
+#+end_src
+- 从 Git Repo 安装
+#+begin_src emacs-lisp
+;; github
+(package! github-package :recipe (:host github :repo "username/repo"))
+;; gitlab
+(package! gitlab-package :recipe (:host gitlab :repo "username/repo"))
+;; other
+(package! other-package :recipe (:host nil :repo "https://example.com/repo"))
+#+end_src
+  如果 repo 仅中只有某个 / 某些文件是你需要的
+#+begin_src emacs-lisp
+(package! some-package
+  :recipe (:host github :repo "username/repo"
+           :files ("some-file.el" "src/elisp/*.el")))
+#+end_src
+  如果需要指定某个 =commit= 或某个 =branch=
+#+begin_src emacs-lisp
+;; commit
+(package! some-package :pin "abcdefghijk")
+;; branch
+(package! some-package :recipe (:branch "stable"))
+#+end_src
+- 使用本地的 repo
+#+begin_src emacs-lisp
+(package! some-package :recipe (:local-repo "/path/to/repo"))
+#+end_src
+** 辅助宏
+这些是 doom 添加的一些非常有用的宏
+- ~load!~ 可以相对于本文件进行外部 ~.el~ 文件的加载
+- ~use-package!~ 用于配置包
+- ~add-load-path!~ 将指定目录添加到 ~load-path~ 中，可以让 Emacs 在使用
+  ~require~ 和 ~use-package~ 时在 ~load-path~ 中进行查找
+- ~map!~ 用于绑定新的快捷键
 * 基础配置
 创建语法绑定可以稍微加速一个配置文件运行
 #+begin_src emacs-lisp :comments no
 ;;; config.el -*- lexical-binding: t; -*-
 #+end_src
+** 使用 elog 记录所有 log 日志
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! elog :recipe (:host github :repo "Kinneyzhang/elog" :depth 1))
+#+end_src
+#+begin_src emacs-lisp 
+(use-package! elog
+  :init (setq my-logger (elog-logger :name "doomrc" :level 'info)))
+#+end_src
+** base 选项配置
 配置个人基础信息, 且配置 gpgkey
 #+begin_src emacs-lisp
 ;;; If you use NIXOS yourself to generate the configuration, you may need to load it.
+(elog-info my-logger "开始配置 base 选项信息......")
 (load! "config.init.el" doom-user-dir 'no-error)
 (load! "private.el" doom-user-dir 'no-error)
 (setopt user-full-name "Shanyou Li"
@@ -522,299 +883,6 @@ tasks."
         calendar-week-start-day 0))
 #+end_src
 
-** doom 配置
-拉取 doom-emacs 仓库的分支
-  - emacs-version: *29.0.60*
-*** 模组
-:properties:
-:header-args:emacs-lisp: :tangle no
-:end:
-
-#+name: init.el
-#+attr_html: :collapsed t
-#+begin_src emacs-lisp :tangle "init.el" :noweb no-export :comments no
-;;; init.el -*- lexical-binding: t; -*-
-
-;; This file controls what Doom modules are enabled and what order they load
-;; in. Remember to run 'doom sync' after modifying it!
-
-;; NOTE Press 'SPC h d h' (or 'C-h d h' for non-vim users) to access Doom's
-;;      documentation. There you'll find a link to Doom's Module Index where all
-;;      of our modules are listed, including what flags they support.
-
-;; NOTE Move your cursor over a module's name (or its flags) and press 'K' (or
-;;      'C-c c k' for non-vim users) to view its documentation. This works on
-;;      flags as well (those symbols that start with a plus).
-;;
-;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
-;;      directory (for easy access to its source code).
-(defadvice! my-remove-environment-value-a (&rest _)
-  :before #'doom-load-envvars-file
-  (delete "EMACSLOADPATH=" process-environment))
-
-;; Determine if there is an available lang-ts-mode
-(defun my-use-ts-mode-p (lang)
-  (let ((mode (intern (format "%s-ts-mode" (symbol-name lang)))))
-    (and (fboundp 'treesit-language-available-p)
-         (treesit-language-available-p lang)
-         (fboundp mode))))
-
-(doom! :input
-       <<doom-input>>
-
-       :completion
-       <<doom-completion>>
-
-       :ui
-       <<doom-ui>>
-
-       :editor
-       <<doom-editor>>
-
-       :emacs
-       <<doom-emacs>>
-
-       :term
-       <<doom-term>>
-
-       :checkers
-       <<doom-checkers>>
-
-       :tools
-       <<doom-tools>>
-
-       :os
-       <<doom-os>>
-
-       :lang
-       <<doom-lang>>
-
-       :email
-       <<doom-email>>
-
-       :app
-       <<doom-app>>
-
-       :config
-       <<doom-config>>
-       )
-#+end_src
-**** 结构化配置
-这是一篇文学编程，同时也是 Doom Emacs 的配置文件。 Doom 对其支持良好，更多详情
-可以通过 ~literate~ (文学) 模块了解。
-
-#+name: doom-config
-#+begin_src emacs-lisp
-literate
-(default +bindings)
-#+end_src
-**** 接口
-可以用来增强 emacs 功能的配置
-- 输入法 ::
-#+name: doom-input
-#+begin_src emacs-lisp
-;;chinese     ; 使用自己定义的配置
-;;japanese
-;;layout            ; auie,ctsrnm is the superior home row
-#+end_src
-- 补全 ::
-  我使用 corfu + vertico
-#+name: doom-completion
-#+begin_src emacs-lisp
-(corfu +icons +orderless)
-(vertico +icons)    ; the search engine of the future
-;;helm              ; the *other* search engine for love and life
-;;ido               ; the other *other* search engine...
-;;(ivy              ; a search engine for love and life
-;; +icons           ; ... icons are nice
-;; +prescient)      ; ... I know what I want(ed)
-#+end_src
-- UI ::
-  emacs 美化相关配置
-  #+name: doom-ui
-  #+begin_src emacs-lisp
-;;deft              ; notational velocity for Emacs
-doom              ; what makes DOOM look the way it does
-doom-dashboard    ; a nifty splash screen for Emacs
-;; doom-quit         ; DOOM quit-message prompts when you quit Emacs
-(emoji +unicode +github)  ; 🙂
-hl-todo           ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
-;;hydra
-indent-guides     ; highlighted indent columns
-(ligatures +extra)         ; ligatures and symbols to make your code pretty again
-;;minimap           ; show a map of the code on the side
-modeline          ; snazzy, Atom-inspired modeline, plus API
-;;nav-flash         ; blink cursor line after big motions
-;;neotree           ; a project drawer, like NERDTree for vim
-ophints           ; highlight the region an operation acts on
-(popup +defaults)   ; tame sudden yet inevitable temporary windows
-;;tabs              ; a tab bar for Emacs
-;;treemacs          ; a project drawer, like neotree but cooler
-;;unicode           ; extended unicode support for various languages
-vc-gutter         ; vcs diff in the fringe
-vi-tilde-fringe   ; fringe tildes to mark beyond EOB
-window-select     ; visually switch windows
-workspaces        ; tab emulation, persistence & separate workspaces
-;;zen               ; distraction-free coding or writing
-  #+end_src
-- 文本编辑相关功能 :: *VI VI VI EDitor of the Beast*
-  #+name: doom-editor
-  #+begin_src emacs-lisp
-(evil +everywhere); come to the dark side, we have cookies
-file-templates    ; auto-snippets for empty files
-fold              ; (nigh) universal code folding
-format            ; automated prettiness
-;;god               ; run Emacs commands without modifier keys
-;;lispy             ; vim for lisp, for people who don't like vim
-multiple-cursors  ; editing in many places at once
-;;objed             ; text object editing for the innocent
-;;parinfer          ; turn lisp into python, sort of
-;;rotate-text       ; cycle region at point between text candidates
-snippets          ; my elves. They type so I don't have to
-;;word-wrap         ; soft wrapping with language-aware indent
-  #+end_src
-- Emacs 内置功能增强 ::
-#+name: doom-emacs
- #+begin_src emacs-lisp
-dired             ; making dired pretty [functional]
-electric          ; smarter, keyword-based electric-indent
-(ibuffer +icons)        ; interactive buffer management
-undo             ; persistent, smarter undo for your inevitable mistakes
-vc                ; version-control and Emacs, sitting in a tree
- #+end_src
-- 终端功能 ::
-  #+name: doom-term
-#+begin_src emacs-lisp
-;; eshell            ; the elisp shell that works everywhere
-;;shell             ; simple shell REPL for Emacs
-;;term              ; basic terminal emulator for Emacs
-vterm             ; the best terminal emulation in Emacs
-#+end_src
-- 检测 :: 可以告诉我哪里不对，但我觉得我应该先好好背背单词或者看看 PEP8
-  #+name: doom-checkers
- #+begin_src emacs-lisp
-(syntax +flymake +childframe)              ; tasing you for every semicolon you forget
-;; (:if (or (executable-find "hunspell")
-;;          (executable-find "aspell")) spell) ; tasing you for misspelling mispelling
-;;grammar           ; tasing grammar mistake every you make
-  #+end_src
-- 工具 :: workflow in Emacs!
-#+name: doom-tools
-#+begin_src emacs-lisp
-tree-sitter
-;;ansible
-;;biblio            ; Writes a PhD for you (citation needed)
-;;debugger          ; FIXME stepping through code, to help you add bugs
-direnv
-docker
-;;editorconfig      ; let someone else argue about tabs vs spaces
-;;ein               ; tame Jupyter notebooks with emacs
-(eval +overlay)     ; run code, run (also, repls)
-;;gist              ; interacting with github gists
-lookup              ; navigate your code and its documentation
-(lsp +eglot)               ; M-x vscode
-magit             ; a git porcelain for Emacs
-;;make              ; run make tasks from Emacs
-pass              ; password manager for nerds
-pdf               ; pdf enhancements
-;;prodigy           ; FIXME managing external services & code builders
-;;rgb               ; creating color strings
-;;taskrunner        ; taskrunner for all your projects
-;;terraform         ; infrastructure as code
-;;tmux              ; an API for interacting with tmux
-;;upload            ; map local to remote projects via ssh/ftp
-#+end_src
-- OS ::
-#+name: doom-os
-#+begin_src emacs-lisp
-(:if IS-MAC macos)  ; improve compatibility with macOS
-tty               ; improve the terminal Emacs experience
-#+end_src
-**** 编程语言支持
-最爽的事情就是，我可以在 Emacs 中编写任何语言 (的 =Hello World=)
-#+name: doom-lang
-#+begin_src emacs-lisp  :noweb-ref none
-(lua +fennel +tree-sitter)
-;;agda              ; types of types of types of types...
-;;beancount         ; mind the GAAP
-;;(cc +lsp)         ; C > C++ == 1
-;;clojure           ; java with a lisp
-;;common-lisp       ; if you've seen one lisp, you've seen them all
-;;coq               ; proofs-as-programs
-;;crystal           ; ruby at the speed of c
-;;csharp            ; unity, .NET, and mono shenanigans
-data              ; config/data formats
-;;(dart +flutter)   ; paint ui and not much else
-;;dhall
-;;elixir            ; erlang done right
-;;elm               ; care for a cup of TEA?
-emacs-lisp        ; drown in parentheses
-;;erlang            ; an elegant language for a more civilized age
-;;ess               ; emacs speaks statistics
-;;factor
-;;faust             ; dsp, but you get to keep your soul
-;;fortran           ; in FORTRAN, GOD is REAL (unless declared INTEGER)
-;;fsharp            ; ML stands for Microsoft's Language
-;;fstar             ; (dependent) types and (monadic) effects and Z3
-;;gdscript          ; the language you waited for
-(go +lsp)         ; the hipster dialect
-;;(haskell +lsp)    ; a language that's lazier than I am
-;;hy                ; readability of scheme w/ speed of python
-;;idris             ; a language you can depend on
-;; json              ; At least it ain't XML
-;;(java +lsp)       ; the poster child for carpal tunnel syndrome
-(javascript +lsp)        ; all(hope(abandon(ye(who(enter(here))))))
-;;julia             ; a better, faster MATLAB
-;;kotlin            ; a better, slicker Java(Script)
-;;latex             ; writing papers in Emacs has never been so fun
-;;lean              ; for folks with too much to prove
-;;ledger            ; be audit you can be
-markdown          ; writing docs for people to ignore
-;;nim               ; python + lisp at the speed of c
-;; (nix +lsp)          ; I hereby declare "nix geht mehr!"
-nix
-;;ocaml             ; an objective camel
-(org +hugo +dragndrop +pretty)           ;organize your plain life in plain text
-;;php               ; perl's insecure younger brother
-;;plantuml          ; diagrams for confusing people more
-;;purescript        ; javascript, but functional
-(python +lsp +tree-sitter)              ; beautiful is better than ugly
-;;qt                ; the 'cutest' gui framework ever
-;;racket            ; a DSL for DSLs
-;;raku              ; the artist formerly known as perl6
-;;rest              ; Emacs as a REST client
-;;rst               ; ReST in peace
-;;(ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-;; rust             ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
-;;scala             ; java, but good
-;;(scheme +guile)   ; a fully conniving family of lisps
-(sh +fish +tree-sitter)                ; she sells {ba,z,fi}sh shells on the C xor
-;;sml
-;;solidity          ; do you need a blockchain? No.
-;;swift             ; who asked for emoji variables?
-;;terra             ; Earth and Moon in alignment for performance.
-web               ; the tubes
-yaml              ; JSON, but readable
-zig               ; C, but simpler
-#+end_src
-**** everything in Emacs
-- 邮件 :: 我不会在 EMacs 中使用邮件🙃
-#+name: doom-email
-#+begin_src emacs-lisp
-;;(mu4e +org +gmail)
-;;notmuch
-;;(wanderlust +gmail)
-#+end_src
-- app :: 可以在 emacs 中查看 RSS ，上 irc
-#+name: doom-app
-#+begin_src emacs-lisp
-;;calendar
-;;emms
-;;everywhere        ; *leave* Emacs!? You must be joking
-;;irc               ; how neckbeards socialize
-;; (rss +org)        ; emacs as an RSS reader
-;;twitter           ; twitter client https://twitter.com/vnought
-#+end_src
 ** 杂项
 *** autoload 对应快捷按键
 #+begin_src emacs-lisp
@@ -916,64 +984,6 @@ Eg: 'bash-ts-mode -> \"bash-ts\"."
                                 (symbol-name mode)
                               mode)))
 #+end_src
-* 包
-** 加载结构
-:properties:
-:header-args:emacs-lisp: :tangle no
-:end:
-doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就可以安装。
-需要注意，不应该将该文件编译为字节码。
-#+begin_src emacs-lisp :tangle "packages.el" :comments no
-;; -*- no-byte-compile: t; -*-
-;;; $DOOMDIR/packages.el
-;;; Load NIXOS automatically generated configuration.
-(load! "packages.init.el" doom-user-dir 'no-error)
-;; (disable-packages! smartparens)
-#+end_src
-
-*警告*: 不要禁用 =~/.emacs.d/core/packages.el= 中列出的包。Doom 依赖这些，禁用它们
-可能出现严重问题。
-- 从官方的源 [[https://melpa.org/][MELPA]] / [[http://elpa.gnu.org/][GNU ELPA]] / [[https://emacsmirror.net/][emacsmirror]] 安装
-#+begin_src emacs-lisp
-(package! some-package)
-#+end_src
-- 关闭某些包
-#+begin_src emacs-lisp
-(package! some-package :disable t)
-#+end_src
-- 从 Git Repo 安装
-#+begin_src emacs-lisp
-;; github
-(package! github-package :recipe (:host github :repo "username/repo"))
-;; gitlab
-(package! gitlab-package :recipe (:host gitlab :repo "username/repo"))
-;; other
-(package! other-package :recipe (:host nil :repo "https://example.com/repo"))
-#+end_src
-  如果 repo 仅中只有某个 / 某些文件是你需要的
-#+begin_src emacs-lisp
-(package! some-package
-  :recipe (:host github :repo "username/repo"
-           :files ("some-file.el" "src/elisp/*.el")))
-#+end_src
-  如果需要指定某个 =commit= 或某个 =branch=
-#+begin_src emacs-lisp
-;; commit
-(package! some-package :pin "abcdefghijk")
-;; branch
-(package! some-package :recipe (:branch "stable"))
-#+end_src
-- 使用本地的 repo
-#+begin_src emacs-lisp
-(package! some-package :recipe (:local-repo "/path/to/repo"))
-#+end_src
-** 辅助宏
-这些是 doom 添加的一些非常有用的宏
-- ~load!~ 可以相对于本文件进行外部 ~.el~ 文件的加载
-- ~use-package!~ 用于配置包
-- ~add-load-path!~ 将指定目录添加到 ~load-path~ 中，可以让 Emacs 在使用
-  ~require~ 和 ~use-package~ 时在 ~load-path~ 中进行查找
-- ~map!~ 用于绑定新的快捷键
 * UI
 字体，等主题 ui 配置
 ** 基本配置
