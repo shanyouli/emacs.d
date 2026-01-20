@@ -380,6 +380,7 @@ doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就
 #+end_src
 #+begin_src emacs-lisp 
 (use-package! elog
+  :autoload elog-logger
   :init (setq my-logger (elog-logger :name "doomrc" :level 'info)))
 #+end_src
 ** base 选项配置
@@ -890,7 +891,6 @@ tasks."
       "C->"  #'remember-init ; 记录光标位置
       "C-<" #'remember-jump ; 跳转到最后记录关闭的位置
       :leader
-      :desc "open in external app" "os" #'open-in-external-app
       :desc "open doom user file" "fp" (cmd!
                                    (let (($f (expand-file-name "config.org" doom-user-dir)))
                                      (if (file-exists-p $f)
@@ -975,6 +975,7 @@ emacsclient -e "(initframe-open-client-frame)"
 #+end_src
 - 裁剪 -mode
 #+begin_src emacs-lisp
+;;;###autoload
 (defun major-mode->string (mode)
   "Convert MODE ending in -mode to a plain string without -mode.
 
@@ -983,6 +984,18 @@ Eg: 'bash-ts-mode -> \"bash-ts\"."
                             (if (symbolp mode)
                                 (symbol-name mode)
                               mode)))
+#+end_src
+- 配置 repl 打开的默认目录
+#+begin_src emacs-lisp
+;;;###autoload
+(defun +my--configure-project-root-and-display (arg display-fn)
+    "Set the environment variable PROOT and displays a terminal using `display-fn'.
+If prefix ARG is non-nil, cd into `default-directory' instead of project root.
+Returns the eat buffer. copy form doomemacs:vterm"
+    (let* ((project-root (or (doom-project-root) default-directory))
+           (default-directory (if arg default-directory project-root)))
+      (setenv "PROOT" project-root)
+      (funcall display-fn)))
 #+end_src
 * UI
 字体，等主题 ui 配置
@@ -1783,12 +1796,12 @@ emt 最初仅支持 macos 但经过扩展支持全部平台，jieba 全平台支
   :init (setq color-rg-mac-load-path-from-shell nil))
 #+end_src
 * 工具
-*** common
+** common
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! psearch :recipe (:host github :repo "twlz0ne/psearch.el"
                            :files ( "psearch.el" )))
 #+end_src
-*** 拼音配置
+** 拼音配置
 **** lib 包
 [[https://github.com/cute-jumper/pinyinlib.el][pinyinlib]] 基本上所有通过拼音首字母搜索字符的都是通过该包实现的
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -1910,7 +1923,7 @@ matches case insensitively."
          )))
 #+end_src
 
-*** Input
+** Input
 **** Emacs-rime
 我用 [[https://github.com/DogLooksGood/emacs-rime][emacs-rime]] 作为 emacs 的输入法
 see@ https://emacs-china.org/t/os-smart-input-source/13436/726
@@ -2189,7 +2202,7 @@ consult-line 在文件过大时，很慢，使用 consult-rg 进行搜索, 参�
       (consult-ripgrep (list (shell-quote-argument buffer-file-name))))))
 #+end_src
 
-*** lsp 配置
+** lsp 配置
 **** lsp-bridge
 lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服务工具
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -2283,8 +2296,19 @@ lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服�
       :autoload eglot-booster-mode
       :init (eglot-booster-mode +1))))
 #+end_src
-*** term 工具
-**** vterm
+** term 工具
++ term 常用按键
+#+begin_src emacs-lisp 
+(map! :leader
+  (:prefix "o"
+   (:when (fboundp 'eat)
+    :desc "Toggle EAT" "s" #'+eat/toggle
+    :desc "EAT Here" "S" #'+eat/here)
+   (:when (fboundp 'aweshell-toggle)
+    :desc "Toggle Eshell popup" "e" #'aweshell-dedicated-toggle
+    :desc "Toggle Eshell" "E" #'aweshell-toggle)))
+#+end_src
+*** vterm
 #+begin_quote
 As good as terminal emulation gets in Emacs
 #+end_quote
@@ -2319,7 +2343,80 @@ VTerm 的安装相对麻烦一些，需要编译一些依赖。当然对于 Unix
             (switch-to-buffer vtermb)
           (call-interactively #'+vterm/here))))))
 #+end_src
-**** Eshell
+*** eat
+在 macos 打开 eat 出现类似 不支持 eat-truecolor 的错误请执行 M+x ~eat-compile-terminfo~[fn:1]
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! eat :recipe (:type git :host codeberg
+                       :repo "akib/emacs-eat"
+                       :depth 1
+                       :files ("*.el" ("term" "term/&.el") "*.texi"
+                               "*.ti" ("terminfo/e" "terminfo/e/*")
+                               ("terminfo/65" "terminfo/65/*")
+                                ("integration" "integration/*")
+               (:exclude ".dir-locals.el" "*-tests.el"))))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! eat
+  :hook (eat-mode . hide-mode-line-mode)
+  :hook (eat-mode . doom-mark-buffer-as-real-h)
+  :commands (+eat/toggle +eat/here)
+  :hook ((eshell-load . eat-eshell-mode)
+         (eshell-load . eat-eshell-visual-command-mode))
+  :config
+  ;; (after! evil (evil-set-initial-state 'eat-mode 'emacs))
+  (set-popup-rules! '(("^\\*eat" :size 0.25 :vslot -4 :select t :quit nil :ttl 0)
+                      ("^\\*my:\\(?:v?term\\|e?shell\\|eat\\)-popup"  ; editing buffers (interaction required)
+       :vslot -5 :size 0.35 :select t :modeline nil :quit nil :ttl nil)))
+  (setopt eat-kill-buffer-on-exit t)
+  (defun +eat/toggle (arg)
+    "Toggles a terminal popup window at project root.
+
+If prefix ARG is non-nil, recreate vterm buffer in the current project's root.
+
+Returns the vterm buffer."
+    (interactive "P")
+    (+my--configure-project-root-and-display
+     arg
+     (lambda ()
+       (let ((buffer-name (format "*my:eat-popup:%s*"
+                                  (if (bound-and-true-p persp-mode)
+                                      (safe-persp-name (get-current-persp))
+                                    "main")))
+             confirm-kill-processes
+             current-prefix-arg)
+         (when arg
+           (let ((buffer (get-buffer buffer-name))
+                 (window (get-buffer-window buffer-name)))
+             (when (buffer-live-p buffer)
+               (kill-buffer buffer))
+             (when (window-live-p window)
+               (delete-window window))))
+         (if-let* ((win (get-buffer-window buffer-name)))
+             (delete-window win)
+           (if-let ((buffer (cl-loop for buf in (doom-buffers-in-mode 'eat-mode)
+                                      if (equal (buffer-local-value '+eat--id buf)
+                                                buffer-name)
+                                      return buf)))
+               (pop-to-buffer buffer)
+             (let ((eat-buffer-name buffer-name))
+                 (eat)
+                 (with-current-buffer (get-buffer buffer-name)
+                   
+                   (setq-local +eat--id buffer-name))))
+           (get-buffer buffer-name))))))
+  (defun +eat/here (arg)
+    "Open a terminal buffer in the current window at project root.
+If prefix ARG is non-nil, cd into `default-directory' instead of project root."
+    (interactive "P")
+    (+my--configure-project-root-and-display
+     arg
+     (lambda ()
+       (save-window-excursion
+         (pop-to-buffer "*scratch*"))
+       (let (display-buffer-alist)
+         (eat))))))
+#+end_src
+*** Eshell
 使用 emacs 怎么不可以使用下 emacs 自带的 eshell 呢？😏
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! aweshell :recipe (:type git :host github :repo "manateelazycat/aweshell"))
@@ -2328,20 +2425,16 @@ VTerm 的安装相对麻烦一些，需要编译一些依赖。当然对于 Unix
 (use-package! aweshell
   :init
   (setq aweshell-use-exec-path-from-shell nil)
-  (map! :leader
-    (:prefix-map ("o" . "open")
-     :desc "Toggle Eshell popup" "e" #'aweshell-dedicated-toggle
-     :desc "Toggle Eshell" "E" #'aweshell-toggle))
   :commands (aweshell-dedicated-toggle aweshell-toggle)
   :config
   (use-package! em-alias
     :config
     (eshell/alias "unzip" "atool --extract --explain $1")))
 #+end_src
-*** TODO 截图工具
-*** TODO gif 工具
+** TODO 截图工具
+** TODO gif 工具
 
-*** 阅读工具
+** 阅读工具
 **** DONE Ebook 管理工具
 CLOSED: [2023-05-24 Wed 12:24]
 :LOGBOOK:
@@ -2454,7 +2547,7 @@ nov
   (setq-default pdf-view-display-size 'fit-width)
   (add-hook! 'pdf-view-mode-hook #'pdf-view-midnight-minor-mode))
 #+end_src
-*** Emojify
+** Emojify
 #+begin_comment
 来自 =:ui emoji= 模块
 #+end_comment
@@ -2500,7 +2593,7 @@ OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能�
   (dolist (emoji emojify-disabled-emojis)
     (remhash emoji emojify-emojis)))
 #+end_src
-*** edit
+** edit
 **** Puni
 通用、可定制的语法删除
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
@@ -2734,7 +2827,7 @@ popd
   :config
   (setq emt-lib-path (concat user-emacs-directory "modules/libEMT.dylib")))
 #+end_src
-*** disable mouse
+** disable mouse
 不用鼠标操作 emacs
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! disable-mouse)
@@ -2750,7 +2843,7 @@ popd
               evil-visual-state-map
               evil-insert-state-map))))
 #+end_src
-*** noflet
+** noflet
 用来，当我退出 emacs 时，不会提示有一些子命令正在运行, 参考来源 [[https://github.com/manateelazycat/lazycat-emacs/blob/8087ff9be53e94f1c82d5d58002667db9529262a/site-lisp/config/init-generic.el#L135][manateelazycat/init-generic.el]]
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! noflet :built-in 'prefer)
@@ -2765,7 +2858,7 @@ popd
   (setq kill-buffer-query-functions
         (remq 'process-kill-buffer-query-function kill-buffer-query-functions)))
 #+end_src
-*** chatpgt-shell
+** chatpgt-shell
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! chatgpt-shell)
 #+end_src
@@ -2811,7 +2904,7 @@ popd
       chatgpt-shell-model-version "gpt-3.5-turbo-0613"))
    (chatgpt-shell)))
 #+end_src
-*** easy-hugo
+** easy-hugo
 =hugo=​的 emacs 管理工具
 #+begin_src emacs-lisp :tangle (if (executable-find "hugo") "packages.el" "no") :noweb-ref none
 (package! easy-hugo)
@@ -2827,7 +2920,7 @@ popd
   :config
   (after! evil (evil-set-initial-state 'easy-hugo-mode 'emacs)))
 #+end_src
-*** dwim-shell-command
+** dwim-shell-command
 一个更好的在 emacs 中执行 shell 命令的工具
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! dwim-shell-command :recipe (:host github :repo "xenodium/dwim-shell-command"))
@@ -2865,7 +2958,7 @@ popd
      "zip" (format "atool -F .tar.xz --add %s '<<*>>'" file)
      :utils "atool")))
 #+end_src
-*** evil
+** evil
 emacs 中模拟 vim 按键风格的神器
 **** evil-pinyin
 使用 pinyin 首字母进行搜索，用法使用冒号：开启
@@ -2886,7 +2979,7 @@ Use JK as a shortcut button for <ESC>
 #+begin_src emacs-lisp
 (setq evil-escape-delay 0.2)
 #+end_src
-*** 中文日历增强
+** 中文日历增强
 使用[[https://github.com/xwl/cal-china-x][cal-china-x]]加强日历配置
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (package! cal-china-x)
@@ -2981,7 +3074,7 @@ Use JK as a shortcut button for <ESC>
   ;; 设置日历的节日，通用节日已经包含了所有节日
   (setq calendar-holidays (append cal-china-x-general-holidays)))
 #+end_src
-*** 字典
+** 字典
 **** insert-translated-name
 一个很好用的中文翻译为英文插件
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -3169,12 +3262,12 @@ Use JK as a shortcut button for <ESC>
 ;;        (:when (executable-find "sdcv")
 ;;         :desc "sdcv" "s" #'my/sdcv-point)))
 #+end_src
-*** pass
+** pass
 #+begin_src emacs-lisp
 (when (modulep! :tools pass)
   (setopt password-store-executable "gopass"))
 #+end_src
-*** 音乐播放
+** 音乐播放
 **** mpd
 #+begin_src emacs-lisp :tangle (if (executable-find "mpd") "packages.el" "no") :nonweb-ref none
 (package! mingus)
@@ -3307,7 +3400,7 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! empv :recipe (:host github :repo "isamert/empv.el"))
 #+end_src
-*** atomic-chrome
+** atomic-chrome
 在浏览器中使用 emacs 作为输入工具, 需要在客户端上安装对应插件如 [[https://github.com/fregante/GhostText][GhostText]]
 [[https://emacs-china.org/t/topic/2523][实用：请教怎样用 emacs 来编辑论坛的帖子 - Emacs-general - Emacs China]]
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -3326,7 +3419,7 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
             ("gitlab\\.com" . gfm-mode)))))
 #+end_src
 
-*** denote
+** denote
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! denote :built-in 'prefer)
 #+end_src
@@ -3347,7 +3440,7 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
   (denote-rename-buffer-mode 1))
 #+end_src
 
-*** ssh-agency
+** ssh-agency
 ssh-agen 让 ssh 仅输入一次密码
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! ssh-agency)
@@ -4669,7 +4762,6 @@ Lisp function does not specify a special indentation."
               (revert-buffer nil t)))))))
   (define-key! help-mode-map  "r" #'remove-hook-at-point))
 #+end_src
-
 ** Lua
 ** nxml-mode
 配合​~smartparen~​有一个小问题，无法正确匹配​“<”和“>”, 下面时是修改代码
@@ -4808,3 +4900,7 @@ yapf
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! ssh-config-mode)
 #+end_src
+
+* Footnotes
+
+[fn:1] https://codeberg.org/akib/emacs-eat/issues/45 
