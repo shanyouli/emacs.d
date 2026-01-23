@@ -417,7 +417,7 @@ doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就
       user-mail-address "shanyouli6@gmail.com"
       ;; user-gpg-key ""
       org-directory (file-truename "~/Documents/org")
-      org-agenda-files (my-path-join org-directory "gtd.org")
+      my-org-agenda-file (my-path-join org-directory "gtd.org")
       my-workdir (my-path-join "~/Code")
       my-blog-dir (my-path-join my-workdir "Git" "Blog")    ;; My Blog Dir
       my-scratch-dir (my-path-join my-workdir "Scratchs"))   ;; 草稿测试文件
@@ -4033,6 +4033,7 @@ Org Mode 无疑是 Emacs 的杀手级应用，其扩展能力以及 Emacs 的契
 ;; (package! org :built-in 'prefer)
 #+end_src
 #+begin_src emacs-lisp :noweb no-export :tangle yes :noweb-prefix no :noweb-ref nil
+(setq org-agenda-files (list my-org-agenda-file))
 (after! org
   <<org-conf>>)
 #+end_src
@@ -4681,63 +4682,73 @@ org-capture 模块设置
 (package! doct)
 #+end_src
 #+begin_src emacs-lisp :noweb-ref none :tangle yes
-(after! org-capture
-  (cl-defun my-org-agenda-todo-date-tree (&optional time &key return olp)
-    "我的TODOS date 树"
-    (let ((org-reverse-datetree-level-formats
-           '("TODOS"
-             ;; "%Y年"
-             "%Y年%m月"
-             "%Y年 第%W周"
-             (lambda (time) (let ((year-month-day (format-time-string "%Y年%m月%d日" time))
-                             (weekday (pcase (format-time-string "%w" time)
-                                        ("0" "星期日")
-                                        ("1" "星期一")
-                                        ("2" "星期二")
-                                        ("3" "星期三")
-                                        ("4" "星期四")
-                                        ("5" "星期五")
-                                        ("6" "星期六"))))
-                         (format "%s %s" year-month-day weekday))))))
-      (org-reverse-datetree-goto-date-in-file time :return return :olp olp)))
-  
-  (setq org-capture-templates
-        (doct `(("TODOS" :keys "t"
-                 :file ,(my-path-join org-directory "gtd.org")
-                 :function my-org-agenda-todo-date-tree
-                 :template ("* %{todo-state} %^{Description}"
-                            ":PROPERTIES:"
-                            ":Created: %U"
-                            ":END:"
-                            "%?")
-                 :todo-state "TODO")
 
-              ("Habit" :keys "h"
-               :file ,(my-path-join org-directory "gtd.org")
-               :prepend t
-               :template ("* %{todo-state} %^{Description}"
-                          "SCHEDULED: <%t %{hibit}>"
-                          ":PROPERTIES:"
-                          ":Created: %U"
-                          ":END:"
-                          "%?")
-               :children (("每日"  :keys "d"
-                           :olp ("Habit" "Days")
-                           :hibit "++1d"
-                           :todo-state "TODO")
-                          ("每周" :keys "w"
-                           :olp ("Habit" "Weeks")
-                           :todo-state "TODO"
-                           :hibit "++1w")
-                          ("每月"  :keys "m"
-                           :olp ("Habit" "Months")
-                           :hibit "++1m"
-                           :todo-state "TODO")
-                          ("其他" :keys "o"
-                           :olp ("Habit" "Other")
-                           :hibit "%^{hibit}"
-                           :todo-state "TODO")
-                           ))))))
+(defadvice! +my-org-capture-init-default-h ()
+  :after #'+org-init-capture-defaults-h
+  (setq org-capture-templates
+        (doct
+         `(;; --- 1. TODOS (动态日期树) ---
+           ("TODOS"
+            :keys "t"
+            :file ,my-org-agenda-file
+            :todo-state "TODO"
+            :template ("* %{todo-state} [#%^{优先级|B|A|C}] %^{Description}"
+                       ":PROPERTIES:"
+                       ":Created: %U"
+                       ":END:"
+                       "%?")
+            :function ,(lambda () 
+                         (let ((org-reverse-datetree-level-formats
+                                `("TODOS" "%Y年%m月" "%Y年 第%W周" ,#'my-org-get-week-day-string)))
+                           ;; 内部已经处理了 TODOS 标题的创建
+                           (org-reverse-datetree-goto-date-in-file nil))))
+
+           ;; --- 2. Habit (自动创建层级) ---
+           ("Habit"
+            :keys "h"
+            :file ,my-org-agenda-file
+            :todo-state "NEXT"
+            ;; 子项会继承 template 和 function
+            :template ("* %{todo-state} [#%^{优先级|B|A|C}] %^{习惯名称}"
+                       "SCHEDULED: <%t %{hibit}>"
+                       ":PROPERTIES:"
+                       ":STYLE: habit"
+                       ":REPEAT_TO_STATE: NEXT"
+                       ":Created: %U"
+                       ":END:"
+                       "%?")
+            :prepend t
+            :function ,(lambda ()
+                         (let ((org-reverse-datetree-level-formats (doct-get :my-olp)))
+                           ;; 内部已经处理了 TODOS 标题的创建
+                           (org-reverse-datetree-goto-date-in-file nil)))
+            :children (("每日" :keys "d" :my-olp ("Habit" "Days")   :hibit ".+1d")
+                       ("每周" :keys "w" :my-olp ("Habit" "Weeks")  :hibit ".+1w")
+                       ("每月" :keys "m" :my-olp ("Habit" "Months") :hibit ".+1m")
+                       ("其他" :keys "o" :my-olp ("Habit" "Other")  :hibit "%^{周期|.+1d|.+1w|.+1m}")))
+
+           ;; --- 3. INBOX ---
+           ("INBOX"
+            :keys "i"
+            :file ,my-org-agenda-file
+            :children (("收集箱" :keys "i" 
+                        :headline "INBOX" ; 如果 INBOX 也不存在，建议也改用 :function
+                        :template ("* %^{Description}" ":PROPERTIES:" ":Created: %U" ":END:"))
+                       ("Protocol"
+                        :keys "p"
+                        :headline "INBOX"
+                        :immediate-finish t
+                        :kill-buffer t
+                        :template ("* %:annotation %:initial"
+                                   ":PROPERTIES:" ":Created: %U" ":END:"))))))))
+
+(defun my-org-get-week-day-string (&optional time)
+  "格式化日期层级：2026年01月21日 星期三"
+  (let* ((t-val (or time (current-time)))
+         (ymd (format-time-string "%Y年%m月%d日" t-val))
+         (day-list '("星期日" "星期一" "星期二" "星期三" "星期四" "星期五" "星期六"))
+         (wday (nth (string-to-number (format-time-string "%w" t-val)) day-list)))
+    (format "%s %s" ymd wday)))
 #+end_src
 ** org-protocol
 配置 org-protocol
@@ -4746,24 +4757,6 @@ org-capture 模块设置
   :config
   (add-to-list 'org-protocol-protocol-alist
                '("org-find-file" :protocol "find-file" :function org-protocol-find-file :kill-client nil))
-  (after! org-capture
-    (add-to-list 'org-capture-templates
-             (doct `(("INBOX" :keys "i"
-                      :file "~/example.org"
-                      :prepend t
-                      :headline "INBOX"
-                      :children (("收集箱" :keys "i"
-                                 :template  ("* %^{Description} \n"
-                                             ":PROPERTIES:"
-                                             ":Created: %U"
-                                             ":END:"))
-                                ("Protocol Bookmarks" :keys "p"
-                                 :immediate-finish t
-                                 :kill-buffer t
-                                 :template ("* %:annotation %:initial"
-                                            ":PROPERTIES:"
-                                            ":Created: %U"
-                                            ":END:"))))))))
   (defun org-protocol-find-file-fix-wsl-path (path)
     "If inside WSL, change Windows-style paths to WSL-style paths."
     (if (not (string-match-p "-[Mm]icrosoft" operating-system-release))
