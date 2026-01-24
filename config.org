@@ -1028,14 +1028,25 @@ path the new root of the generated path."
 #+end_src
 * UI
 字体，等主题 ui 配置
-** 基本配置
+** COMMENT 基本配置
 - 默认标题规则
 #+begin_src emacs-lisp
+(defun +my-title-set-fn (swith)
+  "自定义 Emacs 标题开头的prefix. 推荐： EmacsClient or DoomEmacs"
+  ;; 从剩余参数列表中弹出下一个值
+  (setq my-title (pop command-line-args-left))
+  (elog-info my-logger (format "set title prefix: %s" my-title)))
+
+(add-to-list 'command-switch-alist '("--my-title" . +my-title-set-fn))
+
 (setq frame-title-format
-      '(:eval (if (frame-parameter nil 'my-client)
-                  (my-title-stye "EmacsClient")
-                  (my-title-stye "DoomEmacs")))
+      '(:eval (cond ((frame-parameter nil 'my-client)
+                     (my-title-stye "EmacsClient"))
+                    ((bound-and-true-p my-title)
+                     (my-title-stye my-title))
+                    (t (my-title-stye "DoomEmacs"))))
       icon-title-format t)
+
 (setq doom-fallback-buffer-name "► Doom"
       +doom-dashboard-name "► Doom")
 #+end_src
