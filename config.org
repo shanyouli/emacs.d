@@ -961,7 +961,7 @@ emacsclient -e "(initframe-open-client-frame)"
   "获取当前编辑 buffer 的父目录名"
   (format "%s" (file-name-nondirectory (directory-file-name default-directory))))
 ;;;###autoload
-(defun my-title-stye (name)
+(defun my-title-style (name)
   "`name' tilte 的前缀，优先使用项目名作为结尾，如果项目名不可用将使用父目录结尾"
   (let ((prj-name (and (fboundp 'projectile-project-name)
                       (projectile-project-name))))
@@ -1028,23 +1028,32 @@ path the new root of the generated path."
 #+end_src
 * UI
 字体，等主题 ui 配置
-** COMMENT 基本配置
+** 基本配置
 - 默认标题规则
 #+begin_src emacs-lisp
 (defun +my-title-set-fn (swith)
   "自定义 Emacs 标题开头的prefix. 推荐： EmacsClient or DoomEmacs"
   ;; 从剩余参数列表中弹出下一个值
-  (setq my-title (pop command-line-args-left))
-  (elog-info my-logger (format "set title prefix: %s" my-title)))
+  (let ((arg (downcase (pop command-line-args-left))))
+    (cond ((string= arg "emacsclient")
+           (elog-info my-logger "Set title prefix: EmacsClient")
+           (set-frame-parameter nil 'my-client t))
+          ((string= arg "doomemacs")
+           (elog-info my-logger "Set title prefix: DoomEmacs")
+           (set-frame-parameter nil 'my-doom t))
+          (t
+           (set-frame-parameter nil 'my-doom t)
+           (elog-info my-logger
+             "set title prefix only support: emacsclient or doomemacs")))))
 
 (add-to-list 'command-switch-alist '("--my-title" . +my-title-set-fn))
 
 (setq frame-title-format
-      '(:eval (cond ((frame-parameter nil 'my-client)
-                     (my-title-stye "EmacsClient"))
-                    ((bound-and-true-p my-title)
-                     (my-title-stye my-title))
-                    (t (my-title-stye "DoomEmacs"))))
+      '(:eval (cond ((frame-parameter nil 'my-doom)
+                     (my-title-style "DoomEmacs"))
+               ((frame-parameter nil 'my-client)
+                (my-title-style "EmacsClient"))
+               (t (my-title-style "DoomEmacs"))))
       icon-title-format t)
 
 (setq doom-fallback-buffer-name "► Doom"
@@ -1054,11 +1063,18 @@ path the new root of the generated path."
 #+begin_src emacs-lisp
 (add-hook 'after-make-frame-functions
           (lambda (frame)
-            (pcase (frame-parameter frame 'name)
-              ("scratch" (initframe-init-default-frame frame))
-              ("org-protocol" (initframe-init-default-frame frame 0.618 0.618)))
-            (when (and (frame-parameter frame 'client) (< 1 (my-get-all-display-frame)))
-              (set-frame-parameter frame 'my-client t))))
+            (let ((frame-name (frame-parameter frame 'name)))
+              (pcase frame-name
+                ("scratch" (initframe-init-default-frame frame))
+                ("org-protocol" (initframe-init-default-frame frame 0.618 0.618)))
+              (unless (frame-parameter frame 'my-client)
+                (elog-info my-logger (format "my-client %S" (frame-parameter frame 'my-client)))
+                (elog-info my-logger (format "frame-name %S" frame-name))
+                (if (member frame-name '("DoomEmacs" "Emacs" "emacs" "doomemacs"))
+                    (set-frame-parameter frame 'my-doom t)
+                  (when (and (frame-parameter frame 'client)
+                             (< 1 (my-get-all-display-frame)))
+                    (set-frame-parameter frame 'my-client t)))))))
 #+end_src
 - 更好的显示超出部分
 #+begin_src emacs-lisp
@@ -2635,7 +2651,7 @@ OOTB 的 emoji 模块！麻烦的一点是设置的有些默认字符，可能�
     (remhash emoji emojify-emojis)))
 #+end_src
 ** edit
-**** Puni
+*** Puni
 通用、可定制的语法删除
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
 (package! puni :recipe (:host github :repo "AmaiKinono/puni") :built-in 'prefer)
@@ -2813,7 +2829,7 @@ deleted, kill the pairs around point."
     "C-M-a" 'puni-beginning-of-sexp
     "C-M-e" 'puni-end-of-sexp))
 #+end_src
-**** separedit
+*** separedit
 #+begin_quote
 separedit.el: 在单独的缓冲区编辑注释、docstring 或其中的代码块
 #+end_quote
@@ -2832,7 +2848,7 @@ separedit.el: 在单独的缓冲区编辑注释、docstring 或其中的代码�
   (set-popup-rule! "\\*edit-indirect " :side 'bottom :size .5 :select t :quit nil)
   (custom-set-variables '(separedit-default-mode 'org-mode)))
 #+end_src
-**** 中文结巴分词
+*** 中文结巴分词
 #+begin_quote
 基于 结巴分词 的 Emacs 中文分词 工具，实现了以中文词语为单位的移动和编辑。支持 Linux、Cygwin、Windows 和 Android/Termux 平台。目前 Windows 平台支持是通过调用 Cygwin 进程实 现的。
 #+end_quote
@@ -2859,7 +2875,7 @@ popd
         cns-debug nil) ; debug 模式
 )
 #+end_src
-***** macos
+**** macos
 #+begin_src emacs-lisp
 (use-package! emt
   :when IS-MAC
@@ -4708,7 +4724,8 @@ org-capture 模块设置
                        ":Created: %U"
                        ":END:"
                        "%?")
-            :function ,(lambda () 
+            :function ,(lambda ()
+                         (require 'org-reverse-datetree)
                          (let ((org-reverse-datetree-level-formats
                                 `("TODOS" "%Y年%m月" "%Y年 第%W周" ,#'my-org-get-week-day-string)))
                            ;; 内部已经处理了 TODOS 标题的创建
@@ -4730,6 +4747,7 @@ org-capture 模块设置
                        "%?")
             :prepend t
             :function ,(lambda ()
+                         (require 'org-reverse-datetree)
                          (let ((org-reverse-datetree-level-formats (doct-get :my-olp)))
                            ;; 内部已经处理了 TODOS 标题的创建
                            (org-reverse-datetree-goto-date-in-file nil)))
