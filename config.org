@@ -159,6 +159,7 @@ workspaces        ; tab emulation, persistence & separate workspaces
 file-templates    ; auto-snippets for empty files
 fold              ; (nigh) universal code folding
 format            ; automated prettiness
+(whitespace +trim) ; 自动删除行尾空格.
 ;;god               ; run Emacs commands without modifier keys
 ;;lispy             ; vim for lisp, for people who don't like vim
 multiple-cursors  ; editing in many places at once
@@ -1093,7 +1094,8 @@ path the new root of the generated path."
 #+end_src
 ** 字体配置
 Doom exposes five (optional) variables or controlling fonts in Doom.
-+ ~doom-font~ : set default font, 我使用 "Cascadia Code", size 为 12 ，备选字体: Fantasque Sans Mono, size 为 13
++ ~doom-font~ : set default font, 我使用 "Pragma Sevka SC" size 为 13,
+  或者 "Cascadia Code", size 为 12 ，备选字体: Fantasque Sans Mono, size 为 13
 + ~doom-variable-pitch-font~: Set Serif font, 目前没有喜欢的
 + ~doom-big-font~: used for `doom-big-font-mode`; use this for presentations or streaming ， 这个模式一般不会使用，如果选择字体，我回选择 Fira Code
 + ~doom-unicode-font~: Fallback font for Unicode glyphs ， Unicode ，或者默认字体，目前很多人推荐 [[https://juliamono.netlify.app/][JuliaMono]]， 我应该会尝试
@@ -1461,7 +1463,7 @@ Macos 上借助系统自带的进行主题切换
        ('xwidget-webkit-mode '(:both ("evil" "major-mode" "xwidget")))
        (_ nil)))))
 #+end_src
-*** awesome-tray
+*** COMMENT awesome-tray
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! awesome-tray :recipe (:host github :repo "manateelazycat/awesome-tray"))
 ;; (package! solaire-mode :disable t)
@@ -3935,7 +3937,7 @@ macos 中自动化的一门脚本语言
 #+end_src
 ** nushell
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! nushell-ts-mode :recipe (:host github :repo "herbertjones/nushell-ts-mode") :built-in 'prefer)
+(package! nu-ts-mode :recipe (:host github :repo "ItsOleks/nu-ts-mode"))
 (package! nushell-mode :recipe (:host github :repo "mrkkrp/nushell-mode") :built-in 'prefer)
 #+end_src
 #+begin_src emacs-lisp  :noweb-ref none
@@ -3951,12 +3953,14 @@ macos 中自动化的一门脚本语言
 
 (use-package! nushell-mode
   :init
+  :defer t
   (after! org-src
     (add-to-list 'org-src-lang-modes '("nu" . nushell)))
   :config (+nushell-common-config 'nushell-mode))
 
 (use-package! nushell-ts-mode
   :when (modulep! :tools tree-sitter)
+  :defer t
   :init
   (after! org-src
     (add-to-list 'org-src-lang-modes '("nu" . nushell-ts)))
