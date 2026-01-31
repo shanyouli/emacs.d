@@ -1982,7 +1982,7 @@ matches case insensitively."
 #+end_src
 
 ** Input
-**** Emacs-rime
+*** Emacs-rime
 我用 [[https://github.com/DogLooksGood/emacs-rime][emacs-rime]] 作为 emacs 的输入法
 see@ https://emacs-china.org/t/os-smart-input-source/13436/726
 see@ https://emacs-china.org/t/native-os-sis/14089
@@ -2006,6 +2006,30 @@ see@ https://emacs-china.org/t/native-os-sis/14089
 
   :config
 
+  ;; FIX: rime 和 eat-mode 的兼容问题. @see: https://github.com/DogLooksGood/emacs-rime/issues/248
+  ;; 无法启用。增加以下advice后可以绕过
+  (define-advice rime--text-read-only-p (:around (old-fn) allow-eat-mode)
+    (if (eq major-mode 'eat-mode)
+        nil
+      (funcall old-fn)))
+  ;; 中文可以正常上屏，但是回车（上屏输入的英文）无法工作。
+  (define-advice rime--commit (:around (old-fn &rest args) allow-eat-mode)
+    (if (eq major-mode 'eat-mode)
+        (cl-letf (((symbol-function #'insert)
+                   (lambda (&rest s)
+                     (when eat-terminal
+                       (eat-term-send-string-as-yank eat-terminal (apply #'concat s))))))
+          (apply old-fn args))
+      (apply old-fn args)))
+
+  ;; 在eat buffer一行的末尾，输入包含多个中文字符的拼音后，窗口会向左滚动无法恢复。
+  (defun my/eat-scroll-right-after-input-method ()
+      (when (eq major-mode 'eat-mode)
+        (scroll-right)))
+  ;; in eat-mode-hook
+  (add-hook 'input-method-deactivate-hook #'my/eat-scroll-right-after-input-method 0 t)
+  (after! evil
+    (add-hook 'evil-insert-state-exit-hook #'my/eat-scroll-right-after-input-method 0 t))
   ;; (defadvice! +rime-do-finalize-after-loading-module (&rest _)
   ;;   :after #'rime--load-dynamic-module
   ;;   (add-hook! kill-emacs #'rime-lib-finalize))
@@ -2163,7 +2187,7 @@ see@ https://emacs-china.org/t/native-os-sis/14089
   (add-hook 'evil-insert-state-exit-hook #'input-method-change-cursor-deactivate))
 #+end_src
 
-**** Dired
+*** Dired
 #+begin_src emacs-lisp
 (after! dired
   (use-package! dired-async
@@ -2231,12 +2255,12 @@ see@ https://emacs-china.org/t/native-os-sis/14089
     :before #'wdired-change-to-wdired-mode
     (dired-hide-details-mode 1)))
 #+end_src
-**** Vertico
+*** Vertico
 #+begin_src emacs-lisp :tangle "no"
 (when (modulep! :completion vertico)
   (after! vertico (setq vertico-count 12)))
 #+end_src
-***** 大文件搜索
+**** 大文件搜索
 consult-line 在文件过大时，很慢，使用 consult-rg 进行搜索, 参考
 - [[https://emacs-china.org/t/emacs-rg-buffer/8347/17][emacs-china swiper-grep-or-line]]
 - [[https://github.com/minad/consult/wiki#consult-ripgrep-or-line-counsel-grep-or-swiper-equivalent][consult-wiki]]
@@ -2261,7 +2285,7 @@ consult-line 在文件过大时，很慢，使用 consult-rg 进行搜索, 参�
 #+end_src
 
 ** lsp 配置
-**** lsp-bridge
+*** lsp-bridge
 lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服务工具
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! lsp-bridge
@@ -2494,7 +2518,7 @@ If prefix ARG is non-nil, cd into `default-directory' instead of project root."
 ** TODO gif 工具
 
 ** 阅读工具
-**** DONE Ebook 管理工具
+*** DONE Ebook 管理工具
 CLOSED: [2023-05-24 Wed 12:24]
 :LOGBOOK:
 - State "DONE"       from "TODO"       [2023-05-24 Wed 12:24]
