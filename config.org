@@ -4076,6 +4076,16 @@ yapf
 (package! ssh-config-mode)
 #+end_src
 
+** other
+一些使用 doom 自带配置的，某些修改
+*** fennel 使用
+使用 fnlfmt 工具进行格式化
+#+begin_src emacs-lisp :tangle (if (executable-find "fnlfmt") "yes" "no")
+(use-package! fennel-mode
+  :defer t
+  :config
+  (set-formatter! 'fnlfmt '("fnlfmt"  "-") :modes '(fennel-mode)))
+#+end_src
 * Org Mode
 :properties:
 :CUSTOM_ID: org
