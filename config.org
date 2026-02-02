@@ -468,15 +468,6 @@ doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就
   (message "Have back to remember position"))
 #+end_src
 
-*** 插入当前日期
-格式为​=%Y-%m-%d %G-%M-%S=​
-#+begin_src emacs-lisp :tangle "autoload/init-common.el"
-;;;###autoload
-(defun insert-datetime ()
-  "Insert date at point."
-    (interactive)
-    (insert (format-time-string "%Y-%m-%d %H:%M:%S")))
-#+end_src
 *** 判断当前 frame 是否支持 child-frame
 #+begin_src emacs-lisp :tangle "autoload/init-common.el"
 ;;;###autoload
@@ -1026,6 +1017,30 @@ path the new root of the generated path."
         path)
     (setq path (expand-file-name (apply #'file-name-concat args)))
     (if relative (file-relative-name path) path)))
+#+end_src
+*** 日期处理
+- 一个更好的当前 date 获取函数[fn:2]
+#+begin_src emacs-lisp
+(defvar my-n-format "%Y-%m-%dT%H:%M:%S"
+  "默认使用的时间格式，具体信息请参考 `format-time-string'")
+;;;###autoload
+(cl-defun my-n (&key (h 0) (m 0) (s 0) (yy 0) (mm 0) (dd 0))
+  "更简洁、高效的时间偏移函数。"
+  (let* ((now (decode-time))
+         (delta (make-decoded-time :second s :minute m :hour h
+                                   :day dd :month mm :year yy))
+         (new-time (decoded-time-add now delta)))
+    ;; 直接使用 format-time-string 对结果进行格式化，更安全
+    (format-time-string my-n-format (encode-time new-time))))
+#+end_src
+- 插入当前日期和时间
+#+begin_src emacs-lisp
+;;;###autoload
+(defun insert-datetime ()
+  "Insert date at poin."
+  (interactive)
+  (let ((my-n-format "%Y-%m-%d %H:%M:%S"))
+    (insert (my-n))))
 #+end_src
 * UI
 字体，等主题 ui 配置
@@ -2426,7 +2441,7 @@ VTerm 的安装相对麻烦一些，需要编译一些依赖。当然对于 Unix
           (call-interactively #'+vterm/here))))))
 #+end_src
 *** eat
-在 macos 打开 eat 出现类似 不支持 eat-truecolor 的错误请执行 M+x ~eat-compile-terminfo~[fn:2]
+在 macos 打开 eat 出现类似 不支持 eat-truecolor 的错误请执行 M+x ~eat-compile-terminfo~[fn:3]
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! eat :recipe (:type git :host codeberg
                        :repo "akib/emacs-eat"
@@ -3976,8 +3991,8 @@ macos 中自动化的一门脚本语言
   (interactive))
 
 (use-package! nushell-mode
-  :init
   :defer t
+  :init
   (after! org-src
     (add-to-list 'org-src-lang-modes '("nu" . nushell)))
   :config (+nushell-common-config 'nushell-mode))
@@ -5025,4 +5040,6 @@ media note
 
 [fn:1] https://github.com/rejeep/f.el
 
-[fn:2] https://codeberg.org/akib/emacs-eat/issues/45
+[fn:2]https://paste.sr.ht/~zyd/d6350d65005b6547882548c35923cfddafcfcd65
+
+[fn:3] https://codeberg.org/akib/emacs-eat/issues/45
