@@ -817,6 +817,7 @@ tasks."
           (or (file-directory-p file)
               (file-in-directory-p file (bound-and-true-p package-user-dir))
               (file-in-directory-p file (concat straight-base-dir "straight"))
+              (file-in-directory-p file (bound-and-true-p persp-save-dir))
               (file-in-directory-p file
                                    (file-name-directory (doom-session-file)))))))
 
@@ -4085,7 +4086,9 @@ yapf
   :defer t
   :config
   (set-formatter! 'fnlfmt '("fnlfmt"  "-") :modes '(fennel-mode)))
+
 #+end_src
+***
 * Org Mode
 :properties:
 :CUSTOM_ID: org
