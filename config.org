@@ -3034,6 +3034,29 @@ popd
   :init
   (map! "M-!" #'dwim-shell-command)
   :config
+  (defun my/dwim-rsync-copy-to-dir (dest-dir)
+  "使用 rsync 将 Dired 中标记的文件复制到 DEST-DIR。"
+  (interactive (list (expand-file-name (read-directory-name "DEST DIR: "))))
+  (dwim-shell-command-on-marked-files
+   "Use rsync to copy files to a specified directory."
+   (format "rsync -ahvz --progress --no-i-r '<<f>>' %s"
+           (shell-quote-argument dest-dir))
+   :utils "rsync"
+   :no-progress t
+   :error-autofocus t
+   :silent-success t))
+
+(defun my/dwim-rsync-move-to-dir (dest-dir)
+  "使用 rsync 将 Dired 中标记的文件移动到 DEST-DIR。"
+  (interactive (list (expand-file-name (read-directory-name "DEST DIR: "))))
+  (dwim-shell-command-on-marked-files
+   "Use rsync to move files to a specified directory."
+   (format "rsync -ahvz --progress --no-i-r --remove-source-files <<f>> %s"
+           (shell-quote-argument dest-dir))
+   :no-progress t
+   :error-autofocus t
+   :silent-success t
+   :utils "rsync"))
   (defun my/dwim-shell-commands-unzip ()
     "Unzip all marked archives (of any kind) using `atool'."
     (interactive)
