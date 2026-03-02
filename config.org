@@ -817,12 +817,11 @@ tasks."
           (or (file-directory-p file)
               (file-in-directory-p file (bound-and-true-p package-user-dir))
               (file-in-directory-p file (concat straight-base-dir "straight"))
-              (file-in-directory-p file (bound-and-true-p persp-save-dir))
-              (file-in-directory-p file
-                                   (file-name-directory (doom-session-file)))))))
+              (file-in-directory-p file (bound-and-true-p persp-save-dir))))))
 
 (after! recentf
-  (push (expand-file-name recentf-save-file) recentf-exclude))
+  (push (expand-file-name recentf-save-file) recentf-exclude)
+  (push (expand-file-name (doom-session-file)) recentf-exclude))
 #+end_src
 - 自动保存文件
 使用 ~auto-save-visited-mode~ ,相关讨论[[https://emacs-china.org/t/macos-save-silently-t/24086][关于在 macOS 上设置了 save-silently 为 t ，自动保存时仍然会显示消息的问题]]
@@ -850,7 +849,6 @@ tasks."
   :hook (doom-first-file . auto-save-visited-mode)
   :config
   ;; NOTE: macos 上设置 save-silently 为 t, 自动保存时还是会显示消息
-
   (when IS-MAC
     (setq inhibit-message-regexps '("^Saving" "^Wrote")
           set-message-functions '(inhibit-message))))
@@ -4693,25 +4691,6 @@ ligatures 配置,
 ** agenda
 org todo 相关配置
 #+begin_src emacs-lisp
-;;        ))
-(setq org-todo-keywords
-      '((sequence "TODO(t)" "HOLD(h!)" "WIP(i!)" "WAIT(w!)" "|" "DONE(d!)" "CANCELLED(c@/!)")
-        (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f!)")))
-
-;; 标签行状态变化时标签同步发生变化
-;; Moving  task to CANCELLED adds a CANCELLED tag
-;; Moving a task to WAIT adds a WAIT tag
-;; Moving a task to HOLD adds WAIT and HOLD tag
-;; moving a task to a done state removes WAIT adn HOLD tags
-;; moving a task to TODO removes WAIT, CANCELLED, and HOLD tags
-;; moving a task to DONE removes WAIT, CANCELLED< and HOLD tags
-(setq org-todo-state-tags-triggers
-      (quote (("CANCELLED" ("CANCELLED" . t))
-              ("WAIT" ("WAIT" . t))
-              ("HOLD" ("WAIT" ("HOLD" . t)))
-              (done ("WAIT") ("HOLD"))
-              ("TODO" ("WAIT") ("CANCELLED") ("HOLD"))
-              ("DONE" ("WAIT") ("CANCELLED") ("HOLD")))))
 
 ;; 专家模式选择标题栏
 (setq org-use-fast-todo-selection 'expert)
