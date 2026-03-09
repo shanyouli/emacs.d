@@ -3023,60 +3023,73 @@ popd
 (package! dwim-shell-command :recipe (:host github :repo "xenodium/dwim-shell-command"))
 #+end_src
 #+begin_src emacs-lisp
-(use-package! proced :autoload (proced-process-attributes))
 (use-package! dwim-shell-command
+  :autoload dwim-shell-command-on-marked-files
   :commands (dwim-shell-command
              my/dwim-shell-commands-unzip
              my/dwim-shell-commands-zip
-             my/dwim-shell-command-kill-process)
-  :init
-  (map! "M-!" #'dwim-shell-command)
-  :config
-  (defun my/dwim-rsync-copy-to-dir (dest-dir)
-  "使用 rsync 将 Dired 中标记的文件复制到 DEST-DIR。"
-  (interactive (list (expand-file-name (read-directory-name "DEST DIR: "))))
-  (dwim-shell-command-on-marked-files
-   "Use rsync to copy files to a specified directory."
-   (format "rsync -ahvz --progress --no-i-r '<<f>>' %s"
-           (shell-quote-argument dest-dir))
-   :utils "rsync"
-   :no-progress t
-   :error-autofocus t
-   :silent-success t))
+             my/dwim-rsync-copy-to-dir
+             my/dwim-rsync-move-to-dir)
+ :init (map! "M-!" #'dwim-shell-command)
+ :config
+ (defun my/dwim-rsync-copy-to-dir (dest-dir)
+   "使用 rsync 将 Dired 中标记的文件复制到 DEST-DIR。"
+   (interactive (list (expand-file-name (read-directory-name "DEST DIR: "))))
+   (dwim-shell-command-on-marked-files
+    "Use rsync to copy files to a specified directory."
+    (format "rsync -ahvz --progress --no-i-r '<<f>>' %s"
+            (shell-quote-argument dest-dir))
+    :utils "rsync"
+    :no-progress t
+    :error-autofocus t
+    :silent-success t))
 
-(defun my/dwim-rsync-move-to-dir (dest-dir)
-  "使用 rsync 将 Dired 中标记的文件移动到 DEST-DIR。"
-  (interactive (list (expand-file-name (read-directory-name "DEST DIR: "))))
-  (dwim-shell-command-on-marked-files
-   "Use rsync to move files to a specified directory."
-   (format "rsync -ahvz --progress --no-i-r --remove-source-files <<f>> %s"
-           (shell-quote-argument dest-dir))
-   :no-progress t
-   :error-autofocus t
-   :silent-success t
-   :utils "rsync"))
-  (defun my/dwim-shell-commands-unzip ()
-    "Unzip all marked archives (of any kind) using `atool'."
-    (interactive)
-    (cond ((executable-find "atool")
-           (dwim-shell-command-on-marked-files
-            "Unzip" "atool --extract --explain '<<f>>'"
-            :utils "atool"))
-          ((executable-find "ouch")
-           (dwim-shell-command-on-marked-files "Unzip" "ouch decompress '<<f>>' --dir '<<fne>>'"
-                                               :utils "ouch"))
-          (_ (warn "Please install ouch or atool"))))
+ (defun my/dwim-rsync-move-to-dir (dest-dir)
+   "使用 rsync 将 Dired 中标记的文件移动到 DEST-DIR。"
+   (interactive (list (expand-file-name (read-directory-name "DEST DIR: "))))
+   (dwim-shell-command-on-marked-files
+    "Use rsync to move files to a specified directory."
+    (format "rsync -ahvz --progress --no-i-r --remove-source-files <<f>> %s"
+            (shell-quote-argument dest-dir))
+    :no-progress t
+    :error-autofocus t
+    :silent-success t
+    :utils "rsync"))
+ (defun my/dwim-shell-commands-unzip ()
+   "Unzip all marked archives (of any kind) using `atool'."
+   (interactive)
+   (cond
+    ((executable-find "atool")
+     (dwim-shell-command-on-marked-files
+      "Unzip"
+      "atool --extract --explain '<<f>>'"
+      :utils "atool"))
+    ((executable-find "ouch")
+     (dwim-shell-command-on-marked-files
+      "Unzip"
+      "ouch decompress '<<f>>' --dir '<<fne>>'"
+      :utils "ouch"))
+    (_
+     (warn "Please install ouch or atool"))))
 
-  (defun my/dwim-shell-commands-zip (file)
-    "zip all marked archives (of any kind) to `file' using `atools'"
-    (interactive (if-let ((dir (bound-and-true-p dired-directory)))
-                     (progn
-                       (setq dir (concat (file-name-base  (directory-file-name dir)) ".tar.gz"))
-                       (list (read-string (format "Archive Name(%s):" dir) nil nil dir)))
-                   (list  (read-string (format "Archive Name: " )))))
-    (dwim-shell-command-on-marked-files
-     "zip" (format "atool -F .tar.xz --add %s '<<*>>'" file)
-     :utils "atool")))
+ (defun my/dwim-shell-commands-zip (file)
+   "zip all marked archives (of any kind) to `file' using `atools'"
+   (interactive (if-let ((dir (bound-and-true-p dired-directory)))
+                  (progn
+                    (setq dir
+                          (concat
+                           (file-name-base (directory-file-name dir))
+                           ".tar.gz"))
+                    (list
+                     (read-string (format "Archive Name(%s):" dir)
+                                  nil
+                                  nil
+                                  dir)))
+                  (list (read-string (format "Archive Name: ")))))
+   (dwim-shell-command-on-marked-files
+    "zip"
+    (format "atool -F .tar.xz --add %s '<<*>>'" file)
+    :utils "atool")))
 #+end_src
 ** evil
 emacs 中模拟 vim 按键风格的神器
@@ -3388,7 +3401,7 @@ Use JK as a shortcut button for <ESC>
   (setopt password-store-executable "gopass"))
 #+end_src
 ** 音乐播放
-**** mpd
+*** mpd
 #+begin_src emacs-lisp :tangle (if (executable-find "mpd") "packages.el" "no") :nonweb-ref none
 (package! mingus)
 (package! simple-mpc)
@@ -3516,10 +3529,11 @@ IGNORE-AUTO and NOCONFIRM are passed by `revert-buffer'."
         (cancel-timer simple-mpc--timer)))
     (simple-mpc-start-timer)))
 #+end_src
-**** empv
+*** empv
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! empv :recipe (:host github :repo "isamert/empv.el"))
 #+end_src
+
 ** atomic-chrome
 在浏览器中使用 emacs 作为输入工具, 需要在客户端上安装对应插件如 [[https://github.com/fregante/GhostText][GhostText]]
 [[https://emacs-china.org/t/topic/2523][实用：请教怎样用 emacs 来编辑论坛的帖子 - Emacs-general - Emacs China]]
