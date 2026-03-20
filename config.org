@@ -265,7 +265,7 @@ emacs-lisp        ; drown in parentheses
 ;;latex             ; writing papers in Emacs has never been so fun
 ;;lean              ; for folks with too much to prove
 ;;ledger            ; be audit you can be
-markdown          ; writing docs for people to ignore
+(markdown +tree-sitter) ; writing docs for people to ignore
 ;;nim               ; python + lisp at the speed of c
 ;; (nix +lsp)          ; I hereby declare "nix geht mehr!"
 nix
@@ -743,7 +743,7 @@ tasks."
 ;; (add-hook 'text-mode-hook #'auto-fill-mode)  ;; 自动换行，按照 fill-column 设置
 (add-hook 'text-mode-hook #'toggle-word-wrap) ;; 自动视觉换行
 
-(add-hook! 'doom-first-buffer (global-subword-mode 1))             ; 识别驼峰，而不是傻瓜前进
+(add-hook! 'doom-first-buffer-hook (global-subword-mode 1))             ; 识别驼峰，而不是傻瓜前进
 (global-unset-key (kbd "C-z"))      ; 关闭 "C-z" 最小化
 
 (define-key! global-map "C-s" #'+default/search-buffer)
@@ -852,6 +852,17 @@ tasks."
   (when IS-MAC
     (setq inhibit-message-regexps '("^Saving" "^Wrote")
           set-message-functions '(inhibit-message))))
+#+end_src
+- 特定目录下的文件默认只读
+#+begin_src emacs-lisp
+(defun my-set-readonly-for-specific-path ()
+  (let ((bfn (buffer-file-name)))
+    (when (or (string-match-p (my-path-join "~" ".emacs.d") bfn)
+            (string-match-p (my-path-join "~" ".config" "emacs") bfn)
+            (string-match-p (my-path-join (getenv "XDG_CONFIG_HOME") "emacs") bfn))
+      (read-only-mode 1))))
+
+(add-hook 'find-file-hook #'my-set-readonly-for-specific-path)
 #+end_src
 ** 日历配置
 #+begin_src emacs-lisp
@@ -1444,9 +1455,9 @@ Macos 上借助系统自带的进行主题切换
      "vsc"
      "buffer-position"
      "buffer-size"
-     "flymake" "mise"
+     "flymake" "mise" "major-mode"
      "envrc")
-    :short ("evil" "buffer-name" "buffer-position" "flymake"))
+    :short ("evil" "buffer-name" "buffer-position" "flymake" "major-mode"))
   mini-echo-persistent-function #'my-mini-echo-persistent-detect)
  (defun my-mini-echo-persistent-detect ()
    (with-current-buffer (current-buffer)
@@ -1775,7 +1786,7 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 - 在 Unicode 与 英文之间自动插入中文
 #+begin_src emacs-lisp
 (lib-load "auto-space" my-auto-space-mode)
-(add-hook! doom-first-buffer #'my-auto-space-mode)
+(add-hook! doom-first-buffer-hook #'my-auto-space-mode)
 #+end_src
 - 创建 nix 文件时，不导入自动模板
 #+begin_src emacs-lisp
@@ -2313,7 +2324,7 @@ lsp 补全工具用来在一些场合取代 company， 一个最快的 lsp 服�
 
 #+begin_src emacs-lisp
 (use-package! lsp-bridge
-  ;; :hook (doom-first-buffer . enable-lsp-bridge-for-modes)
+  ;; :hook (doom-first-buffer-hook . enable-lsp-bridge-for-modes)
   ;; :init (require 'acm) ;; Fix acm-silent is a void function error
   :defer 1
   :config
@@ -2449,7 +2460,8 @@ VTerm 的安装相对麻烦一些，需要编译一些依赖。当然对于 Unix
                                "*.ti" ("terminfo/e" "terminfo/e/*")
                                ("terminfo/65" "terminfo/65/*")
                                 ("integration" "integration/*")
-               (:exclude ".dir-locals.el" "*-tests.el"))))
+                                (:exclude ".dir-locals.el" "*-tests.el")))
+  :built-in 'prefer)
 #+end_src
 #+begin_src emacs-lisp
 (use-package! eat
@@ -2931,7 +2943,7 @@ popd
 #+end_src
 #+begin_src emacs-lisp
 (use-package! disable-mouse
-  :hook (doom-first-buffer . global-disable-mouse-mode)
+  :hook (doom-first-buffer-hook . global-disable-mouse-mode)
   :config
   (after! evil
     (mapc #'disable-mouse-in-keymap
@@ -3580,6 +3592,18 @@ ssh-agen 让 ssh 仅输入一次密码
 (package! ssh-agency)
 #+end_src
 
+** appine
+#+begin_quote
+Appine 一个允许将 macOS 原生视图直接嵌入 Emacs 窗口的工具，目前支持
+webkit, PDFKit, Quick look PreviewView
+#+end_quote
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! appine :recipe (:repo "chaoswork/appine" :host github :depth 1))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! appine
+  :commands (appine-open-web-split appine-open-pdf-split))
+#+end_src
 * 窗口管理
 #+begin_src emacs-lisp
 (after! ace-window
@@ -4123,7 +4147,15 @@ yapf
   (set-formatter! 'fnlfmt '("fnlfmt"  "-") :modes '(fennel-mode)))
 
 #+end_src
-***
+** markdown
+更友好的 ~markdown~ indent
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! markdown-indent-mode)
+#+end_src
+#+begin_src emacs-lisp
+(use-package! markdown-indent-mode
+  :hook (markdown-mode . markdown-indent-mode))
+#+end_src
 * Org Mode
 :properties:
 :CUSTOM_ID: org
