@@ -370,6 +370,149 @@ doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就
 - ~add-load-path!~ 将指定目录添加到 ~load-path~ 中，可以让 Emacs 在使用
   ~require~ 和 ~use-package~ 时在 ~load-path~ 中进行查找
 - ~map!~ 用于绑定新的快捷键
+* lib 包配置
+** lib 配置加载函数
+#+begin_src emacs-lisp
+(defmacro lib-load (f &rest functions)
+  "Autoload FUNCTIONS the functions from lib/xx.el"
+  (let ((first-element (car-safe functions))
+        (p (expand-file-name (concat "lib/" f ".el") doom-user-dir)))
+    (when (listp first-element) (setq functions (eval first-element)))
+    (when (file-exists-p p)
+      `(progn
+         ,@(mapcar (lambda (function) `(autoload ',function ,p nil t)) `,functions)))))
+#+end_src
+使用方法
+#+begin_src emacs-lisp :tangle "no"
+(lib-load "auto-space" my-auto-space-mode my-is-chinese-character)
+#+end_src
+** auto space
+在进行中英文输入时，自动在中英文间添加空格，来源: [[https://remacs.fun/posts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%97%B6%E4%BB%A3%E6%88%91%E4%BB%AC%E6%80%8E%E4%B9%88%E7%8E%A9emacs1.-%E4%B8%AD%E8%8B%B1%E6%96%87%E8%BE%93%E5%85%A5%E6%97%B6%E7%9A%84%E7%A9%BA%E6%A0%BC/][大模型时代我们怎么玩 Emacs：1. 中英文输入时的空格 | remacs 的世界]].  基本用法: 加载 lib/auto-space 包
+#+begin_src emacs-lisp :tangle "no"
+(add-hook 'doom-first-buffer-hook #'my-auto-space-mode)
+#+end_src
+** initframe
+处理 初始化过程中 emacs 大小库，并添加一个函数用来正确创建 frame 来自 ~emacsclient~
+基本用法，加载对应包
+#+begin_src bash :tangle "no"
+emacsclient -e "(initframe-open-client-frame)"
+#+end_src
+#+begin_src emacs-lisp
+(lib-load "initframe" initframe-init-default-frame initframe-open-client-frame)
+#+end_src
+** initfont
+- NOTE: 用来暂时处理 中英文字体问题的尝试。路径 ~lib/initfont~
+** init-script
+将编程语言的草稿归档到对应的文件中，目前支持 python，zig，等。
+#+begin_src emacs-lisp :tangle ":no"
+(lib-load "scratch" my-open-scratch-workspace my-scratch-set-language-config)
+#+end_src
+* autoload 库
+最终归宿为 lib 中的一个库。一些有用但不确定是否归档的函数合集。
+** initfont
+用来处理初始化字体的问题, 当默认字体不存在时，加载该库。 ~autoload/initfont~
+** 未分类
+:PROPERTIES:
+:header-args:emacs-lisp: :tangle no :noweb-ref init-common
+:END:
+#+begin_src emacs-lisp :tangle "autoload/init-common.el" :noweb no-export :comments no :noweb-ref nil :noweb-prefix no
+<<init-common>>
+#+end_src
+- 提供我习惯的标题命令风格
+#+begin_src emacs-lisp
+(defun my-get-parent-directory-name ()
+  "获取当前编辑 buffer 的父目录名"
+  (format "%s" (file-name-nondirectory (directory-file-name default-directory))))
+;;;###autoload
+(defun my-title-style (name)
+  "`name' tilte 的前缀，优先使用项目名作为结尾，如果项目名不可用将使用父目录结尾"
+  (let ((prj-name (and (fboundp 'projectile-project-name)
+                      (projectile-project-name))))
+    (concat name "- %b"
+            (if (and prj-name (not (string= "-" prj-name)))
+                (format " - [P:%s]" prj-name)
+              (format " - [D:%s]" (my-get-parent-directory-name))))))
+#+end_src
+- 获取 GUI 窗口数量
+#+begin_src emacs-lisp
+;;;###autoload
+(defun my-get-all-display-frame ()
+  "获取当前 GUI 窗口数量"
+  (length (seq-filter #'display-graphic-p (frame-list))))
+#+end_src
+- 裁剪 -mode
+#+begin_src emacs-lisp
+;;;###autoload
+(defun major-mode->string (mode)
+  "Convert MODE ending in -mode to a plain string without -mode.
+
+Eg: 'bash-ts-mode -> \"bash-ts\"."
+  (replace-regexp-in-string "-mode$" ""
+                            (if (symbolp mode)
+                                (symbol-name mode)
+                              mode)))
+#+end_src
+- 配置 repl 打开的默认目录
+#+begin_src emacs-lisp
+;;;###autoload
+(defun +my--configure-project-root-and-display (arg display-fn)
+    "Set the environment variable PROOT and displays a terminal using `display-fn'.
+If prefix ARG is non-nil, cd into `default-directory' instead of project root.
+Returns the eat buffer. copy form doomemacs:vterm"
+    (let* ((project-root (or (doom-project-root) default-directory))
+           (default-directory (if arg default-directory project-root)))
+      (setenv "PROOT" project-root)
+      (funcall display-fn)))
+#+end_src
+- 文件路径处理相关函数，其主要来源：[fn:1]
+#+begin_src emacs-lisp
+;;;###autoload
+(defun my-path-relative-p (path)
+  "Return t if PATH is relative, false otherwise."
+  (not (file-name-absolute-p path)))
+
+;;;###autoload
+(defun my-path-expand (path &optional dir)
+  "Expand PATH relative to DIR, File name handlers are ignored."
+  (let (file-name-hander-alist)
+    (expand-file-name path dir)))
+
+;;;###autoload
+(defun my-path-join (&rest args)
+  "Join ARGS to a single path.
+
+Be aware if one of the arguments is an absolute path, `my-f-join'
+will discard all the preceeding arguments and make this absolute
+path the new root of the generated path."
+  (let ((relative (my-path-relative-p (car args)))
+        path)
+    (setq path (expand-file-name (apply #'file-name-concat args)))
+    (if relative (file-relative-name path) path)))
+#+end_src
+*** 日期处理
+- 一个更好的当前 date 获取函数[fn:2]
+#+begin_src emacs-lisp
+(defvar my-n-format "%Y-%m-%dT%H:%M:%S"
+  "默认使用的时间格式，具体信息请参考 `format-time-string'")
+;;;###autoload
+(cl-defun my-n (&key (h 0) (m 0) (s 0) (yy 0) (mm 0) (dd 0))
+  "更简洁、高效的时间偏移函数。"
+  (let* ((now (decode-time))
+         (delta (make-decoded-time :second s :minute m :hour h
+                                   :day dd :month mm :year yy))
+         (new-time (decoded-time-add now delta)))
+    ;; 直接使用 format-time-string 对结果进行格式化，更安全
+    (format-time-string my-n-format (encode-time new-time))))
+#+end_src
+- 插入当前日期和时间
+#+begin_src emacs-lisp
+;;;###autoload
+(defun insert-datetime ()
+  "Insert date at poin."
+  (interactive)
+  (let ((my-n-format "%Y-%m-%d %H:%M:%S"))
+    (insert (my-n))))
+#+end_src
 * 基础配置
 创建语法绑定可以稍微加速一个配置文件运行
 #+begin_src emacs-lisp :comments no
@@ -421,7 +564,7 @@ doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就
       my-org-agenda-file (my-path-join org-directory "gtd.org")
       my-workdir (my-path-join "~/Code")
       my-blog-dir (my-path-join my-workdir "Git" "Blog")    ;; My Blog Dir
-      my-scratch-dir (my-path-join my-workdir "Scratchs"))   ;; 草稿测试文件
+      my-scratch-root-dir (my-path-join my-workdir "Scratchs"))   ;; 草稿测试文件
 #+end_src
 - 强制 shell-file-name 为 bash 或 zsh，避免卡顿
 #+begin_src emacs-lisp
@@ -910,147 +1053,9 @@ tasks."
        :desc "org" "o" (cmd!
                         (+find-file-in-project (or (bound-and-true-p org-directory)
                                                    "~/org")))
-       :desc "draft" "t" (cmd! (+find-file-in-project "~/Workspace/Draft"))
+       :desc "draft" "t" (my-open-scratch-workspace)
+       :desc "py" "y" (cmd! (my-open-scratch-workspace "python"))
        :desc "flashes" "f" (cmd! (+find-file-in-project "~/flashes"))))
-#+end_src
-
-* lib 包配置
-** lib 配置加载函数
-#+begin_src emacs-lisp
-(defmacro lib-load (f &rest functions)
-  "Autoload FUNCTIONS the functions from lib/xx.el"
-  (let ((first-element (car-safe functions))
-        (p (expand-file-name (concat "lib/" f ".el") doom-user-dir)))
-    (when (listp first-element) (setq functions (eval first-element)))
-    (when (file-exists-p p)
-      `(progn
-         ,@(mapcar (lambda (function) `(autoload ',function ,p nil t)) `,functions)))))
-#+end_src
-使用方法
-#+begin_src emacs-lisp :tangle "no"
-(lib-load "auto-space" my-auto-space-mode my-is-chinese-character)
-#+end_src
-** auto space
-在进行中英文输入时，自动在中英文间添加空格，来源: [[https://remacs.fun/posts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%97%B6%E4%BB%A3%E6%88%91%E4%BB%AC%E6%80%8E%E4%B9%88%E7%8E%A9emacs1.-%E4%B8%AD%E8%8B%B1%E6%96%87%E8%BE%93%E5%85%A5%E6%97%B6%E7%9A%84%E7%A9%BA%E6%A0%BC/][大模型时代我们怎么玩 Emacs：1. 中英文输入时的空格 | remacs 的世界]].  基本用法: 加载 lib/auto-space 包
-#+begin_src emacs-lisp :tangle "no"
-(add-hook 'doom-first-buffer-hook #'my-auto-space-mode)
-#+end_src
-** initframe
-处理 初始化过程中 emacs 大小库，并添加一个函数用来正确创建 frame 来自 ~emacsclient~
-基本用法，加载对应包
-#+begin_src bash :tangle "no"
-emacsclient -e "(initframe-open-client-frame)"
-#+end_src
-#+begin_src emacs-lisp
-(lib-load "initframe" initframe-init-default-frame initframe-open-client-frame)
-#+end_src
-** initfont
-- NOTE: 用来暂时处理 中英文字体问题的尝试。路径 ~lib/initfont~
-* autoload 库
-最终归宿为 lib 中的一个库。一些有用但不确定是否归档的函数合集。
-** initfont
-用来处理初始化字体的问题, 当默认字体不存在时，加载该库。 ~autoload/initfont~
-** 未分类
-:PROPERTIES:
-:header-args:emacs-lisp: :tangle no :noweb-ref init-common
-:END:
-#+begin_src emacs-lisp :tangle "autoload/init-common.el" :noweb no-export :comments no :noweb-ref nil :noweb-prefix no
-<<init-common>>
-#+end_src
-- 提供我习惯的标题命令风格
-#+begin_src emacs-lisp
-(defun my-get-parent-directory-name ()
-  "获取当前编辑 buffer 的父目录名"
-  (format "%s" (file-name-nondirectory (directory-file-name default-directory))))
-;;;###autoload
-(defun my-title-style (name)
-  "`name' tilte 的前缀，优先使用项目名作为结尾，如果项目名不可用将使用父目录结尾"
-  (let ((prj-name (and (fboundp 'projectile-project-name)
-                      (projectile-project-name))))
-    (concat name "- %b"
-            (if (and prj-name (not (string= "-" prj-name)))
-                (format " - [P:%s]" prj-name)
-              (format " - [D:%s]" (my-get-parent-directory-name))))))
-#+end_src
-- 获取 GUI 窗口数量
-#+begin_src emacs-lisp
-;;;###autoload
-(defun my-get-all-display-frame ()
-  "获取当前 GUI 窗口数量"
-  (length (seq-filter #'display-graphic-p (frame-list))))
-#+end_src
-- 裁剪 -mode
-#+begin_src emacs-lisp
-;;;###autoload
-(defun major-mode->string (mode)
-  "Convert MODE ending in -mode to a plain string without -mode.
-
-Eg: 'bash-ts-mode -> \"bash-ts\"."
-  (replace-regexp-in-string "-mode$" ""
-                            (if (symbolp mode)
-                                (symbol-name mode)
-                              mode)))
-#+end_src
-- 配置 repl 打开的默认目录
-#+begin_src emacs-lisp
-;;;###autoload
-(defun +my--configure-project-root-and-display (arg display-fn)
-    "Set the environment variable PROOT and displays a terminal using `display-fn'.
-If prefix ARG is non-nil, cd into `default-directory' instead of project root.
-Returns the eat buffer. copy form doomemacs:vterm"
-    (let* ((project-root (or (doom-project-root) default-directory))
-           (default-directory (if arg default-directory project-root)))
-      (setenv "PROOT" project-root)
-      (funcall display-fn)))
-#+end_src
-- 文件路径处理相关函数，其主要来源：[fn:1]
-#+begin_src emacs-lisp  
-;;;###autoload
-(defun my-path-relative-p (path)
-  "Return t if PATH is relative, false otherwise."
-  (not (file-name-absolute-p path)))
-
-;;;###autoload
-(defun my-path-expand (path &optional dir)
-  "Expand PATH relative to DIR, File name handlers are ignored."
-  (let (file-name-hander-alist)
-    (expand-file-name path dir)))
-
-;;;###autoload
-(defun my-path-join (&rest args)
-  "Join ARGS to a single path.
-
-Be aware if one of the arguments is an absolute path, `my-f-join'
-will discard all the preceeding arguments and make this absolute
-path the new root of the generated path."
-  (let ((relative (my-path-relative-p (car args)))
-        path)
-    (setq path (expand-file-name (apply #'file-name-concat args)))
-    (if relative (file-relative-name path) path)))
-#+end_src
-*** 日期处理
-- 一个更好的当前 date 获取函数[fn:2]
-#+begin_src emacs-lisp
-(defvar my-n-format "%Y-%m-%dT%H:%M:%S"
-  "默认使用的时间格式，具体信息请参考 `format-time-string'")
-;;;###autoload
-(cl-defun my-n (&key (h 0) (m 0) (s 0) (yy 0) (mm 0) (dd 0))
-  "更简洁、高效的时间偏移函数。"
-  (let* ((now (decode-time))
-         (delta (make-decoded-time :second s :minute m :hour h
-                                   :day dd :month mm :year yy))
-         (new-time (decoded-time-add now delta)))
-    ;; 直接使用 format-time-string 对结果进行格式化，更安全
-    (format-time-string my-n-format (encode-time new-time))))
-#+end_src
-- 插入当前日期和时间
-#+begin_src emacs-lisp
-;;;###autoload
-(defun insert-datetime ()
-  "Insert date at poin."
-  (interactive)
-  (let ((my-n-format "%Y-%m-%d %H:%M:%S"))
-    (insert (my-n))))
 #+end_src
 * UI
 字体，等主题 ui 配置
