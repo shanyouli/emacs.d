@@ -371,42 +371,18 @@ doom 通过 =packages.el= 来安装包，非常简单，只需要 ~package!~ 就
   ~require~ 和 ~use-package~ 时在 ~load-path~ 中进行查找
 - ~map!~ 用于绑定新的快捷键
 * lib 包配置
-** lib 配置加载函数
-#+begin_src emacs-lisp
-(defmacro lib-load (f &rest functions)
-  "Autoload FUNCTIONS the functions from lib/xx.el"
-  (let ((first-element (car-safe functions))
-        (p (expand-file-name (concat "lib/" f ".el") doom-user-dir)))
-    (when (listp first-element) (setq functions (eval first-element)))
-    (when (file-exists-p p)
-      `(progn
-         ,@(mapcar (lambda (function) `(autoload ',function ,p nil t)) `,functions)))))
-#+end_src
-使用方法
-#+begin_src emacs-lisp :tangle "no"
-(lib-load "auto-space" my-auto-space-mode my-is-chinese-character)
-#+end_src
 ** auto space
 在进行中英文输入时，自动在中英文间添加空格，来源: [[https://remacs.fun/posts/%E5%A4%A7%E6%A8%A1%E5%9E%8B%E6%97%B6%E4%BB%A3%E6%88%91%E4%BB%AC%E6%80%8E%E4%B9%88%E7%8E%A9emacs1.-%E4%B8%AD%E8%8B%B1%E6%96%87%E8%BE%93%E5%85%A5%E6%97%B6%E7%9A%84%E7%A9%BA%E6%A0%BC/][大模型时代我们怎么玩 Emacs：1. 中英文输入时的空格 | remacs 的世界]].  基本用法: 加载 lib/auto-space 包
-#+begin_src emacs-lisp :tangle "no"
-(add-hook 'doom-first-buffer-hook #'my-auto-space-mode)
-#+end_src
 ** initframe
 处理 初始化过程中 emacs 大小库，并添加一个函数用来正确创建 frame 来自 ~emacsclient~
 基本用法，加载对应包
 #+begin_src bash :tangle "no"
 emacsclient -e "(initframe-open-client-frame)"
 #+end_src
-#+begin_src emacs-lisp
-(lib-load "initframe" initframe-init-default-frame initframe-open-client-frame)
-#+end_src
 ** initfont
 - NOTE: 用来暂时处理 中英文字体问题的尝试。路径 ~lib/initfont~
 ** init-script
 将编程语言的草稿归档到对应的文件中，目前支持 python，zig，等。
-#+begin_src emacs-lisp :tangle ":no"
-(lib-load "scratch" my-open-scratch-workspace my-scratch-set-language-config)
-#+end_src
 * autoload 库
 最终归宿为 lib 中的一个库。一些有用但不确定是否归档的函数合集。
 ** initfont
@@ -865,6 +841,36 @@ tasks."
   (let ((roam-agenda-files (delete-dups (my/org-roam-list-notes-by-tag "roam-agenda"))))
     (cl-union orig-val roam-agenda-files :test #'equal)))
 #+end_src
+** lib 包的函数
+*** lib 配置加载函数
+#+begin_src emacs-lisp
+(defmacro lib-load (f &rest functions)
+  "Autoload FUNCTIONS the functions from lib/xx.el"
+  (let ((first-element (car-safe functions))
+        (p (expand-file-name (concat "lib/" f ".el") doom-user-dir)))
+    (when (listp first-element) (setq functions (eval first-element)))
+    (when (file-exists-p p)
+      `(progn
+         ,@(mapcar (lambda (function) `(autoload ',function ,p nil t)) `,functions)))))
+#+end_src
+使用方法
+#+begin_src emacs-lisp :tangle "no"
+(lib-load "auto-space" my-auto-space-mode my-is-chinese-character)
+#+end_src
+- auto-space
+#+begin_src emacs-lisp 
+(lib-load "auto-space" my-auto-space-mode my-is-chinese-character)
+(add-hook 'doom-first-buffer-hook #'my-auto-space-mode)
+#+end_src
+- initframe
+#+begin_src emacs-lisp
+(lib-load "initframe" initframe-init-default-frame initframe-open-client-frame)
+#+end_src
+- init-scratch
+#+begin_src emacs-lisp
+(lib-load "scratch" my-open-scratch-workspace my-scratch-set-language-config)
+#+end_src
+
 ** 设置一些常用的默认值
 #+begin_src emacs-lisp
 (setq-default delete-by-moving-to-trash t ; 文件删除到回收站
@@ -1053,7 +1059,7 @@ tasks."
        :desc "org" "o" (cmd!
                         (+find-file-in-project (or (bound-and-true-p org-directory)
                                                    "~/org")))
-       :desc "draft" "t" (my-open-scratch-workspace)
+       :desc "draft" "t" #'my-open-scratch-workspace
        :desc "py" "y" (cmd! (my-open-scratch-workspace "python"))
        :desc "flashes" "f" (cmd! (+find-file-in-project "~/flashes"))))
 #+end_src
