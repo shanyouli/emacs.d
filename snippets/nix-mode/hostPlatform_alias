@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: hostPlatform alias
+# key: psh
+# --
+pkgs.stdenvNoCC.hostPlatform.
