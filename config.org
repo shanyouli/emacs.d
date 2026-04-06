@@ -1860,15 +1860,20 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 emt 最初仅支持 macos 但经过扩展支持全部平台，jieba 全平台支持，但很久没有更新了。
 我推荐使用 emt
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
-(package! emt :recipe (:host github :repo "roife/emt" :files ("*.el" )))
+(package! emt :recipe (:host github :repo "roife/emt" :files ("*.el" )) :built-in 'prefer)
 #+end_src
 #+begin_src emacs-lisp
 (use-package! emt
-  :when IS-MAC
   :commands (emt-mode)
   ;; :hook (doom-first-file . emt-mode)
-  :config
-  (setq emt-lib-path (concat user-emacs-directory "modules/libEMT.dylib")))
+  :init
+  (unless (bound-and-true-p emt-lib-path)
+    (setq emt-lib-path
+          (my-path-join user-emacs-directory
+                        "modules"
+                        (format "libEMT.%s" (cond (IS-LINUX "so")
+                                                  (IS-MAC "dylib")
+                                                  (IS-WINDOWS "dll")))))))
 #+end_src
 ** 统计字数
 #+begin_src emacs-lisp :tangle "packages.el" :noweb-ref none
