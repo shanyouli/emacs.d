@@ -4073,13 +4073,13 @@ macos 中自动化的一门脚本语言
     (add-to-list 'org-src-lang-modes '("nu" . nushell)))
   :config (+nushell-common-config 'nushell-mode))
 
-(use-package! nushell-ts-mode
+(use-package! nu-ts-mode
   :when (modulep! :tools tree-sitter)
   :defer t
   :init
   (after! org-src
-    (add-to-list 'org-src-lang-modes '("nu" . nushell-ts)))
-  (set-tree-sitter! 'nushell-mode 'nushell-ts-mode
+    (add-to-list 'org-src-lang-modes '("nu" . nu-ts)))
+  (set-tree-sitter! 'nushell-mode 'nu-ts-mode
     `((nu :url "https://github.com/nushell/tree-sitter-nu")))
   :config (+nushell-common-config 'nushell-mode))
 #+end_src
