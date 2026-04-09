@@ -107,8 +107,9 @@
               (my-scratch-exec-first-available init-commands))
             (unless (file-exists-p (expand-file-name ".git" lang-root))
               (shell-command "git init" nil)
-              (with-temp-file ".gitignore"
-                (insert "__pycache__/\nnode_modules/\n.venv/\n")))
+              (unless (file-exists-p (expand-file-name ".gitignore" lang-root))
+                (with-temp-file ".gitignore"
+                  (insert "__pycache__/\nnode_modules/\n.venv/\n"))))
             (unless (file-exists-p entry-path)
               (my-scratch-create-new-entry entry-path
                                            (plist-get config :shebang)))
