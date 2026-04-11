@@ -465,8 +465,8 @@ path the new root of the generated path."
     (setq path (expand-file-name (apply #'file-name-concat args)))
     (if relative (file-relative-name path) path)))
 #+end_src
-*** 日期处理
-- 一个更好的当前 date 获取函数[fn:2]
+- 日期处理
++ 一个更好的当前 date 获取函数[fn:2]
 #+begin_src emacs-lisp
 (defvar my-n-format "%Y-%m-%dT%H:%M:%S"
   "默认使用的时间格式，具体信息请参考 `format-time-string'")
@@ -480,7 +480,7 @@ path the new root of the generated path."
     ;; 直接使用 format-time-string 对结果进行格式化，更安全
     (format-time-string my-n-format (encode-time new-time))))
 #+end_src
-- 插入当前日期和时间
++ 插入当前日期和时间
 #+begin_src emacs-lisp
 ;;;###autoload
 (defun insert-datetime ()
@@ -489,6 +489,33 @@ path the new root of the generated path."
   (let ((my-n-format "%Y-%m-%d %H:%M:%S"))
     (insert (my-n))))
 #+end_src
+- better toggle input method, 参考[fn:3]
+#+begin_src emacs-lisp
+;;;###autoload
+(defun +toggle-input-method ()
+    "避免误触开启输入法."
+    (interactive)
+    (cond ((bound-and-true-p evil-mode)
+           ;; evil-mode
+           (cond ((or (eq evil-state 'insert) (eq evil-state 'emacs))
+                  (toggle-input-method))
+                 (t
+                  (evil-insert-state)
+                  (toggle-input-method)))
+           (cond
+              (current-input-method
+               ;; evil-escape and pyim may conflict
+               ;; @see https://github.com/redguardtoo/emacs.d/issues/629
+               (evil-escape-mode -1)
+               (message "IME on!"))
+              (t
+               (evil-escape-mode 1)
+               (message "IME off!"))))
+          (t
+           ;; NOT Evil-mode
+           (toggle-input-method))))
+#+end_src
+
 * 基础配置
 创建语法绑定可以稍微加速一个配置文件运行
 #+begin_src emacs-lisp :comments no
@@ -2031,6 +2058,53 @@ matches case insensitively."
 #+end_src
 
 ** Input
+基本 toggle-input-method
+#+begin_src emacs-lisp
+(map! "C-\\" #'my-toggle-input-method)
+#+end_src
+- 根据输入法是否启用设置不同的光标配色
+#+begin_src emacs-lisp
+(after! evil
+  ;; 激活时
+  (defvar ime-cursor-insert '(bar "DarkOrange")
+    "Default cursor color if using an input method.")
+  (defvar ime-cursor-visual '(hollow "DarkOrange")
+    "Default cursor color if using an input method.")
+  (defvar ime-cursor-normal '(box "DarkOrange")
+    "Default cursor color if using an input method.")
+  ;; 不激活时, #x6495ED
+  (defvar default-cursor-insert '(bar "CornflowerBlue")
+    "Default text cursor color.")
+  (defvar default-cursor-visual '(hollow "CornflowerBlue")
+    "Default text cursor color.")
+  (defvar default-cursor-normal '(box "CornflowerBlue")
+    "Default text cursor color.")
+  ;; 定义函数
+  (defun input-method-change-cursor-activate()
+    "Set cursor to show that input-method is activated."
+    (interactive)
+    (setq evil-normal-state-cursor ime-cursor-normal)
+    (setq evil-visual-state-cursor ime-cursor-visual)
+    (setq evil-insert-state-cursor ime-cursor-insert)
+    (evil-refresh-cursor))
+  (defun input-method-change-cursor-deactivate()
+    "Set cursor to show that input-method is deactivated."
+    (interactive)
+    (setq evil-normal-state-cursor default-cursor-normal)
+    (setq evil-visual-state-cursor default-cursor-visual)
+    (setq evil-insert-state-cursor default-cursor-insert)
+    (evil-refresh-cursor))
+  ;;(defun input-method-change-cursor-auto()
+  ;;    "Auto set cursor to show whether input-method is activated or not."
+  ;;    (interactive)
+  ;;  (if rime-mode (input-method-change-cursor-activate) (input-method-change-cursor-deactivate)))
+  ;; Hook
+  ;;(add-hook 'post-command-hook #'input-method-change-cursor-auto)
+  (add-hook 'input-method-activate-hook #'input-method-change-cursor-activate)
+  (add-hook 'input-method-deactivate-hook #'input-method-change-cursor-deactivate)
+  (add-hook 'evil-insert-state-entry-hook (lambda () (when current-input-method (deactivate-input-method))))
+  (add-hook 'evil-insert-state-exit-hook #'input-method-change-cursor-deactivate))
+#+end_src
 *** Emacs-rime
 我用 [[https://github.com/DogLooksGood/emacs-rime][emacs-rime]] 作为 emacs 的输入法
 see@ https://emacs-china.org/t/os-smart-input-source/13436/726
@@ -2042,7 +2116,8 @@ see@ https://emacs-china.org/t/native-os-sis/14089
 (use-package! rime
   :commands (my-toggle-input-method +rime-convert-string-at-point)
   :autoload (rime--load-dynamic-module)
-  :bind (:map rime-mode-map ("C-`" . 'rime-send-keybinding))
+  :bind (("s-." . '+rime-convert-string-at-point)
+         :map rime-mode-map ("C-`" . 'rime-send-keybinding))
   :hook (insert-translated-name-active . (lambda ()
                                            (when (and (not (featurep 'rime))
                                                     (string= "rime" default-input-method))
@@ -2052,9 +2127,6 @@ see@ https://emacs-china.org/t/native-os-sis/14089
           rime-show-candidate 'posframe)
   (setq rime-posframe-properties
         (list :font "Unifont-18" :internal-border-with 3))
-  (map! "C-\\" #'my-toggle-input-method
-        "s-." #'+rime-convert-string-at-point)
-
   (when (daemonp) (add-hook 'after-init-hook #'rime--load-dynamic-module))
   :config
 
@@ -2122,28 +2194,6 @@ see@ https://emacs-china.org/t/native-os-sis/14089
       (apply fn args))
     (add-hook! kill-emacs #'rime-lib-finalize))
 
-  (defun my-toggle-input-method ()
-    "避免误触开启输入法."
-    (interactive)
-    (cond ((and (boundp 'evil-mode) evil-mode)
-           ;; evil-mode
-           (cond ((or (eq evil-state 'insert) (eq evil-state 'emacs))
-                  (toggle-input-method))
-                 ((active-minibuffer-window)
-                  (toggle-input-method))
-                 (t nil))
-           (unless (active-minibuffer-window)
-             (cond
-              (current-input-method
-               ;; evil-escape and pyim may conflict
-               ;; @see https://github.com/redguardtoo/emacs.d/issues/629
-               (evil-escape-mode -1)
-               (message "IME on!"))
-              (t
-               (evil-escape-mode 1)
-               (message "IME off!")))))
-          (t (toggle-input-method))))
-
   (defun +rime-force-enable ()
     "强制`rime'使用中文输入状态。如果当前不是`rime'输入法，则新激活`rime',如果当前是`evil'的非编辑状态
 则转变为 `evil-insert-state'"
@@ -2198,50 +2248,10 @@ see@ https://emacs-china.org/t/native-os-sis/14089
                         'posframe
                       'popup)
                   my--rime-show-candidate))))
-(after! evil
-  ;; 激活时
-  (defvar ime-cursor-insert '(bar "DarkOrange")
-    "Default cursor color if using an input method.")
-  (defvar ime-cursor-visual '(hollow "DarkOrange")
-    "Default cursor color if using an input method.")
-  (defvar ime-cursor-normal '(box "DarkOrange")
-    "Default cursor color if using an input method.")
-  ;; 不激活时, #x6495ED
-  (defvar default-cursor-insert '(bar "CornflowerBlue")
-    "Default text cursor color.")
-  (defvar default-cursor-visual '(hollow "CornflowerBlue")
-    "Default text cursor color.")
-  (defvar default-cursor-normal '(box "CornflowerBlue")
-    "Default text cursor color.")
-  ;; 定义函数
-  (defun input-method-change-cursor-activate()
-    "Set cursor to show that input-method is activated."
-    (interactive)
-    (setq evil-normal-state-cursor ime-cursor-normal)
-    (setq evil-visual-state-cursor ime-cursor-visual)
-    (setq evil-insert-state-cursor ime-cursor-insert)
-    (evil-refresh-cursor))
-  (defun input-method-change-cursor-deactivate()
-    "Set cursor to show that input-method is deactivated."
-    (interactive)
-    (setq evil-normal-state-cursor default-cursor-normal)
-    (setq evil-visual-state-cursor default-cursor-visual)
-    (setq evil-insert-state-cursor default-cursor-insert)
-    (evil-refresh-cursor))
-  ;;(defun input-method-change-cursor-auto()
-  ;;    "Auto set cursor to show whether input-method is activated or not."
-  ;;    (interactive)
-  ;;  (if rime-mode (input-method-change-cursor-activate) (input-method-change-cursor-deactivate)))
-  ;; Hook
-  ;;(add-hook 'post-command-hook #'input-method-change-cursor-auto)
-  (add-hook 'input-method-activate-hook #'input-method-change-cursor-activate)
-  (add-hook 'input-method-deactivate-hook #'input-method-change-cursor-deactivate)
-  (add-hook 'evil-insert-state-entry-hook (lambda () (when current-input-method (deactivate-input-method))))
-  (add-hook 'evil-insert-state-exit-hook #'input-method-change-cursor-deactivate))
 #+end_src
 
 *** rimel
-一款基于 liberime 的包，比 emacs-rime 更轻量的中文输入法
+一款基于 liberime 的包，比 emacs-rime 更轻量的中文输入法[fn:4], 更多讨论[[https://emacs-china.org/t/liberime-emacs-rime/31225][emacs-china rimel 发布]]
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! liberime :built-in 'prefer)
 (package! rimel :recipe (:host github :repo "jixiuf/rimel"))
@@ -2510,7 +2520,7 @@ VTerm 的安装相对麻烦一些，需要编译一些依赖。当然对于 Unix
           (call-interactively #'+vterm/here))))))
 #+end_src
 *** eat
-在 macos 打开 eat 出现类似 不支持 eat-truecolor 的错误请执行 M+x ~eat-compile-terminfo~[fn:3]
+在 macos 打开 eat 出现类似 不支持 eat-truecolor 的错误请执行 M+x ~eat-compile-terminfo~[fn:5]
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! eat :recipe (:type git :host codeberg
                        :repo "akib/emacs-eat"
@@ -5163,4 +5173,8 @@ media note
 
 [fn:2]https://paste.sr.ht/~zyd/d6350d65005b6547882548c35923cfddafcfcd65
 
-[fn:3] https://codeberg.org/akib/emacs-eat/issues/45
+[fn:3] https://github.com/redguardtoo/emacs.d/blob/3da56451132e10ed5f925aa32adff19185bff705/lisp/init-chinese.el#L8
+
+[fn:4] https://github.com/jixiuf/rimel
+
+[fn:5] https://codeberg.org/akib/emacs-eat/issues/45
