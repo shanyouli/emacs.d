@@ -35,11 +35,19 @@
   "延迟执行，在中英文之间自动添加空格。"
   (run-with-idle-timer 0 nil 'my-add-space-between-chinese-and-english))
 
+;; 定义局部的 minor mode
 ;;;###autoload
 (define-minor-mode my-auto-space-mode
   "在中英文之间自动添加空格的模式。"
   :lighter " Auto-Space"
-  :global t
+  :global nil
   (if my-auto-space-mode
-      (add-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english)
-    (remove-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english)))
+      (add-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english nil t)
+    (remove-hook 'post-self-insert-hook 'my-add-space-between-chinese-and-english t)))
+
+;; 定义全局的 minor mode
+;;;autoload
+(define-globalized-minor-mode global-my-auto-space-mode
+  my-auto-space-mode ; 参数 A: 对应的局部模式变量名
+  (lambda () (my-auto-space-mode +1)) ;启动局部模式时调用的函数
+  )
