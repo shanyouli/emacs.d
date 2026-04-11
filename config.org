@@ -387,11 +387,86 @@ emacsclient -e "(initframe-open-client-frame)"
 最终归宿为 lib 中的一个库。一些有用但不确定是否归档的函数合集。
 ** initfont
 用来处理初始化字体的问题, 当默认字体不存在时，加载该库。 ~autoload/initfont~
+** 根据输入法的状态配置 cursor[fn:1]
+#+begin_src emacs-lisp :tangle "autoload/init-cursor.el"
+;;; autoload/init-cursor.el -*- lexical-binding: t; -*-
+
+(defcustom my-ime-active-color "DarkRed"
+  "Preferred background color when input method is active."
+  :type 'string)
+(defcustom my-ime-active-fallback-color "DarkOrange"
+  "Second background color when input method is active."
+  :type 'string)
+(defcustom my-ime-face-near-same-color-threshold
+  (or (bound-and-true-p face-near-same-color-threshold) 15000)
+  "Determine the smallest parity value for two colors that are similar."
+  :type 'int)
+
+(defvar my-theme-original-cursor nil "theme default cursor color.")
+(defvar my-theme-computed-ime-cursor nil "Cursor color after activating the input method.")
+
+;;;###autoload
+(defun my-refresh-cursor-color-cache (&rest _)
+  "获取当前主题光标色彩的默认值和激活输入法后的色彩。"
+  (let* ((raw-color (face-attribute 'cursor :background nil t))
+         (default-color (if (and (stringp raw-color) (not (string-empty-p raw-color)))
+                                       raw-color
+                          (frame-parameter nil 'cursor-color)))
+         (dist (color-distance default-color my-ime-active-color)))
+    (setq my-theme-original-cursor default-color)
+    (setq my-theme-computed-ime-cursor (if (< dist my-ime-face-near-same-color-threshold)
+                                           my-ime-active-color
+                                         my-ime-active-fallback-color))
+    ;; DEBUG
+    ;; (message "Cursor Cache Updated: Default [%s], IME [%s]" my-theme-original-cursor
+    ;;          my-theme-computed-ime-cursor)
+    ))
+;;;###autoload
+(defun my-apply-cursor-style (&optional active)
+  "根据输入法状态应用对应的光标颜色。
+ACTIVE 为 非-nil 时应用激活输入法后的颜色，反之使用主题默认光标色彩。"
+  (unless my-theme-computed-ime-cursor (my-refresh-cursor-color-cache))
+  (let ((final-color (if active my-theme-computed-ime-cursor my-theme-original-cursor)))
+    (if (and  (bound-and-true-p evil-local-mode)
+              (and (boundp evil-state) (not (eq evil-state 'emacs))))
+          (progn
+            (setq evil-normal-state-cursor (list 'box final-color)
+                  evil-visual-state-cursor (list 'hollow final-color)
+                  evil-insert-state-cursor (list 'bar final-color))
+            (evil-refresh-cursor))
+       ;; --- 非 Evil 路径 (原生 Emacs 或 Evil-Emacs-State) ---
+        (set-cursor-color final-color))))
+#+end_src
+- 使用代码
+#+begin_src emacs-lisp :tangele "no"
+;; 根据主题切换自动更新色彩
+(if (boundp 'enable-theme-functions)
+    (add-hook 'enable-theme-functions #'my-refresh-cursor-color-cache)
+  (advice-add 'load-theme :after #'my-refresh-cursor-color-cache))
+;; 2. 根据输入法状态切换钩子
+(add-hook 'input-method-activate-hook   (lambda () (my-apply-cursor-style t)))
+(add-hook 'input-method-deactivate-hook (lambda () (my-apply-cursor-style nil)))
+
+;; 3. Evil 专用
+(with-eval-after-load 'evil
+  ;; 插入模式退出时根据输入法状态恢复颜色
+  (add-hook 'evil-insert-state-exit-hook
+            (lambda () (my-apply-cursor-style current-input-method)))
+
+  ;; 插入模式进入时关闭输入法 (如果需要)
+  (add-hook 'evil-insert-state-entry-hook
+            (lambda () (when current-input-method (deactivate-input-method))))
+
+  ;; 状态切换时(如切到 Emacs State) 重新校验颜色
+  (add-hook 'evil-state-transition-hook
+            (lambda () (my-apply-cursor-style current-input-method))))
+#+end_src
 ** 未分类
 :PROPERTIES:
 :header-args:emacs-lisp: :tangle no :noweb-ref init-common
 :END:
 #+begin_src emacs-lisp :tangle "autoload/init-common.el" :noweb no-export :comments no :noweb-ref nil :noweb-prefix no
+;;; autoload/init-common.el -*- lexical-binding: t; -*-
 <<init-common>>
 #+end_src
 - 提供我习惯的标题命令风格
@@ -440,7 +515,7 @@ Returns the eat buffer. copy form doomemacs:vterm"
       (setenv "PROOT" project-root)
       (funcall display-fn)))
 #+end_src
-- 文件路径处理相关函数，其主要来源：[fn:1]
+- 文件路径处理相关函数，其主要来源：[fn:2]
 #+begin_src emacs-lisp
 ;;;###autoload
 (defun my-path-relative-p (path)
@@ -466,7 +541,7 @@ path the new root of the generated path."
     (if relative (file-relative-name path) path)))
 #+end_src
 - 日期处理
-+ 一个更好的当前 date 获取函数[fn:2]
++ 一个更好的当前 date 获取函数[fn:3]
 #+begin_src emacs-lisp
 (defvar my-n-format "%Y-%m-%dT%H:%M:%S"
   "默认使用的时间格式，具体信息请参考 `format-time-string'")
@@ -489,7 +564,7 @@ path the new root of the generated path."
   (let ((my-n-format "%Y-%m-%d %H:%M:%S"))
     (insert (my-n))))
 #+end_src
-- better toggle input method, 参考[fn:3]
+- better toggle input method, 参考[fn:4]
 #+begin_src emacs-lisp
 ;;;###autoload
 (defun +toggle-input-method ()
@@ -2064,50 +2139,21 @@ matches case insensitively."
 #+end_src
 - 根据输入法是否启用设置不同的光标配色
 #+begin_src emacs-lisp
+(add-hook! doom-load-theme-hook #'my-refresh-cursor-color-cache)
+;; 2. 输入法状态切换钩子
+(add-hook 'input-method-activate-hook   (lambda () (my-apply-cursor-style t)))
+(add-hook 'input-method-deactivate-hook (lambda () (my-apply-cursor-style nil)))
+
 (after! evil
-  ;; 激活时
-  (defvar ime-cursor-insert '(bar "DarkOrange")
-    "Default cursor color if using an input method.")
-  (defvar ime-cursor-visual '(hollow "DarkOrange")
-    "Default cursor color if using an input method.")
-  (defvar ime-cursor-normal '(box "DarkOrange")
-    "Default cursor color if using an input method.")
-  ;; 不激活时, #x6495ED
-  (defvar default-cursor-insert '(bar "CornflowerBlue")
-    "Default text cursor color.")
-  (defvar default-cursor-visual '(hollow "CornflowerBlue")
-    "Default text cursor color.")
-  (defvar default-cursor-normal '(box "CornflowerBlue")
-    "Default text cursor color.")
-  ;; 定义函数
-  (defun input-method-change-cursor-activate()
-    "Set cursor to show that input-method is activated."
-    (interactive)
-    (setq evil-normal-state-cursor ime-cursor-normal)
-    (setq evil-visual-state-cursor ime-cursor-visual)
-    (setq evil-insert-state-cursor ime-cursor-insert)
-    (evil-refresh-cursor))
-  (defun input-method-change-cursor-deactivate()
-    "Set cursor to show that input-method is deactivated."
-    (interactive)
-    (setq evil-normal-state-cursor default-cursor-normal)
-    (setq evil-visual-state-cursor default-cursor-visual)
-    (setq evil-insert-state-cursor default-cursor-insert)
-    (evil-refresh-cursor))
-  ;;(defun input-method-change-cursor-auto()
-  ;;    "Auto set cursor to show whether input-method is activated or not."
-  ;;    (interactive)
-  ;;  (if rime-mode (input-method-change-cursor-activate) (input-method-change-cursor-deactivate)))
-  ;; Hook
-  ;;(add-hook 'post-command-hook #'input-method-change-cursor-auto)
-  (add-hook 'input-method-activate-hook #'input-method-change-cursor-activate)
-  (add-hook 'input-method-deactivate-hook #'input-method-change-cursor-deactivate)
-  (add-hook 'evil-insert-state-entry-hook (lambda () (when current-input-method (deactivate-input-method))))
-  (add-hook 'evil-insert-state-exit-hook #'input-method-change-cursor-deactivate))
+  ;; 插入模式退出时根据输入法状态恢复颜色
+  (add-hook! evil-insert-state-exit-hook (my-apply-cursor-style current-input-method))
+  ;; 插入模式进入时关闭输入法 (如果需要)
+  ;; (add-hook! evil-insert-state-entry-hook (when current-input-method (deactivate-input-method)))
+  ;; 状态切换时(如切到 Emacs State) 重新校验颜色
+  (add-hook! evil-state-transition-hook (my-apply-cursor-style current-input-method)))
 #+end_src
 *** Emacs-rime
 我用 [[https://github.com/DogLooksGood/emacs-rime][emacs-rime]] 作为 emacs 的输入法
-see@ https://emacs-china.org/t/os-smart-input-source/13436/726
 see@ https://emacs-china.org/t/native-os-sis/14089
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! rime :ignore IS-WINDOWS :built-in 'prefer)
@@ -2251,7 +2297,7 @@ see@ https://emacs-china.org/t/native-os-sis/14089
 #+end_src
 
 *** rimel
-一款基于 liberime 的包，比 emacs-rime 更轻量的中文输入法[fn:4], 更多讨论[[https://emacs-china.org/t/liberime-emacs-rime/31225][emacs-china rimel 发布]]
+一款基于 liberime 的包，比 emacs-rime 更轻量的中文输入法[fn:5], 更多讨论[[https://emacs-china.org/t/liberime-emacs-rime/31225][emacs-china rimel 发布]]
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! liberime :built-in 'prefer)
 (package! rimel :recipe (:host github :repo "jixiuf/rimel"))
@@ -2520,7 +2566,7 @@ VTerm 的安装相对麻烦一些，需要编译一些依赖。当然对于 Unix
           (call-interactively #'+vterm/here))))))
 #+end_src
 *** eat
-在 macos 打开 eat 出现类似 不支持 eat-truecolor 的错误请执行 M+x ~eat-compile-terminfo~[fn:5]
+在 macos 打开 eat 出现类似 不支持 eat-truecolor 的错误请执行 M+x ~eat-compile-terminfo~[fn:6]
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! eat :recipe (:type git :host codeberg
                        :repo "akib/emacs-eat"
@@ -2968,42 +3014,6 @@ separedit.el: 在单独的缓冲区编辑注释、docstring 或其中的代码�
   :config
   (set-popup-rule! "\\*edit-indirect " :side 'bottom :size .5 :select t :quit nil)
   (custom-set-variables '(separedit-default-mode 'org-mode)))
-#+end_src
-*** 中文结巴分词
-#+begin_quote
-基于 结巴分词 的 Emacs 中文分词 工具，实现了以中文词语为单位的移动和编辑。支持 Linux、Cygwin、Windows 和 Android/Termux 平台。目前 Windows 平台支持是通过调用 Cygwin 进程实 现的。
-#+end_quote
-+ 安装
-#+begin_src bash :tangle "no"
-[[ ! -d $HOME/Repos ]] && mkdir -p $HOME/Repos
-git clone --depth 1 https://github.com/kanglmf/emacs-chinese-word-segmentation $HOME/Repos/emacs-chinese-word-segmentation
-pushd $HOME/Repos/emacs-chinese-word-segmentation
-# using g++
-make
-# using clang++
-env CXX=clang++ make
-popd
-#+end_src
-#+begin_src emacs-lisp :tangle (if (file-directory-p (concat (getenv "HOME") "/Repos/emacs-chinese-word-segmentation")) "yes" "no")
-(setq my-cns-path (concat (getenv "HOME") "/Repos/emacs-chinese-word-segmentation"))
-(use-package! cns
-  :unless IS-MAC
-  :load-path my-cns-path
-  :init
-  (setq cns-prog (concat my-cns-path "/cnws")
-        cns-dict-directory (concat my-cns-path "/cppjieba/dict")
-        cns-recent-segmentation-limit 20 ; 分词限制
-        cns-debug nil) ; debug 模式
-)
-#+end_src
-**** macos
-#+begin_src emacs-lisp
-(use-package! emt
-  :when IS-MAC
-  :commands (emt-mode)
-  ;; :hook (doom-first-file . emt-mode)
-  :config
-  (setq emt-lib-path (concat user-emacs-directory "modules/libEMT.dylib")))
 #+end_src
 ** disable mouse
 不用鼠标操作 emacs
@@ -5169,12 +5179,14 @@ media note
 
 * Footnotes
 
-[fn:1] https://github.com/rejeep/f.el
+[fn:1] https://emacs-china.org/t/os-smart-input-source/13436/1160
 
-[fn:2]https://paste.sr.ht/~zyd/d6350d65005b6547882548c35923cfddafcfcd65
+[fn:2] https://github.com/rejeep/f.el
 
-[fn:3] https://github.com/redguardtoo/emacs.d/blob/3da56451132e10ed5f925aa32adff19185bff705/lisp/init-chinese.el#L8
+[fn:3]https://paste.sr.ht/~zyd/d6350d65005b6547882548c35923cfddafcfcd65
 
-[fn:4] https://github.com/jixiuf/rimel
+[fn:4] https://github.com/redguardtoo/emacs.d/blob/3da56451132e10ed5f925aa32adff19185bff705/lisp/init-chinese.el#L8
 
-[fn:5] https://codeberg.org/akib/emacs-eat/issues/45
+[fn:5] https://github.com/jixiuf/rimel
+
+[fn:6] https://codeberg.org/akib/emacs-eat/issues/45
