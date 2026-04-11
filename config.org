@@ -4077,13 +4077,12 @@ macos 中自动化的一门脚本语言
   :when (modulep! :tools tree-sitter)
   :defer t
   :init
-  (after! org-src
-    (add-to-list 'org-src-lang-modes '("nu" . nu-ts)))
+  ;; (after! org-src
+  ;;   (add-to-list 'org-src-lang-modes '("nu" . nu-ts)))
   (set-tree-sitter! 'nushell-mode 'nu-ts-mode
     `((nu :url "https://github.com/nushell/tree-sitter-nu")))
-  :config (+nushell-common-config 'nushell-mode))
+  :config (+nushell-common-config 'nu-ts-mode))
 #+end_src
-
 ** TODO python
 *** 格式化
 **** 格式化工具
