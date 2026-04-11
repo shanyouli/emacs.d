@@ -438,7 +438,7 @@ ACTIVE 为 非-nil 时应用激活输入法后的颜色，反之使用主题默�
         (set-cursor-color final-color))))
 #+end_src
 - 使用代码
-#+begin_src emacs-lisp :tangele "no"
+#+begin_src emacs-lisp :tangle "no"
 ;; 根据主题切换自动更新色彩
 (if (boundp 'enable-theme-functions)
     (add-hook 'enable-theme-functions #'my-refresh-cursor-color-cache)
@@ -2135,7 +2135,7 @@ matches case insensitively."
 ** Input
 基本 toggle-input-method
 #+begin_src emacs-lisp
-(map! "C-\\" #'my-toggle-input-method)
+(map! "C-\\" #'+toggle-input-method)
 #+end_src
 - 根据输入法是否启用设置不同的光标配色
 #+begin_src emacs-lisp
@@ -2152,150 +2152,6 @@ matches case insensitively."
   ;; 状态切换时(如切到 Emacs State) 重新校验颜色
   (add-hook! evil-state-transition-hook (my-apply-cursor-style current-input-method)))
 #+end_src
-*** Emacs-rime
-我用 [[https://github.com/DogLooksGood/emacs-rime][emacs-rime]] 作为 emacs 的输入法
-see@ https://emacs-china.org/t/native-os-sis/14089
-#+begin_src emacs-lisp :tangle "packages.el"
-(package! rime :ignore IS-WINDOWS :built-in 'prefer)
-#+end_src
-#+begin_src emacs-lisp
-(use-package! rime
-  :commands (my-toggle-input-method +rime-convert-string-at-point)
-  :autoload (rime--load-dynamic-module)
-  :bind (("s-." . '+rime-convert-string-at-point)
-         :map rime-mode-map ("C-`" . 'rime-send-keybinding))
-  :hook (insert-translated-name-active . (lambda ()
-                                           (when (and (not (featurep 'rime))
-                                                    (string= "rime" default-input-method))
-                                               (require 'rime nil t))))
-  :init
-  (setopt default-input-method "rime"
-          rime-show-candidate 'posframe)
-  (setq rime-posframe-properties
-        (list :font "Unifont-18" :internal-border-with 3))
-  (when (daemonp) (add-hook 'after-init-hook #'rime--load-dynamic-module))
-  :config
-
-  ;; FIX: rime 和 eat-mode 的兼容问题. @see: https://github.com/DogLooksGood/emacs-rime/issues/248
-  ;; 无法启用。增加以下advice后可以绕过
-  (define-advice rime--text-read-only-p (:around (old-fn) allow-eat-mode)
-    (if (eq major-mode 'eat-mode)
-        nil
-      (funcall old-fn)))
-  ;; 中文可以正常上屏，但是回车（上屏输入的英文）无法工作。
-  (define-advice rime--commit (:around (old-fn &rest args) allow-eat-mode)
-    (if (eq major-mode 'eat-mode)
-        (cl-letf (((symbol-function #'insert)
-                   (lambda (&rest s)
-                     (when eat-terminal
-                       (eat-term-send-string-as-yank eat-terminal (apply #'concat s))))))
-          (apply old-fn args))
-      (apply old-fn args)))
-
-  ;; 在eat buffer一行的末尾，输入包含多个中文字符的拼音后，窗口会向左滚动无法恢复。
-  (defun my/eat-scroll-right-after-input-method ()
-      (when (eq major-mode 'eat-mode)
-        (scroll-right)))
-  ;; in eat-mode-hook
-  (add-hook 'input-method-deactivate-hook #'my/eat-scroll-right-after-input-method 0 t)
-  (after! evil
-    (add-hook 'evil-insert-state-exit-hook #'my/eat-scroll-right-after-input-method 0 t))
-  ;; (defadvice! +rime-do-finalize-after-loading-module (&rest _)
-  ;;   :after #'rime--load-dynamic-module
-  ;;   (add-hook! kill-emacs #'rime-lib-finalize))
-  (defun my-rime-init-f ()
-    (unless (boundp rime--lib-loaded)
-      (unless (file-exists-p rime--module-path)
-        (rime-compile-module))
-      (rime--load-dynamic-module)))
-  (define-key! rime-active-mode-map
-    "RET" (cmd! (rime--return)
-                (when current-input-method (deactivate-input-method)))
-    ;; "<return>" (cmd! (rime--return)
-    ;;                  (when current-input-method (deactivate-input-method)))
-    "C-j" #'rime-inline-ascii)
-  ;;; fix posfrmae 吃字现象
-  (defun +rime--posframe-display-content-a (args)
-    "给 `rime--posframe-display-content' 传入的字符串加一个全角空
-  格，以解决 `posframe' 偶尔吃字的问题。"
-    (cl-destructuring-bind (content) args
-      (let ((newresult (if (or (eq rime-posframe-style 'vertical)
-                               (string-blank-p content))
-                           content
-                         (concat content "　"))))
-        (list newresult))))
-
-  (if (fboundp 'rime--posframe-display-content)
-      (advice-add 'rime--posframe-display-content
-                  :filter-args
-                  #'+rime--posframe-display-content-a)
-    (error "Function `rime--posframe-display-content' is not available."))
-
-  (defadvice! +rime--load-dynamic-module-a (fn &rest args)
-    :around #'rime--load-dynamic-module
-    (if (active-minibuffer-window)
-        (with-temp-message ""
-          (let ((inhibit-message t))
-            (apply fn args)))
-      (apply fn args))
-    (add-hook! kill-emacs #'rime-lib-finalize))
-
-  (defun +rime-force-enable ()
-    "强制`rime'使用中文输入状态。如果当前不是`rime'输入法，则新激活`rime',如果当前是`evil'的非编辑状态
-则转变为 `evil-insert-state'"
-    (interactive)
-    (let ((input-method "rime"))
-      (unless (string= current-input-method input-method)
-        (activate-input-method input-method))
-      (when (rime-predicate-evil-mode-p)
-        (if (= (+ 1 (point)) (line-end-position))
-            (evil-append 1)
-          (evil-insert 1))
-        (rime-force-enable))))
-
-  (defun +rime-convert-string-at-point (&optional return-cregexp)
-    "如果光标前的第一个字符是空格，则仅激活`rime',否则将光标前的字符串转换为中文"
-    (interactive "P")
-    (+rime-force-enable)
-    (unless (or (looking-back "\\s-" 1))
-      (let ((string (if mark-active
-                        (buffer-substring-no-properties
-                         (region-beginning) (region-end))
-                      (buffer-substring-no-properties
-                       (point) (max (line-beginning-position) (- (point) 80)))))
-            code
-            length)
-        (cond ((string-match "\\([a-z'-]+\\|[[:punct:]]\\) *$" string)
-               (setq code (replace-regexp-in-string
-                           "^[-']" ""
-                           (match-string 0 string)))
-               (setq length (length code))
-               (setq code (replace-regexp-in-string " +" "" code))
-               (if mark-active
-                   (delete-region (region-beginning) (region-end))
-                 (when (> length 0)
-                   (delete-char (- 0 length))))
-               (when (> length 0)
-                 (setq unread-command-events
-                       (append (listify-key-sequence code)
-                               unread-command-events))))
-              (t (message "`+rime-convert-string-at-point' did nothing."))))))
-
-  (when (daemonp)
-    (defvar my--rime-show-candidate (or (bound-and-true-p rime-show-candidate)
-                                        'posframe))
-    (setq-hook! rime-active-mode rime-show-candidate
-                (if (derived-mode-p 'org-mode)
-                    (if (and (bound-and-true-p rime-posframe-buffer)
-                             (fboundp 'posframe--find-existing-posframe)
-                             (let ((-posframe-buffer (get-buffer rime-posframe-buffer)))
-                               (and -posframe-buffer
-                                    (frame-live-p (posframe--find-existing-posframe -posframe-buffer)))))
-                        'posframe
-                      'popup)
-                  my--rime-show-candidate))))
-#+end_src
-
 *** rimel
 一款基于 liberime 的包，比 emacs-rime 更轻量的中文输入法[fn:5], 更多讨论[[https://emacs-china.org/t/liberime-emacs-rime/31225][emacs-china rimel 发布]]
 #+begin_src emacs-lisp :tangle "packages.el"
