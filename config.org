@@ -855,13 +855,9 @@ tasks."
 #+end_src
 使用方法
 #+begin_src emacs-lisp :tangle "no"
-(lib-load "auto-space" my-auto-space-mode my-is-chinese-character)
+(lib-load "auto-space" my-auto-space-mode my-is-chinese-character global-my-auto-space-mode)
 #+end_src
-- auto-space
-#+begin_src emacs-lisp 
-(lib-load "auto-space" my-auto-space-mode my-is-chinese-character)
-(add-hook 'doom-first-buffer-hook #'my-auto-space-mode)
-#+end_src
+*** 懒加载相关库
 - initframe
 #+begin_src emacs-lisp
 (lib-load "initframe" initframe-init-default-frame initframe-open-client-frame)
@@ -870,7 +866,10 @@ tasks."
 #+begin_src emacs-lisp
 (lib-load "scratch" my-open-scratch-workspace my-scratch-set-language-config)
 #+end_src
-
+- auto-space
+#+begin_src emacs-lisp
+(lib-load "auto-space" my-auto-space-mode my-is-chinese-character global-my-auto-space-mode)
+#+end_src
 ** 设置一些常用的默认值
 #+begin_src emacs-lisp
 (setq-default delete-by-moving-to-trash t ; 文件删除到回收站
@@ -1796,8 +1795,13 @@ emacs 使用 C-x C-e 执行代码时，内联效果
 不运用第三方包，仅运用自己编写的库和 doom 基本包
 - 在 Unicode 与 英文之间自动插入中文
 #+begin_src emacs-lisp
-(lib-load "auto-space" my-auto-space-mode)
-(add-hook! doom-first-buffer-hook #'my-auto-space-mode)
+(add-hook! doom-first-buffer-hook #'global-my-auto-space-mode)
+(add-hook! insert-translate-name-active-hook
+  (when (bound-and-true-p global-my-auto-space-mode)
+    (my-auto-space-mode -1)))
+(add-hook! insert-translated-name-inactive-hook
+           (when (bound-and-true-p global-my-auto-space-mode)
+             (my-auto-space-mode +1)))
 #+end_src
 - 创建 nix 文件时，不导入自动模板
 #+begin_src emacs-lisp
@@ -1806,7 +1810,6 @@ emacs 使用 C-x C-e 执行代码时，内联效果
     (setq +file-templates-alist
           (cl-remove-if (lambda (elt) (equal '(nix-mode) elt)) +file-templates-alist))))
 #+end_src
-
 ** 在 Unicode 与英文之间自动插入中文
 - 你也可以使用 ~wraplish~ 来进行当前 buffer 所有内容自动插入空格
 #+begin_src emacs-lisp :tangle "packages.el"
@@ -1883,6 +1886,11 @@ emt 最初仅支持 macos 但经过扩展支持全部平台，jieba 全平台支
 (use-package! advance-words-count :commands (advance-words-count))
 #+end_src
 
+** evil
+- 变量 my-evil-temp-status-is-edit-p, 用来临时缓存当前 buffer 是否为编辑模式
+#+begin_src emacs-lisp
+(defvar my-evil-temp-status-is-edit-p nil "Whether the temporary record is currently in edit mode")
+#+end_src
 * 搜索
 ** color-rg
 当你需要使用 多文件搜索替换时，推荐使用 color-rg
@@ -2035,6 +2043,10 @@ see@ https://emacs-china.org/t/native-os-sis/14089
   :commands (my-toggle-input-method +rime-convert-string-at-point)
   :autoload (rime--load-dynamic-module)
   :bind (:map rime-mode-map ("C-`" . 'rime-send-keybinding))
+  :hook (insert-translated-name-active . (lambda ()
+                                           (when (and (not (featurep 'rime))
+                                                    (string= "rime" default-input-method))
+                                               (require 'rime nil t))))
   :init
   (setopt default-input-method "rime"
           rime-show-candidate 'posframe)
@@ -2044,7 +2056,6 @@ see@ https://emacs-china.org/t/native-os-sis/14089
         "s-." #'+rime-convert-string-at-point)
 
   (when (daemonp) (add-hook 'after-init-hook #'rime--load-dynamic-module))
-
   :config
 
   ;; FIX: rime 和 eat-mode 的兼容问题. @see: https://github.com/DogLooksGood/emacs-rime/issues/248
@@ -2090,7 +2101,8 @@ see@ https://emacs-china.org/t/native-os-sis/14089
     "给 `rime--posframe-display-content' 传入的字符串加一个全角空
   格，以解决 `posframe' 偶尔吃字的问题。"
     (cl-destructuring-bind (content) args
-      (let ((newresult (if (string-blank-p content)
+      (let ((newresult (if (or (eq rime-posframe-style 'vertical)
+                               (string-blank-p content))
                            content
                          (concat content "　"))))
         (list newresult))))
@@ -2228,6 +2240,34 @@ see@ https://emacs-china.org/t/native-os-sis/14089
   (add-hook 'evil-insert-state-exit-hook #'input-method-change-cursor-deactivate))
 #+end_src
 
+*** rimel
+一款基于 liberime 的包，比 emacs-rime 更轻量的中文输入法
+#+begin_src emacs-lisp :tangle "packages.el"
+(package! liberime :built-in 'prefer)
+(package! rimel :recipe (:host github :repo "jixiuf/rimel"))
+#+end_src
+#+begin_src emacs-lisp
+(use-package! rimel
+  :init
+  (setopt default-input-method "rimel")
+  :hook (insert-translated-name-active . (lambda ()
+                                           (when (and (not (featurep 'rimel))
+                                                      (string= "rimel" default-input-method))
+                                               (require 'rimel nil t))))
+  :custom
+  (rimel-show-candidate 'posframe) ; 优先使用 posframe
+  (rimel-highlight-first t) ; 高亮第一个候选项
+  (rimel-posframe-style 'vertical) ; or horizontal
+  (rimel-posframe-min-width 15)
+  (rimel-disable-predicates
+      '(rimel-predicate-prog-in-code-p
+        rimel-predicate-after-alphabet-char-p
+        rimel-predicate-current-uppercase-letter-p
+        rimel-predicate-evil-mode-p))
+  :config
+  (push '(?\C-` . "C-<grave>") rimel-keymap))
+#+end_src
+
 *** Dired
 #+begin_src emacs-lisp
 (after! dired
@@ -2297,9 +2337,12 @@ see@ https://emacs-china.org/t/native-os-sis/14089
     (dired-hide-details-mode 1)))
 #+end_src
 *** Vertico
-#+begin_src emacs-lisp :tangle "no"
+#+begin_src emacs-lisp
 (when (modulep! :completion vertico)
-  (after! vertico (setq vertico-count 12)))
+  (after! vertico
+;; (run-with-idle-timer 0.4 nil (lambda () (setq vertico-count 10)))
+    (setq vertico-count 10)
+    ))
 #+end_src
 **** 大文件搜索
 consult-line 在文件过大时，很慢，使用 consult-rg 进行搜索, 参考
@@ -3236,7 +3279,7 @@ Use JK as a shortcut button for <ESC>
   (setq calendar-holidays (append cal-china-x-general-holidays)))
 #+end_src
 ** 字典
-**** insert-translated-name
+*** insert-translated-name
 一个很好用的中文翻译为英文插件
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! insert-translated-name
@@ -3252,42 +3295,44 @@ Use JK as a shortcut button for <ESC>
              insert-translated-name-insert-with-camel
              insert-translated-name-insert
              insert-translated-name-insert-original-translation)
+  :custom (insert-translated-name-translate-engine "deeplx")
+  :init
+  (defvar insert-translated-name-active-hook nil
+    "Input methods to deal with after activation, adding spaces, etc. hook")
+  (defvar insert-translated-name-inactive-hook nil
+    "Finish processing hook after conversion.")
   :config
-  (setq insert-translated-name-translate-engine "deeplx")
   (defun my/change-insert-translate-engine ()
     (interactive)
     (cond ((string-equal insert-translated-name-translate-engine "deeplx")
            (setq insert-translated-name-translate-engine "trans"))
           ((string-equal insert-translated-name-translate-engine "trans")
-           (setq insert-translated-name-translate-engine "deeplx"))
-          ))
+           (setq insert-translated-name-translate-engine "deeplx"))))
   (defvar insert--evil-last-status-is-edit-p nil "缓存当前的 evil state 是否为编辑模式")
   (defvar insert--my-auto-space-mode-p nil "缓存当前的 my-auto-space-mode 的状态")
-
   (defadvice! +insert-translated-name-active (fn &rest args)
-    "在调用之前 load rime,防止提示无法激活 rime 输入法"
+    "处理某些可能影响 `insert-translated-name-active' 的行为."
     :before #'insert-translated-name-active
-    (when (fboundp 'evil-mode)
-      (setq insert--evil-last-status-is-edit-p (or (evil-insert-state-p)
-                                                   (evil-emacs-state-p)))
-      (unless insert--evil-last-status-is-edit-p (evil-insert-state)))
-    (setq insert--my-auto-space-mode-p (bound-and-true-p my-auto-space-mode))
-    (when insert--my-auto-space-mode-p (my-auto-space-mode -1))
-    (if (and (not (featurep 'rime))
-             (string= "rime" default-input-method))
-        (require 'rime nil t)))
-
+    (doom-run-hooks 'insert-translated-name-active-hook))
   (defadvice! +insert-translated-name-inactive (fn &rest args)
-    :after
-    (when (fboundp 'evil-mode)
-      (unless insert--evil-last-status-is-edit-p
-        (evil-change-to-previous-state))))
+    :after #'insert-translated-name-inactive
+    (doom-run-hooks 'insert-translated-name-inactive-hook))
 
-  (when insert--my-auto-space-mode-p
-    (my-auto-space-mode +1)
-    (setq insert--my-auto-space-mode-p nil)))
+  (add-hook 'insert-translate-name-active-hook
+            (lambda ()
+              (when (bound-and-true-p evil-mode)
+                (setq my-evil-temp-status-is-edit-p
+                      (or (evil-insert-state-p)
+                          (evil-emacs-state-p)))
+                (unless my-evil-temp-status-is-edit-p
+                  (evil-insert-state)))))
+  (add-hook 'insert-translated-name-inactive-hook
+            (lambda ()
+              (when (and (bound-and-true-p evil-mode)
+                         (not my-evil-temp-status-is-edit-p))
+                (evil-change-to-previous-state)))))
 #+end_src
-**** immersive-translate
+*** immersive-translate
 [[https://github.com/Elilif/emacs-immersive-translate/blob/main/README_CN.org][emacs-immersive-translate]]是受 immersive-translate/immersive-translate 的启发，在 Emacs 中实现了类似的功能。
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! immersive-translate)
@@ -3295,7 +3340,7 @@ Use JK as a shortcut button for <ESC>
 #+begin_src emacs-lisp
 (setopt immersive-translate-backend 'trans)
 #+end_src
-**** fanyi
+*** fanyi
 有道翻译工具
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! posframe :built-in 'prefer)
@@ -3311,7 +3356,7 @@ Use JK as a shortcut button for <ESC>
        :desc "fanyi postfram" "d" #'fanyi-dwim2
        :desc "fanyi history" "h" #'fanyi-from-history))
 #+end_src
-**** go-translate
+*** go-translate
 另一款好用的翻译插件
 #+begin_src emacs-lisp :tangle "packages.el"
 (package! gt)
@@ -3408,7 +3453,7 @@ Use JK as a shortcut button for <ESC>
     (interactive)
     (gt--do-translate 'sdcv)))
 #+end_src
-**** 按键配置
+*** 按键配置
 #+begin_src emacs-lisp
 ;; (map! :leader
 ;;       :desc "zh2en" "it" #'insert-translated-name-insert
